@@ -1,7 +1,13 @@
 # moviediary
 
 Kasutame:
-- Materialize (CSS, JavaScript)- http://materializecss.com/
-- Vert.x (Java)- http://vertx.io/
+- Frontend - MaterializeCss (CSS, JavaScript)- http://materializecss.com/
+- Frontend - Handlebars (Java) - https://github.com/jknack/handlebars.java
+- Backend - Vert.x (Java)- http://vertx.io/
 - Andmebaas- MySQL
 - Filmide andmed TMdb- https://www.themoviedb.org/?language=en
+
+Igast documentatsiooni:
+- Handlebars: https://jknack.github.io/handlebars.java/
+- Vert.x: http://vertx.io/docs/, https://github.com/vert-x3/vertx-examples
+- Materialize admin example: http://demo.geekslabs.com/materialize-v1.0/index.html
