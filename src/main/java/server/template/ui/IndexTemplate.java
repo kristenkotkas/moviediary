@@ -1,4 +1,4 @@
-package sys.template.ui;
+package server.template.ui;
 
 import io.vertx.core.json.JsonArray;
 

@@ -1,6 +1,8 @@
-package sys.util;
+package server.util;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,15 +11,21 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class FileUtils {
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
+    private static final String CONFIG = "/server.json";
 
     /**
      * Loads config from classpath.
      *
-     * @return local.json config
-     * @throws IOException when not found
+     * @return server.json config
      */
-    public static JsonObject getConfig() throws IOException {
-        return new JsonObject(readToString("/local.json"));
+    public static JsonObject getConfig() {
+        try {
+            return new JsonObject(readToString(CONFIG));
+        } catch (IOException e) {
+            log.info("server.json config not found.");
+        }
+        return new JsonObject();
     }
 
     /**

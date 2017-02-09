@@ -1,4 +1,4 @@
-package sys.router;
+package server.router;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -6,14 +6,17 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
-import sys.template.engine.HandlebarsTemplateEngine;
-import sys.template.ui.BaseTemplate;
-import sys.template.ui.IndexTemplate;
+import server.template.engine.HandlebarsTemplateEngine;
+import server.template.ui.BaseTemplate;
+import server.template.ui.IndexTemplate;
 
 public class UiRouter extends Routable {
+    private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
     private static final String INDEX = "/";
 
     private static final String TEMPL_INDEX = "templates/index.hbs";

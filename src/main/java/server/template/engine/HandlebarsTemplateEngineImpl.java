@@ -1,4 +1,4 @@
-package sys.template.engine;
+package server.template.engine;
 
 import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;

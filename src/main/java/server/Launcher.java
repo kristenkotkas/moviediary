@@ -1,23 +1,26 @@
-package sys;
+package server;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import sys.verticle.ServerVerticle;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import server.verticle.ServerVerticle;
 
 import java.io.IOException;
 
-import static sys.util.FileUtils.getConfig;
-import static sys.util.FileUtils.parseArguments;
-
+import static server.util.FileUtils.getConfig;
+import static server.util.FileUtils.parseArguments;
 
 /**
  * Launches the server.
  */
 public class Launcher {
+    private static final Logger log = LoggerFactory.getLogger(Launcher.class);
 
     public static void main(String[] args) throws IOException {
-        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory"); //set vertx logging to slf4j
+        //set vertx logging to slf4j
+        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
         JsonObject config = getConfig().mergeIn(parseArguments(args));
         Vertx.vertx().deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar -> {
             if (ar.succeeded()) {
