@@ -15,12 +15,12 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     private static final int HTTPS = 443;
     private static final String ENDPOINT = "api.themoviedb.org";
     private static final String APIKEY = "tmdb_key";
-    private final int IS_MOVIE = 0;
-    private final int IS_SEARCH = 1;
 
     private final Vertx vertx;
     private final JsonObject config;
     private final HttpClient client;
+
+    private String cacheName;
 
     protected TmdbServiceImpl(Vertx vertx, JsonObject config) {
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
@@ -31,28 +31,22 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getSearch(String name) { //pärib tmdb-st otsingu
-        return getResponse(name, IS_SEARCH);
+        cacheName = "search" + name;
+        return getResponse("/3/search/movie?api_key=" + config.getString(APIKEY) + "&query=" + name);
     }
 
     @Override
     public Future<JsonObject> getMovie(String id) { //pärib tmdb-st filmi
-        return getResponse(id, IS_MOVIE);
+        cacheName = "movie_" + id;
+        return getResponse("/3/movie/" + id + "?api_key=" + config.getString(APIKEY));
     }
 
-    private Future<JsonObject> getResponse(String movie, int type) {
+    private Future<JsonObject> getResponse(String request) {
         Future<JsonObject> future = Future.future();
-        String cacheName = "movie_" + movie;
         CacheItem<JsonObject> cache = getCached(cacheName); //proovime cachei enne
-        String request;
-        if (type == IS_MOVIE) {
-            request = "/3/movie/" + movie + "?api_key=" + config.getString(APIKEY);
-        } else {
-            request = "/3/search/movie?api_key=" + config.getString(APIKEY) + "&query=" + movie;
-        }
         if (!tryCachedResult(true, cache, future)) {
             client.get(HTTPS, ENDPOINT, request, response -> handleResponse(response, cache, future)).end();
         }
-
         return future;
     }
 
