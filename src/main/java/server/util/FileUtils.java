@@ -59,6 +59,7 @@ public class FileUtils {
 
     /**
      * Converts given args to JsonObject.
+     * Example: -key1=value1 -key2=value2 ...
      *
      * @param args to convert
      * @return jsonObject

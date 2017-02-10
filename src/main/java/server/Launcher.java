@@ -24,9 +24,9 @@ public class Launcher {
         JsonObject config = getConfig().mergeIn(parseArguments(args));
         Vertx.vertx().deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar -> {
             if (ar.succeeded()) {
-                System.out.println("Server up!");
+                log.info("Server up!");
             } else {
-                System.out.println("Fail: " + ar.cause());
+                log.error(ar.cause());
             }
         });
     }

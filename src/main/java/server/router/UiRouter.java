@@ -1,5 +1,6 @@
 package server.router;
 
+import eu.kyngas.template.engine.HandlebarsTemplateEngine;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -11,7 +12,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
-import server.template.engine.HandlebarsTemplateEngine;
 import server.template.ui.BaseTemplate;
 import server.template.ui.IndexTemplate;
 

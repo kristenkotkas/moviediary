@@ -30,15 +30,18 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     @Override
     public Future<JsonObject> getMovie(String name) { //pärib tmdb-st filmi
         Future<JsonObject> future = Future.future();
-        System.out.println(config.getString(APIKEY));
-        client.get(HTTPS, ENDPOINT, "/3/search/movie?api_key=" + config.getString(APIKEY) +
-                "&query=" + name, response -> handleResponse(response, future)).end();
+        String cacheName = "movie_" + name;
+        CacheItem<JsonObject> cache = getCached(cacheName); //proovime cachei enne
+        if (!tryCachedResult(true, cache, future)) {
+            client.get(HTTPS, ENDPOINT, "/3/search/movie?api_key=" + config.getString(APIKEY) +
+                    "&query=" + name, response -> handleResponse(response, cache, future)).end();
+        }
         return future;
     }
 
-    private void handleResponse(HttpClientResponse response, Future<JsonObject> future) {
+    private void handleResponse(HttpClientResponse response, CacheItem<JsonObject> cache, Future<JsonObject> future) {
         if (response.statusCode() == Status.OK) {
-            response.bodyHandler(body -> future.complete(body.toJsonObject()));
+            response.bodyHandler(body -> future.complete(cache.set(body.toJsonObject())));
         } else {
             future.fail("API returned code: " + response.statusCode() +
                     "; message: " + response.statusMessage());

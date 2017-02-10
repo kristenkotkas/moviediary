@@ -53,12 +53,12 @@ public class TmdbRouter extends Routable {
                 .end(Json.encodePrettily(result));
     }
 
-    public static <T> Handler<AsyncResult<T>> resultHandler(RoutingContext ctx, Consumer<T> success) {
+    private <T> Handler<AsyncResult<T>> resultHandler(RoutingContext ctx, Consumer<T> success) {
         return ar -> {
             if (ar.succeeded()) {
                 success.accept(ar.result());
             } else {
-                log.info(ar.cause());
+                log.error(ar.cause());
                 serviceUnavailable(ctx);
             }
         };

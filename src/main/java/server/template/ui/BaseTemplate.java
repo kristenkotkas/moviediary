@@ -1,7 +1,6 @@
 package server.template.ui;
 
-
-import server.template.engine.TypeSafeTemplate;
+import eu.kyngas.template.engine.TypeSafeTemplate;
 
 public interface BaseTemplate extends TypeSafeTemplate {
 
