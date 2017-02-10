@@ -17,7 +17,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     private static final Logger log = LoggerFactory.getLogger(TmdbServiceImpl.class);
     private static final int HTTPS = 443;
     private static final String ENDPOINT = "api.themoviedb.org";
-    private static final String APIKEY_PREFIX = "&api_key=";
+    private static final String APIKEY_PREFIX1 = "&api_key=";
+    private static final String APIKEY_PREFIX2 = "?api_key=";
     private static final String APIKEY = "tmdb_key";
 
     private static final String MOVIE_NAME = "/3/search/movie?query=";
@@ -36,18 +37,18 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieByName(String name) { //pärib tmdb-st otsingu
-        return get(MOVIE_NAME + name, getCached(SEARCH.get(name)));
+        return get(MOVIE_NAME + name + APIKEY_PREFIX1, getCached(SEARCH.get(name)));
     }
 
     @Override
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
-        return get(MOVIE_ID + id, getCached(MOVIE.get(id)));
+        return get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
     }
 
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {
         Future<JsonObject> future = Future.future();
         if (!tryCachedResult(true, cache, future)) {
-            client.get(HTTPS, ENDPOINT, uri + APIKEY_PREFIX + config.getString(APIKEY, ""),
+            client.get(HTTPS, ENDPOINT, uri + config.getString(APIKEY, ""),
                     response -> handleResponse(response, cache, future)).end();
         }
         return future;
