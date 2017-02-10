@@ -13,6 +13,6 @@ Igast documentatsiooni:
 - Materialize admin example: http://demo.geekslabs.com/materialize-v1.0/index.html
 
 Käivitamine:
-- (Tmdb api töötamiseks on vaja resources/server.json faili panna "tmdb_key": "<api_key>")
+- (Tmdb api töötamiseks on vaja resources/server.json faili panna "tmdb_key": "(api_key)")
 - Launcher main class
 - Gradlest shadowJar task ja jooksuta /build/libs/moviediary.jar
