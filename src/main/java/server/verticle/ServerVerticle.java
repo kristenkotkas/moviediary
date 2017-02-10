@@ -26,7 +26,7 @@ public class ServerVerticle extends AbstractVerticle {
     public void start() throws Exception {
         Router router = Router.router(vertx); //handles addresses client connects to
         tmdb = TmdbService.create(vertx, config()); //tmdb api service
-        routables = Arrays.asList(new TmdbRouter(vertx, tmdb), new UiRouter(vertx)); //tmdb rest api + ui
+        routables = Arrays.asList(new TmdbRouter(vertx, tmdb), new UiRouter(vertx, config())); //tmdb rest api + ui
         routables.forEach(routable -> routable.route(router));
         router.route().last().handler(Status::notFound); //if no handler found for address -> 404
         //starts server at localhost:8080
