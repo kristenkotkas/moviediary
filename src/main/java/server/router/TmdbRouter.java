@@ -20,7 +20,8 @@ public class TmdbRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(TmdbRouter.class);
     private static final String CONTENT_JSON = "application/json";
 
-    private static final String API_GET = "/api/:movieName";
+    private static final String API_GET_SEARCH = "/search/:movieName";
+    private static final String API_GET_MOVIE = "/movie/:movieId";
 
     private final TmdbService tmdb;
 
@@ -31,11 +32,21 @@ public class TmdbRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        router.get(API_GET).handler(this::handleApiGet);
+        router.get(API_GET_SEARCH).handler(this::handleApiGetSearch);
+        router.get(API_GET_MOVIE).handler(this::handleApiGetMovie);
     }
 
-    private void handleApiGet(RoutingContext ctx) { // handleb filmi json päringut /api/:filminimi -> localhost:8080/api/avatar
-        String name = ctx.request().getParam(parseParam(API_GET));
+    private void handleApiGetSearch(RoutingContext ctx) { // handleb otsingu json päringut /search/:filminimi -> localhost:8080/search/avatar
+        String name = ctx.request().getParam(parseParam(API_GET_SEARCH));
+        if (name == null) {
+            badRequest(ctx);
+            return;
+        }
+        tmdb.getSearch(name).setHandler(resultHandler(ctx, jsonResponse(ctx)));
+    }
+
+    private void handleApiGetMovie(RoutingContext ctx) { // handleb filmi json päringut /movie/:filminimi -> localhost:8080/movie/1234
+        String name = ctx.request().getParam(parseParam(API_GET_MOVIE));
         if (name == null) {
             badRequest(ctx);
             return;
