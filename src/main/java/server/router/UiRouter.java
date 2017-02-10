@@ -18,7 +18,7 @@ import server.template.ui.IndexTemplate;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static server.util.FileUtils.UI_CACHE;
+import static server.util.FileUtils.isRunningFromJar;
 
 public class UiRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
@@ -35,7 +35,7 @@ public class UiRouter extends Routable {
 
     public UiRouter(Vertx vertx, JsonObject config) throws Exception {
         super(vertx);
-        this.engine = HandlebarsTemplateEngine.create(config.getBoolean(UI_CACHE, true) ? null : RESOURCES);
+        this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : RESOURCES);
         this.config = config;
     }
 
@@ -44,7 +44,7 @@ public class UiRouter extends Routable {
         router.get(INDEX).handler(this::handleIndex); // lehe / kuvamise jaoks kutsume tema handlerit
 
         //jagab staatilisi ressursse
-        router.route(STATIC_PATH).handler(StaticHandler.create(config.getBoolean(UI_CACHE, true) ?
+        router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
                 .setIncludeHidden(false));

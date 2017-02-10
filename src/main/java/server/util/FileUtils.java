@@ -13,8 +13,6 @@ public class FileUtils {
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
     private static final String CONFIG = "/server.json";
 
-    public static final String UI_CACHE = "uiCaching";
-
     /**
      * Loads config from classpath.
      *
@@ -22,11 +20,7 @@ public class FileUtils {
      */
     public static JsonObject getConfig(String[] args) {
         try {
-            JsonObject json = new JsonObj(readToString(CONFIG)).mergeIn(parseArguments(args));
-            if (isRunningFromJar()) {
-                json.remove(UI_CACHE);
-            }
-            return json;
+            return new JsonObj(readToString(CONFIG)).mergeIn(parseArguments(args));
         } catch (IOException e) {
             log.error(CONFIG + " not found.");
         }
