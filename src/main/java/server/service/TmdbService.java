@@ -10,6 +10,7 @@ public interface TmdbService extends CachingService<JsonObject> {
         return new TmdbServiceImpl(vertx, config);
     }
 
-    Future<JsonObject> getSearch(String name);
-    Future<JsonObject> getMovie(String id);
+    Future<JsonObject> getMovieByName(String name);
+
+    Future<JsonObject> getMovieById(String id);
 }

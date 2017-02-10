@@ -42,16 +42,16 @@ public class TmdbRouter extends Routable {
             badRequest(ctx);
             return;
         }
-        tmdb.getSearch(name).setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        tmdb.getMovieByName(name).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private void handleApiGetMovie(RoutingContext ctx) { // handleb filmi json päringut /movie/:filminimi -> localhost:8080/movie/1234
-        String name = ctx.request().getParam(parseParam(API_GET_MOVIE));
-        if (name == null) {
+        String id = ctx.request().getParam(parseParam(API_GET_MOVIE));
+        if (id == null) {
             badRequest(ctx);
             return;
         }
-        tmdb.getMovie(name).setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        tmdb.getMovieById(id).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private static String parseParam(String requestUri) {

@@ -2,9 +2,6 @@ package server.service;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
- */
 public interface CachingService<T> {
 
     /**
@@ -16,10 +13,10 @@ public interface CachingService<T> {
 
     /**
      * Cached value wrapper.
-     * Default timeout is 1 second.
+     * Default timeout is 1 hour.
      **/
     class CacheItem<T> {
-        private long timeout = TimeUnit.SECONDS.toMillis(1);
+        private long timeout = TimeUnit.HOURS.toMillis(1);
         private long timestamp = 0;
         private T value;
 

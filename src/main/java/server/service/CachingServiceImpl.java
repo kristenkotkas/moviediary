@@ -5,9 +5,7 @@ import io.vertx.ext.web.impl.ConcurrentLRUCache;
 
 /**
  * Caching for services.
- *
- * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
- */
+ **/
 public abstract class CachingServiceImpl<T> implements CachingService<T> {
     protected static final int DEFAULT_MAX_CACHE_SIZE = 10000;
     private final ConcurrentLRUCache<String, CacheItem<T>> cache;
