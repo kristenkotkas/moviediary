@@ -1,3 +1,17 @@
+html, body {
+    height: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 /* label focus color */
 .input-field input[type=text]:focus + label {
     color: #000;

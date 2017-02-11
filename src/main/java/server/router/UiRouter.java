@@ -55,7 +55,8 @@ public class UiRouter extends Routable {
         JsonObject card1 = new JsonObject().put("card", "kaart 1").put("sisu", "sisu 1");
         JsonObject card2 = new JsonObject().put("card", "kaart 2").put("sisu", "sisu 2");
         JsonObject card3 = new JsonObject().put("card", "kaart 3").put("sisu", "sisu 3");
-        JsonArray array = new JsonArray().add(card1).add(card2).add(card3);
+        JsonObject card4 = new JsonObject().put("card", "kaart 4").put("sisu", "sisu 4");
+        JsonArray array = new JsonArray().add(card1).add(card2).add(card3).add(card4);
         engine.render(getSafe(ctx, TEMPL_INDEX, IndexTemplate.class)
                 .setPealkiri("Mega pealkiri") //lisa muutujaid
                 .setCards(array), endHandler(ctx));
