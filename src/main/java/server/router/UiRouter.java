@@ -14,6 +14,8 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import server.template.ui.BaseTemplate;
 import server.template.ui.IndexTemplate;
+import server.template.ui.Login2Template;
+import server.template.ui.LoginTemplate;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,8 +29,12 @@ public class UiRouter extends Routable {
     private static final String STATIC_FOLDER = "static";
 
     private static final String INDEX = "/";
+    private static final String LOGIN = "/login";
+    private static final String LOGIN2 = "/login2";
 
     private static final String TEMPL_INDEX = "templates/index.hbs";
+    private static final String TEMPL_LOGIN = "templates/login.hbs";
+    private static final String TEMPL_LOGIN2 = "templates/login2.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final JsonObject config;
@@ -41,13 +47,22 @@ public class UiRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        router.get(INDEX).handler(this::handleIndex); // lehe / kuvamise jaoks kutsume tema handlerit
+        router.get(INDEX).handler(this::handleIndex);
+        router.get(LOGIN).handler(this::handleLogin);
+        router.get(LOGIN2).handler(this::handleLogin2);
 
-        //jagab staatilisi ressursse
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
                 .setIncludeHidden(false));
+    }
+
+    private void handleLogin(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class), endHandler(ctx));
+    }
+
+    private void handleLogin2(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_LOGIN2, Login2Template.class), endHandler(ctx));
     }
 
     private void handleIndex(RoutingContext ctx) {

@@ -12,6 +12,34 @@ body {
     vertical-align: middle;
 }
 
+.login-form {
+    width: 280px;
+}
+
+.margin {
+    margin: 0 !important;
+}
+
+.login-text {
+    margin-top: -6px;
+    margin-left: -10px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* label focus color */
 .input-field input[type=text]:focus + label {
     color: #000;
