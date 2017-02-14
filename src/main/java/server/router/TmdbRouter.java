@@ -1,24 +1,17 @@
 package server.router;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.service.TmdbService;
 
-import java.util.function.Consumer;
-
 import static server.entity.Status.badRequest;
-import static server.entity.Status.serviceUnavailable;
+import static server.util.HandlerUtils.*;
 
 public class TmdbRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(TmdbRouter.class);
-    private static final String CONTENT_JSON = "application/json";
 
     private static final String API_GET_SEARCH = "/search/:movieName";
     private static final String API_GET_MOVIE = "/movie/:movieId";
@@ -54,24 +47,5 @@ public class TmdbRouter extends Routable {
         tmdb.getMovieById(id).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private static String parseParam(String requestUri) {
-        return requestUri.split(":")[1];
-    }
 
-    private <T> Consumer<T> jsonResponse(RoutingContext ctx) {
-        return result -> ctx.response()
-                .putHeader(HttpHeaders.CONTENT_TYPE, CONTENT_JSON)
-                .end(Json.encodePrettily(result));
-    }
-
-    private <T> Handler<AsyncResult<T>> resultHandler(RoutingContext ctx, Consumer<T> success) {
-        return ar -> {
-            if (ar.succeeded()) {
-                success.accept(ar.result());
-            } else {
-                log.error(ar.cause());
-                serviceUnavailable(ctx);
-            }
-        };
-    }
 }
