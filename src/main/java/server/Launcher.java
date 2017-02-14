@@ -2,6 +2,8 @@ package server;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import server.verticle.ServerVerticle;
@@ -19,7 +21,11 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
         setLoggingToSLF4J();
-        Vertx.vertx().deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig(args)), ar -> {
+        Vertx.vertx(new VertxOptions()
+                .setAddressResolverOptions(new AddressResolverOptions()
+                        .addServer("8.8.8.8")
+                        .addServer("8.8.4.4")))
+                .deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig(args)), ar -> {
             if (ar.succeeded()) {
                 log.info("Server up!");
             } else {

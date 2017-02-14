@@ -1,11 +1,9 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'java'
+    id 'idea'
+    id 'application'
 }
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     mavenCentral()
@@ -25,16 +23,10 @@ shadowJar {
 dependencies {
     compile files('/libs/templ-handlebars.jar')
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.8'
-
-    compile("com.github.jknack:handlebars:1.3.0")
-
-    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
-
+    compile group: 'com.github.jknack', name: 'handlebars', version: '1.3.0'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.3.3'
-    compile("io.vertx:vertx-web:3.3.3")
-    compile("io.vertx:vertx-jdbc-client:3.3.3")
-
-    compileOnly("io.vertx:vertx-codegen:3.3.3")
-
+    compile group: 'io.vertx', name: 'vertx-web', version: '3.3.3'
+    compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.3.3'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
     testCompile("io.vertx:vertx-unit:3.3.3")
 }
