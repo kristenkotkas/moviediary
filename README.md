@@ -9,7 +9,7 @@ Kasutame:
 
 Igast documentatsiooni:
 - Handlebars: https://jknack.github.io/handlebars.java/
-- Vert.x: http://vertx.io/docs/, https://github.com/vert-x3/vertx-examples
+- Vert.x: http://vertx.io/docs/, https://github.com/vert-x3/vertx-examples, http://vertx.io/blog/posts/introduction-to-vertx.html
 - Materialize admin example: http://demo.geekslabs.com/materialize-v1.0/index.html
 
 Käivitamine:
