@@ -5,7 +5,7 @@
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://kyngas.eu:3366/MovieDiary</jdbc-url>
+      <jdbc-url>jdbc:mysql://kyngas.eu:3366/MovieDiary?characterEncoding=UTF-8&amp;verifyServerCertificate=false&amp;useSSL=true&amp;requireSSL=true</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />
