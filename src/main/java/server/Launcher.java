@@ -21,11 +21,12 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
         setLoggingToSLF4J();
-        Vertx.vertx(new VertxOptions()
+        VertxOptions vOptions = new VertxOptions()
                 .setAddressResolverOptions(new AddressResolverOptions()
                         .addServer("8.8.8.8")
-                        .addServer("8.8.4.4")))
-                .deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig(args)), ar -> {
+                        .addServer("8.8.4.4"));
+        DeploymentOptions dOptions = new DeploymentOptions().setConfig(getConfig(args));
+        Vertx.vertx(vOptions).deployVerticle(new ServerVerticle(), dOptions, ar -> {
             if (ar.succeeded()) {
                 log.info("Server up!");
             } else {
