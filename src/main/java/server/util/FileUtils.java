@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 
 public class FileUtils {
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
-    private static final String CONFIG = "/server.json";
+    private static final String SECRET = "/server.json";
+    private static final String CONFIG = "/config.json";
 
     /**
      * Loads config from classpath.
@@ -19,12 +20,18 @@ public class FileUtils {
      * @return server.json config
      */
     public static JsonObject getConfig(String[] args) {
+        JsonObject config = new JsonObj();
         try {
-            return new JsonObj(readToString(CONFIG)).mergeIn(parseArguments(args));
+            config.mergeIn(new JsonObj(readToString(CONFIG)));
         } catch (IOException e) {
             log.error(CONFIG + " not found.");
         }
-        return new JsonObj();
+        try {
+            config.mergeIn(new JsonObj(readToString(SECRET)));
+        } catch (IOException e) {
+            log.error(SECRET + " not found.");
+        }
+        return config.mergeIn(parseArguments(args));
     }
 
     /**
@@ -61,10 +68,10 @@ public class FileUtils {
 
     /**
      * Converts given args to JsonObject.
-     * Example: -key1=value1 -key2=value2 ...
+     * Example input: String[]{"-key1=value1", "-key2=value2", ...}
      *
      * @param args to convert
-     * @return jsonObject
+     * @return jsonObj
      */
     private static JsonObj parseArguments(String[] args) {
         return args == null ? new JsonObj() : new JsonObj(Arrays.stream(args)

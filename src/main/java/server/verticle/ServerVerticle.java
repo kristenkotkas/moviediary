@@ -1,6 +1,7 @@
 package server.verticle;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
@@ -15,6 +16,8 @@ import server.service.TmdbService;
 import java.util.Arrays;
 import java.util.List;
 
+import static server.util.NetworkUtils.*;
+
 /**
  * Main server logic.
  */
@@ -26,7 +29,7 @@ public class ServerVerticle extends AbstractVerticle {
     private List<Routable> routables;
 
     @Override
-    public void start() throws Exception {
+    public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx); //handles addresses client connects to
         tmdb = TmdbService.create(vertx, config()); //tmdb api service
         database = DatabaseService.create(vertx, config()); //
@@ -36,10 +39,11 @@ public class ServerVerticle extends AbstractVerticle {
                 new UiRouter(vertx, config())); //ui
         routables.forEach(routable -> routable.route(router));
         router.route().last().handler(Status::notFound); //if no handler found for address -> 404
-        //starts server at localhost:8080
+
         vertx.createHttpServer()
                 .requestHandler(router::accept)
-                .listen(8080, "localhost");
+                .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
+                        config().getString(HTTP_HOST, DEFAULT_HOST), futureHandler(future));
     }
 
     @Override

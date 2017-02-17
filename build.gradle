@@ -28,5 +28,5 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-web', version: '3.3.3'
     compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.3.3'
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
-    testCompile("io.vertx:vertx-unit:3.3.3")
+    compile group: 'io.vertx', name: 'vertx-unit', version: '3.3.3'
 }
