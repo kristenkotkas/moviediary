@@ -25,18 +25,13 @@ body {
     margin-left: -10px !important;
 }
 
+@media only screen and (min-width: 993px) {
+    #forgot-password {
+        padding-left: 0;
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
+/* ---- Can be removed if not needed ----*/
 
 
 

@@ -1,23 +1,15 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'java'
     id 'idea'
     id 'application'
-}
-
-repositories {
-    mavenCentral()
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
-mainClassName = 'server.Launcher'
-group 'org.movies'
-
-shadowJar {
-    baseName = 'moviediary'
-    classifier = ''
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -28,5 +20,16 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-web', version: '3.3.3'
     compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.3.3'
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
-    compile group: 'io.vertx', name: 'vertx-unit', version: '3.3.3'
+    compile group: 'org.pac4j', name: 'vertx-pac4j', version: '2.1.0'
+    compile group: 'org.pac4j', name: 'pac4j-oauth', version: '1.9.5'
+
+    testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.3.3'
+}
+
+mainClassName = 'server.Launcher'
+group 'org.movies'
+
+shadowJar {
+    baseName = 'moviediary'
+    classifier = ''
 }
