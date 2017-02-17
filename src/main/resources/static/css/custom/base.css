@@ -1,11 +1,11 @@
-html, body {
+/*html, body {
     height: 100%;
 }
 
 html {
     display: table;
     margin: auto;
-}
+}*/
 
 .login-body {
     display: table-cell;
@@ -29,6 +29,12 @@ html {
     #forgot-password {
         padding-left: 0;
     }
+}
+
+/* Mobile menu button location*/
+.sidebar-collapse {
+    left: 10px;
+    bottom: 45px;
 }
 
 /* ---- Can be removed if not needed ----*/
