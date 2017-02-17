@@ -4,6 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -22,6 +23,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final JsonObject config;
     private final JDBCClient client;
 
+    private static final String SQL_INSERT_USER = "INSERT INTO Users (Email, Password, Serialnumber, Firstname, Lastname)" +
+            " VALUES ?, ?, ?, ?, ?";
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
     private static final String SQL_QUERY_VIEWS = "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
             "FROM Views " +
@@ -35,18 +38,26 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
     }
 
+    // Suure tõenäosusega pooleli / ei tööta. Implementatsioon DatabaseRouter-sse puudub.
+    @Override
+    public void insertUser(JsonObject user){
+        Future<JsonObject> future = Future.future();
+        JsonArray data = user.getJsonArray("USER");
+        client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_USER, data, ar -> {
+                    if (ar.failed()){
+                        future.fail(ar.cause());
+                    }
+                })));
+    }
+
     @Override
     public Future<JsonObject> getAllUsers() {
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) { //cache timeout peaks väikseks panema või mitte kasutama
             client.getConnection(connHandler(future,
-                    new Handler<SQLConnection>() {
-                        @Override
-                        public void handle(SQLConnection conn) {
-                            conn.query(SQL_QUERY_USERS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future));
-                        }
-                    }));
+                    conn -> conn.query(SQL_QUERY_USERS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -57,12 +68,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
-                    new Handler<SQLConnection>() {
-                        @Override
-                        public void handle(SQLConnection conn) {
-                            conn.query(SQL_QUERY_VIEWS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future));
-                        }
-                    }));
+                    conn -> conn.query(SQL_QUERY_VIEWS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }

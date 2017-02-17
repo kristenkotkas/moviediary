@@ -17,6 +17,8 @@ public interface DatabaseService extends CachingService<JsonObject> {
         return new DatabaseServiceImpl(vertx, config);
     }
 
+    void insertUser(JsonObject user);
+
     Future<JsonObject> getAllUsers();
 
     Future<JsonObject> getAllViews();
