@@ -23,6 +23,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final JDBCClient client;
 
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
+    private static final String SQL_QUERY_VIEWS = "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
+            "FROM Views " +
+            "JOIN Movies ON Views.MovieId = Movies.Id " +
+            "JOIN Users ON Views.UserId = Users.Id";
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
@@ -37,7 +41,28 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) { //cache timeout peaks väikseks panema või mitte kasutama
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, resultHandler(conn, CACHE_ALL, future))));
+                    new Handler<SQLConnection>() {
+                        @Override
+                        public void handle(SQLConnection conn) {
+                            conn.query(SQL_QUERY_USERS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future));
+                        }
+                    }));
+        }
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> getAllViews() {
+        Future<JsonObject> future = Future.future();
+        CacheItem<JsonObject> cache = getCached(CACHE_ALL);
+        if (!tryCachedResult(false, cache, future)) {
+            client.getConnection(connHandler(future,
+                    new Handler<SQLConnection>() {
+                        @Override
+                        public void handle(SQLConnection conn) {
+                            conn.query(SQL_QUERY_VIEWS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future));
+                        }
+                    }));
         }
         return future;
     }
