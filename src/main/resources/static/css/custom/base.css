@@ -7,7 +7,7 @@ html {
     margin: auto;
 }
 
-body {
+.login-body {
     display: table-cell;
     vertical-align: middle;
 }
