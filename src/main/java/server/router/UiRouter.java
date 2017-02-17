@@ -32,14 +32,24 @@ public class UiRouter extends Routable {
     private static final String STATIC_FOLDER = "static";
 
     public static final String UI_INDEX = "/";
+    public static final String UI_USER = "/private/user";
     public static final String UI_HOME = "/private/home";
+    public static final String UI_MOVIES = "/private/movies";
+    public static final String UI_HISTORY = "/private/history";
+    public static final String UI_STATISTICS = "/private/statistics";
+    public static final String UI_WISHLIST = "/private/wishlist";
     public static final String UI_LOGIN = "/login";
     public static final String UI_LOGIN2 = "/login2";
     public static final String UI_FORMLOGIN = "/formlogin";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
 
     private static final String TEMPL_INDEX = "templates/index.hbs";
+    private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
+    private static final String TEMPL_MOVIES = "templates/movies.hbs";
+    private static final String TEMPL_HISTORY = "templates/history.hbs";
+    private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
+    private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
     private static final String TEMPL_LOGIN = "templates/login.hbs";
     private static final String TEMPL_LOGIN2 = "templates/login2.hbs";
     private static final String TEMPL_FORMLOGIN = "templates/formlogin.hbs";
