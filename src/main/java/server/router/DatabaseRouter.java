@@ -5,13 +5,14 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import org.pac4j.http.client.indirect.FormClient;
+import server.security.FormClient;
 import server.security.SecurityConfig;
 import server.service.DatabaseService;
 
 import static io.vertx.core.http.HttpHeaders.LOCATION;
 import static server.entity.Status.*;
 import static server.router.UiRouter.UI_FORM_REGISTER;
+import static server.security.FormClient.*;
 import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.contains;
 import static server.util.HandlerUtils.jsonResponse;
@@ -42,10 +43,10 @@ public class DatabaseRouter extends Routable {
 
     // TODO: 19.02.2017 hash password
     private void handleUsersInsert(RoutingContext ctx) {
-        String username = ctx.request().getFormAttribute("username");
-        String password = ctx.request().getFormAttribute("password");
-        String firstname = ctx.request().getFormAttribute("firstname");
-        String lastname = ctx.request().getFormAttribute("lastname");
+        String username = ctx.request().getFormAttribute(FORM_USERNAME);
+        String password = ctx.request().getFormAttribute(FORM_PASSWORD);
+        String firstname = ctx.request().getFormAttribute(FORM_FIRSTNAME);
+        String lastname = ctx.request().getFormAttribute(FORM_LASTNAME);
         if (contains("", username, password, firstname, lastname)) {
             serviceUnavailable(ctx, new Throwable("All fields must be filled!"));
             return;

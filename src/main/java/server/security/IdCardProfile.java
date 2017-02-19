@@ -2,27 +2,25 @@ package server.security;
 
 import org.pac4j.core.profile.CommonProfile;
 
+import static server.security.SecurityConfig.*;
+
 public class IdCardProfile extends CommonProfile {
-    public static final String SERIAL = "Serialnumber";
-    public static final String FIRSTNAME = "first_name";
-    public static final String LASTNAME = "family_name";
-    public static final String ISSUER = "Issuer";
-    public static final String COUNTRY = "location";
+    // TODO: 19.02.2017 define attributes
 
     public IdCardProfile(IdCardCredentials credentials) {
         setId(credentials.getSerial());
-        addAttribute(SERIAL, credentials.getSerial());
-        addAttribute(FIRSTNAME, credentials.getFirstName());
-        addAttribute(LASTNAME, credentials.getLastName());
-        addAttribute(ISSUER, credentials.getIssuer());
-        addAttribute(COUNTRY, credentials.getCountry());
+        addAttribute(PAC4J_SERIAL, credentials.getSerial());
+        addAttribute(PAC4J_FIRSTNAME, credentials.getFirstName());
+        addAttribute(PAC4J_LASTNAME, credentials.getLastName());
+        addAttribute(PAC4J_ISSUER, credentials.getIssuer());
+        addAttribute(PAC4J_COUNTRY, credentials.getCountry());
     }
 
     public String getSerial() {
-        return (String) getAttribute(SERIAL);
+        return (String) getAttribute(PAC4J_SERIAL);
     }
 
     public String getIssuer() {
-        return (String) getAttribute(ISSUER);
+        return (String) getAttribute(PAC4J_ISSUER);
     }
 }

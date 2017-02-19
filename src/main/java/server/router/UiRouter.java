@@ -12,7 +12,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
-import org.pac4j.http.client.indirect.FormClient;
+import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.template.ui.*;
@@ -92,8 +92,8 @@ public class UiRouter extends Routable {
                 break;
             case "FormClient":
                 unique = jsonObject.getString("email");
-                fullName = "FormClient Fullname";
-                firstName = "Firstname";
+                firstName = jsonObject.getString("first_name");
+                fullName = firstName + " " + jsonObject.getString("family_name");
                 break;
             case "Google2Client":
                 unique = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
@@ -102,8 +102,8 @@ public class UiRouter extends Routable {
                 break;
             case "IdCardClient":
                 unique = jsonObject.getString("Serialnumber");
-                fullName = jsonObject.getString("first_name") + " " + jsonObject.getString("family_name");
                 firstName = jsonObject.getString("first_name");
+                fullName = firstName + " " + jsonObject.getString("family_name");
 
         } // TODO: 19. veebr. 2017 add idcard
         System.out.println("UNIQUE: " + unique);
