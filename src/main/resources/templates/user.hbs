@@ -12,6 +12,11 @@
 <body class="blue lighten-5">
 {{> templates/navigationBar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
+<div class="input-field col s12">
+    <a href="{{logoutLink}}" type="submit" class="btn waves-effect waves-light col s12 btn red logout-button">
+        <i class="fa fa-sign-out left re"></i>Log out
+    </a>
+</div>
 <script type="text/javascript" src="/static/js/jquery-2.2.4.min.js"></script>
 <script type="text/javascript" src="/static/js/materialize.min.js"></script>
 <script type="text/javascript" src="/static/js/plugins.js"></script>
