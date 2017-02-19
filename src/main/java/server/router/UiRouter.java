@@ -59,6 +59,7 @@ public class UiRouter extends Routable {
 
     private String unique = "";
     private String fullName = "";
+    private String firstName = "";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -87,18 +88,22 @@ public class UiRouter extends Routable {
             case "FacebookClient":
                 unique = jsonObject.getString("email");
                 fullName = jsonObject.getString("name");
+                firstName = jsonObject.getString("first_name");
                 break;
             case "FormClient":
                 unique = jsonObject.getString("email");
                 fullName = "FormClient Fullname";
+                firstName = "Firstname";
                 break;
             case "Google2Client":
                 unique = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
                 fullName = jsonObject.getString("displayName");
+                firstName = jsonObject.getString("name.givenName");
                 break;
             case "IdCardClient":
                 unique = jsonObject.getString("Serialnumber");
                 fullName = jsonObject.getString("first_name") + " " + jsonObject.getString("family_name");
+                firstName = jsonObject.getString("first_name");
 
         } // TODO: 19. veebr. 2017 add idcard
         System.out.println("UNIQUE: " + unique);
@@ -131,8 +136,8 @@ public class UiRouter extends Routable {
     }
 
     private void handleHome(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
         setData(ctx);
+        engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
     }
 
     private void handleMovies(RoutingContext ctx) {
@@ -197,6 +202,7 @@ public class UiRouter extends Routable {
         baseTemplate.setStatistics(UI_STATISTICS);
         baseTemplate.setWishlist(UI_WISHLIST);
         baseTemplate.setUserName(fullName);
+        baseTemplate.setFirstName(firstName);
         return baseTemplate;
     }
 }

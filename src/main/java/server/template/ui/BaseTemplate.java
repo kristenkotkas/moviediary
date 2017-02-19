@@ -18,4 +18,6 @@ public interface BaseTemplate extends TypeSafeTemplate {
     void setWishlist(String wishlist);
 
     void setUserName(String name);
+
+    void setFirstName(String name);
 }
