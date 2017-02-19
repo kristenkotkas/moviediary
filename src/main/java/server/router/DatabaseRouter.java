@@ -57,7 +57,7 @@ public class DatabaseRouter extends Routable {
             if (!exists) {
                 database.insertUser(new JsonArray()
                         .add(username).add(password)
-                        .add("unique")
+                        .add("")
                         .add(firstname).add(lastname))
                         .setHandler(resultHandler(ctx, ar -> ctx.response()
                                 .putHeader(LOCATION, securityConfig.getPac4jConfig()

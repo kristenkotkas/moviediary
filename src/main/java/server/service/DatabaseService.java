@@ -21,6 +21,8 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> insertUser(JsonArray userData);
 
+    Future<JsonObject> insertUserOAuth2(String email, String firstname, String lastname);
+
     Future<JsonObject> getUser(String username);
 
     Future<JsonObject> getAllUsers();

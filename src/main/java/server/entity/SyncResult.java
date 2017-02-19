@@ -52,6 +52,11 @@ public class SyncResult<T> {
         return this;
     }
 
+    public SyncResult<T> peek(Consumer<? super T> consumer) {
+        consumer.accept(value);
+        return this;
+    }
+
     public SyncResult<T> executeAsync(Runnable runnable) {
         executor.execute(runnable);
         return this;

@@ -12,6 +12,9 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
+import static server.util.CommonUtils.contains;
+import static server.util.CommonUtils.nonNull;
+
 //näited -> https://github.com/vert-x3/vertx-examples/tree/master/jdbc-examples
 
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
@@ -53,6 +56,26 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     }
                     conn.close();
                 })));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insertUserOAuth2(String email, String firstname, String lastname) {
+        Future<JsonObject> future = Future.future();
+        if (!nonNull(email, firstname, lastname) || contains("", email, firstname, lastname)) {
+            future.fail(new Throwable("Email, firstname and lastname must exist!"));
+            return future;
+        }
+        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
+                .add(email).add("").add("")
+                .add(firstname).add(lastname), ar -> {
+            if (ar.succeeded()) {
+                future.complete(ar.result().toJson());
+            } else {
+                future.fail(ar.cause());
+            }
+            conn.close();
+        })));
         return future;
     }
 
