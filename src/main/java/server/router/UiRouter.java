@@ -54,6 +54,7 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
+    private static final String TEMPL_NAVIGATION = "templates/navigationBar.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -83,14 +84,54 @@ public class UiRouter extends Routable {
         router.get(UI_FORM_REGISTER).handler(this::handleFormRegister);
         router.get(UI_IDCARDLOGIN).handler(this::handleIdCardLogin);
 
+        router.get(UI_USER).handler(this::handleUser);
+        router.get(UI_MOVIES).handler(this::handleMovies);
+        router.get(UI_HISTORY).handler(this::handleHistory);
+        router.get(UI_STATISTICS).handler(this::handleStatistics);
+        router.get(UI_WISHLIST).handler(this::handleWishlist);
+
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
                 .setIncludeHidden(false));
     }
 
+    private void handleUser(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class)
+                .setUserName(""), endHandler(ctx)); // FIXME: 19. veebr. 2017 db'st nimi võtta
+        System.out.println(ctx.user().principal());
+    }
+
     private void handleHome(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
+    }
+
+    private void handleMovies(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_MOVIES, MoviesTemplate.class), endHandler(ctx));
+    }
+
+    private void handleHistory(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_HISTORY, HistoryTemplate.class), endHandler(ctx));
+    }
+
+    private void handleStatistics(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_STATISTICS, StatisticsTemplate.class), endHandler(ctx));
+    }
+
+    private void handleWishlist(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
+    }
+
+    // FIXME: 19. veebr. 2017 use this
+    private void handleNavigation(RoutingContext ctx) {
+        engine.render(getSafe(ctx,TEMPL_NAVIGATION, NavigationTemplate.class)
+                .setUser(UI_USER)
+                .setHome(UI_HOME)
+                .setMovies(UI_MOVIES)
+                .setHistory(UI_HISTORY)
+                .setStatistics(UI_STATISTICS)
+                .setWishlist(UI_WISHLIST)
+                .setUserName("Jane DoeName"), endHandler(ctx));
     }
 
     private void handleLogin(RoutingContext ctx) {

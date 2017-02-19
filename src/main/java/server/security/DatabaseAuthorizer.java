@@ -23,7 +23,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private static final String PASSWORD = "Password";
     private static final String SERIAL = "Serialnumber";
 
-    private static final String FIRSTNAME = "Firstname";
+    public static final String FIRSTNAME = "Firstname";
 
     private final DatabaseService database;
 
