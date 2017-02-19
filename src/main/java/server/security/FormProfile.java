@@ -17,9 +17,14 @@ public class FormProfile extends CommonProfile {
         addAttribute(PAC4J_PASSWORD, password);
         SyncResult<JsonObject> result = new SyncResult<>();
         result.executeAsync(() -> database.getUser(email).setHandler(ar -> result.setReady(ar.result())));
-        JsonObject user = getRows(result.await().get()).getJsonObject(0);
-        addAttribute(PAC4J_FIRSTNAME, user.getString(DB_FIRSTNAME));
-        addAttribute(PAC4J_LASTNAME, user.getString(DB_LASTNAME));
+        getRows(result.await().get()).stream()
+                .map(obj -> (JsonObject) obj)
+                .filter(json -> email.equals(json.getString(DB_EMAIL)))
+                .findAny()
+                .ifPresent(json -> {
+                    addAttribute(PAC4J_FIRSTNAME, json.getString(DB_FIRSTNAME));
+                    addAttribute(PAC4J_LASTNAME, json.getString(DB_LASTNAME));
+                });
     }
 
     // TODO: 17.02.2017 return hash instead

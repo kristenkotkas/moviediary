@@ -20,6 +20,8 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
 
     private String loginUrl;
 
+    // TODO: 19.02.2017 redirect back to login if invalid
+
     @Override
     protected void internalInit(WebContext context) {
         super.internalInit(context);
