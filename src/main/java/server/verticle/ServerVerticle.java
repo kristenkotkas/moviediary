@@ -8,6 +8,7 @@ import io.vertx.ext.web.Router;
 import server.entity.Status;
 import server.router.*;
 import server.security.SecurityConfig;
+import server.service.BankLinkService;
 import server.service.DatabaseService;
 import server.service.TmdbService;
 
@@ -29,11 +30,13 @@ public class ServerVerticle extends AbstractVerticle {
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx); //handles addresses client connects to
         TmdbService tmdb = TmdbService.create(vertx, config());
+        BankLinkService bls = BankLinkService.create(vertx, config());
         DatabaseService database = DatabaseService.create(vertx, config());
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig), //authentication
                 new TmdbRouter(vertx, tmdb), //tmdb rest api
+                new BankLinkRouter(vertx, bls),
                 new DatabaseRouter(vertx, database, securityConfig), //database rest api
                 new UiRouter(vertx, securityConfig)); //ui
         routables.forEach(routable -> routable.route(router));
