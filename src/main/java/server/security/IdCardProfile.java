@@ -3,42 +3,26 @@ package server.security;
 import org.pac4j.core.profile.CommonProfile;
 
 public class IdCardProfile extends CommonProfile {
-    private final IdCardCredentials credentials;
+    public static final String SERIAL = "Serialnumber";
+    public static final String FIRSTNAME = "first_name";
+    public static final String LASTNAME = "family_name";
+    public static final String ISSUER = "Issuer";
+    public static final String COUNTRY = "location";
 
     public IdCardProfile(IdCardCredentials credentials) {
-        this.credentials = credentials;
+        setId(credentials.getSerial());
+        addAttribute(SERIAL, credentials.getSerial());
+        addAttribute(FIRSTNAME, credentials.getFirstName());
+        addAttribute(LASTNAME, credentials.getLastName());
+        addAttribute(ISSUER, credentials.getIssuer());
+        addAttribute(COUNTRY, credentials.getCountry());
     }
 
     public String getSerial() {
-        return credentials.getSerial();
-    }
-
-    public String getFirstName() {
-        return credentials.getFirstName();
-    }
-
-    public String getLastName() {
-        return credentials.getLastName();
+        return (String) getAttribute(SERIAL);
     }
 
     public String getIssuer() {
-        return credentials.getIssuer();
-    }
-
-    public String getCountry() {
-        return credentials.getCountry();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        final IdCardProfile that = (IdCardProfile) obj;
-        return credentials.equals(that.credentials);
-    }
-
-    @Override
-    public int hashCode() {
-        return credentials != null ? credentials.hashCode() : 0;
+        return (String) getAttribute(ISSUER);
     }
 }

@@ -16,14 +16,12 @@ import server.service.DatabaseService;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static server.security.IdCardProfile.SERIAL;
 import static server.service.DatabaseService.getRows;
 
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private static final String EMAIL = "Email";
     private static final String PASSWORD = "Password";
-    private static final String SERIAL = "Serialnumber";
-
-    public static final String FIRSTNAME = "Firstname";
 
     private final DatabaseService database;
 
@@ -49,16 +47,21 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
-
-        //todo change to serial number checking (hash)
-        IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream,
-                                     DatabaseService database) -> {
-            System.out.println("-------------Authorizing ID Card user----------------------");
-            boolean isAuthorized = stream.anyMatch(json ->
-                    profile.getSerial().equals(json.getString(SERIAL)));
-            return isAuthorized;
+        IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream, DatabaseService database) -> {
+            System.out.println("-------------Authorizing ID Card user------------------");
+            boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(SERIAL)));
+            System.out.println("Is authorized: " + isAuthorized);
+            if (isAuthorized) {
+                return true;
+            }
+            System.out.println("-------------Registering ID Card user------------------");
+            SyncResult<Boolean> result = new SyncResult<>();
+            result.executeAsync(() -> database.insertIdCardUser(profile.getSerial(), profile.getFirstName(),
+                    profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
+            return result.await().get();
         }),
 
+        //todo password hashing checking
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
                 .filter(json -> json.getString(EMAIL).equals(profile.getEmail()))
                 .anyMatch(json -> profile.getPassword().equals(json.getString(PASSWORD))));
@@ -73,6 +76,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         }
 
         public static boolean isAuthorized(DatabaseService database, CommonProfile profile, JsonArray users) {
+            // TODO: 19.02.2017 profiles as enummap or smth -> get enum based on clientname from profile
             for (ProfileAuthorizer authorizer : values()) {
                 if (authorizer.type.isInstance(profile)) {
                     return authorizer.checker.apply(profile, users.stream().map(obj -> (JsonObject) obj), database);
@@ -89,15 +93,15 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
-                System.out.println("-------------Authorizing Facebook/Google user----------------------");
+                System.out.println("------------Authorizing Facebook/Google user--------------");
                 System.out.println(profile);
                 boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(EMAIL)));
                 if (isAuthorized) {
                     return true;
                 }
-                System.out.println("--------Registering Facebook/Google user----------");
+                System.out.println("------------Registering Facebook/Google user-------------");
                 SyncResult<Boolean> result = new SyncResult<>();
-                result.executeAsync(() -> database.insertUserOAuth2(profile.getEmail(), profile.getFirstName(),
+                result.executeAsync(() -> database.insertOAuth2User(profile.getEmail(), profile.getFirstName(),
                         profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
                 return result.await().get();
             };

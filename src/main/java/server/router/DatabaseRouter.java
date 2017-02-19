@@ -40,7 +40,7 @@ public class DatabaseRouter extends Routable {
         router.get(API_VIEWS_ALL).handler(this::handleViewsAll);
     }
 
-    // TODO: 19.02.2017 different inserts for all auth methods
+    // TODO: 19.02.2017 hash password
     private void handleUsersInsert(RoutingContext ctx) {
         String username = ctx.request().getFormAttribute("username");
         String password = ctx.request().getFormAttribute("password");

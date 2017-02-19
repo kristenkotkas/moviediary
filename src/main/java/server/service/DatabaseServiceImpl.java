@@ -11,6 +11,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
@@ -60,22 +61,30 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> insertUserOAuth2(String email, String firstname, String lastname) {
+    public Future<JsonObject> insertOAuth2User(String email, String firstname, String lastname) {
         Future<JsonObject> future = Future.future();
         if (!nonNull(email, firstname, lastname) || contains("", email, firstname, lastname)) {
             future.fail(new Throwable("Email, firstname and lastname must exist!"));
             return future;
         }
         client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                .add(email).add("").add("")
-                .add(firstname).add(lastname), ar -> {
-            if (ar.succeeded()) {
-                future.complete(ar.result().toJson());
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        })));
+                .add(email).add("")
+                .add("")
+                .add(firstname).add(lastname), updateResultHandler(conn, future))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insertIdCardUser(String serial, String firstname, String lastname) {
+        Future<JsonObject> future = Future.future();
+        if (!nonNull(serial, firstname, lastname) || contains("", serial, firstname, lastname)) {
+            future.fail(new Throwable("SerialCode, firstname and lastname must exist!"));
+            return future;
+        }
+        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
+                .add("").add("")
+                .add(serial)
+                .add(firstname).add(lastname), updateResultHandler(conn, future))));
         return future;
     }
 
@@ -86,7 +95,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
-                            resultHandler(conn, CACHE_USER + username, future))));
+                            resultSetHandler(conn, CACHE_USER + username, future))));
         }
         return future;
     }
@@ -97,7 +106,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) { //cache timeout peaks väikseks panema või mitte kasutama
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, resultHandler(conn, CACHE_ALL, future))));
+                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -108,7 +117,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_VIEWS, resultHandler(conn, CACHE_ALL, future))));
+                    conn -> conn.query(SQL_QUERY_VIEWS, resultSetHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -123,10 +132,22 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         };
     }
 
-    private Handler<AsyncResult<ResultSet>> resultHandler(SQLConnection conn, String key, Future<JsonObject> future) {
+    private Handler<AsyncResult<ResultSet>> resultSetHandler(SQLConnection conn, String key,
+                                                             Future<JsonObject> future) {
         return ar -> {
             if (ar.succeeded()) {
                 future.complete(getCached(key).set(ar.result().toJson()));
+            } else {
+                future.fail(ar.cause());
+            }
+            conn.close();
+        };
+    }
+
+    private Handler<AsyncResult<UpdateResult>> updateResultHandler(SQLConnection conn, Future<JsonObject> future) {
+        return ar -> {
+            if (ar.succeeded()) {
+                future.complete(ar.result().toJson());
             } else {
                 future.fail(ar.cause());
             }

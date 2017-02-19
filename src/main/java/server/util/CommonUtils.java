@@ -1,6 +1,8 @@
 package server.util;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CommonUtils {
 
@@ -21,5 +23,18 @@ public class CommonUtils {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Lowercases and capitalizes given name.
+     *
+     * @param name to use
+     * @return capitalized text string
+     */
+    public static String capitalizeName(String name) {
+        return Arrays.stream(name.split(" "))
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
     }
 }

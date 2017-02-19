@@ -3,6 +3,8 @@ package server.security;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.util.CommonHelper;
 
+import static server.util.CommonUtils.capitalizeName;
+
 public class IdCardCredentials extends Credentials {
     private final String serial;
     private final String firstName;
@@ -21,8 +23,8 @@ public class IdCardCredentials extends Credentials {
     public IdCardCredentials(String subjectDN) {
         String[] data = subjectDN.split(", ");
         serial = getItem(data, 0);
-        firstName = getItem(data, 1);
-        lastName = getItem(data, 2);
+        firstName = capitalizeName(getItem(data, 1));
+        lastName = capitalizeName(getItem(data, 2));
         issuer = getItem(data, 5);
         country = getItem(data, 6);
         setClientName(IdCardClient.class.getSimpleName());
