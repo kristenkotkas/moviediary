@@ -12,7 +12,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
-import org.pac4j.http.client.indirect.FormClient;
+import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.template.ui.*;

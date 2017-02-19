@@ -16,13 +16,10 @@ import server.service.DatabaseService;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static server.security.IdCardProfile.SERIAL;
+import static server.security.SecurityConfig.*;
 import static server.service.DatabaseService.getRows;
 
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
-    private static final String EMAIL = "Email";
-    private static final String PASSWORD = "Password";
-
     private final DatabaseService database;
 
     public DatabaseAuthorizer(DatabaseService database) {
@@ -49,7 +46,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
         IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream, DatabaseService database) -> {
             System.out.println("-------------Authorizing ID Card user------------------");
-            boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(SERIAL)));
+            boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(DB_SERIAL)));
             System.out.println("Is authorized: " + isAuthorized);
             if (isAuthorized) {
                 return true;
@@ -63,8 +60,8 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         //todo password hashing checking
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
-                .filter(json -> json.getString(EMAIL).equals(profile.getEmail()))
-                .anyMatch(json -> profile.getPassword().equals(json.getString(PASSWORD))));
+                .filter(json -> json.getString(DB_EMAIL).equals(profile.getEmail()))
+                .anyMatch(json -> profile.getPassword().equals(json.getString(DB_PASSWORD))));
 
         private final Class type;
         private final TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> checker;
@@ -95,7 +92,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
             return (profile, stream, database) -> {
                 System.out.println("------------Authorizing Facebook/Google user--------------");
                 System.out.println(profile);
-                boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(EMAIL)));
+                boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(DB_EMAIL)));
                 if (isAuthorized) {
                     return true;
                 }
