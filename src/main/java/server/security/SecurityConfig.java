@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static server.router.UiRouter.UI_FORMLOGIN;
+import static server.router.UiRouter.UI_FORM_LOGIN;
 import static server.security.SecurityConfig.AuthClient.getCallback;
 import static server.security.SecurityConfig.AuthClient.values;
 import static server.util.NetworkUtils.isServer;
@@ -35,7 +35,7 @@ public class SecurityConfig {
         // TODO: 17.02.2017 store in config or smth
         System.out.println("Is server: " + isServer(config));
         this.pac4jConfig.getClients().findClient(FormClient.class).setLoginUrl((isServer(config) ?
-                "https://movies.kyngas.eu" : "http://localhost:8081") + UI_FORMLOGIN);
+                "https://movies.kyngas.eu" : "http://localhost:8081") + UI_FORM_LOGIN);
     }
 
     public Config getPac4jConfig() {

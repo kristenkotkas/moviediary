@@ -31,8 +31,9 @@ public class Status {
         ctx.response().setStatusCode(BAD_REQUEST).end();
     }
 
-    public static void serviceUnavailable(RoutingContext ctx) {
-        ctx.response().setStatusCode(SERVICE_UNAVAILABLE).end();
+    public static void serviceUnavailable(RoutingContext ctx, Throwable cause) {
+        ctx.response().setStatusCode(SERVICE_UNAVAILABLE).end(SERVICE_UNAVAILABLE + ": Service unavailable\n" +
+                "Cause: " + cause.getMessage());
     }
 
     public static void notImplemented(RoutingContext ctx) {

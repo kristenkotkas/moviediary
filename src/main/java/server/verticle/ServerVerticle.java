@@ -14,6 +14,7 @@ import server.service.TmdbService;
 import java.util.Arrays;
 import java.util.List;
 
+import static server.util.HandlerUtils.futureHandler;
 import static server.util.NetworkUtils.*;
 
 /**
@@ -22,17 +23,14 @@ import static server.util.NetworkUtils.*;
 public class ServerVerticle extends AbstractVerticle {
     private static final Logger log = LoggerFactory.getLogger(ServerVerticle.class);
 
-    private TmdbService tmdb;
-    private DatabaseService database;
-    private SecurityConfig securityConfig;
     private List<Routable> routables;
 
     @Override
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx); //handles addresses client connects to
-        tmdb = TmdbService.create(vertx, config()); //tmdb api service
-        database = DatabaseService.create(vertx, config()); //database service
-        securityConfig = new SecurityConfig(config(), database); // security
+        TmdbService tmdb = TmdbService.create(vertx, config());
+        DatabaseService database = DatabaseService.create(vertx, config());
+        SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig), //authentication
                 new TmdbRouter(vertx, tmdb), //tmdb rest api

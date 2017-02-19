@@ -1,6 +1,7 @@
 package server.util;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -32,7 +33,23 @@ public class HandlerUtils {
                 success.accept(ar.result());
             } else {
                 log.error(ar.cause());
-                serviceUnavailable(ctx);
+                serviceUnavailable(ctx, ar.cause());
+            }
+        };
+    }
+
+    /**
+     * Completes or fails future based on result.
+     *
+     * @param future to use
+     * @return this handler
+     */
+    public static <T> Handler<AsyncResult<T>> futureHandler(Future<Void> future) {
+        return ar -> {
+            if (ar.succeeded()) {
+                future.complete();
+            } else {
+                future.fail(ar.cause());
             }
         };
     }

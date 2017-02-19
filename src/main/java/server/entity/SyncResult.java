@@ -17,8 +17,9 @@ import java.util.function.Consumer;
  */
 public class SyncResult<T> {
     private static final Logger log = LoggerFactory.getLogger(SyncResult.class);
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
     private final CountDownLatch latch = new CountDownLatch(1);
-    private ExecutorService executor;
+
     private T value;
 
     public T get() {
@@ -40,11 +41,6 @@ public class SyncResult<T> {
         return this;
     }
 
-    public SyncResult<T> setExecutor(ExecutorService executor) {
-        this.executor = executor;
-        return this;
-    }
-
     public boolean isPresent() {
         return value != null;
     }
@@ -57,9 +53,6 @@ public class SyncResult<T> {
     }
 
     public SyncResult<T> executeAsync(Runnable runnable) {
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
-        }
         executor.execute(runnable);
         return this;
     }

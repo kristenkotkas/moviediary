@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen,projection">
+</head>
+<body class="amber darken-2">
+<div class="row">
+
+    <div class="card col s12 m12 l12 z-depth-0 center">
+
+        <div class="card-content grey-text">
+            <span class="card-title">Log in</span>
+        </div>
+
+        <div class="row" id="username-input">
+            <div class="input-field left-align">
+                <i class="fa fa-user-o prefix" aria-hidden="true"></i>
+                <input id="username" type="text" class="validate">
+                <label for="username">Username</label>
+            </div>
+        </div>
+
+        <div class="row" id="password-input">
+            <div class="input-field left-align">
+                <i class="fa fa-lock prefix" aria-hidden="true"></i>
+                <input id="password" type="password" class="validate">
+                <label for="password">Password</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-field login-text left-align">
+                <input id="remember-me" type="checkbox">
+                <label for="remember-me">Remember me</label>
+            </div>
+        </div>
+
+        <div class="row" id="login-button">
+            <a class="waves-effect waves-light btn z-depth-0">
+                <i class="fa fa-sign-in left"></i>Login</a>
+        </div>
+
+        <div class="row" id="fb-login-button">
+            <a class="waves-effect waves-light btn blue darken-4 z-depth-0">
+                <i class="fa fa-facebook-f left"></i>Login with Facebook</a>
+        </div>
+
+        <div class="row" id="google-login-button">
+            <a class="waves-effect waves-light btn red z-depth-0">
+                <i class="fa fa-google-plus left"></i>Login with Google+</a>
+        </div>
+
+        <div class="row" id="id-login-button">
+            <a class="waves-effect waves-light btn blue lighten-2 z-depth-0">
+                <i class="fa fa-id-card-o left"></i>Login with id-kaart</a>
+        </div>
+
+        <div class="row left-align">
+            <div class="input-field col s6 m6 l6" id="register-now">
+                <p class="margin medium-small">
+                    <a href="">Register!</a>
+                </p>
+            </div>
+            <div class="input-field col s6 m6 l6" id="forgot-password">
+                <p class="margin right-align medium-small">
+                    <a href="">Forgot password ?</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="/static/js/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="/static/js/materialize.min.js"></script>
+<script type="text/javascript" src="/static/js/plugins.js"></script>
+</body>
+</html>

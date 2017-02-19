@@ -59,8 +59,8 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
             }
             try {
                 String subjectDN = ((X509Certificate) CertificateFactory.getInstance(CERT_TYPE)
-                        .generateCertificate(new ByteArrayInputStream(
-                                fixFormat(cert).getBytes(StandardCharsets.UTF_8))))
+                        .generateCertificate(new ByteArrayInputStream(fixFormat(cert)
+                                .getBytes(StandardCharsets.UTF_8))))
                         .getSubjectDN()
                         .getName();
                 log.info("--------------Credentials Valid--------------");

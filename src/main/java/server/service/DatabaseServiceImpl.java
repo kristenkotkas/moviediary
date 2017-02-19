@@ -16,20 +16,22 @@ import io.vertx.ext.sql.SQLConnection;
 
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
     private static final Logger log = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+
     private static final String MYSQL = "mysql";
-    private static final String RESULTS = "results";
+
+    private static final String SQL_INSERT_USER =
+            "INSERT INTO Users (Email, Password, Serialnumber, Firstname, Lastname) VALUES (?, ?, ?, ?, ?)";
+    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
+    private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Email = ?";
+    private static final String SQL_QUERY_VIEWS =
+            "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
+                    "FROM Views " +
+                    "JOIN Movies ON Views.MovieId = Movies.Id " +
+                    "JOIN Users ON Views.UserId = Users.Id";
 
     private final Vertx vertx;
     private final JsonObject config;
     private final JDBCClient client;
-
-    private static final String SQL_INSERT_USER = "INSERT INTO Users (Email, Password, Serialnumber, Firstname, Lastname)" +
-            " VALUES ?, ?, ?, ?, ?";
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
-    private static final String SQL_QUERY_VIEWS = "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
-            "FROM Views " +
-            "JOIN Movies ON Views.MovieId = Movies.Id " +
-            "JOIN Users ON Views.UserId = Users.Id";
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
@@ -38,17 +40,32 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
     }
 
-    // Suure tõenäosusega pooleli / ei tööta. Implementatsioon DatabaseRouter-sse puudub.
     @Override
-    public void insertUser(JsonObject user){
+    public Future<JsonObject> insertUser(JsonArray userData) {
+        // TODO: 19.02.2017 create userData array here, check for invalid values
         Future<JsonObject> future = Future.future();
-        JsonArray data = user.getJsonArray("USER");
         client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_INSERT_USER, data, ar -> {
-                    if (ar.failed()){
+                conn -> conn.updateWithParams(SQL_INSERT_USER, userData, ar -> {
+                    if (ar.succeeded()) {
+                        future.complete(ar.result().toJson());
+                    } else {
                         future.fail(ar.cause());
                     }
+                    conn.close();
                 })));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> getUser(String username) {
+        Future<JsonObject> future = Future.future();
+        CacheItem<JsonObject> cache = getCached(CACHE_USER + username);
+        if (!tryCachedResult(false, cache, future)) {
+            client.getConnection(connHandler(future,
+                    conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
+                            resultHandler(conn, CACHE_USER + username, future))));
+        }
+        return future;
     }
 
     @Override
@@ -57,7 +74,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) { //cache timeout peaks väikseks panema või mitte kasutama
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future))));
+                    conn -> conn.query(SQL_QUERY_USERS, resultHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -68,7 +85,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_VIEWS, DatabaseServiceImpl.this.resultHandler(conn, CACHE_ALL, future))));
+                    conn -> conn.query(SQL_QUERY_VIEWS, resultHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -86,9 +103,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private Handler<AsyncResult<ResultSet>> resultHandler(SQLConnection conn, String key, Future<JsonObject> future) {
         return ar -> {
             if (ar.succeeded()) {
-                JsonObject json = ar.result().toJson();
-                json.remove(RESULTS); //andmebaas tagastab liialt palju infot, jätame osa ära (rows ja results on sama info topelt)
-                future.complete(getCached(key).set(json));
+                future.complete(getCached(key).set(ar.result().toJson()));
             } else {
                 future.fail(ar.cause());
             }

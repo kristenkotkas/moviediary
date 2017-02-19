@@ -1,9 +1,5 @@
 package server.util;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -26,22 +22,6 @@ public class NetworkUtils {
     public static final int MAX_BODY_SIZE = 25 * MB;
 
     private static int s_isServer = -1;
-
-    /**
-     * Completes or fails future based on result.
-     *
-     * @param future to use
-     * @return this handler
-     */
-    public static Handler<AsyncResult<HttpServer>> futureHandler(Future<Void> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                future.complete();
-            } else {
-                future.fail(ar.cause());
-            }
-        };
-    }
 
     /**
      * Checks if given host is resolved to localhost.

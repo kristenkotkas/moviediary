@@ -11,50 +11,45 @@
 <body class="cyan login-body">
 <div class="row">
     <div class="col s12 z-depth-0 card-panel">
-        <form class="login-form" method="post" action="{{form}}">
+        <form class="login-form" method="post" action="{{registerRestUrl}}">
             <div class="row">
                 <div class="input-field col s12 center">
-                    <h5 class="center grey-text">Log in</h5>
+                    <h5 class="center grey-text">Sign up</h5>
                 </div>
             </div>
             <div class="row margin">
+                <div class="input-field col s12">
+                    <i class="fa fa-user-o prefix" aria-hidden="true"></i>
+                    <input id="username" type="text" name="username">
+                    <label for="username">Username</label>
+                </div>
+            </div>
+            <div class="row margin">
+                <div class="input-field col s12">
+                    <i class="fa fa-lock prefix" aria-hidden="true"></i>
+                    <input id="password" type="password" name="password">
+                    <label for="password">Password</label>
+                </div>
+            </div>
+            <div class="row margin">
+                <div class="input-field col s12">
+                    <i class="fa fa-lock prefix" aria-hidden="true"></i>
+                    <input id="firstname" type="text" name="firstname">
+                    <label for="firstname">Firstname</label>
+                </div>
+            </div>
+            <div class="row margin">
+                <div class="input-field col s12">
+                    <i class="fa fa-lock prefix" aria-hidden="true"></i>
+                    <input id="lastname" type="text" name="lastname">
+                    <label for="lastname">Lastname</label>
+                </div>
+            </div>
+            <div class="row">
                 <div class="input-field col s12">
                     <button type="submit" class="btn waves-effect waves-light col s12">
-                        <i class="fa fa-sign-in left"></i>Login with Password
+                        <i class="fa fa-sign-in left"></i>Register
                     </button>
-                </div>
-            </div>
-            <div class="row margin">
-                <div class="input-field col s12">
-                    <a href="{{facebook}}" class="btn waves-effect waves-light col s12 blue darken-4">
-                        <i class="fa fa-facebook-f left"></i>Login with Facebook
-                    </a>
-                </div>
-            </div>
-            <div class="row margin">
-                <div class="input-field col s12">
-                    <a href="{{google}}" class="btn waves-effect waves-light col s12 red">
-                        <i class="fa fa-google-plus left"></i>Login with Google+
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
-                    <a href="{{idCard}}" class="btn waves-effect waves-light col s12 blue lighten-2">
-                        <i class="fa fa-id-card-o left"></i>Login with id-kaart
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s6 m6 l6" id="register-now">
-                    <p class="margin medium-small">
-                        <a href="#">Register!</a>
-                    </p>
-                </div>
-                <div class="input-field col s6 m6 l6" id="forgot-password">
-                    <p class="margin right-align medium-small">
-                        <a href="">Forgot password ?</a>
-                    </p>
                 </div>
             </div>
         </form>

@@ -8,14 +8,13 @@ import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
-import org.pac4j.vertx.handler.impl.ApplicationLogoutHandler;
-import org.pac4j.vertx.handler.impl.ApplicationLogoutHandlerOptions;
-import org.pac4j.vertx.handler.impl.CallbackHandler;
-import org.pac4j.vertx.handler.impl.CallbackHandlerOptions;
+import org.pac4j.vertx.handler.impl.*;
 import server.security.SecurityConfig;
 
 import static server.router.UiRouter.UI_HOME;
-import static server.router.UiRouter.UI_LOGIN2;
+import static server.router.UiRouter.UI_LOGIN;
+import static server.security.SecurityConfig.AUTHORIZER;
+import static server.security.SecurityConfig.AuthClient.getClientNames;
 import static server.util.NetworkUtils.MAX_BODY_SIZE;
 import static server.util.NetworkUtils.isServer;
 
@@ -35,27 +34,27 @@ public class AuthRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        router.route().handler(BodyHandler.create().setBodyLimit(MAX_BODY_SIZE));
+        router.route().handler(BodyHandler.create()
+                .setBodyLimit(MAX_BODY_SIZE)
+                .setMergeFormAttributes(true));
         router.route().handler(CookieHandler.create());
         router.route().handler(createSessionHandler());
         router.route().handler(UserSessionHandler.create(securityConfig.getAuthProvider()));
 
-/*        router.route(AUTH_PRIVATE).handler(new SecurityHandler(vertx, securityConfig.getPac4jConfig(),
+        router.route(AUTH_PRIVATE).handler(new SecurityHandler(vertx, securityConfig.getPac4jConfig(),
                 securityConfig.getAuthProvider(),
                 new SecurityHandlerOptions()
                         .withClients(getClientNames())
-                        .withAuthorizers(AUTHORIZER)));*/
+                        .withAuthorizers(AUTHORIZER)));
 
         CallbackHandler callback = new CallbackHandler(vertx, securityConfig.getPac4jConfig(),
                 new CallbackHandlerOptions()
                         .setDefaultUrl(UI_HOME)
                         .setMultiProfile(false));
-        router.get(CALLBACK).handler(callback);
-        router.post(CALLBACK).handler(BodyHandler.create().setMergeFormAttributes(true)); // TODO: 16/02/2017 move up?
-        router.post(CALLBACK).handler(callback);
+        router.route(CALLBACK).handler(callback);
 
         router.get(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx, new ApplicationLogoutHandlerOptions()
-                .setDefaultUrl(UI_LOGIN2), securityConfig.getPac4jConfig()));
+                .setDefaultUrl(UI_LOGIN), securityConfig.getPac4jConfig()));
     }
 
     /**

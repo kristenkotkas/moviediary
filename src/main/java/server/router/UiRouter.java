@@ -5,8 +5,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
@@ -20,6 +18,8 @@ import server.template.ui.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.DatabaseRouter.API_USERS_INSERT;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -39,11 +39,10 @@ public class UiRouter extends Routable {
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
     public static final String UI_LOGIN = "/login";
-    public static final String UI_LOGIN2 = "/login2";
-    public static final String UI_FORMLOGIN = "/formlogin";
+    public static final String UI_FORM_LOGIN = "/formlogin";
+    public static final String UI_FORM_REGISTER = "/formregister";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
 
-    private static final String TEMPL_INDEX = "templates/index.hbs";
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
     private static final String TEMPL_MOVIES = "templates/movies.hbs";
@@ -51,8 +50,8 @@ public class UiRouter extends Routable {
     private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
     private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
     private static final String TEMPL_LOGIN = "templates/login.hbs";
-    private static final String TEMPL_LOGIN2 = "templates/login2.hbs";
-    private static final String TEMPL_FORMLOGIN = "templates/formlogin.hbs";
+    private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
+    private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
 
     private final HandlebarsTemplateEngine engine;
@@ -76,11 +75,11 @@ public class UiRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        router.get(UI_INDEX).handler(this::handleIndex);
+        router.get(UI_INDEX).handler(this::handleLogin);
         router.get(UI_HOME).handler(this::handleHome);
         router.get(UI_LOGIN).handler(this::handleLogin);
-        router.get(UI_LOGIN2).handler(this::handleLogin2);
-        router.get(UI_FORMLOGIN).handler(this::handleFormLogin);
+        router.get(UI_FORM_LOGIN).handler(this::handleFormLogin);
+        router.get(UI_FORM_REGISTER).handler(this::handleFormRegister);
         router.get(UI_IDCARDLOGIN).handler(this::handleIdCardLogin);
 
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
@@ -89,39 +88,30 @@ public class UiRouter extends Routable {
                 .setIncludeHidden(false));
     }
 
-    private void handleIndex(RoutingContext ctx) {
-        JsonObject card1 = new JsonObject().put("card", "kaart 1").put("sisu", "sisu 1");
-        JsonObject card2 = new JsonObject().put("card", "kaart 2").put("sisu", "sisu 2");
-        JsonObject card3 = new JsonObject().put("card", "kaart 3").put("sisu", "sisu 3");
-        JsonObject card4 = new JsonObject().put("card", "kaart 4").put("sisu", "sisu 4");
-        JsonArray array = new JsonArray().add(card1).add(card2).add(card3).add(card4);
-        engine.render(getSafe(ctx, TEMPL_INDEX, IndexTemplate.class)
-                .setPealkiri("Mega pealkiri")
-                .setCards(array), endHandler(ctx));
-    }
-
     private void handleHome(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
     }
 
     private void handleLogin(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class), endHandler(ctx));
-    }
-
-    private void handleLogin2(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_LOGIN2, Login2Template.class)
-                .setForm(UI_HOME + FORM.getClientNamePrefixed())
+        engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
+                .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebook(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogle(UI_HOME + GOOGLE.getClientNamePrefixed())
                 .setIdCard(UI_HOME + IDCARD.getClientNamePrefixed()), endHandler(ctx));
     }
 
     private void handleFormLogin(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_FORMLOGIN, FormLoginTemplate.class)
+        engine.render(getSafe(ctx, TEMPL_FORM_LOGIN, FormLoginTemplate.class)
+                .setRegisterUrl(UI_FORM_REGISTER)
                 .setCallbackUrl(securityConfig.getPac4jConfig()
                         .getClients()
                         .findClient(FormClient.class)
                         .getCallbackUrl()), endHandler(ctx));
+    }
+
+    private void handleFormRegister(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
+                .setRegisterRestUrl(API_USERS_INSERT), endHandler(ctx));
     }
 
     private void handleIdCardLogin(RoutingContext ctx) {
@@ -136,13 +126,9 @@ public class UiRouter extends Routable {
                         .getCallbackUrl()), endHandler(ctx));
     }
 
-    //tagastab templaadi mis on type param tüüpi, peab olema BaseTemplate alamklass
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
-        //siia saad panna baseTemplatei muutujaid kui vajadust peaks olema
-        //need on saadaval kõikidele alamklassidele
-        //näiteks
-        baseTemplate.setHello("world!");
+        baseTemplate.setLogoutLink(AUTH_LOGOUT);
         return baseTemplate;
     }
 }
