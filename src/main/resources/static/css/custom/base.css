@@ -26,9 +26,41 @@
     }
 }
 
-/* ---- Can be removed if not needed ----*/
+/* Nav bar centering */
+#nav-bar {
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
 
+#nav-bar ul {
+    clear: left;
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 50%;
+    text-align: center;
+}
 
+#nav-bar ul li {
+    display: block;
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    right: 50%;
+}
+
+/* Mobile nav bar button */
+.sidebar-collapse {
+    position: absolute;
+    left: 10px;
+    top: 20px;
+}
 
 /* label focus color */
 .input-field input[type=text]:focus + label {
@@ -70,7 +102,7 @@ header .brand-logo img {
 }
 
 /* Mobile mode */
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 601px) {
     /* Logo position */
     header .brand-logo {
         margin: 3px 0;
@@ -85,10 +117,15 @@ header .brand-logo img {
     ul.side-nav.leftside-navigation {
         top: 60px !important;
     }
+
+    /* Mobile nav bar button */
+    .sidebar-collapse {
+        top: 10px;
+    }
 }
 
 /* Tablet mode */
-@media only screen and (min-width: 500px) and (max-width: 1070px) {
+@media only screen and (min-width: 500px) and (max-width: 992px) {
     /* Logo position */
     header .brand-logo {
         margin: 3px 0;
