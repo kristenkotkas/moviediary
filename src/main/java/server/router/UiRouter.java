@@ -57,7 +57,8 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
 
-    private String email = "";
+    private String unique = "";
+    private String fullName = "";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -78,20 +79,29 @@ public class UiRouter extends Routable {
         };
     }
 
-    private String getEmail(RoutingContext ctx) {
+    private void setData(RoutingContext ctx) {
         String logInType = ctx.user().principal().fieldNames().iterator().next();
         JsonObject jsonObject = ctx.user().principal().getJsonObject(logInType);
         System.out.println(logInType);
         switch (logInType) {
             case "FacebookClient":
+                unique = jsonObject.getString("email");
+                fullName = jsonObject.getString("name");
+                break;
             case "FormClient":
-                email = jsonObject.getString("email");
+                unique = jsonObject.getString("email");
+                fullName = "FormClient Fullname";
                 break;
             case "Google2Client":
-                email = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
+                unique = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
+                fullName = jsonObject.getString("displayName");
                 break;
+            case "IdCardClient":
+                unique = jsonObject.getString("Serialnumber");
+                fullName = jsonObject.getString("first_name") + " " + jsonObject.getString("family_name");
+
         } // TODO: 19. veebr. 2017 add idcard
-        return email;
+        System.out.println("UNIQUE: " + unique);
     }
 
     @Override
@@ -122,7 +132,7 @@ public class UiRouter extends Routable {
 
     private void handleHome(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
-        getEmail(ctx);
+        setData(ctx);
     }
 
     private void handleMovies(RoutingContext ctx) {
@@ -186,7 +196,7 @@ public class UiRouter extends Routable {
         baseTemplate.setHistory(UI_HISTORY);
         baseTemplate.setStatistics(UI_STATISTICS);
         baseTemplate.setWishlist(UI_WISHLIST);
-        baseTemplate.setUserName(email);
+        baseTemplate.setUserName(fullName);
         return baseTemplate;
     }
 }
