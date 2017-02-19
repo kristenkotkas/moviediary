@@ -16,8 +16,12 @@
     margin-left: -10px !important;
 }
 
-.page-heading {
-    margin: 3% 0 2% 4%;
+.page-heading{
+    margin: 3% 0 1% 4%;
+}
+
+.logout-button{
+    margin: 0 0 2% 4%;
 }
 
 @media only screen and (min-width: 1071px) {
