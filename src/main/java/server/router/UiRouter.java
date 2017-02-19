@@ -5,6 +5,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
@@ -55,6 +57,8 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
 
+    private String email = "";
+
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
 
@@ -72,6 +76,22 @@ public class UiRouter extends Routable {
                 ctx.fail(ar.cause());
             }
         };
+    }
+
+    private String getEmail(RoutingContext ctx) {
+        String logInType = ctx.user().principal().fieldNames().iterator().next();
+        JsonObject jsonObject = ctx.user().principal().getJsonObject(logInType);
+        System.out.println(logInType);
+        switch (logInType) {
+            case "FacebookClient":
+            case "FormClient":
+                email = jsonObject.getString("email");
+                break;
+            case "Google2Client":
+                email = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
+                break;
+        } // TODO: 19. veebr. 2017 add idcard
+        return email;
     }
 
     @Override
@@ -98,11 +118,11 @@ public class UiRouter extends Routable {
     private void handleUser(RoutingContext ctx) {
         // FIXME: 19. veebr. 2017 db'st nimi võtta
         engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
-        System.out.println(ctx.user().principal());
     }
 
     private void handleHome(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
+        getEmail(ctx);
     }
 
     private void handleMovies(RoutingContext ctx) {
@@ -166,7 +186,7 @@ public class UiRouter extends Routable {
         baseTemplate.setHistory(UI_HISTORY);
         baseTemplate.setStatistics(UI_STATISTICS);
         baseTemplate.setWishlist(UI_WISHLIST);
-        baseTemplate.setUserName("Jane DoeName");
+        baseTemplate.setUserName(email);
         return baseTemplate;
     }
 }
