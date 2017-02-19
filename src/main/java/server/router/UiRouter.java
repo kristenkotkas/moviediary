@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_INSERT;
+import static server.router.DatabaseRouter.USER_EXISTS;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -111,6 +112,7 @@ public class UiRouter extends Routable {
 
     private void handleFormRegister(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
+                .setUserExists(ctx.request().getParam(USER_EXISTS) != null)
                 .setRegisterRestUrl(API_USERS_INSERT), endHandler(ctx));
     }
 

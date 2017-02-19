@@ -2,6 +2,8 @@ package server.entity;
 
 import io.vertx.ext.web.RoutingContext;
 
+import static io.vertx.core.http.HttpHeaders.LOCATION;
+
 /**
  * Contains http status codes and convenience methods.
  */
@@ -32,8 +34,16 @@ public class Status {
     }
 
     public static void serviceUnavailable(RoutingContext ctx, Throwable cause) {
-        ctx.response().setStatusCode(SERVICE_UNAVAILABLE).end(SERVICE_UNAVAILABLE + ": Service unavailable\n" +
-                "Cause: " + cause.getMessage());
+        ctx.response()
+                .setStatusCode(SERVICE_UNAVAILABLE)
+                .end(SERVICE_UNAVAILABLE + ": Service unavailable\n" + "Cause: " + cause.getMessage());
+    }
+
+    public static void redirect(RoutingContext ctx, String location) {
+        ctx.response()
+                .putHeader(LOCATION, location)
+                .setStatusCode(FOUND)
+                .end();
     }
 
     public static void notImplemented(RoutingContext ctx) {
