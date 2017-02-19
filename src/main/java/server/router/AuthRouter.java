@@ -32,6 +32,10 @@ public class AuthRouter extends Routable {
         this.securityConfig = securityConfig;
     }
 
+
+    // TODO: 19.02.2017 if fb/google auth is canceled -> redirect to login with error message?
+    // TODO: 19.02.2017 if any actions fail -> custom page or redirect to login?
+
     @Override
     public void route(Router router) {
         router.route().handler(BodyHandler.create()

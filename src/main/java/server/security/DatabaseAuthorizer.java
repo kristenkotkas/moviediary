@@ -52,8 +52,12 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         //todo change to serial number checking (hash)
         IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream,
-                                     DatabaseService database) -> stream.anyMatch(json ->
-                profile.getFirstName().toLowerCase().equals(json.getString(FIRSTNAME).toLowerCase()))),
+                                     DatabaseService database) -> {
+            System.out.println("-------------Authorizing ID Card user----------------------");
+            boolean isAuthorized = stream.anyMatch(json ->
+                    profile.getSerial().equals(json.getString(SERIAL)));
+            return isAuthorized;
+        }),
 
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
                 .filter(json -> json.getString(EMAIL).equals(profile.getEmail()))

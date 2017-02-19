@@ -33,7 +33,6 @@ public class SecurityConfig {
                 .collect(toList()));
         this.pac4jConfig.addAuthorizer(AUTHORIZER, new DatabaseAuthorizer(database));
         // TODO: 17.02.2017 store in config or smth
-        System.out.println("Is server: " + isServer(config));
         this.pac4jConfig.getClients().findClient(FormClient.class).setLoginUrl((isServer(config) ?
                 "https://movies.kyngas.eu" : "http://localhost:8081") + UI_FORM_LOGIN);
     }

@@ -54,7 +54,6 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
-    private static final String TEMPL_NAVIGATION = "templates/navigationBar.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -97,8 +96,8 @@ public class UiRouter extends Routable {
     }
 
     private void handleUser(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class)
-                .setUserName(""), endHandler(ctx)); // FIXME: 19. veebr. 2017 db'st nimi võtta
+        // FIXME: 19. veebr. 2017 db'st nimi võtta
+        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
         System.out.println(ctx.user().principal());
     }
 
@@ -120,18 +119,6 @@ public class UiRouter extends Routable {
 
     private void handleWishlist(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
-    }
-
-    // FIXME: 19. veebr. 2017 use this
-    private void handleNavigation(RoutingContext ctx) {
-        engine.render(getSafe(ctx,TEMPL_NAVIGATION, NavigationTemplate.class)
-                .setUser(UI_USER)
-                .setHome(UI_HOME)
-                .setMovies(UI_MOVIES)
-                .setHistory(UI_HISTORY)
-                .setStatistics(UI_STATISTICS)
-                .setWishlist(UI_WISHLIST)
-                .setUserName("Jane DoeName"), endHandler(ctx));
     }
 
     private void handleLogin(RoutingContext ctx) {
@@ -172,6 +159,14 @@ public class UiRouter extends Routable {
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLogoutLink(AUTH_LOGOUT);
+        //need on nüüd saadaval igalpool ja täidetud siin isegi kui subtemplate ei kasuta neid
+        baseTemplate.setUser(UI_USER);
+        baseTemplate.setHome(UI_HOME);
+        baseTemplate.setMovies(UI_MOVIES);
+        baseTemplate.setHistory(UI_HISTORY);
+        baseTemplate.setStatistics(UI_STATISTICS);
+        baseTemplate.setWishlist(UI_WISHLIST);
+        baseTemplate.setUserName("Jane DoeName");
         return baseTemplate;
     }
 }
