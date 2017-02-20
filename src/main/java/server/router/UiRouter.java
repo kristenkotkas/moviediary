@@ -15,6 +15,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
+import server.service.DatabaseService;
 import server.template.ui.*;
 
 import java.nio.file.Path;
@@ -23,6 +24,7 @@ import java.nio.file.Paths;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_INSERT;
 import static server.router.DatabaseRouter.USER_EXISTS;
+import static server.router.EventBusRouter.EVENTBUS;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -65,11 +67,13 @@ public class UiRouter extends Routable {
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
+    private final DatabaseService database;
 
-    public UiRouter(Vertx vertx, SecurityConfig securityConfig) throws Exception {
+    public UiRouter(Vertx vertx, SecurityConfig securityConfig, DatabaseService database) throws Exception {
         super(vertx);
         this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : RESOURCES);
         this.securityConfig = securityConfig;
+        this.database = database;
     }
 
     public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
@@ -201,7 +205,6 @@ public class UiRouter extends Routable {
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLogoutLink(AUTH_LOGOUT);
-        //need on nüüd saadaval igalpool ja täidetud siin isegi kui subtemplate ei kasuta neid
         baseTemplate.setUser(UI_USER);
         baseTemplate.setHome(UI_HOME);
         baseTemplate.setMovies(UI_MOVIES);
@@ -210,6 +213,7 @@ public class UiRouter extends Routable {
         baseTemplate.setWishlist(UI_WISHLIST);
         baseTemplate.setUserName(fullName);
         baseTemplate.setFirstName(firstName);
+        baseTemplate.setEventbus(EVENTBUS);
         return baseTemplate;
     }
 }

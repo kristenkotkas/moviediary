@@ -20,4 +20,6 @@ public interface BaseTemplate extends TypeSafeTemplate {
     void setUserName(String name);
 
     void setFirstName(String name);
+
+    void setEventbus(String eventbus);
 }

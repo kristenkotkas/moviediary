@@ -36,11 +36,13 @@ public class ServerVerticle extends AbstractVerticle {
         routables = Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig), //authentication
                 new TmdbRouter(vertx, tmdb), //tmdb rest api
-                new BankLinkRouter(vertx, bls),
+                new BankLinkRouter(vertx, bls), //pangalink
                 new DatabaseRouter(vertx, database, securityConfig), //database rest api
-                new UiRouter(vertx, securityConfig)); //ui
+                new EventBusRouter(vertx, database), //eventbus
+                new UiRouter(vertx, securityConfig, database)); //ui
         routables.forEach(routable -> routable.route(router));
         router.route().last().handler(Status::notFound); //if no handler found for address -> 404
+        // TODO: 20.02.2017 mingi ilus 404 leht?
 
         vertx.createHttpServer()
                 .requestHandler(router::accept)
