@@ -48,8 +48,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {
         Future<JsonObject> future = Future.future();
         if (!tryCachedResult(true, cache, future)) {
-            client.get(HTTPS, ENDPOINT, uri + config.getString(APIKEY, ""),
-                    response -> handleResponse(response, cache, future)).end();
+            client.getNow(HTTPS, ENDPOINT, uri + config.getString(APIKEY, ""),
+                    response -> handleResponse(response, cache, future));
         }
         return future;
     }

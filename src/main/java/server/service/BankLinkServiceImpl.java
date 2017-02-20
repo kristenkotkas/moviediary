@@ -3,21 +3,19 @@ package server.service;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import server.entity.Status;
 
+import static server.entity.Status.OK;
 import static server.service.BankLinkServiceImpl.Cache.PAYMENT;
 
-
-// VAJAB PANGALINK-NET SERVERI JOOKSMIST ANTUD MASINAS
 public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implements BankLinkService {
-    private static final Logger log = LoggerFactory.getLogger(TmdbServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BankLinkServiceImpl.class);
     private static final int HTTP = 8083;
     private static final String ENDPOINT = "localhost" ;
+    private static final String ENABLED = "use_pangalink";
 
     private static final String PAYMENTS = "/api/project/";
 
@@ -29,7 +27,7 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
         this.vertx = vertx;
         this.config = config;
-        this.client = vertx.createHttpClient(new HttpClientOptions());
+        this.client = vertx.createHttpClient();
     }
 
     public Future<JsonObject> getPayments(){
@@ -43,20 +41,27 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {
         Future<JsonObject> future = Future.future();
-        if (!tryCachedResult(true, cache, future)) {
-            client.get(HTTP, ENDPOINT, uri,
-                    response -> handleResponse(response, cache, future)).end();
+        if (isEnabled(future) && !tryCachedResult(false, cache, future)) { //kas peaks olema cached?, kui jah siis kui kauaks
+            client.getNow(HTTP, ENDPOINT, uri, response -> handleResponse(response, cache, future));
         }
         return future;
     }
 
     private void handleResponse(HttpClientResponse response, CacheItem<JsonObject> cache, Future<JsonObject> future) {
-        if (response.statusCode() == Status.OK) {
+        if (response.statusCode() == OK) {
             response.bodyHandler(body -> future.complete(cache.set(body.toJsonObject())));
         } else {
             future.fail("API returned code: " + response.statusCode() +
                     "; message: " + response.statusMessage());
         }
+    }
+
+    private boolean isEnabled(Future future) {
+        if (!config.getBoolean(ENABLED, false)) {
+            future.fail("Pangalink usage is disabled!");
+            return false;
+        }
+        return true;
     }
 
     public enum Cache {
