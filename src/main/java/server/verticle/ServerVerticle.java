@@ -38,7 +38,7 @@ public class ServerVerticle extends AbstractVerticle {
                 new TmdbRouter(vertx, tmdb), //tmdb rest api
                 new BankLinkRouter(vertx, bls),
                 new DatabaseRouter(vertx, database, securityConfig), //database rest api
-                new UiRouter(vertx, securityConfig)); //ui
+                new UiRouter(vertx, securityConfig, database)); //ui
         routables.forEach(routable -> routable.route(router));
         router.route().last().handler(Status::notFound); //if no handler found for address -> 404
 

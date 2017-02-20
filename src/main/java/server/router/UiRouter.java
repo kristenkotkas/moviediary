@@ -15,6 +15,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
+import server.service.DatabaseService;
 import server.template.ui.*;
 
 import java.nio.file.Path;
@@ -59,17 +60,19 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
 
-    private String unique = "";
-    private String fullName = "";
-    private String firstName = "";
+    public static String unique = "";
+    public static String fullName = "";
+    public static String firstName = "";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
+    private DatabaseService database;
 
-    public UiRouter(Vertx vertx, SecurityConfig securityConfig) throws Exception {
+    public UiRouter(Vertx vertx, SecurityConfig securityConfig, DatabaseService database) throws Exception {
         super(vertx);
         this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : RESOURCES);
         this.securityConfig = securityConfig;
+        this.database = database;
     }
 
     public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
@@ -107,8 +110,7 @@ public class UiRouter extends Routable {
                 firstName = jsonObject.getString("first_name");
                 fullName = firstName + " " + jsonObject.getString("family_name");
 
-        } // TODO: 19. veebr. 2017 add idcard
-        System.out.println("UNIQUE: " + unique);
+        }
     }
 
     @Override
@@ -134,7 +136,6 @@ public class UiRouter extends Routable {
     }
 
     private void handleUser(RoutingContext ctx) {
-        // FIXME: 19. veebr. 2017 db'st nimi võtta
         engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
     }
 

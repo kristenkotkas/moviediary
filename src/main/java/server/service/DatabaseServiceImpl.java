@@ -12,6 +12,7 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
+import server.router.UiRouter;
 
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
@@ -31,7 +32,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "JOIN Users ON Views.UserId = Users.Id";
+                    "JOIN Users ON Views.UserId = Users.Id " +
+                    "WHERE Email = ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -117,7 +119,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_VIEWS, resultSetHandler(conn, CACHE_ALL, future))));
+                    conn -> conn.queryWithParams(SQL_QUERY_VIEWS, new JsonArray().add(UiRouter.unique),
+                            resultSetHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
