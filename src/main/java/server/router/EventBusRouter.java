@@ -5,6 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -13,6 +14,7 @@ import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import server.service.DatabaseService;
+import server.util.StringUtils;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +41,24 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply(param -> database.getAllUsers(), JsonObject::size));
-        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews()));
+        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews(), new Function<JsonObject, Object>() {
+            @Override
+            public Object apply(JsonObject json) {
+                json.remove("results");
+                JsonArray array = json.getJsonArray("rows");
+                for (int i = 0; i < array.size(); i++) {
+                    array.getJsonObject(i).put("Start", StringUtils.getNormalDTFromDB(
+                            array.getJsonObject(i).getString("Start"), StringUtils.SHORT_DATE));
+                    array.getJsonObject(i).put("End", StringUtils.getNormalDTFromDB(
+                            array.getJsonObject(i).getString("End"), StringUtils.SHORT_DATE));
+                    array.getJsonObject(i).put("WasFirst", StringUtils.getNormalBoolean(
+                            array.getJsonObject(i).getBoolean("WasFirst")));
+                    array.getJsonObject(i).put("WasCinema", StringUtils.getNormalBoolean(
+                            array.getJsonObject(i).getBoolean("WasCinema")));
+                }
+                return json;
+            }
+        }));
         gateway(TEST_GATEWAY, log());
 
         // TODO: 20.02.2017 remove

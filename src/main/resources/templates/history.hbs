@@ -18,7 +18,8 @@
             <div class="card l4">
                 <div class="card-content">
                     <span class="card-title">Filters</span>
-                    <div class="row"></div>
+                    <div class="row">
+                    </div>
                     <div class="row">
                         <div class="input-field login-text left-align">
                             <input id="seenFirst" type="checkbox">
@@ -154,8 +155,8 @@
                                     '<th>Title</th>' +
                                     '<th>Start</th>' +
                                     '<th>End</th>' +
-                                    '<th>Was first</th>' +
-                                    '<th>Was cinema</th>' +
+                                    '<th class="center">Was first</th>' +
+                                    '<th class="center">Was cinema</th>' +
                                     '</tr>');
                             Materialize.toast("Retrieved movies from database!", 5000);
 
@@ -166,8 +167,8 @@
                                         '<td>' + data[i].Title + '</td>' +
                                         '<td>' + data[i].Start + '</td>' +
                                         '<td>' + data[i].End + '</td>' +
-                                        '<td>' + data[i].WasCinema + '</td>' +
-                                        '<td>' + data[i].WasFirst + '</td>' +
+                                        '<td class="center">' + data[i].WasCinema + '</td>' +
+                                        '<td class="center">' + data[i].WasFirst + '</td>' +
                                         '</tr>');
                             });
                         });
