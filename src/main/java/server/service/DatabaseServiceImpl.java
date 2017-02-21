@@ -14,6 +14,8 @@ import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 import server.router.UiRouter;
 
+import java.time.LocalDateTime;
+
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
 
@@ -28,8 +30,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             "INSERT INTO Users (Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?)";
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
+    private static final String SQL_INSERT_DEMO_VIEWS = "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Title, Start, End, WasFirst, WasCinema " +
+                    "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ?";
@@ -57,6 +61,22 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                 .add(password)
                 .add(firstname)
                 .add(lastname), updateResultHandler(conn, future))));
+        insertDemoViews(username, 157336, 1,0);
+        insertDemoViews(username, 334541, 1,1);
+        insertDemoViews(username, 334543, 0,1);
+        return future;
+    }
+
+    private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
+        Future<JsonObject> future = Future.future();
+        client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
+                        .add(username)
+                        .add(movieId)
+                        .add(LocalDateTime.now().toString())
+                        .add(LocalDateTime.now().plusHours(2).toString())
+                        .add(wasFirst)
+                        .add(wasCinema), updateResultHandler(conn, future))));
         return future;
     }
 

@@ -41,23 +41,18 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply(param -> database.getAllUsers(), JsonObject::size));
-        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews(), new Function<JsonObject, Object>() {
-            @Override
-            public Object apply(JsonObject json) {
-                json.remove("results");
-                JsonArray array = json.getJsonArray("rows");
-                for (int i = 0; i < array.size(); i++) {
-                    array.getJsonObject(i).put("Start", StringUtils.getNormalDTFromDB(
-                            array.getJsonObject(i).getString("Start"), StringUtils.SHORT_DATE));
-                    array.getJsonObject(i).put("End", StringUtils.getNormalDTFromDB(
-                            array.getJsonObject(i).getString("End"), StringUtils.SHORT_DATE));
-                    array.getJsonObject(i).put("WasFirst", StringUtils.getNormalBoolean(
-                            array.getJsonObject(i).getBoolean("WasFirst")));
-                    array.getJsonObject(i).put("WasCinema", StringUtils.getNormalBoolean(
-                            array.getJsonObject(i).getBoolean("WasCinema")));
-                }
-                return json;
+        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews(), json -> {
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                array.getJsonObject(i).put("Start", StringUtils.getNormalDTFromDB(
+                        array.getJsonObject(i).getString("Start"), StringUtils.LONG_DATE));
+                array.getJsonObject(i).put("WasFirst", StringUtils.getNormalBoolean(
+                        array.getJsonObject(i).getBoolean("WasFirst")));
+                array.getJsonObject(i).put("WasCinema", StringUtils.getNormalBoolean(
+                        array.getJsonObject(i).getBoolean("WasCinema")));
             }
+            return json;
         }));
         gateway(TEST_GATEWAY, log());
 

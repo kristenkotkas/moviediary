@@ -29,6 +29,6 @@ public class StringUtils {
     }
 
     public static String getNormalBoolean(boolean string) {
-        return string ? "<i class=\"fa fa-check text-green\"></i>" : ""; // FIXME: 21. veebr. 2017 PARANDADA
+        return string ? "\"fa fa-check text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
     }
 }

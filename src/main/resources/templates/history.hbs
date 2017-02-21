@@ -113,7 +113,7 @@
         <div class="card">
             <div class="card-content white-text">
                 <span class="card-title grey-text">History</span>
-                <table class="striped highlight">
+                <table class="striped highlight responsive-table">
                     <thead class="grey-text">
                     </thead>
                     <tbody id="table" class="grey-text">
@@ -153,10 +153,9 @@
                             $("#table").append(
                                     '<tr>' +
                                     '<th>Title</th>' +
-                                    '<th>Start</th>' +
-                                    '<th>End</th>' +
-                                    '<th class="center">Was first</th>' +
-                                    '<th class="center">Was cinema</th>' +
+                                    '<th>Date</th>' +
+                                    '<th class="center">Viewed first time</th>' +
+                                    '<th class="center">Viewed in cinema</th>' +
                                     '</tr>');
                             Materialize.toast("Retrieved movies from database!", 5000);
 
@@ -166,9 +165,8 @@
                                         '<tr>' +
                                         '<td>' + data[i].Title + '</td>' +
                                         '<td>' + data[i].Start + '</td>' +
-                                        '<td>' + data[i].End + '</td>' +
-                                        '<td class="center">' + data[i].WasCinema + '</td>' +
-                                        '<td class="center">' + data[i].WasFirst + '</td>' +
+                                        '<td class="center"><i class=' + data[i].WasCinema + '></i></td>' +
+                                        '<td class="center"><i class=' + data[i].WasFirst + '></i></td>' +
                                         '</tr>');
                             });
                         });
