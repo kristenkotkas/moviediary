@@ -1,7 +1,6 @@
 package server.router;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -13,6 +12,7 @@ import static io.vertx.core.http.HttpHeaders.LOCATION;
 import static server.entity.Status.*;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.security.FormClient.*;
+import static server.service.DatabaseService.DB_USERNAME;
 import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.contains;
 import static server.util.HandlerUtils.jsonResponse;
@@ -54,17 +54,13 @@ public class DatabaseRouter extends Routable {
         database.getUser(username).setHandler(resultHandler(ctx, result -> {
             boolean exists = getRows(result).stream()
                     .map(obj -> (JsonObject) obj)
-                    .anyMatch(json -> json.getString("Email").equals(username));
+                    .anyMatch(json -> json.getString(DB_USERNAME).equals(username));
             if (!exists) {
-                database.insertUser(new JsonArray()
-                        .add(username).add(password)
-                        .add("")
-                        .add(firstname).add(lastname))
-                        .setHandler(resultHandler(ctx, ar -> ctx.response()
-                                .putHeader(LOCATION, securityConfig.getPac4jConfig()
-                                        .getClients()
-                                        .findClient(FormClient.class)
-                                        .getCallbackUrl() + formAuthData(username, password))
+                database.insertUser(username, password, firstname, lastname).setHandler(resultHandler(ctx, ar ->
+                        ctx.response().putHeader(LOCATION, securityConfig.getPac4jConfig()
+                                .getClients()
+                                .findClient(FormClient.class)
+                                .getCallbackUrl() + formAuthData(username, password))
                                 .setStatusCode(FOUND)
                                 .end()));
             } else {

@@ -25,15 +25,14 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String MYSQL = "mysql";
 
     private static final String SQL_INSERT_USER =
-            "INSERT INTO Users (Email, Password, Serialnumber, Firstname, Lastname) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO Users (Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?)";
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
-    private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Email = ?";
+    private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, End, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "JOIN Users ON Views.UserId = Users.Id " +
-                    "WHERE Email = ?";
+                    "WHERE Username = ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -47,46 +46,17 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> insertUser(JsonArray userData) {
-        // TODO: 19.02.2017 create userData array here, check for invalid values
+    public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
         Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_INSERT_USER, userData, ar -> {
-                    if (ar.succeeded()) {
-                        future.complete(ar.result().toJson());
-                    } else {
-                        future.fail(ar.cause());
-                    }
-                    conn.close();
-                })));
-        return future;
-    }
-
-    @Override
-    public Future<JsonObject> insertOAuth2User(String email, String firstname, String lastname) {
-        Future<JsonObject> future = Future.future();
-        if (!nonNull(email, firstname, lastname) || contains("", email, firstname, lastname)) {
+        if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
             future.fail(new Throwable("Email, firstname and lastname must exist!"));
             return future;
         }
         client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                .add(email).add("")
-                .add("")
-                .add(firstname).add(lastname), updateResultHandler(conn, future))));
-        return future;
-    }
-
-    @Override
-    public Future<JsonObject> insertIdCardUser(String serial, String firstname, String lastname) {
-        Future<JsonObject> future = Future.future();
-        if (!nonNull(serial, firstname, lastname) || contains("", serial, firstname, lastname)) {
-            future.fail(new Throwable("SerialCode, firstname and lastname must exist!"));
-            return future;
-        }
-        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                .add("").add("")
-                .add(serial)
-                .add(firstname).add(lastname), updateResultHandler(conn, future))));
+                .add(username)
+                .add(password)
+                .add(firstname)
+                .add(lastname), updateResultHandler(conn, future))));
         return future;
     }
 

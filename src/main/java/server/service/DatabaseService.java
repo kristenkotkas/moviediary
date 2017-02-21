@@ -9,6 +9,11 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_ALL = "all";
     String CACHE_USER = "user_";
 
+    String DB_USERNAME = "Username";
+    String DB_PASSWORD = "Password";
+    String DB_FIRSTNAME = "Firstname";
+    String DB_LASTNAME = "Lastname";
+
     String COLUMNS = "columnNames";
     String ROWS = "rows";
     String RESULTS = "results";
@@ -19,11 +24,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
         return new DatabaseServiceImpl(vertx, config);
     }
 
-    Future<JsonObject> insertUser(JsonArray userData);
-
-    Future<JsonObject> insertOAuth2User(String email, String firstname, String lastname);
-
-    Future<JsonObject> insertIdCardUser(String serial, String firstname, String lastname);
+    Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
 
     Future<JsonObject> getUser(String username);
 
