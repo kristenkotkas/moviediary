@@ -13,4 +13,6 @@ public interface BankLinkService {
     Future<JsonObject> getPaymentById(String id);
 
     Future<JsonObject> getPayments();
+
+    Future<JsonObject> createPayment(JsonObject paymentDetails);
 }
