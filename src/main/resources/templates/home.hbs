@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
     <title>Home</title>
     <script src="/static/js/fallback.min.js"></script>
-    <script src="/static/js/loader.js"></script>
 </head>
 <body class="blue lighten-5">
 {{> templates/navigationBar.hbs}}
@@ -25,8 +25,10 @@
     </div>
 </div>
 
+<script src="/static/js/loaders/ui.js"></script>
+<script src="/static/js/loaders/eventbus.js"></script>
 <script>
-    fallback.ready(function () {
+    fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         console.log("Hello world!");
 
         $("#EventbusButton").click(function () { //klikkamine mingile id-ga objectile

@@ -19,31 +19,26 @@ fallback.load({
         '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js',
         '//movies.kyngas.eu/static/js/jquery-2.2.4.min.js'
     ],
-    materialize: [
+    Materialize: [
         '//localhost:8081/static/js/materialize.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js',
         '//movies.kyngas.eu/static/js/materialize.min.js'
-    ],
-    plugins: [
-        '//localhost:8081/static/js/plugins.min.js',
-        '//demo.geekslabs.com/materialize-v1.0/js/plugins.min.js',
-        '//movies.kyngas.eu/static/js/plugins.min.js'
-    ],
-    SockJS: [
-        '//localhost:8081/static/js/sockjs-0.3.4.min.js',
-        '//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js',
-        '//movies.kyngas.eu/static/js/sockjs-0.3.4.min.js'
-    ],
-    EventBus: [
-        '//localhost:8081/static/js/vertx-eventbus.js',
-        '//raw.githubusercontent.com/vert-x3/vertx-examples/master/web-examples/src/main/java/io/vertx/example/web/chat/webroot/vertx-eventbus.js',
-        '//movies.kyngas.eu/static/js/vertx-eventbus.js'
     ]
+    /*plugins: [
+     '//localhost:8081/static/js/plugins.min.js',
+     '//demo.geekslabs.com/materialize-v1.0/js/plugins.min.js',
+     '//movies.kyngas.eu/static/js/plugins.min.js'
+     ],*/
 }, {
     shim: {
+        //base.css requires materialize.css to be loaded before etc...
         base_css: ['materialize_css'],
-        materialize: ['jQuery'],
-        plugins: ['jQuery', 'materialize'],
-        EventBus: ['SockJS']
+        Materialize: ['jQuery']
+        /*plugins: ['jQuery', 'Materialize'],*/
     }
+});
+
+//Enables sidebar functionality after MaterializeCSS has been loaded
+fallback.ready(['Materialize'], function () {
+    $(".sidebar-collapse").sideNav();
 });
