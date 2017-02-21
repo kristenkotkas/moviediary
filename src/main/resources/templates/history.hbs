@@ -149,28 +149,27 @@
                         eventbus.send("database_get_history", {}, function (error, reply) {
                             console.log(reply.body);
                             var data = reply.body['rows'];
-                            var text =
+                            $("#table").append(
                                     '<tr>' +
                                     '<th>Title</th>' +
                                     '<th>Start</th>' +
                                     '<th>End</th>' +
                                     '<th>Was first</th>' +
                                     '<th>Was cinema</th>' +
-                                    '</tr>';
+                                    '</tr>');
                             Materialize.toast("Retrieved movies from database!", 5000);
 
                             $.each(data, function (i) {
-                                text += '<tr>' +
+
+                                $("#table").append(
+                                        '<tr>' +
                                         '<td>' + data[i].Title + '</td>' +
                                         '<td>' + data[i].Start + '</td>' +
                                         '<td>' + data[i].End + '</td>' +
                                         '<td>' + data[i].WasCinema + '</td>' +
                                         '<td>' + data[i].WasFirst + '</td>' +
-                                        '</tr>';
+                                        '</tr>');
                             });
-
-                            $("#table").append(text);
-
                         });
 
                     }, 10);
