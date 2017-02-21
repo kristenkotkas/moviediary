@@ -28,6 +28,7 @@ public class EventBusRouter extends Routable {
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
     public static final String TEST_GATEWAY = "go_right_through";
+    public static final String DATABASE_GET_HISTORY = "database_get_history";
 
     //consumer -> ainult sissetulevad sõnumid lubatud (ja vastused)
     //gateway -> kõik sõnumid lubatud
@@ -38,6 +39,7 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply(param -> database.getAllUsers(), JsonObject::size));
+        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews()));
         gateway(TEST_GATEWAY, log());
 
         // TODO: 20.02.2017 remove

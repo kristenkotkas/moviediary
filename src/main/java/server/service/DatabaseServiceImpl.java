@@ -29,7 +29,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Email = ?";
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Firstname, Lastname, Title, Start, End, WasFirst, WasCinema " +
+            "SELECT Title, Start, End, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "JOIN Users ON Views.UserId = Users.Id " +
