@@ -1,5 +1,6 @@
 package server.util;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,11 +49,12 @@ public class StringUtils {
         return string ? "\"fa fa-check text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
     }
 
-    public static String formToDBDate(String date) {
+    public static String formToDBDate(String date, boolean isEnd) {
         //"22 February, 2017" -> 2017-02-22T
         if (!date.equals("")) {
             String[] parts = date.split(" ");
-            return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
+            if (isEnd) return LocalDate.parse((parts[2] + "-" + months.get(parts[1]) + "-") + parts[0]).plusDays(1).toString() + "T";
+            else return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
         } return "";
     }
 }

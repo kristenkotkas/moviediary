@@ -119,8 +119,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     @Override
     public Future<JsonObject> getAllViews(String param) {
         JsonObject json = new JsonObject(param);
-        json.put("start", StringUtils.formToDBDate(json.getString("start")));
-        json.put("end", StringUtils.formToDBDate(json.getString("end")));
+        json.put("start", StringUtils.formToDBDate(json.getString("start"), false));
+        json.put("end", StringUtils.formToDBDate(json.getString("end"), true));
+        System.out.println(json.encodePrettily());
         //"WHERE Username = ? AND Start >= ? AND End <= ? AND " + "WasFirst = ? AND WasCinema = ?"
         // AND ? AND ?
         String SQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS;
