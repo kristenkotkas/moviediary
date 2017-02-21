@@ -32,7 +32,6 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             "SELECT Title, Start, End, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "JOIN Users ON Views.UserId = Users.Id " +
                     "WHERE Username = ?";
 
     private final Vertx vertx;

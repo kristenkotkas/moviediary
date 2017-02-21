@@ -107,7 +107,7 @@ public class UiRouter extends Routable {
                 firstName = jsonObject.getString("name.givenName");
                 break;
             case "IdCardClient":
-                unique = jsonObject.getString("Serialnumber");
+                unique = jsonObject.getString("serialnumber");
                 firstName = jsonObject.getString("first_name");
                 fullName = firstName + " " + jsonObject.getString("family_name");
 
