@@ -32,11 +32,12 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
     private static final String SQL_INSERT_DEMO_VIEWS = "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_VIEWS =
+    //NOT final
+    private static String SQL_QUERY_VIEWS =
                     "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Username = ?";
+                    "WHERE Username = ? AND Start >= ? AND End <= ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -105,11 +106,28 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     @Override
     public Future<JsonObject> getAllViews() {
+        // TODO: 21. veebr. 2017 tööle panna? 
+        JsonObject json = new JsonObject("{\n" +
+                "  \"is-first\": false,\n" +
+                "  \"is-cinema\": false,\n" +
+                "  \"start\": \"2017-02-11T22:57:42Z\",\n" +
+                "  \"end\": \"2017-02-28T22:57:42Z\"\n" +
+                "}");
+        //"WHERE Username = ? AND Start >= ? AND End <= ? AND " + "WasFirst = ? AND WasCinema = ?"
+        // AND ? AND ?
+        if (json.getBoolean("is-first")) SQL_QUERY_VIEWS += " AND WasFirst";
+        if (json.getBoolean("is-cinema")) SQL_QUERY_VIEWS += " AND WasCinema";
+
+        System.out.println("QUERY:" + SQL_QUERY_VIEWS);
+
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
-                    conn -> conn.queryWithParams(SQL_QUERY_VIEWS, new JsonArray().add(UiRouter.unique),
+                    conn -> conn.queryWithParams(SQL_QUERY_VIEWS, new JsonArray()
+                                    .add(UiRouter.unique)
+                                    .add(json.getString("start"))
+                                    .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_ALL, future))));
         }
         return future;
