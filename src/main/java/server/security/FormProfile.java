@@ -6,7 +6,7 @@ import server.entity.SyncResult;
 import server.service.DatabaseService;
 
 import static server.security.SecurityConfig.*;
-import static server.service.DatabaseService.getRows;
+import static server.service.DatabaseService.*;
 
 public class FormProfile extends CommonProfile {
     // TODO: 19.02.2017 define attributes
@@ -19,7 +19,7 @@ public class FormProfile extends CommonProfile {
         result.executeAsync(() -> database.getUser(email).setHandler(ar -> result.setReady(ar.result())));
         getRows(result.await().get()).stream()
                 .map(obj -> (JsonObject) obj)
-                .filter(json -> email.equals(json.getString(DB_EMAIL)))
+                .filter(json -> email.equals(json.getString(DB_USERNAME)))
                 .findAny()
                 .ifPresent(json -> {
                     addAttribute(PAC4J_FIRSTNAME, json.getString(DB_FIRSTNAME));

@@ -63,7 +63,7 @@ public class EventBusRouter extends Routable {
 
         // TODO: 20.02.2017 remove
         //saadab stringi sellele aadressile iga 2 sekundi tagant
-        vertx.setPeriodic(2000L, timer -> vertx.eventBus().publish(TEST_GATEWAY, "Sending publishing message!"));
+        //vertx.setPeriodic(2000L, timer -> vertx.eventBus().publish(TEST_GATEWAY, "Sending publishing message!"));
     }
 
     private <T> void listen(String address, Handler<Message<T>> replyHandler) {

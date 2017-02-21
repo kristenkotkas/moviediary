@@ -30,12 +30,6 @@ public class SecurityConfig {
     public static final String PAC4J_ISSUER = "issuer";
     public static final String PAC4J_COUNTRY = "location";
 
-    public static final String DB_EMAIL = "Email";
-    public static final String DB_PASSWORD = "Password";
-    public static final String DB_SERIAL = "Serialnumber";
-    public static final String DB_FIRSTNAME = "Firstname";
-    public static final String DB_LASTNAME = "Lastname";
-
 
 
     private final Pac4jAuthProvider authProvider = new Pac4jAuthProvider();

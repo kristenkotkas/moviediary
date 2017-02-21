@@ -3,14 +3,14 @@ package server.util;
 import java.time.LocalDateTime;
 
 public class StringUtils {
-    public static int SHORT_DATE = 1;
-    public static int LONG_DATE = 2;
+    public static final int SHORT_DATE = 1;
+    public static final int LONG_DATE = 2;
 
     /**
-     * Returns String representing given LocalDateTime
+     * Returns String representing given LocalDateTime.
      *
-     * @param date
-     * @return
+     * @param date to format
+     * @return date as string
      */
     public static String getNormalDate(LocalDateTime date, int type) {
         String returnString = Integer.toString(date.getDayOfMonth()) + " " +
