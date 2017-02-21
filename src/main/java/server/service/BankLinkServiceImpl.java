@@ -4,6 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -30,8 +31,14 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
         this.client = vertx.createHttpClient();
     }
 
+    @Override
     public Future<JsonObject> getPayments(){
         return get(PAYMENTS, getCached(PAYMENT.prefix));
+    }
+
+    @Override
+    public Future<JsonObject> createPayment(JsonObject paymentDetails){
+        return post(PAYMENTS, paymentDetails, getCached(PAYMENT.prefix));
     }
 
     @Override
@@ -44,6 +51,16 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
         if (isEnabled(future) && !tryCachedResult(false, cache, future)) { //kas peaks olema cached?, kui jah siis kui kauaks
             client.getNow(HTTP, ENDPOINT, uri, response -> handleResponse(response, cache, future));
         }
+        return future;
+    }
+
+    private Future<JsonObject> post(String uri, JsonObject body, CacheItem<JsonObject> cache){
+        Future<JsonObject> future = Future.future();
+        if (isEnabled(future)){
+            client.post(HTTP, ENDPOINT, uri, response ->handleResponse(response, cache, future))
+                    .putHeader("content-type", "application/json; charset=utf-8").end(Json.encodePrettily(body));
+        }
+
         return future;
     }
 
