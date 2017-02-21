@@ -60,22 +60,22 @@
                 </div>
             </div>
 
-            <div class="col s12 m12 l6"> <!-- small 12/12, med 12/12, large 6/12-->
+            <!--<div class="col s12 m12 l6"> <!-- small 12/12, med 12/12, large 6/12--
                 <div class="card small z-depth-0">
                     <div class="card-content">
                         <div class="row">
-                            <div class="col s4"> <!--4/12-->
+                            <div class="col s4"> <!--4/12--
                                 <span class="card-title">Quick search</span>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col s4 offset-s2 input-field"> <!--4/12, sides 2/12-->
+                            <div class="col s4 offset-s2 input-field"> <!--4/12, sides 2/12-
                                 <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
                                     <i class="fa fa-search left"></i>Today
                                 </button>
                             </div>
-                            <div class="col s4 input-field"> <!--4/12-->
+                            <div class="col s4 input-field"> <!--4/12-
                                 <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
                                     <i class="fa fa-search left"></i>This week
                                 </button>
@@ -83,17 +83,17 @@
                         </div>
 
                         <div class="row">
-                            <div class="col s4 input-field"> <!--4/12-->
+                            <div class="col s4 input-field"> <!--4/12-
                                 <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
                                     <i class="fa fa-search left"></i>This month
                                 </button>
                             </div>
-                            <div class="col s4 input-field"> <!--4/12-->
+                            <div class="col s4 input-field"> <!--4/12-
                                 <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
                                     <i class="fa fa-search left"></i>This year
                                 </button>
                             </div>
-                            <div class="col s4 input-field"> <!--4/12-->
+                            <div class="col s4 input-field"> <!--4/12-
                                 <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
                                     <i class="fa fa-search left"></i>All time
                                 </button>
@@ -102,7 +102,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
         <div class="row">
             <div class="">
                 <div class="card z-depth-0">
@@ -136,7 +136,12 @@
                 eventbus.onopen = function () { // ühendus loodud
                     setTimeout(function () {
                         //saadame "database_users" aadressile sõnumi, parameetriks {} ehk hetkel tühi jsonobject
-                        eventbus.send("database_get_history", {}, function (error, reply) {
+                        eventbus.send("database_get_history",
+                                {'is-first':$("#seenFirst").is(':checked'),
+                                    'is-cinema':$("#wasCinema").is(':checked'),
+                                    'start':$("#startingDay").pickadate('picker').get(),
+                                    'end':$("#endDay").pickadate('picker').get()}
+                                , function (error, reply) {
                             console.log(reply.body);
                             var data = reply.body['rows'];
                             $("#table").empty().append(

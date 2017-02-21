@@ -41,7 +41,7 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply(param -> database.getAllUsers(), JsonObject::size));
-        listen(DATABASE_GET_HISTORY, reply(param -> database.getAllViews(), json -> {
+        listen(DATABASE_GET_HISTORY, reply(database::getAllViews, json -> {
             json.remove("results");
             JsonArray array = json.getJsonArray("rows");
             for (int i = 0; i < array.size(); i++) {

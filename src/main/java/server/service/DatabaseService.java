@@ -30,7 +30,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getAllUsers();
 
-    Future<JsonObject> getAllViews();
+    Future<JsonObject> getAllViews(String param);
 
     /**
      * Gets columns as json array.
