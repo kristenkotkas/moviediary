@@ -1,9 +1,6 @@
 package server.service;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -61,10 +58,24 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                 .add(username)
                 .add(password)
                 .add(firstname)
-                .add(lastname), updateResultHandler(conn, future))));
-        insertDemoViews(username, 157336, 1,0);
-        insertDemoViews(username, 334541, 1,1);
-        insertDemoViews(username, 334543, 0,1);
+                .add(lastname), ar -> {
+            if (ar.succeeded()) {
+                Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
+                Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
+                Future<JsonObject> future3 = insertDemoViews(username, 334543, 0, 1);
+                //teeme 3 sisestust korraga ja saame teada kas õnnestus
+                CompositeFuture.all(future1, future2, future3).setHandler(result -> {
+                    if (result.succeeded()) {
+                        future.complete(ar.result().toJson());
+                    } else {
+                        future.fail(result.cause());
+                    }
+                });
+            } else {
+                future.fail(ar.cause());
+            }
+            conn.close();
+        })));
         return future;
     }
 
