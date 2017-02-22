@@ -16,3 +16,9 @@ Käivitamine:
 - (Tmdb api töötamiseks on vaja resources/server.json faili panna "tmdb_key": "(api_key)")
 - Launcher main class
 - Gradlest shadowJar task ja jooksuta /build/libs/moviediary.jar
+
+Meeskonna liikmed:
+- Kristen Kotkas- Front-end ja dokumentatsioon
+- Kristjan Hendrik Küngas - Back-end
+- Alar Leemet - Front-/Backend
+
