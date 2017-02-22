@@ -22,3 +22,5 @@ Meeskonna liikmed:
 - Kristjan Hendrik Küngas - Back-end
 - Alar Leemet - Front-/Backend
 
+[Prohektiplaan](https://github.com/kristenkotkas/moviediary/wiki/Projektiplaan)
+[Prototüüp](https://github.com/kristenkotkas/moviediary/wiki/Protot%C3%BC%C3%BCp)
