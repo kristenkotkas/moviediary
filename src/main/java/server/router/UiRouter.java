@@ -5,13 +5,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
+import org.pac4j.core.profile.CommonProfile;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
@@ -28,6 +27,7 @@ import static server.router.EventBusRouter.EVENTBUS;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
+import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 
 public class UiRouter extends Routable {
@@ -62,8 +62,6 @@ public class UiRouter extends Routable {
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
 
     public static String unique = "";
-    public static String fullName = "";
-    public static String firstName = "";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -84,34 +82,6 @@ public class UiRouter extends Routable {
                 ctx.fail(ar.cause());
             }
         };
-    }
-
-    private void setData(RoutingContext ctx) {
-        String logInType = ctx.user().principal().fieldNames().iterator().next();
-        JsonObject jsonObject = ctx.user().principal().getJsonObject(logInType);
-        System.out.println(logInType);
-        switch (logInType) {
-            case "FacebookClient":
-                unique = jsonObject.getString("email");
-                fullName = jsonObject.getString("name");
-                firstName = jsonObject.getString("first_name");
-                break;
-            case "FormClient":
-                unique = jsonObject.getString("email");
-                firstName = jsonObject.getString("first_name");
-                fullName = firstName + " " + jsonObject.getString("family_name");
-                break;
-            case "Google2Client":
-                unique = new JsonArray(jsonObject.getString("emails")).getJsonObject(0).getString("value");
-                fullName = jsonObject.getString("displayName");
-                firstName = jsonObject.getString("name.givenName");
-                break;
-            case "IdCardClient":
-                unique = jsonObject.getString("serialnumber");
-                firstName = jsonObject.getString("first_name");
-                fullName = firstName + " " + jsonObject.getString("family_name");
-
-        }
     }
 
     @Override
@@ -141,7 +111,6 @@ public class UiRouter extends Routable {
     }
 
     private void handleHome(RoutingContext ctx) {
-        setData(ctx);
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
     }
 
@@ -209,8 +178,9 @@ public class UiRouter extends Routable {
         baseTemplate.setHistory(UI_HISTORY);
         baseTemplate.setStatistics(UI_STATISTICS);
         baseTemplate.setWishlist(UI_WISHLIST);
-        baseTemplate.setUserName(fullName);
-        baseTemplate.setFirstName(firstName);
+        CommonProfile profile = getProfile(ctx);
+        baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
+        baseTemplate.setFirstName(profile.getFirstName());
         baseTemplate.setEventbus(EVENTBUS);
         return baseTemplate;
     }

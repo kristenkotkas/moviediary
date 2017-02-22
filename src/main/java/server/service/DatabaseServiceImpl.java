@@ -30,9 +30,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
     private static final String SQL_INSERT_DEMO_VIEWS = "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
-    //NOT final
+    // TODO: 22. veebr. 2017 lisada kuupäeva järgi sorteerimine
     private static final String SQL_QUERY_VIEWS =
-                    "SELECT Title, Start, WasFirst, WasCinema " +
+            "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND End <= ?";
@@ -125,8 +125,13 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         //"WHERE Username = ? AND Start >= ? AND End <= ? AND " + "WasFirst = ? AND WasCinema = ?"
         // AND ? AND ?
         String SQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS;
-        if (json.getBoolean("is-first")) SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
-        if (json.getBoolean("is-cinema")) SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
+        if (json.getBoolean("is-first")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
+        }
+        SQL_QUERY_VIEWS_TEMP += " ORDER BY Start";
 
         System.out.println("QUERY:" + SQL_QUERY_VIEWS);
 

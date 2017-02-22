@@ -1,5 +1,10 @@
 package server.util;
 
+import io.vertx.ext.web.RoutingContext;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.vertx.VertxProfileManager;
+import org.pac4j.vertx.VertxWebContext;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -25,7 +30,6 @@ public class CommonUtils {
         return false;
     }
 
-
     /**
      * Lowercases and capitalizes given name.
      *
@@ -37,4 +41,9 @@ public class CommonUtils {
                 .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
                 .collect(Collectors.joining(" "));
     }
+
+    public static CommonProfile getProfile(RoutingContext ctx) {
+        return new VertxProfileManager(new VertxWebContext(ctx)).get(true).get();
+    }
+
 }

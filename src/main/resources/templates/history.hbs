@@ -104,16 +104,15 @@
                 </div>
             </div>
         </div>
-            <div class="row">
-                <div class="">
-                    <div class="card z-depth-0">
-                        <table class="highlight responsive-table">
-                            <thead class="grey-text">
-                            </thead>
-                            <tbody id="table" class="grey-text">
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="row">
+            <div class="">
+                <div class="card z-depth-0">
+                    <table class="highlight responsive-table">
+                        <thead class="grey-text">
+                        </thead>
+                        <tbody id="table" class="grey-text">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -131,47 +130,41 @@
     $(document).ready(function () { //siis kui leht laetud
         console.log("Hello world!");
 
-        $("#Search").click(function () {//klikkamine mingile id-ga objectile
-            setTimeout(function () { //pmts Thread.sleep() aga javascript ei toeta tavalist sleepi
-                var eventbus = new EventBus("{{eventbus}}"); //ühendame eventbusi
-                //eventbusi tohiks luua ainult ühe korra ühel lehel, see crap näidis...
-                eventbus.onopen = function () { // ühendus loodud
-                    setTimeout(function () {
-                        //saadame "database_users" aadressile sõnumi, parameetriks {} ehk hetkel tühi jsonobject
-                        eventbus.send("database_get_history",
-                                {
-                                    'is-first': $("#seenFirst").is(':checked'),
-                                    'is-cinema': $("#wasCinema").is(':checked'),
-                                    'start': $("#startingDay").pickadate('picker').get(),
-                                    'end': $("#endDay").pickadate('picker').get()
-                                }
-                                , function (error, reply) {
-                                    console.log(reply.body);
-                                    var data = reply.body['rows'];
-                                    $("#table").empty().append(
-                                            '<tr>' +
-                                            '<th class="table-row">Title</th>' +
-                                            '<th>Date</th>' +
-                                            '<th class="center">Watched first time</th>' +
-                                            '<th class="center">Watched in cinema</th>' +
-                                            '</tr>');
-                                    Materialize.toast("Retrieved movies from database!", 5000);
+        $("#Search").click(function () {
+            var eventbus = new EventBus("{{eventbus}}");
+            eventbus.onopen = function () {
+                eventbus.send("database_get_history",
+                        {
+                            'is-first': $("#seenFirst").is(':checked'),
+                            'is-cinema': $("#wasCinema").is(':checked'),
+                            'start': $("#startingDay").pickadate('picker').get(),
+                            'end': $("#endDay").pickadate('picker').get()
+                        }
+                        , function (error, reply) {
+                            console.log(reply.body);
+                            var data = reply.body['rows'];
+                            $("#table").empty().append(
+                                    '<tr>' +
+                                    '<th class="table-row">Title</th>' +
+                                    '<th>Date</th>' +
+                                    '<th class="center">Watched first time</th>' +
+                                    '<th class="center">Watched in cinema</th>' +
+                                    '</tr>');
+                            Materialize.toast("Retrieved movies from database!", 5000);
 
-                                    $.each(data, function (i) {
+                            $.each(data, function (i) {
 
-                                        $("#table").append(
-                                                '<tr>' +
-                                                '<td class="table-row">' + data[i].Title + '</td>' +
-                                                '<td>' + data[i].Start + '</td>' +
-                                                '<td class="center"><i class=' + data[i].WasFirst + '></i></td>' +
-                                                '<td class="center"><i class=' + data[i].WasCinema + '></i></td>' +
-                                                '</tr>');
-                                    });
-                                });
+                                $("#table").append(
+                                        '<tr>' +
+                                        '<td class="table-row">' + data[i].Title + '</td>' +
+                                        '<td>' + data[i].Start + '</td>' +
+                                        '<td class="center"><i class=' + data[i].WasFirst + '></i></td>' +
+                                        '<td class="center"><i class=' + data[i].WasCinema + '></i></td>' +
+                                        '</tr>');
+                            });
+                        });
 
-                    }, 10);
-                }
-            }, 10);
+            }
         });
     });
 </script>
