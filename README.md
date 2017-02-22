@@ -1,4 +1,6 @@
-# moviediary
+# Moviediary
+
+Tegemist on filmide vaatamisi haldava rakendusega. Kasutajal on võimalus lisada vaadatud filme, ning aeg millal ta seda vaatas. Hiljem saab vaadata nähtud filmide ajalugu ning erinevat statistikat vaatamiste kohta. 
 
 Meeskonna liikmed:
 - Kristen Kotkas- Front-end ja dokumentatsioon
