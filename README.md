@@ -10,3 +10,5 @@ Viited:
 - [Projektiplaan](https://github.com/kristenkotkas/moviediary/wiki/Projektiplaan)
 - [Prototüüp](https://github.com/kristenkotkas/moviediary/wiki/Protot%C3%BC%C3%BCp)
 
+Etapid:
+- [Etapp 1](https://github.com/kristenkotkas/moviediary/wiki/Etapp-1)
