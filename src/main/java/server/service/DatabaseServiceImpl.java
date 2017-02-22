@@ -9,7 +9,6 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
-import server.router.UiRouter;
 import server.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -30,12 +29,19 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
     private static final String SQL_INSERT_DEMO_VIEWS = "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
-    // TODO: 22. veebr. 2017 lisada kuupäeva järgi sorteerimine
+
+    // FIXME: 22. veebr. 2017 tagasi sisse kommenteerida, ja alumine ära kustutada, kui username saamine korras
+    /*private static final String SQL_QUERY_VIEWS =
+            "SELECT Title, Start, WasFirst, WasCinema " +
+                    "FROM Views " +
+                    "JOIN Movies ON Views.MovieId = Movies.Id " +
+                    "WHERE Username = ? AND Start >= ? AND End <= ?";*/
+
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Username = ? AND Start >= ? AND End <= ?";
+                    "WHERE Start >= ? AND End <= ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -131,7 +137,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         if (json.getBoolean("is-cinema")) {
             SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
         }
-        SQL_QUERY_VIEWS_TEMP += " ORDER BY Start";
+        SQL_QUERY_VIEWS_TEMP += " ORDER BY Start DESC";
 
         System.out.println("QUERY:" + SQL_QUERY_VIEWS);
 
@@ -141,7 +147,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
             client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
-                                    .add(UiRouter.unique)
+                                    //.add(UiRouter.unique) fixme tagsi sisse kommenteerida, kui username saamine korras
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_ALL, future))));

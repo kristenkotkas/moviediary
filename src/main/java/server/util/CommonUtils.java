@@ -2,11 +2,13 @@ package server.util;
 
 import io.vertx.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CommonUtils {
@@ -43,7 +45,9 @@ public class CommonUtils {
     }
 
     public static CommonProfile getProfile(RoutingContext ctx) {
-        return new VertxProfileManager(new VertxWebContext(ctx)).get(true).get();
+        ProfileManager<CommonProfile> profileManager = new VertxProfileManager(new VertxWebContext(ctx));
+        Optional<CommonProfile> profile = profileManager.get(true);
+        return profile.orElse(null);
     }
 
 }

@@ -179,8 +179,10 @@ public class UiRouter extends Routable {
         baseTemplate.setStatistics(UI_STATISTICS);
         baseTemplate.setWishlist(UI_WISHLIST);
         CommonProfile profile = getProfile(ctx);
-        baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
-        baseTemplate.setFirstName(profile.getFirstName());
+        if (profile != null) {
+            baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
+            baseTemplate.setFirstName(profile.getFirstName());
+        }
         baseTemplate.setEventbus(EVENTBUS);
         return baseTemplate;
     }

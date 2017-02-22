@@ -41,12 +41,39 @@ public class StringUtils {
         return returnString;
     }
 
+    public static String toNormalTime(String dateTime) {
+        //15:23 <- 2017-02-21T15:46:11Z
+        LocalDateTime time = LocalDateTime.parse(dateTime.substring(0, dateTime.length() - 1));
+        String hour = Integer.toString(time.getHour());
+        String min = Integer.toString(time.getMinute());
+
+        return (hour.length() == 1 ? "0" + hour : hour) + ":" +
+                (min.length() == 1 ? "0" + min : min);
+    }
+
     public static String getNormalDTFromDB(String date, int type) {
         return getNormalDate(LocalDateTime.parse(date.substring(0, date.length()-1)), type);
     }
 
-    public static String getNormalBoolean(boolean string) {
-        return string ? "\"fa fa-check text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
+    public static String toCapital(String string) {
+        String result = "";
+
+        result += string.substring(0, 1).toUpperCase();
+        result += string.substring(1, string.length()).toLowerCase();
+
+        return result;
+    }
+
+    public static String getWeekdayFromDB(String date) {
+        return LocalDateTime.parse(date.substring(0, date.length()-1)).getDayOfWeek().toString();
+    }
+
+    public static String getFirstSeen(boolean string) {
+        return string ? "\"fa fa-eye text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
+    }
+
+    public static String getCinema(boolean string) {
+        return string ? "\"fa fa-ticket text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
     }
 
     public static String formToDBDate(String date, boolean isEnd) {
@@ -57,4 +84,6 @@ public class StringUtils {
             else return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
         } return "";
     }
+
+
 }

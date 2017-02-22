@@ -14,12 +14,13 @@ import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import server.service.DatabaseService;
-import server.util.StringUtils;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import static server.util.StringUtils.*;
 
 public class EventBusRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(EventBusRouter.class);
@@ -45,12 +46,15 @@ public class EventBusRouter extends Routable {
             json.remove("results");
             JsonArray array = json.getJsonArray("rows");
             for (int i = 0; i < array.size(); i++) {
-                array.getJsonObject(i).put("Start", StringUtils.getNormalDTFromDB(
-                        array.getJsonObject(i).getString("Start"), StringUtils.LONG_DATE));
-                array.getJsonObject(i).put("WasFirst", StringUtils.getNormalBoolean(
+                array.getJsonObject(i).put("WasFirst", getFirstSeen(
                         array.getJsonObject(i).getBoolean("WasFirst")));
-                array.getJsonObject(i).put("WasCinema", StringUtils.getNormalBoolean(
+                array.getJsonObject(i).put("WasCinema", getCinema(
                         array.getJsonObject(i).getBoolean("WasCinema")));
+                array.getJsonObject(i).put("DayOfWeek", toCapital(getWeekdayFromDB(array.getJsonObject(i)
+                        .getString("Start")).substring(0, 3)));
+                array.getJsonObject(i).put("Time", toNormalTime(array.getJsonObject(i).getString("Start")));
+                array.getJsonObject(i).put("Start", getNormalDTFromDB(
+                        array.getJsonObject(i).getString("Start"), LONG_DATE));
             }
             return json;
         }));
