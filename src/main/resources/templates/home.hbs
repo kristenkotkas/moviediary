@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#E3F2FD">
     <title>Home</title>
-    <script src="/static/js/fallback.min.js"></script>
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
 </head>
 <body class="blue lighten-5">
+<!-- Page loader -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
 {{> templates/navigationBar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">Hello {{firstName}}</h3>
 
@@ -16,7 +22,10 @@
         <div class="card blue-grey darken-1" style="height: 600px">
             <div class="card-content white-text">
                 <span class="card-title">Eventbus testing</span>
-                <p id="eventbusText">Nothing going on yet!</p>
+                <form>
+                    <label for="InsertText">Insert message to send!</label>
+                    <input id="InsertText" type="text">
+                </form>
                 <div class="card-action">
                     <a id="EventbusButton" class="btn waves-effect waves-light">Click me to start</a>
                 </div>
@@ -25,44 +34,23 @@
     </div>
 </div>
 
+<script src="/static/js/fallback.min.js"></script>
 <script src="/static/js/loaders/ui.js"></script>
 <script src="/static/js/loaders/eventbus.js"></script>
 <script>
     fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-        console.log("Hello world!");
-
-        $("#EventbusButton").click(function () { //klikkamine mingile id-ga objectile
-            $("#eventbusText").text("Button clicked, waiting 1 second"); //teksti sättimine
-
-            setTimeout(function () { //pmts Thread.sleep() aga javascript ei toeta tavalist sleepi
-                $("#eventbusText").text("Connecting to eventbus...");
-                var eventbus = new EventBus("{{eventbus}}"); //ühendame eventbusi
-                //eventbusi tohiks luua ainult ühe korra ühel lehel, see crap näidis...
-
-                eventbus.onopen = function () { // ühendus loodud
-                    $("#eventbusText").text("Eventbus connected, waiting 1 second");
-
-                    setTimeout(function () {
-                        $("#eventbusText").text("Querying users from database...");
-
-                        //saadame "database_users" aadressile sõnumi, parameetriks {} ehk hetkel tühi jsonobject
-                        eventbus.send("database_users", {}, function (error, reply) {
-                            console.log(reply.body);
-                            $("#eventbusText").text("Response: " + JSON.stringify(reply.body));
-                            Materialize.toast("Retrieved users from database!", 5000);
-                        });
-
-                        //registreerime end aadressile, server saadab siia aegajalt sõnumeid (andmete surumine pmts)
-                        eventbus.registerHandler("go_right_through", function (error, message) {
-                            Materialize.toast(message.body, 2000);
-                        });
-
-
-                    }, 1000);
-                }
-            }, 1000);
-        });
-
+        var eventbus = new EventBus("{{eventbus}}");
+        eventbus.onopen = function () {
+            eventbus.registerHandler("go_right_through", function (error, message) {
+                Materialize.toast(message.body, 2000);
+            });
+            $("#EventbusButton").click(function () {
+                var input = $("#InsertText").val();
+                eventbus.send("go_right_through", input, function (error, message) {
+                    console.log(message.body)
+                });
+            });
+        };
     });
 </script>
 </body>

@@ -24,11 +24,16 @@ public class FormProfile extends CommonProfile {
                 .ifPresent(json -> {
                     addAttribute(PAC4J_FIRSTNAME, json.getString(DB_FIRSTNAME));
                     addAttribute(PAC4J_LASTNAME, json.getString(DB_LASTNAME));
+                    addAttribute(PAC4J_SALT, json.getString(DB_SALT));
                 });
     }
 
-    // TODO: 17.02.2017 return hash instead
+    // TODO: 22/02/2017 show hash only
     public String getPassword() {
         return (String) getAttribute(PAC4J_PASSWORD);
+    }
+
+    public String getSalt() {
+        return (String) getAttribute(PAC4J_SALT);
     }
 }

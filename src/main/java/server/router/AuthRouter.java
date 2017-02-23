@@ -11,6 +11,7 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 import org.pac4j.vertx.handler.impl.*;
 import server.security.SecurityConfig;
 
+import static server.router.EventBusRouter.EVENTBUS_ALL;
 import static server.router.UiRouter.UI_HOME;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.SecurityConfig.AUTHORIZER;
@@ -19,6 +20,7 @@ import static server.util.NetworkUtils.MAX_BODY_SIZE;
 import static server.util.NetworkUtils.isServer;
 
 public class AuthRouter extends Routable {
+    public static final String AUTH_API = "(?!\\/api\\/users\\/insert)(\\/api\\/.*)";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
     private static final String CALLBACK = "/callback";
@@ -44,11 +46,13 @@ public class AuthRouter extends Routable {
         router.route().handler(createSessionHandler());
         router.route().handler(UserSessionHandler.create(securityConfig.getAuthProvider()));
 
-        router.route(AUTH_PRIVATE).handler(new SecurityHandler(vertx, securityConfig.getPac4jConfig(),
-                securityConfig.getAuthProvider(),
-                new SecurityHandlerOptions()
-                        .withClients(getClientNames())
-                        .withAuthorizers(AUTHORIZER)));
+        SecurityHandler securityHandler = new SecurityHandler(vertx, securityConfig.getPac4jConfig(),
+                securityConfig.getAuthProvider(), new SecurityHandlerOptions()
+                .withClients(getClientNames())
+                .withAuthorizers(AUTHORIZER));
+        router.route(AUTH_PRIVATE).handler(securityHandler);
+        router.routeWithRegex(AUTH_API).handler(securityHandler);
+        router.route(EVENTBUS_ALL).handler(securityHandler);
 
         CallbackHandler callback = new CallbackHandler(vertx, securityConfig.getPac4jConfig(),
                 new CallbackHandlerOptions()

@@ -29,8 +29,7 @@ public class SecurityConfig {
     public static final String PAC4J_LASTNAME = "family_name";
     public static final String PAC4J_ISSUER = "issuer";
     public static final String PAC4J_COUNTRY = "location";
-
-
+    public static final String PAC4J_SALT = "salt";
 
     private final Pac4jAuthProvider authProvider = new Pac4jAuthProvider();
     private final Config pac4jConfig;
@@ -41,7 +40,6 @@ public class SecurityConfig {
                 .collect(toList()));
         this.pac4jConfig.getClients().findClient(FormClient.class).enable(database, config);
         this.pac4jConfig.addAuthorizer(AUTHORIZER, new DatabaseAuthorizer(database));
-
     }
 
     public Config getPac4jConfig() {
