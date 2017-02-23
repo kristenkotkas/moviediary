@@ -30,18 +30,11 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_INSERT_DEMO_VIEWS =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
 
-    // FIXME: 22. veebr. 2017 tagasi sisse kommenteerida, ja alumine ära kustutada, kui username saamine korras
-    /*private static final String SQL_QUERY_VIEWS =
-            "SELECT Title, Start, WasFirst, WasCinema " +
-                    "FROM Views " +
-                    "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Username = ? AND Start >= ? AND End <= ?";*/
-
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Start >= ? AND End <= ?";
+                    "WHERE Username = ? AND Start >= ? AND End <= ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -149,7 +142,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
             client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
-                                    //.add(UiRouter.unique) fixme tagsi sisse kommenteerida, kui username saamine korras
+                                    .add(username)
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_ALL, future))));
