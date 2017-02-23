@@ -76,7 +76,7 @@ public class DatabaseRouter extends Routable {
     }
 
     private void handleViewsAll(RoutingContext ctx) {
-        //database.getAllViews().setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        //database.getViews().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private String formAuthData(String username, String password) {

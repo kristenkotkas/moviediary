@@ -125,7 +125,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> getAllViews(String param) {
+    public Future<JsonObject> getViews(String username, String param) {
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
