@@ -3,7 +3,7 @@ package server.security;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.util.CommonHelper;
 
-import static server.util.CommonUtils.capitalizeName;
+import static server.util.StringUtils.capitalizeName;
 
 public class IdCardCredentials extends Credentials {
     private final String serial;
