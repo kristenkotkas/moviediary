@@ -5,7 +5,6 @@ fallback.load({
         '//localhost:8081/static/js/sockjs-0.3.4.min.js'
     ],
     EventBus: [
-        '//raw.githubusercontent.com/vert-x3/vertx-examples/master/web-examples/src/main/java/io/vertx/example/web/chat/webroot/vertx-eventbus.js',
         '//movies.kyngas.eu/static/js/vertx-eventbus.js',
         '//localhost:8081/static/js/vertx-eventbus.js'
     ]

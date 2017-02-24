@@ -31,8 +31,13 @@ fallback.load({
     }
 });
 
-// Enables sidebar functionality and disables loader after UI css and javascript have been loaded.
+// Enables various UI functionality after css and javascript have been loaded.
 fallback.ready(function () {
-    $(".sidebar-collapse").sideNav();
-    $('body').addClass('loaded');
+    $(".sidebar-collapse").sideNav(); //sidebar
+    $(".datepicker").pickadate({ //calendar
+        //http://amsul.ca/pickadate.js/date/#options
+        selectMonths: true,
+        selectYears: 15
+    });
+    $('body').addClass('loaded'); //loader
 });
