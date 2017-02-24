@@ -9,6 +9,7 @@ public class IdCardProfile extends CommonProfile {
 
     public IdCardProfile(IdCardCredentials credentials) {
         setId(credentials.getSerial());
+        addAttribute(PAC4J_EMAIL, credentials.getSerial());
         addAttribute(PAC4J_SERIAL, credentials.getSerial());
         addAttribute(PAC4J_FIRSTNAME, credentials.getFirstName());
         addAttribute(PAC4J_LASTNAME, credentials.getLastName());

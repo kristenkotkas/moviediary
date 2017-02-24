@@ -13,6 +13,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
 import server.service.DatabaseService;
 
@@ -22,7 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static io.vertx.ext.web.handler.sockjs.BridgeEventType.SEND;
+import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static server.util.StringUtils.*;
 
 public class EventBusRouter extends Routable {
@@ -33,8 +34,9 @@ public class EventBusRouter extends Routable {
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
-    public static final String TEST_GATEWAY = "go_right_through";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
+
+    public static final String MESSENGER = "messenger";
 
     private final ConcurrentHashMap<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
@@ -59,11 +61,7 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
-        gateway(TEST_GATEWAY, log());
-
-        // TODO: 20.02.2017 remove
-        //saadab stringi sellele aadressile iga 2 sekundi tagant
-        //vertx.setPeriodic(2000L, timer -> vertx.eventBus().publish(TEST_GATEWAY, "Sending publishing message!"));
+        gateway(MESSENGER, log());
     }
 
     private <T> void listen(String address, Handler<Message<T>> replyHandler) {
@@ -83,7 +81,6 @@ public class EventBusRouter extends Routable {
     private <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
                                           BiFunction<String, T, Object> compiler) {
         return msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body())).setHandler(ar -> {
-            System.out.println(messageToString(msg));
             if (ar.succeeded()) {
                 msg.reply(compiler.apply(msg.headers().get("user"), ar.result()));
             } else {
@@ -135,16 +132,15 @@ public class EventBusRouter extends Routable {
                 .map(key -> new PermittedOptions().setAddress(key))
                 .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
         router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
-            // TODO: 23/02/2017 for all types
-            if (event.type() == SEND) {
-                System.out.println("--------send-----------");
-                String email = ((Pac4jUser) event.socket().webUser())
+            if (event.getRawMessage() != null && event.type() != RECEIVE) {
+                CommonProfile profile = ((Pac4jUser) event.socket().webUser())
                         .pac4jUserProfiles().values().stream()
                         .findAny()
-                        .orElse(null)
-                        .getEmail();
-                // TODO: 23/02/2017 works for idcardprofile?
-                event.setRawMessage(event.getRawMessage().put("headers", new JsonObject().put("user", email)));
+                        .orElse(null);
+                event.setRawMessage(event.getRawMessage()
+                        .put("headers", new JsonObject()
+                                .put("user", profile.getEmail())
+                                .put("name", profile.getFirstName())));
             }
             event.complete(true);
         }));

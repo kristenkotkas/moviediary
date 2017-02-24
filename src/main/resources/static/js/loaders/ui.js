@@ -14,7 +14,6 @@ fallback.load({
         '//localhost:8081/static/css/custom/base.css'
     ],
     jQuery: [
-        '//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js',
         '//movies.kyngas.eu/static/js/jquery-2.2.4.min.js',
         '//localhost:8081/static/js/jquery-2.2.4.min.js'
@@ -24,22 +23,16 @@ fallback.load({
         '//movies.kyngas.eu/static/js/materialize.min.js',
         '//localhost:8081/static/js/materialize.min.js'
     ]
-    /*plugins: [
-     '//demo.geekslabs.com/materialize-v1.0/js/plugins.min.js',
-     '//movies.kyngas.eu/static/js/plugins.min.js',
-     '//localhost:8081/static/js/plugins.min.js'
-     ],*/
 }, {
     shim: {
         //base.css requires materialize.css to be loaded before etc...
         base_css: ['materialize_css'],
         Materialize: ['jQuery']
-        /*plugins: ['jQuery', 'Materialize'],*/
     }
 });
 
-//Enables sidebar functionality after MaterializeCSS has been loaded
-fallback.ready(['Materialize'], function () {
+// Enables sidebar functionality and disables loader after UI css and javascript have been loaded.
+fallback.ready(function () {
     $(".sidebar-collapse").sideNav();
     $('body').addClass('loaded');
 });

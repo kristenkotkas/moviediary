@@ -16,24 +16,22 @@
 </div>
 {{> templates/navigationBar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">Hello {{firstName}}</h3>
-
 <div class="row">
     <div class="col s12 m6">
-        <div class="card blue-grey darken-1" style="height: 600px">
+        <div class="card blue-grey darken-1 small">
             <div class="card-content white-text">
-                <span class="card-title">Eventbus testing</span>
-                <form>
-                    <label for="InsertText">Insert message to send!</label>
-                    <input id="InsertText" type="text">
+                <span class="card-title">Messenger</span>
+                <form action="#">
+                    <label for="MessageInput">Insert message</label>
+                    <input id="MessageInput" type="text">
                 </form>
                 <div class="card-action">
-                    <a id="EventbusButton" class="btn waves-effect waves-light">Click me to start</a>
+                    <a id="SendMessage" class="btn waves-effect waves-light">Send</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script src="/static/js/fallback.min.js"></script>
 <script src="/static/js/loaders/ui.js"></script>
 <script src="/static/js/loaders/eventbus.js"></script>
@@ -41,14 +39,13 @@
     fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         var eventbus = new EventBus("{{eventbus}}");
         eventbus.onopen = function () {
-            eventbus.registerHandler("go_right_through", function (error, message) {
-                Materialize.toast(message.body, 2000);
+            eventbus.registerHandler("messenger", function (err, msg) {
+                console.log(msg);
+                Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
             });
-            $("#EventbusButton").click(function () {
-                var input = $("#InsertText").val();
-                eventbus.send("go_right_through", input, function (error, message) {
-                    console.log(message.body)
-                });
+            $("#SendMessage").click(function () {
+                var input = $("#MessageInput").val();
+                eventbus.publish("messenger", input);
             });
         };
     });
