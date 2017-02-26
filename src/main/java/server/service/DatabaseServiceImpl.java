@@ -9,12 +9,12 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
-import server.util.StringUtils;
 
 import java.time.LocalDateTime;
 
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
+import static server.util.StringUtils.*;
 
 //näited -> https://github.com/vert-x3/vertx-examples/tree/master/jdbc-examples
 
@@ -24,24 +24,17 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String MYSQL = "mysql";
 
     private static final String SQL_INSERT_USER =
-            "INSERT INTO Users (Username, Password, Firstname, Lastname) VALUES (?, ?, ?, ?)";
+            "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
-    private static final String SQL_INSERT_DEMO_VIEWS = "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-
-    // FIXME: 22. veebr. 2017 tagasi sisse kommenteerida, ja alumine ära kustutada, kui username saamine korras
-    /*private static final String SQL_QUERY_VIEWS =
-            "SELECT Title, Start, WasFirst, WasCinema " +
-                    "FROM Views " +
-                    "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Username = ? AND Start >= ? AND End <= ?";*/
+    private static final String SQL_INSERT_DEMO_VIEWS =
+            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Start >= ? AND End <= ?";
+                    "WHERE Username = ? AND Start >= ? AND End <= ?";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -61,11 +54,13 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             future.fail(new Throwable("Email, firstname and lastname must exist!"));
             return future;
         }
+        String salt = genString();
         client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
                 .add(username)
-                .add(password)
                 .add(firstname)
-                .add(lastname), ar -> {
+                .add(lastname)
+                .add(hash(password, salt))
+                .add(salt), ar -> {
             if (ar.succeeded()) {
                 Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
                 Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
@@ -123,10 +118,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> getAllViews(String param) {
+    public Future<JsonObject> getViews(String username, String param) {
         JsonObject json = new JsonObject(param);
-        json.put("start", StringUtils.formToDBDate(json.getString("start"), false));
-        json.put("end", StringUtils.formToDBDate(json.getString("end"), true));
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
         System.out.println(json.encodePrettily());
         //"WHERE Username = ? AND Start >= ? AND End <= ? AND " + "WasFirst = ? AND WasCinema = ?"
         // AND ? AND ?
@@ -147,7 +142,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
             client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
-                                    //.add(UiRouter.unique) fixme tagsi sisse kommenteerida, kui username saamine korras
+                                    .add(username)
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_ALL, future))));

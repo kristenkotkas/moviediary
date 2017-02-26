@@ -10,9 +10,10 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_USER = "user_";
 
     String DB_USERNAME = "Username";
-    String DB_PASSWORD = "Password";
     String DB_FIRSTNAME = "Firstname";
     String DB_LASTNAME = "Lastname";
+    String DB_PASSWORD = "Password";
+    String DB_SALT = "Salt";
 
     String COLUMNS = "columnNames";
     String ROWS = "rows";
@@ -30,7 +31,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getAllUsers();
 
-    Future<JsonObject> getAllViews(String param);
+    Future<JsonObject> getViews(String username, String param);
 
     /**
      * Gets columns as json array.

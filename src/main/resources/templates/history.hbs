@@ -3,13 +3,17 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
     <title>History</title>
-    <link href="/static/css/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" media="screen,projection">
-    <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <link href="/static/css/custom/style.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
 </head>
 <body class="blue lighten-5">
+<!-- Page loader -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
 {{> templates/navigationBar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">History</h3>
 <div class="row">
@@ -70,29 +74,21 @@
         </div>
     </div>
 </div>
-
-
-<script type="text/javascript" src="/static/js/jquery-2.2.4.min.js"></script>
-<script type="text/javascript" src="/static/js/materialize.min.js"></script>
-<script type="text/javascript" src="/static/js/plugins.js"></script>
-<script type="text/javascript" src="/static/js/sockjs-0.3.4.min.js"></script>
-<script type="text/javascript" src='/static/js/vertx-eventbus.js'></script>
+<script src="/static/js/fallback.min.js"></script>
+<script src="/static/js/loaders/ui.js"></script>
+<script src="/static/js/loaders/eventbus.js"></script>
 <script>
-    //kõik on asynchronous, function () {} kutsutakse välja nagu vertxi handlerit
-    $(document).ready(function () { //siis kui leht laetud
-        console.log("Hello world!");
-
-        $("#Search").click(function () {
-            var eventbus = new EventBus("{{eventbus}}");
-            eventbus.onopen = function () {
+    fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () { //siis kui need 3 saavad laetud
+        var eventbus = new EventBus("{{eventbus}}");
+        eventbus.onopen = function () {
+            $("#Search").click(function () {
                 eventbus.send("database_get_history",
                         {
                             'is-first': $("#seenFirst").is(':checked'),
                             'is-cinema': $("#wasCinema").is(':checked'),
                             'start': $("#startingDay").pickadate('picker').get(),
                             'end': $("#endDay").pickadate('picker').get()
-                        }
-                        , function (error, reply) {
+                        }, function (error, reply) {
                             console.log(reply.body);
                             var data = reply.body['rows'];
                             $("#table").empty().append(
@@ -105,9 +101,7 @@
                                     '<th></th>' +
                                     '</tr>');
                             Materialize.toast("Retrieved movies from database!", 5000);
-
                             $.each(data, function (i) {
-
                                 $("#table").append(
                                         '<tr>' +
                                         '<td class="table-row">' + data[i].Title + '</td>' +
@@ -119,9 +113,8 @@
                                         '</tr>');
                             });
                         });
-
-            }
-        });
+            });
+        };
     });
 </script>
 </body>

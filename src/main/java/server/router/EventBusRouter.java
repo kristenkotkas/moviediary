@@ -13,13 +13,17 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.vertx.auth.Pac4jUser;
 import server.service.DatabaseService;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static server.util.StringUtils.*;
 
 public class EventBusRouter extends Routable {
@@ -30,19 +34,18 @@ public class EventBusRouter extends Routable {
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
-    public static final String TEST_GATEWAY = "go_right_through";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
 
-    //consumer -> ainult sissetulevad sõnumid lubatud (ja vastused)
-    //gateway -> kõik sõnumid lubatud
+    public static final String MESSENGER = "messenger";
+
     private final ConcurrentHashMap<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
 
     public EventBusRouter(Vertx vertx, DatabaseService database) {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
-        listen(DATABASE_USERS_SIZE, reply(param -> database.getAllUsers(), JsonObject::size));
-        listen(DATABASE_GET_HISTORY, reply(database::getAllViews, json -> {
+        listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
+        listen(DATABASE_GET_HISTORY, reply(database::getViews, (user, json) -> {
             json.remove("results");
             JsonArray array = json.getJsonArray("rows");
             for (int i = 0; i < array.size(); i++) {
@@ -58,11 +61,7 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
-        gateway(TEST_GATEWAY, log());
-
-        // TODO: 20.02.2017 remove
-        //saadab stringi sellele aadressile iga 2 sekundi tagant
-        //vertx.setPeriodic(2000L, timer -> vertx.eventBus().publish(TEST_GATEWAY, "Sending publishing message!"));
+        gateway(MESSENGER, log());
     }
 
     private <T> void listen(String address, Handler<Message<T>> replyHandler) {
@@ -73,15 +72,17 @@ public class EventBusRouter extends Routable {
         gateways.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
-    // usage: reply(query_parameter_from_client -> some_function_that_returns_future(), result_of_that_function -> do_something_with_result());
+    // usage: reply((user, query_parameter_from_client) -> some_function_that_returns_future(), (user, result_of_that_function) -> do_something_with_result());
+    // user = users email or serial
     // query_parameter = some parameter client adds with the request (could be null)
     // some_function_that_returns_future() = for example database.getAllUsers()
     // result_of_that_function = database.getAllUsers() result (json object in this case)
     // do_something_with_result() = change the result into int for example (json -> json.size())
-    private <T> Handler<Message<T>> reply(Function<String, Future<T>> processor, Function<T, Object> compiler) {
-        return msg -> processor.apply(String.valueOf(msg.body())).setHandler(ar -> {
+    private <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
+                                          BiFunction<String, T, Object> compiler) {
+        return msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body())).setHandler(ar -> {
             if (ar.succeeded()) {
-                msg.reply(compiler.apply(ar.result()));
+                msg.reply(compiler.apply(msg.headers().get("user"), ar.result()));
             } else {
                 msg.reply("Failure: " + ar.cause().getMessage());
             }
@@ -130,7 +131,19 @@ public class EventBusRouter extends Routable {
         gateways.keySet().stream()
                 .map(key -> new PermittedOptions().setAddress(key))
                 .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
-        router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options));
+        router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
+            if (event.getRawMessage() != null && event.type() != RECEIVE) {
+                CommonProfile profile = ((Pac4jUser) event.socket().webUser())
+                        .pac4jUserProfiles().values().stream()
+                        .findAny()
+                        .orElse(null);
+                event.setRawMessage(event.getRawMessage()
+                        .put("headers", new JsonObject()
+                                .put("user", profile.getEmail())
+                                .put("name", profile.getFirstName())));
+            }
+            event.complete(true);
+        }));
     }
 
     @Override

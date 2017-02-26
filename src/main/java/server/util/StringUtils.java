@@ -1,11 +1,23 @@
 package server.util;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
 public class StringUtils {
+    private static final Logger log = LoggerFactory.getLogger(StringUtils.class);
     public static final int SHORT_DATE = 1;
     public static final int LONG_DATE = 2;
     private static Map<String, String> months = new HashMap<String, String>() {{
@@ -30,6 +42,7 @@ public class StringUtils {
      * @return date as string
      */
     public static String getNormalDate(LocalDateTime date, int type) {
+
         String returnString = Integer.toString(date.getDayOfMonth()) + " " +
                 date.getMonth().toString().substring(0, 1).toUpperCase();
         if (type == SHORT_DATE) {
@@ -80,10 +93,54 @@ public class StringUtils {
         //"22 February, 2017" -> 2017-02-22T
         if (!date.equals("")) {
             String[] parts = date.split(" ");
-            if (isEnd) return LocalDate.parse((parts[2] + "-" + months.get(parts[1]) + "-") + parts[0]).plusDays(1).toString() + "T";
-            else return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
+            if (isEnd) {
+                return LocalDate.parse((parts[2] + "-" + months.get(parts[1]) + "-") +
+                        parts[0]).plusDays(1).toString() + "T";
+            } else {
+                return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
+            }
         } return "";
     }
 
+    /**
+     * Lowercases and capitalizes given name.
+     *
+     * @param name to use
+     * @return capitalized text string
+     */
+    public static String capitalizeName(String name) {
+        return Arrays.stream(name.split(" "))
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+    }
 
+
+    public static String hash(String input, String salt) {
+        try {
+            return toString(MessageDigest.getInstance("SHA-256").digest(input.concat(salt).getBytes(UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Hashing uses an invalid algorithm.", e);
+        }
+        return "null";
+    }
+
+    private static String toString(byte[] array) {
+        return printHexBinary(array).toLowerCase();
+    }
+
+    /**
+     * Generates 16 length string consisting of lowercase alphanumeric characters.
+     *
+     * @return generated string
+     */
+    public static String genString() {
+        try {
+            byte[] bytes = new byte[8];
+            SecureRandom.getInstance("SHA1PRNG").nextBytes(bytes);
+            return toString(bytes);
+        } catch (NoSuchAlgorithmException e) {
+            log.error("String generating uses an invalid algorithm.", e);
+        }
+        return "default";
+    }
 }

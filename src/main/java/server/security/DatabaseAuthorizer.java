@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static server.service.DatabaseService.*;
+import static server.util.StringUtils.genString;
+import static server.util.StringUtils.hash;
 
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private final DatabaseService database;
@@ -53,16 +55,15 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
             System.out.println("-------------Registering ID Card user------------------");
             SyncResult<Boolean> result = new SyncResult<>();
             result.executeAsync(() -> database.insertUser(profile.getSerial(),
-                    "",
+                    genString(),
                     profile.getFirstName(),
                     profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
             return result.await().get();
         }),
 
-        //todo password hashing checking
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
                 .filter(json -> json.getString(DB_USERNAME).equals(profile.getEmail()))
-                .anyMatch(json -> profile.getPassword().equals(json.getString(DB_PASSWORD))));
+                .anyMatch(json -> hash(profile.getPassword(), profile.getSalt()).equals(json.getString(DB_PASSWORD))));
 
         private final Class type;
         private final TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> checker;

@@ -2,6 +2,8 @@ package server.router;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.security.FormClient;
@@ -19,6 +21,7 @@ import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
 
 public class DatabaseRouter extends Routable {
+    private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String USER_EXISTS = "userExists";
 
     public static final String API_USERS_ALL = "/api/users/all";
@@ -41,7 +44,6 @@ public class DatabaseRouter extends Routable {
         router.get(API_VIEWS_ALL).handler(this::handleViewsAll);
     }
 
-    // TODO: 19.02.2017 hash password
     private void handleUsersInsert(RoutingContext ctx) {
         String username = ctx.request().getFormAttribute(FORM_USERNAME);
         String password = ctx.request().getFormAttribute(FORM_PASSWORD);
@@ -74,7 +76,7 @@ public class DatabaseRouter extends Routable {
     }
 
     private void handleViewsAll(RoutingContext ctx) {
-        //database.getAllViews().setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        //database.getViews().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private String formAuthData(String username, String password) {
