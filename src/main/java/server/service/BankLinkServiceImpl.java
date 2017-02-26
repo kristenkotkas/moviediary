@@ -18,7 +18,8 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String ENDPOINT = "localhost" ;
     private static final String ENABLED = "use_pangalink";
 
-    private static final String PAYMENTS = "/api/project/";
+    private static final String SOLUTIONS = "/api/project/";
+    private static final String PAYMENTS = "/banklink/ipizza";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -32,18 +33,23 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> getPayments(){
-        return get(PAYMENTS, getCached(PAYMENT.prefix));
-    }
-
-    @Override
-    public Future<JsonObject> createPayment(JsonObject paymentDetails){
+    public Future<JsonObject> createPayment(JsonObject paymentDetails) {
         return post(PAYMENTS, paymentDetails, getCached(PAYMENT.prefix));
     }
 
     @Override
-    public Future<JsonObject> getPaymentById(String id) {
-        return get(PAYMENTS + id, getCached(PAYMENT.get(id)));
+    public Future<JsonObject> getPaymentSolutions(){
+        return get(SOLUTIONS, getCached(PAYMENT.prefix));
+    }
+
+    @Override // TODO 23.02 save the details received (certs, UID)
+    public Future<JsonObject> createPaymentSolution(JsonObject solutionDetails){
+        return post(SOLUTIONS, solutionDetails, getCached(PAYMENT.prefix));
+    }
+
+    @Override
+    public Future<JsonObject> getPaymentSolutionById(String id) {
+        return get(SOLUTIONS + id, getCached(PAYMENT.get(id)));
     }
 
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {
