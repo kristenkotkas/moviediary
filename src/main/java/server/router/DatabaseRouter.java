@@ -26,7 +26,6 @@ public class DatabaseRouter extends Routable {
 
     public static final String API_USERS_ALL = "/api/users/all";
     public static final String API_USERS_INSERT = "/api/users/insert";
-    public static final String API_VIEWS_ALL = "/api/views/all";
 
     private final DatabaseService database;
     private final SecurityConfig securityConfig;
@@ -41,7 +40,6 @@ public class DatabaseRouter extends Routable {
     public void route(Router router) {
         router.get(API_USERS_ALL).handler(this::handleUsersAll);
         router.post(API_USERS_INSERT).handler(this::handleUsersInsert);
-        router.get(API_VIEWS_ALL).handler(this::handleViewsAll);
     }
 
     private void handleUsersInsert(RoutingContext ctx) {
@@ -73,10 +71,6 @@ public class DatabaseRouter extends Routable {
 
     private void handleUsersAll(RoutingContext ctx) {
         database.getAllUsers().setHandler(resultHandler(ctx, jsonResponse(ctx)));
-    }
-
-    private void handleViewsAll(RoutingContext ctx) {
-        //database.getViews().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private String formAuthData(String username, String password) {

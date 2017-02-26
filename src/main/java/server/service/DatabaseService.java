@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 
 public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_ALL = "all";
+    String CACHE_VIEWS = "views_";
     String CACHE_USER = "user_";
 
     String DB_USERNAME = "Username";

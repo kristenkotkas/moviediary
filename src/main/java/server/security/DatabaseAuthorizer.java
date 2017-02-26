@@ -46,13 +46,10 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
         IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream, DatabaseService database) -> {
-            System.out.println("-------------Authorizing ID Card user------------------");
             boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(DB_USERNAME)));
-            System.out.println("Is authorized: " + isAuthorized);
             if (isAuthorized) {
                 return true;
             }
-            System.out.println("-------------Registering ID Card user------------------");
             SyncResult<Boolean> result = new SyncResult<>();
             result.executeAsync(() -> database.insertUser(profile.getSerial(),
                     genString(),
@@ -92,13 +89,10 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
-                System.out.println("------------Authorizing Facebook/Google user--------------");
-                System.out.println(profile);
                 boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(DB_USERNAME)));
                 if (isAuthorized) {
                     return true;
                 }
-                System.out.println("------------Registering Facebook/Google user-------------");
                 SyncResult<Boolean> result = new SyncResult<>();
                 result.executeAsync(() -> database.insertUser(
                         profile.getEmail(),

@@ -41,7 +41,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
+        super(DEFAULT_MAX_CACHE_SIZE);
         this.vertx = vertx;
         this.config = config;
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
@@ -137,7 +137,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         System.out.println("QUERY:" + SQL_QUERY_VIEWS);
 
         Future<JsonObject> future = Future.future();
-        CacheItem<JsonObject> cache = getCached(CACHE_ALL);
+        CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username);
         if (!tryCachedResult(false, cache, future)) {
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
             client.getConnection(connHandler(future,
@@ -145,7 +145,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                                     .add(username)
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
-                            resultSetHandler(conn, CACHE_ALL, future))));
+                            resultSetHandler(conn, CACHE_VIEWS + username, future))));
         }
         return future;
     }

@@ -43,6 +43,8 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
         });
     }
 
+    // TODO: 26.02.2017 redirect on invalid credentials, example below
+
 /*    @Override
     protected FormCredentials retrieveCredentials(final WebContext context) throws HttpAction {
         CommonHelper.assertNotNull("credentialsExtractor", getCredentialsExtractor());

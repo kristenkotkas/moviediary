@@ -27,11 +27,7 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
     private String loginUrl = null;
 
     public IdCardClient() {
-        setAuthenticator((credentials, context) -> {
-            log.info("----------Validation/set profile-----------");
-            credentials.setUserProfile(new IdCardProfile(credentials));
-            log.info("---------Profile ok-------------------");
-        });
+        setAuthenticator((credentials, context) -> credentials.setUserProfile(new IdCardProfile(credentials)));
     }
 
     // TODO: 13.02.2017 http://www.pac4j.org/docs/customizations.html
@@ -41,12 +37,8 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
     protected void internalInit(WebContext context) {
         super.internalInit(context);
         loginUrl = callbackUrlResolver.compute(URL, context);
-        setRedirectActionBuilder(webContext -> {
-            log.info("Redirecting to " + loginUrl);
-            return RedirectAction.redirect(loginUrl);
-        });
+        setRedirectActionBuilder(webContext -> RedirectAction.redirect(loginUrl));
         setCredentialsExtractor(webContext -> {
-            log.info("--------------Extracting credentials--------------");
             String verify = webContext.getRequestParameter(CLIENT_VERIFIED_STATE);
             String cert = webContext.getRequestParameter(CLIENT_CERTIFICATE);
             if (verify == null || !VERIFIED.equals(verify)) {
@@ -58,13 +50,11 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
                 return null;
             }
             try {
-                String subjectDN = ((X509Certificate) CertificateFactory.getInstance(CERT_TYPE)
+                return new IdCardCredentials(((X509Certificate) CertificateFactory.getInstance(CERT_TYPE)
                         .generateCertificate(new ByteArrayInputStream(fixFormat(cert)
                                 .getBytes(StandardCharsets.UTF_8))))
                         .getSubjectDN()
-                        .getName();
-                log.info("--------------Credentials Valid--------------");
-                return new IdCardCredentials(subjectDN);
+                        .getName());
             } catch (CertificateException e) {
                 log.error("Client certificate is invalid: " + cert, e);
             }

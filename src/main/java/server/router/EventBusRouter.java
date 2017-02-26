@@ -72,12 +72,6 @@ public class EventBusRouter extends Routable {
         gateways.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
-    // usage: reply((user, query_parameter_from_client) -> some_function_that_returns_future(), (user, result_of_that_function) -> do_something_with_result());
-    // user = users email or serial
-    // query_parameter = some parameter client adds with the request (could be null)
-    // some_function_that_returns_future() = for example database.getAllUsers()
-    // result_of_that_function = database.getAllUsers() result (json object in this case)
-    // do_something_with_result() = change the result into int for example (json -> json.size())
     private <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
                                           BiFunction<String, T, Object> compiler) {
         return msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body())).setHandler(ar -> {
@@ -89,7 +83,6 @@ public class EventBusRouter extends Routable {
         });
     }
 
-    // same as above but without changing the result
     private <T> Handler<Message<T>> reply(Function<String, Future<T>> processor) {
         return msg -> processor.apply(String.valueOf(msg.body())).setHandler(ar -> {
             if (ar.succeeded()) {
