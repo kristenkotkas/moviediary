@@ -93,9 +93,10 @@ public class StringUtils {
         //"22 February, 2017" -> 2017-02-22T
         if (!date.equals("")) {
             String[] parts = date.split(" ");
+            String day = parts[0].length() == 1 ? "0" + parts[0] : parts[0];
             if (isEnd) {
                 return LocalDate.parse((parts[2] + "-" + months.get(parts[1]) + "-") +
-                        parts[0]).plusDays(1).toString() + "T";
+                        day).plusDays(1).toString() + "T";
             } else {
                 return (parts[2] + "-" + months.get(parts[1]) + "-") + parts[0] + "T";
             }
