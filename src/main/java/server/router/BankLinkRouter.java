@@ -6,14 +6,17 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import org.apache.commons.codec.binary.Base64;
 import server.service.BankLinkService;
 
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.security.Signature;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static server.entity.Status.badRequest;
 import static server.entity.Status.serviceUnavailable;
+import static server.util.CommonUtils.getPemPrivateKey;
 import static server.util.HandlerUtils.*;
 
 import static server.util.CommonUtils.contains;
@@ -44,31 +47,43 @@ public class BankLinkRouter extends Routable {
     }
 
     private void handleApiCreatePayment(RoutingContext ctx){
-        String vk_service = ctx.getBodyAsJson().getString("name");
-        String vk_version = ctx.getBodyAsJson().getString("description");
-        String vk_snd_id = ctx.getBodyAsJson().getString("account_owner");
-        String vk_stamp = ctx.getBodyAsJson().getString("account_nr");
-        String vk_amount = ctx.getBodyAsJson().getString("amount");
-        String vk_curr = "";
-        String vk_acc = "";
-        String vk_name = "";
-        String vk_ref = "";
-        String vk_lang = "EST";
-        String vk_msg = ctx.getBodyAsJson().getString("product");
+        String vk_service = "1011";
+        String vk_version = "008";
+        String vk_snd_id = ""; // kliendi tunnuskood pangale edastamiseks kujul uid100023
+        String vk_stamp = ""; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
+        String vk_amount = ctx.getBodyAsJson().getString("amount"); // Makse summa
+        String vk_curr = "EUR"; // Makse valuuta
+        String vk_acc = ctx.getBodyAsJson().getString("account_nr"); // Saaja konto nr
+        String vk_name = ""; // Maksja nimi
+        String vk_ref = ""; // Viitenumber
+        String vk_lang = "EST"; //tehingu keel
+        String vk_msg = ctx.getBodyAsJson().getString("product"); // Toode/makse kirjeldus
         String vk_return = RETURN_URL;
         String vk_cancel = CANCEL_URL;
-        String vk_datetime = LocalDateTime.now().toString();
-        String vk_encoding = "utf-8";
+        String vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toString();
 
-        try{
-            Signature instance = Signature.getInstance("SHA1withRSA");
-            //instance.initSign();//TODO:implement getting key
-        }
-        catch (NoSuchAlgorithmException e){
+        String toBeSigned = "004" + vk_service + vk_version + vk_snd_id + vk_stamp + vk_amount +
+                vk_curr + vk_acc + vk_name + vk_ref + vk_lang + vk_msg + vk_return + vk_cancel +
+                vk_datetime;
+
+        try {
+            Signature instance = Signature.getInstance("SHA1withRSA");vertx.fileSystem().readFile("path", result ->{
+                try{
+                    instance.initSign(getPemPrivateKey(result.result().toString(StandardCharsets.UTF_8), "RSA"));
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            });
+            instance.update((toBeSigned).getBytes());
+            byte[] signature = instance.sign();
+            String vk_mac = Base64.encodeBase64(signature).toString();
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
 
 
     }

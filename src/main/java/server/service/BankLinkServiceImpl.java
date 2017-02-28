@@ -42,7 +42,7 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return get(SOLUTIONS, getCached(PAYMENT.prefix));
     }
 
-    @Override // TODO 23.02 save the details received (certs, UID)
+    @Override // TODO 23.02 save the details received (cert, private key, UID)
     public Future<JsonObject> createPaymentSolution(JsonObject solutionDetails){
         return post(SOLUTIONS, solutionDetails, getCached(PAYMENT.prefix));
     }
