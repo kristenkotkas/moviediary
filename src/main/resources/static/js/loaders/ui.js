@@ -39,5 +39,9 @@ fallback.ready(function () {
         selectMonths: true,
         selectYears: 15
     });
+    $('.tooltipped').tooltip({ //tooltips
+        delay: 100,
+        position: 'top'
+    });
     $('body').addClass('loaded'); //loader
 });
