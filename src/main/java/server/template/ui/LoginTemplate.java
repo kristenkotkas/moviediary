@@ -3,9 +3,11 @@ package server.template.ui;
 public interface LoginTemplate extends BaseTemplate {
     LoginTemplate setFormUrl(String formUrl);
 
-    LoginTemplate setFacebook(String facebook);
+    LoginTemplate setFacebookUrl(String facebookUrl);
 
-    LoginTemplate setGoogle(String google);
+    LoginTemplate setGoogleUrl(String googleUrl);
 
-    LoginTemplate setIdCard(String idCard);
+    LoginTemplate setIdCardUrl(String idCardUrl);
+
+    LoginTemplate setError(boolean error);
 }

@@ -17,8 +17,17 @@
 {{> templates/navigationBar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
 <div class="input-field col s12">
-    <a href="{{logoutLink}}" type="submit" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
+    <a href="{{logoutUrl}}" type="submit" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
         <i class="fa fa-sign-out left re"></i>Log out
+    </a>
+    <a href="{{userPage}}?lang=en" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
+        <i class="fa fa-sign-out left re"></i>English
+    </a>
+    <a href="{{userPage}}?lang=et" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
+        <i class="fa fa-sign-out left re"></i>Estonian
+    </a>
+    <a href="{{userPage}}?lang=de" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
+        <i class="fa fa-sign-out left re"></i>German
     </a>
 </div>
 <script src="/static/js/fallback.min.js"></script>

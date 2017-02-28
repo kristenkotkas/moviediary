@@ -19,8 +19,13 @@
         <form class="login-form" method="get" action="{{formUrl}}">
             <div class="row">
                 <div class="input-field col s12 center">
-                    <h5 class="center grey-text">Log in</h5>
+                    <h5 class="center grey-text">{{i18n "LOGIN" locale=lang}}</h5>
                 </div>
+                {{#if error}}
+                    <div class="input-field col s12 center">
+                        <h5 class="center red-text">Unauthorized</h5>
+                    </div>
+                {{/if}}
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
@@ -31,22 +36,22 @@
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
-                    <a href="{{facebook}}" class="btn waves-effect waves-light col s12 blue darken-4 z-depth-0">
+                    <a href="{{facebookUrl}}" class="btn waves-effect waves-light col s12 blue darken-4 z-depth-0">
                         <i class="fa fa-facebook-f left"></i>Login with Facebook
                     </a>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
-                    <a href="{{google}}" class="btn waves-effect waves-light col s12 red z-depth-0">
-                        <i class="fa fa-google-plus left"></i>Login with Google+
+                    <a href="{{googleUrl}}" class="btn waves-effect waves-light col s12 red z-depth-0">
+                        <i class="fa fa-google-plus left"></i>Login with Google
                     </a>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <a href="{{idCard}}" class="btn waves-effect waves-light col s12 blue lighten-2 z-depth-0">
-                        <i class="fa fa-id-card-o left"></i>Login with id-kaart
+                    <a href="{{idCardUrl}}" class="btn waves-effect waves-light col s12 blue lighten-2 z-depth-0">
+                        <i class="fa fa-id-card-o left"></i>Login with ID-Card
                     </a>
                 </div>
             </div>

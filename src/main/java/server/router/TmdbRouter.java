@@ -29,7 +29,7 @@ public class TmdbRouter extends Routable {
         router.get(API_GET_MOVIE).handler(this::handleApiGetMovie);
     }
 
-    private void handleApiGetSearch(RoutingContext ctx) { // handleb otsingu json päringut /search/:filminimi -> localhost:8080/search/avatar
+    private void handleApiGetSearch(RoutingContext ctx) {
         String name = ctx.request().getParam(parseParam(API_GET_SEARCH));
         if (name == null) {
             badRequest(ctx);
@@ -38,7 +38,7 @@ public class TmdbRouter extends Routable {
         tmdb.getMovieByName(name).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private void handleApiGetMovie(RoutingContext ctx) { // handleb filmi json päringut /movie/:filmi id -> localhost:8080/movie/1234
+    private void handleApiGetMovie(RoutingContext ctx) {
         String id = ctx.request().getParam(parseParam(API_GET_MOVIE));
         if (id == null) {
             badRequest(ctx);

@@ -16,11 +16,18 @@ import server.service.DatabaseService;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.pac4j.core.util.CommonHelper.addParameter;
+import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.UiRouter.UI_LOGIN;
 import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
 
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
+    private static final String UNAUTHORIZED = "Unauthorized";
+    public static final String URL = "url";
+    public static final String ERROR = "error";
+
     private final DatabaseService database;
 
     public DatabaseAuthorizer(DatabaseService database) {
@@ -42,17 +49,20 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         return isAnyAuthorized(context, profiles);
     }
 
+    @Override
+    protected boolean handleError(WebContext context) throws HttpAction {
+        throw HttpAction.redirect(UNAUTHORIZED, context,
+                addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, ERROR, UNAUTHORIZED)));
+    }
+
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
         IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream, DatabaseService database) -> {
-            System.out.println("-------------Authorizing ID Card user------------------");
             boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(DB_USERNAME)));
-            System.out.println("Is authorized: " + isAuthorized);
             if (isAuthorized) {
                 return true;
             }
-            System.out.println("-------------Registering ID Card user------------------");
             SyncResult<Boolean> result = new SyncResult<>();
             result.executeAsync(() -> database.insertUser(profile.getSerial(),
                     genString(),
@@ -92,17 +102,14 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
-                System.out.println("------------Authorizing Facebook/Google user--------------");
-                System.out.println(profile);
                 boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(DB_USERNAME)));
                 if (isAuthorized) {
                     return true;
                 }
-                System.out.println("------------Registering Facebook/Google user-------------");
                 SyncResult<Boolean> result = new SyncResult<>();
                 result.executeAsync(() -> database.insertUser(
                         profile.getEmail(),
-                        "",
+                        genString(),
                         profile.getFirstName(),
                         profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
                 return result.await().get();
