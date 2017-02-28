@@ -15,7 +15,7 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navigationBar.hbs}}
-<h3 class="light grey-text text-lighten-1 page-heading">Hello {{firstName}}</h3>
+<h3 class="light grey-text text-lighten-1 page-heading">Hello {{userFirstName}}</h3>
 <div class="row">
     <div class="col s12 m6">
         <div class="card white small z-depth-0">
@@ -35,7 +35,7 @@
 <script src="/static/js/loaders/eventbus.js"></script>
 <script>
     fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-        var eventbus = new EventBus("{{eventbus}}");
+        var eventbus = new EventBus("{{eventbusUrl}}");
         eventbus.onopen = function () {
             eventbus.registerHandler("messenger", function (err, msg) {
                 console.log(msg);

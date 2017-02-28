@@ -33,6 +33,7 @@ import static server.util.FileUtils.isRunningFromJar;
 public class UiRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
+    private static final String LANGUAGE = "lang";
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
 
@@ -102,7 +103,14 @@ public class UiRouter extends Routable {
     }
 
     private void handleUser(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
+        UserTemplate template = getSafe(ctx, TEMPL_USER, UserTemplate.class);
+        String lang = ctx.request().getParam(LANGUAGE);
+        if (lang != null) {
+            // TODO: 28.02.2017 store as cookie?, currently is cleared when browser is closed
+            ctx.session().data().put(LANGUAGE, lang);
+            template.setLang(lang);
+        }
+        engine.render(template, endHandler(ctx));
     }
 
     private void handleHome(RoutingContext ctx) {
@@ -128,9 +136,9 @@ public class UiRouter extends Routable {
     private void handleLogin(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
-                .setFacebook(UI_HOME + FACEBOOK.getClientNamePrefixed())
-                .setGoogle(UI_HOME + GOOGLE.getClientNamePrefixed())
-                .setIdCard(UI_HOME + IDCARD.getClientNamePrefixed()), endHandler(ctx));
+                .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
+                .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
+                .setIdCardUrl(UI_HOME + IDCARD.getClientNamePrefixed()), endHandler(ctx));
     }
 
     private void handleFormLogin(RoutingContext ctx) {
@@ -162,19 +170,20 @@ public class UiRouter extends Routable {
 
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
-        baseTemplate.setLogoutLink(AUTH_LOGOUT);
-        baseTemplate.setUser(UI_USER);
-        baseTemplate.setHome(UI_HOME);
-        baseTemplate.setMovies(UI_MOVIES);
-        baseTemplate.setHistory(UI_HISTORY);
-        baseTemplate.setStatistics(UI_STATISTICS);
-        baseTemplate.setWishlist(UI_WISHLIST);
+        baseTemplate.setLang((String) ctx.session().data().getOrDefault(LANGUAGE, ctx.preferredLocale().language()));
+        baseTemplate.setLogoutUrl(AUTH_LOGOUT);
+        baseTemplate.setUserPage(UI_USER);
+        baseTemplate.setHomePage(UI_HOME);
+        baseTemplate.setMoviesPage(UI_MOVIES);
+        baseTemplate.setHistoryPage(UI_HISTORY);
+        baseTemplate.setStatisticsPage(UI_STATISTICS);
+        baseTemplate.setWishlistPage(UI_WISHLIST);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
             baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
-            baseTemplate.setFirstName(profile.getFirstName());
+            baseTemplate.setUserFirstName(profile.getFirstName());
         }
-        baseTemplate.setEventbus(EVENTBUS);
+        baseTemplate.setEventbusUrl(EVENTBUS);
         return baseTemplate;
     }
 }

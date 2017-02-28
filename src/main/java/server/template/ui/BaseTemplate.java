@@ -3,23 +3,25 @@ package server.template.ui;
 import eu.kyngas.template.engine.TypeSafeTemplate;
 
 public interface BaseTemplate extends TypeSafeTemplate {
-    void setLogoutLink(String logoutLink);
+    void setLang(String lang);
 
-    void setUser(String user);
+    void setLogoutUrl(String logoutUrl);
 
-    void setHome(String home);
+    void setEventbusUrl(String eventbusUrl);
 
-    void setMovies(String movies);
+    void setUserPage(String userPage);
 
-    void setHistory(String history);
+    void setHomePage(String homePage);
 
-    void setStatistics(String statistics);
+    void setMoviesPage(String moviesPage);
 
-    void setWishlist(String wishlist);
+    void setHistoryPage(String historyPage);
+
+    void setStatisticsPage(String statisticsPage);
+
+    void setWishlistPage(String wishlistPage);
 
     void setUserName(String name);
 
-    void setFirstName(String name);
-
-    void setEventbus(String eventbus);
+    void setUserFirstName(String name);
 }
