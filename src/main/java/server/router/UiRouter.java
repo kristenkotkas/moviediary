@@ -20,10 +20,13 @@ import server.template.ui.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_INSERT;
 import static server.router.DatabaseRouter.USER_EXISTS;
 import static server.router.EventBusRouter.EVENTBUS;
+import static server.security.DatabaseAuthorizer.ERROR;
+import static server.security.DatabaseAuthorizer.URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -135,6 +138,7 @@ public class UiRouter extends Routable {
 
     private void handleLogin(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
+                .setError(ctx.request().getParam(ERROR) != null)
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -171,7 +175,7 @@ public class UiRouter extends Routable {
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLang((String) ctx.session().data().getOrDefault(LANGUAGE, ctx.preferredLocale().language()));
-        baseTemplate.setLogoutUrl(AUTH_LOGOUT);
+        baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
         baseTemplate.setUserPage(UI_USER);
         baseTemplate.setHomePage(UI_HOME);
         baseTemplate.setMoviesPage(UI_MOVIES);

@@ -8,4 +8,6 @@ public interface LoginTemplate extends BaseTemplate {
     LoginTemplate setGoogleUrl(String googleUrl);
 
     LoginTemplate setIdCardUrl(String idCardUrl);
+
+    LoginTemplate setError(boolean error);
 }

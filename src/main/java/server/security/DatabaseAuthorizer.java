@@ -16,11 +16,18 @@ import server.service.DatabaseService;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.pac4j.core.util.CommonHelper.addParameter;
+import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.UiRouter.UI_LOGIN;
 import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
 
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
+    private static final String UNAUTHORIZED = "Unauthorized";
+    public static final String URL = "url";
+    public static final String ERROR = "error";
+
     private final DatabaseService database;
 
     public DatabaseAuthorizer(DatabaseService database) {
@@ -40,6 +47,12 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     @Override
     public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) throws HttpAction {
         return isAnyAuthorized(context, profiles);
+    }
+
+    @Override
+    protected boolean handleError(WebContext context) throws HttpAction {
+        throw HttpAction.redirect(UNAUTHORIZED, context,
+                addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, ERROR, UNAUTHORIZED)));
     }
 
     public enum ProfileAuthorizer {
@@ -96,7 +109,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
                 SyncResult<Boolean> result = new SyncResult<>();
                 result.executeAsync(() -> database.insertUser(
                         profile.getEmail(),
-                        "",
+                        genString(),
                         profile.getFirstName(),
                         profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
                 return result.await().get();

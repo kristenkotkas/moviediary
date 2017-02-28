@@ -21,6 +21,11 @@
                 <div class="input-field col s12 center">
                     <h5 class="center grey-text">{{i18n "LOGIN" locale=lang}}</h5>
                 </div>
+                {{#if error}}
+                    <div class="input-field col s12 center">
+                        <h5 class="center red-text">Unauthorized</h5>
+                    </div>
+                {{/if}}
             </div>
             <div class="row margin">
                 <div class="input-field col s12">

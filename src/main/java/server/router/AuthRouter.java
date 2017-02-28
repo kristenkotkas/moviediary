@@ -13,7 +13,6 @@ import server.security.SecurityConfig;
 
 import static server.router.EventBusRouter.EVENTBUS_ALL;
 import static server.router.UiRouter.UI_HOME;
-import static server.router.UiRouter.UI_LOGIN;
 import static server.security.SecurityConfig.AUTHORIZER;
 import static server.security.SecurityConfig.AuthClient.getClientNames;
 import static server.util.NetworkUtils.MAX_BODY_SIZE;
@@ -33,9 +32,6 @@ public class AuthRouter extends Routable {
         this.config = config;
         this.securityConfig = securityConfig;
     }
-
-    // TODO: 19.02.2017 if fb/google auth is canceled -> redirect to login with error message?
-    // TODO: 19.02.2017 if any actions fail -> custom page or redirect to login?
 
     @Override
     public void route(Router router) {
@@ -60,8 +56,8 @@ public class AuthRouter extends Routable {
                         .setMultiProfile(false));
         router.route(CALLBACK).handler(callback);
 
-        router.get(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx, new ApplicationLogoutHandlerOptions()
-                .setDefaultUrl(UI_LOGIN), securityConfig.getPac4jConfig()));
+        router.get(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx,
+                new ApplicationLogoutHandlerOptions(), securityConfig.getPac4jConfig()));
     }
 
     /**
