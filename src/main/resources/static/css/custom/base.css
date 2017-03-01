@@ -30,7 +30,7 @@
 
 .btn:focus,
 .btn:hover{
-    background-color: ButtonHighlight !important;
+    /*background-color: ButtonHighlight !important;*/
 }
 
 .not-found {
@@ -145,6 +145,9 @@ header .brand-logo img {
         top: 10px;
     }
 
+    .movies-search-bar {
+        width: 100%;
+    }
 }
 
 /* Tablet mode */
