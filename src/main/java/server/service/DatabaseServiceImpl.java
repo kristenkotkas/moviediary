@@ -25,7 +25,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
+    private static final String SQL_QUERY_USERS =
+            "SELECT * FROM Users JOIN Settings ON Users.Username = Settings.Username";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
     private static final String SQL_INSERT_DEMO_VIEWS =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
@@ -35,6 +36,11 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND End <= ?";
+
+    private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
+
+    private static final String SQL_INSERT_SETTINGS =
+            "INSERT INTO Settings (Username, RuntimeType, Language) VALUES (?, ?, ?)";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -91,6 +97,27 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                         .add(LocalDateTime.now().plusHours(2).toString())
                         .add(wasFirst)
                         .add(wasCinema), updateResultHandler(conn, future))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> getSettings(String username) {
+        Future<JsonObject> future = Future.future();
+        client.getConnection(connHandler(future,
+                conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
+                        resultSetHandler(conn, CACHE_SETTINGS + username, future))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insertSettings(String username, String runtimeType, String language) {
+        Future<JsonObject> future = Future.future();
+        // TODO: 01/03/2017 get previous settings -> if param null, replace
+        client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_SETTINGS, new JsonArray()
+                        .add(username)
+                        .add(runtimeType != null ? runtimeType : "default")
+                        .add(language), updateResultHandler(conn, future))));
         return future;
     }
 

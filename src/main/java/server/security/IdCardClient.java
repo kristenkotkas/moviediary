@@ -9,11 +9,11 @@ import org.pac4j.core.util.CommonHelper;
 import server.router.UiRouter;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static server.router.UiRouter.UI_IDCARDLOGIN;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -29,9 +29,6 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
     public IdCardClient() {
         setAuthenticator((credentials, context) -> credentials.setUserProfile(new IdCardProfile(credentials)));
     }
-
-    // TODO: 13.02.2017 http://www.pac4j.org/docs/customizations.html
-    // TODO: 13.02.2017 logout handler (LogoutActionBuilder) ??
 
     @Override
     protected void internalInit(WebContext context) {
@@ -51,8 +48,7 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
             }
             try {
                 return new IdCardCredentials(((X509Certificate) CertificateFactory.getInstance(CERT_TYPE)
-                        .generateCertificate(new ByteArrayInputStream(fixFormat(cert)
-                                .getBytes(StandardCharsets.UTF_8))))
+                        .generateCertificate(new ByteArrayInputStream(fixFormat(cert).getBytes(UTF_8))))
                         .getSubjectDN()
                         .getName());
             } catch (CertificateException e) {

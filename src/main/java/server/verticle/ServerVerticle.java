@@ -34,7 +34,7 @@ public class ServerVerticle extends AbstractVerticle {
         DatabaseService database = DatabaseService.create(vertx, config());
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
-                new AuthRouter(vertx, config(), securityConfig), //authentication
+                new AuthRouter(vertx, database, config(), securityConfig), //authentication
                 new TmdbRouter(vertx, tmdb), //tmdb rest api
                 new BankLinkRouter(vertx, bls), //pangalink
                 new DatabaseRouter(vertx, database, securityConfig), //database rest api

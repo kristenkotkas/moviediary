@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_INSERT;
 import static server.router.DatabaseRouter.USER_EXISTS;
 import static server.router.EventBusRouter.EVENTBUS;
@@ -36,7 +37,6 @@ import static server.util.FileUtils.isRunningFromJar;
 public class UiRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
-    private static final String LANGUAGE = "lang";
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
 
@@ -109,7 +109,7 @@ public class UiRouter extends Routable {
         UserTemplate template = getSafe(ctx, TEMPL_USER, UserTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
-            // TODO: 28.02.2017 store as cookie?, currently is cleared when browser is closed
+            database.insertSettings(getProfile(ctx).getEmail(), null, lang); // TODO: 01/03/2017 dont need to wait till db is updated?
             ctx.session().data().put(LANGUAGE, lang);
             template.setLang(lang);
         }
@@ -174,7 +174,7 @@ public class UiRouter extends Routable {
 
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
-        baseTemplate.setLang((String) ctx.session().data().getOrDefault(LANGUAGE, ctx.preferredLocale().language()));
+        baseTemplate.setLang((String) ctx.session().data().get(LANGUAGE));
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
         baseTemplate.setUserPage(UI_USER);
         baseTemplate.setHomePage(UI_HOME);

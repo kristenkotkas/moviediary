@@ -9,12 +9,15 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_ALL = "all";
     String CACHE_VIEWS = "views_";
     String CACHE_USER = "user_";
+    String CACHE_SETTINGS = "settings_";
 
     String DB_USERNAME = "Username";
     String DB_FIRSTNAME = "Firstname";
     String DB_LASTNAME = "Lastname";
     String DB_PASSWORD = "Password";
     String DB_SALT = "Salt";
+    String DB_RUNTIME_TYPE = "RuntimeType";
+    String DB_LANGUAGE = "Language";
 
     String COLUMNS = "columnNames";
     String ROWS = "rows";
@@ -27,6 +30,10 @@ public interface DatabaseService extends CachingService<JsonObject> {
     }
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
+
+    Future<JsonObject> getSettings(String username);
+
+    Future<JsonObject> insertSettings(String username, String runtimeType, String language);
 
     Future<JsonObject> getUser(String username);
 
