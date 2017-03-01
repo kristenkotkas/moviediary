@@ -49,10 +49,10 @@ remotes {
 }
 
 ssh.settings {
-    knownHosts = file("known_hosts")
+    knownHosts = file("/misc/known_hosts")
 }
 
-task deployMovieDiary() {
+task deployMovieDiary(dependsOn: shadowJar) {
     doLast {
         ssh.run {
             session(remotes.master) {
