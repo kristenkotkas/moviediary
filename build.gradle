@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'org.hidetake.ssh' version '2.7.0'
 }
 
 targetCompatibility = 1.8
@@ -32,4 +33,35 @@ group 'org.movies'
 shadowJar {
     baseName = 'moviediary'
     classifier = ''
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+remotes {
+    master {
+        role 'master'
+        host = 'kyngas.eu'
+        user = 'kristjan'
+        identity = file('C:\\grapes\\keys\\kristjan\\id_rsa')
+    }
+}
+
+ssh.settings {
+    knownHosts = file("known_hosts")
+}
+
+task deployMovieDiary() {
+    doLast {
+        ssh.run {
+            session(remotes.master) {
+                File server = file('C:\\Users\\Kristjan\\ownCloud\\java\\moviediary\\build\\libs\\moviediary.jar')
+                if (server.exists()) {
+                    put from: server, into: '/home/kristjan/Downloads/'
+                }
+            }
+        }
+        println ':deploy:done'
+    }
 }
