@@ -33,6 +33,8 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getSettings(String username);
 
+    Future<JsonObject> updateSettings(String username, String runtimeType, String language);
+
     Future<JsonObject> insertSettings(String username, String runtimeType, String language);
 
     Future<JsonObject> getUser(String username);

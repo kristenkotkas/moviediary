@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import org.pac4j.core.authorization.authorizer.ProfileAuthorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.oauth.profile.facebook.FacebookProfile;
 import org.pac4j.oauth.profile.google2.Google2Profile;
@@ -16,6 +17,7 @@ import server.service.DatabaseService;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.pac4j.core.exception.HttpAction.redirect;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.UiRouter.UI_LOGIN;
@@ -51,7 +53,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
     @Override
     protected boolean handleError(WebContext context) throws HttpAction {
-        throw HttpAction.redirect(UNAUTHORIZED, context,
+        throw redirect(UNAUTHORIZED, context,
                 addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, ERROR, UNAUTHORIZED)));
     }
 
@@ -102,9 +104,13 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
-                boolean isAuthorized = stream.anyMatch(json -> profile.getEmail().equals(json.getString(DB_USERNAME)));
+                boolean isAuthorized = stream.anyMatch(json -> json.getString(DB_USERNAME).equals(profile.getEmail()));
                 if (isAuthorized) {
                     return true;
+                }
+                if (profile.getEmail() == null) {
+                    // TODO: 2.03.2017 redirect user to login with message: "you need to allow access to email"
+                    throw new TechnicalException("User email not found.");
                 }
                 SyncResult<Boolean> result = new SyncResult<>();
                 result.executeAsync(() -> database.insertUser(

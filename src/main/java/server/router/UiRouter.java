@@ -109,7 +109,7 @@ public class UiRouter extends Routable {
         UserTemplate template = getSafe(ctx, TEMPL_USER, UserTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
-            database.insertSettings(getProfile(ctx).getEmail(), null, lang); // TODO: 01/03/2017 dont need to wait till db is updated?
+            database.updateSettings(getProfile(ctx).getEmail(), null, lang);
             ctx.session().data().put(LANGUAGE, lang);
             template.setLang(lang);
         }

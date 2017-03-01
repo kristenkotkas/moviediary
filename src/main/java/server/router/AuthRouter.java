@@ -26,9 +26,8 @@ public class AuthRouter extends Routable {
     public static final String AUTH_API = "(?!\\/api\\/users\\/insert)(\\/api\\/.*)";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
-    private static final String CALLBACK = "/callback";
     public static final String LANGUAGE = "lang";
-
+    private static final String CALLBACK = "/callback";
     private final DatabaseService database;
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -69,14 +68,28 @@ public class AuthRouter extends Routable {
         router.get(AUTH_PRIVATE).handler(this::handleLanguage);
     }
 
+    /**
+     * Verifies that user session contains language.
+     * If it does not, it is retrieved from the user settings table.
+     * If it does not exist in table, user browser's locale is used and inserted into table.
+     */
     private void handleLanguage(RoutingContext ctx) {
         if (!ctx.session().data().containsKey(LANGUAGE)) {
-            database.getSettings(getProfile(ctx).getEmail()).setHandler(
-                    ar -> ctx.session().data().put(LANGUAGE, ar.succeeded() && getNumRows(ar.result()) > 0 ?
-                            getRows(ar.result()).getJsonObject(0).getString(DB_LANGUAGE) :
-                            ctx.preferredLocale().language()));
+            database.getSettings(getProfile(ctx).getEmail()).setHandler(ar -> {
+                String lang = ctx.preferredLocale().language();
+                if (ar.succeeded()) {
+                    if (getNumRows(ar.result()) > 0) {
+                        lang = getRows(ar.result()).getJsonObject(0).getString(DB_LANGUAGE);
+                    } else {
+                        database.insertSettings(getProfile(ctx).getEmail(), null, lang);
+                    }
+                }
+                ctx.session().data().put(LANGUAGE, lang);
+                ctx.next();
+            });
+        } else {
+            ctx.next();
         }
-        ctx.next();
     }
 
     /**

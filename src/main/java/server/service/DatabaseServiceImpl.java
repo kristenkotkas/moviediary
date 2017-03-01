@@ -20,17 +20,16 @@ import static server.util.StringUtils.*;
 
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
     private static final Logger log = LoggerFactory.getLogger(DatabaseServiceImpl.class);
-
     private static final String MYSQL = "mysql";
 
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_USERS =
-            "SELECT * FROM Users JOIN Settings ON Users.Username = Settings.Username";
+
+    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
+
     private static final String SQL_INSERT_DEMO_VIEWS =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
-
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
@@ -38,7 +37,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     "WHERE Username = ? AND Start >= ? AND End <= ?";
 
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-
+    private static final String SQL_UPDATE_SETTINGS =
+            "UPDATE Settings SET RuntimeType = ?, Language = ? WHERE Username = ?";
     private static final String SQL_INSERT_SETTINGS =
             "INSERT INTO Settings (Username, RuntimeType, Language) VALUES (?, ?, ?)";
 
@@ -106,6 +106,19 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         client.getConnection(connHandler(future,
                 conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
                         resultSetHandler(conn, CACHE_SETTINGS + username, future))));
+        return future;
+    }
+
+    // TODO: 2.03.2017 only update what needed
+    @Override
+    public Future<JsonObject> updateSettings(String username, String runtimeType, String language) {
+        Future<JsonObject> future = Future.future();
+        // TODO: 01/03/2017 get previous settings -> if param null, replace
+        client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_UPDATE_SETTINGS, new JsonArray()
+                        .add(runtimeType != null ? runtimeType : "default")
+                        .add(language)
+                        .add(username), updateResultHandler(conn, future))));
         return future;
     }
 

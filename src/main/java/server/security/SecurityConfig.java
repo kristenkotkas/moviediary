@@ -52,8 +52,16 @@ public class SecurityConfig {
 
     public enum AuthClient {
         FORM("form", FormClient.class, (key, secret) -> new FormClient()),
-        FACEBOOK("facebook", FacebookClient.class, FacebookClient::new),
-        GOOGLE("google", Google2Client.class, Google2Client::new),
+        FACEBOOK("facebook", FacebookClient.class, (key, secret) -> {
+            FacebookClient fb = new FacebookClient(key, secret);
+            fb.setScope("email");
+            return fb;
+        }),
+        GOOGLE("google", Google2Client.class, (key, secret) -> {
+            Google2Client g2c = new Google2Client(key, secret);
+            g2c.setScope(Google2Client.Google2Scope.EMAIL);
+            return g2c;
+        }),
         IDCARD("idcard", IdCardClient.class, (key, secret) -> new IdCardClient());
 
         private static final String OAUTH = "oauth";
