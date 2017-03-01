@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#E3F2FD">
     <title>Movie</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="/static/css/font-awesome-4.7.0/css/font-awesome.css" type="text/css" rel="stylesheet"
+          media="screen,projection">
 </head>
 <body class="blue lighten-5">
 <!-- Page loader -->
@@ -15,6 +17,16 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navigationBar.hbs}}
+<div class="card z-depth-0">
+    <form>
+        <div class="input-field">
+            <input id="search" type="search" required>
+            <label class="label-icon" for="search">
+                <i class="fa fa-search"></i></label>
+        </div>
+    </form>
+</div>
+
 <h3 class="light grey-text text-lighten-1 page-heading">Movies</h3>
 <script src="/static/js/fallback.min.js"></script>
 <script src="/static/js/loaders/ui.js"></script>

@@ -16,16 +16,26 @@
     margin-left: -10px !important;
 }
 
-.page-heading{
+.page-heading {
     margin: 3% 0 1% 4%;
 }
 
-.logout-button{
+.logout-button {
     margin: 0 0 2% 4%;
 }
 
 .table-row {
     padding: 0 0 0 3%;
+}
+
+.btn:focus,
+.btn:hover{
+    background-color: ButtonHighlight !important;
+}
+
+.not-found {
+    margin: 15px 15px 15px 15px;
+    font-size: xx-large;
 }
 
 @media only screen and (min-width: 1071px) {
