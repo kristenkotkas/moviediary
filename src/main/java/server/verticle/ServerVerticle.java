@@ -25,6 +25,7 @@ public class ServerVerticle extends AbstractVerticle {
     private static final Logger log = LoggerFactory.getLogger(ServerVerticle.class);
 
     private List<Routable> routables;
+    // TODO: 02/03/2017 pass in services with constructor for testing
 
     @Override
     public void start(Future<Void> future) throws Exception {

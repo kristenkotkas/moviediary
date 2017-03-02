@@ -41,7 +41,8 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
 
     public void enable(DatabaseService database, JsonObject config) {
         // TODO: 17.02.2017 store in config or smth
-        loginUrl = (isServer(config) ? "https://movies.kyngas.eu" : "http://localhost:8081") + UI_FORM_LOGIN;
+        loginUrl = (isServer(config) ? "https://movies.kyngas.eu" :
+                "http://localhost:" + config.getString("http_port")) + UI_FORM_LOGIN;
         setAuthenticator((credentials, context) -> {
             if (credentials == null) {
                 throw new CredentialsException("No credentials provided.");
