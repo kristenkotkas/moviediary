@@ -26,7 +26,8 @@
                         <div class="input-field login-text">
                             <input id="seenFirst" type="checkbox">
                             <label for="seenFirst" class="tooltipped"
-                                   data-position="right" data-tooltip="Some helpful info">
+                                   data-position="right"
+                                   data-tooltip="{{i18n "FIRST_TOOLTIP" locale=lang}}">
                                 <i class="fa fa-eye" aria-hidden="true"></i>&ensp; Was first time
                             </label>
                         </div>
@@ -101,9 +102,6 @@
                                         '<th class="table-row">Title</th>' +
                                         '<th>Date</th>' +
                                         '<th>Time</th>' +
-                                        '<th></th>' +
-                                        '<th></th>' +
-                                        '<th></th>' +
                                         '</tr>');
                                 Materialize.toast("Retrieved movies from database!", 5000);
                                 $.each(data, function (i) {
@@ -120,11 +118,11 @@
                             } else {
                                 $("#table").empty();
                                 $("#viewsTitle").empty().append(
-                                    '<div class="card z-depth-0">' +
+                                        '<div class="card z-depth-0">' +
                                         '<div class="card-title">' +
-                                            '<a class="light grey-text text-lighten-1 not-found">Views not present</a>' +
+                                        '<a class="light grey-text text-lighten-1 not-found">Views not present</a>' +
                                         '</div>' +
-                                    '</div>'
+                                        '</div>'
                                 );
                             }
                         });
