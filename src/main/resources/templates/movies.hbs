@@ -21,21 +21,51 @@
 <div class="row">
     <div class="col movies-search-bar m10 offset-m1 l6 offset-l3">
         <div class="card z-depth-0">
-            <form class="search">
-                <div class="search-wrapper input-field">
-                    <input class="movies-search-bar" id="search" type="search" required>
-                    <label class="label-icon" for="search">
-                        <i class="fa fa-search left"></i></label>
-                    <div class="search-results">
-                    </div>
+            <div class="search-wrapper input-field">
+                <input class="movies-search-bar" id="search" type="search" required>
+                <label class="label-icon" for="search">
+                    <i class="fa fa-search left"></i></label>
+                <div class="search-results" id="search-result">
+
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-
 <script src="/static/js/fallback.min.js"></script>
 <script src="/static/js/loaders/ui.js"></script>
+<script src="/static/js/loaders/eventbus.js"></script>
+<script>
+    fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () { //siis kui need 3 saavad laetud
+        var eventbus = new EventBus("{{eventbusUrl}}");
+        eventbus.onopen = function () {
+            $("#search").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    $("#search-result").empty();
+                    eventbus.send("api_get_search",
+                            {'title': $("#search").val()}, function (error, reply) {
+                                var data = reply.body.results;
+                                console.log(data);
+                                $.each(data, function (i) {
+                                    var movie = data[i];
+                                    $("#search-result").append(
+                                            $.parseHTML(
+                                                    '<div class="">' +
+                                                        '<div class="search-results">' +
+                                                        movie.release_date.split('-')[0] + ' . . . . ' +
+                                                        movie.original_title +
+                                                        '</div>' +
+                                                    '</div>')
+                                    );
+                                });
+
+                            });
+                }
+            });
+        };
+    });
+</script>
+
 </body>
 </html>

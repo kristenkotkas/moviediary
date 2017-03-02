@@ -43,7 +43,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieByName(String name) { //pärib tmdb-st otsingu
-        return get(MOVIE_NAME + name + APIKEY_PREFIX1, getCached(SEARCH.get(name)));
+        return get(MOVIE_NAME + name.replaceAll(" ", "-") + APIKEY_PREFIX1, getCached(SEARCH.get(name)));
     }
 
     @Override
