@@ -27,7 +27,7 @@
                             <input id="seenFirst" type="checkbox">
                             <label for="seenFirst" class="tooltipped"
                                    data-position="right"
-                                   data-tooltip="{{i18n "FIRST_TOOLTIP" locale=lang}}">
+                                   data-tooltip="{{i18n "WAS_FIRST_TOOLTIP" locale=lang}}">
                                 <i class="fa fa-eye" aria-hidden="true"></i>&ensp; Was first time
                             </label>
                         </div>
@@ -35,7 +35,9 @@
                     <div class="row">
                         <div class="input-field login-text">
                             <input id="wasCinema" type="checkbox">
-                            <label for="wasCinema">
+                            <label for="wasCinema" class="tooltipped"
+                                   data-position="right"
+                                   data-tooltip="{{i18n "WAS_CINEMA_TOOLTIP" locale=lang}}">
                                 <i class="fa fa-ticket" aria-hidden="true"></i>&ensp; Was in cinema
                             </label>
                         </div>
@@ -55,8 +57,8 @@
                     </div>
                     <div class="row">
                         <div class="input-field row">
-                            <button id="Search" type="submit" data-tooltip="Click me"
-                                    class="btn tooltipped waves-effect waves-light col s12 z-depth-0">
+                            <button id="Search" type="submit"
+                                    class="btn waves-effect waves-light col s12 z-depth-0">
                                 <i class="fa fa-search left"></i>Search
                             </button>
                         </div>
@@ -105,15 +107,16 @@
                                         '</tr>');
                                 Materialize.toast("Retrieved movies from database!", 5000);
                                 $.each(data, function (i) {
-                                    $("#table").append(
-                                            '<tr>' +
-                                            '<td class="table-row">' + data[i].Title + '</td>' +
-                                            '<td>' + data[i].Start + '</td>' +
-                                            '<td>' + data[i].Time + '</td>' +
-                                            '<td>' + data[i].DayOfWeek + '</td>' +
-                                            '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
-                                            '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
-                                            '</tr>');
+                                        $("#table").append(
+                                            $.parseHTML('<tr>' +
+                                                    '<td class="table-row">' + data[i].Title + '</td>' +
+                                                    '<td>' + data[i].Start + '</td>' +
+                                                    '<td>' + data[i].Time + '</td>' +
+                                                    '<td>' + data[i].DayOfWeek + '</td>' +
+                                                    '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
+                                                    '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
+                                                    '</tr>')
+                                                );
                                 });
                             } else {
                                 $("#table").empty();
