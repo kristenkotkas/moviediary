@@ -28,7 +28,6 @@ import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.USER_EXISTS;
-import static server.router.EventBusRouter.EVENTBUS;
 import static server.security.DatabaseAuthorizer.ERROR;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.SecurityConfig.AuthClient.*;
@@ -193,7 +192,6 @@ public class UiRouter extends Routable {
             baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
             baseTemplate.setUserFirstName(profile.getFirstName());
         }
-        baseTemplate.setEventbusUrl(EVENTBUS);
         return baseTemplate;
     }
 }

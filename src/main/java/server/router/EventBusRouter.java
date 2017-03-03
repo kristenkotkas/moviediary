@@ -63,8 +63,7 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
-        listen(API_GET_SEARCH, reply(name -> tmdb.getMovieByName(new JsonObject(name).getString("title"))));
-
+        listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
         gateway(MESSENGER, log());
     }
 

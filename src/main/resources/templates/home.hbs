@@ -4,57 +4,36 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#E3F2FD">
-    <title>Home</title>
+    <title>{{i18n "NAVBAR_HOME" locale=lang}}</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="blue lighten-5">
-<!-- Page loader -->
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
     <div class="loader-section section-right"></div>
 </div>
-{{> templates/navigationBar.hbs}}
-<h3 class="light grey-text text-lighten-1 page-heading">Hello {{userFirstName}}</h3>
+{{> templates/navbar.hbs}}
+<h3 class="light grey-text text-lighten-1 page-heading">{{i18n "HOME_HELLO" locale=lang}} {{userFirstName}}</h3>
 <div class="row">
     <div class="col s12 m6">
         <div class="card white small z-depth-0">
             <div class="card-content grey-text">
-                <span class="card-title">Messenger</span>
-                <label for="MessageInput">Insert message</label>
+                <span class="card-title">{{i18n "HOME_MESSENGER" locale=lang}}</span>
+                <label for="MessageInput">{{i18n "HOME_INSERT_MESSAGE" locale=lang}}</label>
                 <input id="MessageInput" type="text">
                 <div class="card-action">
-                    <a id="SendMessage" class="btn waves-effect waves-light z-depth-0">Send</a>
+                    <a id="SendMessage" class="btn waves-effect waves-light z-depth-0">
+                        {{i18n "HOME_SEND" locale=lang}}
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="/static/js/fallback.min.js"></script>
-<script src="/static/js/loaders/ui.js"></script>
-<script src="/static/js/loaders/eventbus.js"></script>
-<script>
-    fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-        var eventbus = new EventBus("{{eventbusUrl}}");
-        eventbus.onopen = function () {
-            eventbus.registerHandler("messenger", function (err, msg) {
-                console.log(msg);
-                Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
-            });
-            var sendMessage = function () {
-                var input = $("#MessageInput").val();
-                eventbus.publish("messenger", input);
-            };
-            $("#MessageInput").keyup(function (e) {
-                if (e.keyCode == 13) {
-                    sendMessage();
-                }
-            });
-            $("#SendMessage").click(function () {
-                sendMessage();
-            });
-        };
-    });
-</script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/eventbus.js"></script>
+<script async type="text/javascript" src="/static/js/pages/home.js"></script>
 </body>
 </html>

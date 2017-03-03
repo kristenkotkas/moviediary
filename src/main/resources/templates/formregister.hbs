@@ -4,11 +4,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00bcd4">
-    <title>Form Register</title>
+    <title>{{i18n "FORM_REGISTER_TITLE" locale=lang}}</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="cyan login-body">
-<!-- Page loader -->
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -19,50 +18,50 @@
         <form class="login-form" method="post" action="{{registerRestUrl}}">
             <div class="row">
                 <div class="input-field col s12 center">
-                    <h5 class="center grey-text">Sign up</h5>
+                    <h5 class="center grey-text">{{i18n "FORM_REGISTER_SIGNUP" locale=lang}}</h5>
                 </div>
                 {{#if userExists}}
                     <div class="input-field col s12 center">
-                        <h5 class="center red-text">User already exists!</h5>
+                        <h5 class="center red-text">{{i18n "FORM_REGISTER_EXISTS" locale=lang}}</h5>
                     </div>
                 {{/if}}
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <input id="firstname" type="text" name="firstname" required>
-                    <label for="firstname">Firstname</label>
+                    <label for="firstname">{{i18n "FORM_REGISTER_FIRSTNAME" locale=lang}}</label>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <input id="lastname" type="text" name="lastname" required>
-                    <label for="lastname">Lastname</label>
+                    <label for="lastname">{{i18n "FORM_REGISTER_LASTNAME" locale=lang}}</label>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <input id="username" type="email" name="username" required>
-                    <label for="username">E-mail</label>
+                    <label for="username">{{i18n "FORM_LOGIN_EMAIL" locale=lang}}</label>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <input id="password" type="password" name="password" required>
-                    <label for="password">Password</label>
+                    <label for="password">{{i18n "FORM_LOGIN_PASSWORD" locale=lang}}</label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
                     <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
-                        <i class="fa fa-sign-in left"></i>Register
+                        <i class="fa fa-sign-in left"></i>{{i18n "FORM_LOGIN_REGISTER" locale=lang}}
                     </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<script type="text/javascript" src="/static/js/fallback.min.js"></script>
-<script type="text/javascript" src="/static/js/loaders/ui.js"></script>
-<script type="text/javascript" src="/static/js/loaders/page-center.js"></script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/page-center.js"></script>
 </body>
 </html>

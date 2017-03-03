@@ -4,33 +4,32 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#E3F2FD">
-    <title>Movie</title>
+    <title>{{i18n "NAVBAR_ME" locale=lang}}</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="blue lighten-5">
-<!-- Page loader -->
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
     <div class="loader-section section-right"></div>
 </div>
-{{> templates/navigationBar.hbs}}
+{{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
 <div class="input-field col s12">
     <a href="{{logoutUrl}}" type="submit" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        <i class="fa fa-sign-out left re"></i>Log out
+        <i class="fa fa-sign-out left re"></i>{{i18n "USER_LOGOUT" locale=lang}}
     </a>
     <a href="{{userPage}}?lang=en" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        <i class="fa fa-sign-out left re"></i>English
+        <i class="fa fa-sign-out left re"></i>{{i18n "USER_ENGLISH" locale=lang}}
     </a>
     <a href="{{userPage}}?lang=et" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        <i class="fa fa-sign-out left re"></i>Estonian
+        <i class="fa fa-sign-out left re"></i>{{i18n "USER_ESTONIAN" locale=lang}}
     </a>
     <a href="{{userPage}}?lang=de" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        <i class="fa fa-sign-out left re"></i>German
+        <i class="fa fa-sign-out left re"></i>{{i18n "USER_GERMAN" locale=lang}}
     </a>
 </div>
-<script src="/static/js/fallback.min.js"></script>
-<script src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
 </body>
 </html>
