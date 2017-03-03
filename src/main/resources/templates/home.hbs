@@ -41,11 +41,17 @@
                 console.log(msg);
                 Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
             });
+            var sendMessage = function () {
+                var input = $("#MessageInput").val();
+                eventbus.publish("messenger", input);
+            };
             $("#MessageInput").keyup(function (e) {
                 if (e.keyCode == 13) {
-                    var input = $("#MessageInput").val();
-                    eventbus.publish("messenger", input);
+                    sendMessage();
                 }
+            });
+            $("#SendMessage").click(function () {
+                sendMessage();
             });
         };
     });
