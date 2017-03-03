@@ -6,8 +6,8 @@ import io.vertx.core.json.JsonObject;
 
 public interface TmdbService extends CachingService<JsonObject> {
 
-    static TmdbService create(Vertx vertx, JsonObject config) {
-        return new TmdbServiceImpl(vertx, config);
+    static TmdbService create(Vertx vertx, JsonObject config, DatabaseService database) {
+        return new TmdbServiceImpl(vertx, config, database);
     }
 
     Future<JsonObject> getMovieByName(String name);

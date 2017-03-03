@@ -33,11 +33,13 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     private final Vertx vertx;
     private final JsonObject config;
     private final HttpClient client;
+    private final DatabaseService database;
 
-    protected TmdbServiceImpl(Vertx vertx, JsonObject config) {
+    protected TmdbServiceImpl(Vertx vertx, JsonObject config, DatabaseService database) {
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
         this.vertx = vertx;
         this.config = config;
+        this.database = database;
         this.client = vertx.createHttpClient(new HttpClientOptions().setSsl(true));
     }
 
@@ -48,8 +50,12 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
-        System.out.println("MOVIEID: " + id);
-        return get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
+        Future<JsonObject> future = get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
+        // FIXME: 4. märts. 2017 filmi lisamine andmebaasi
+        /*JsonObject json = future.result();
+        Future<JsonObject> future1 = database.insertMovie(json.getInteger("movieId"), json.getString("title"), json.getInteger("year"));
+        */
+        return future;
     }
 
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {

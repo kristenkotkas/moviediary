@@ -47,6 +47,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_INSERT_SETTINGS =
             "INSERT INTO Settings (Username, RuntimeType, Language) VALUES (?, ?, ?)";
 
+    private static final String SQL_INSERT_MOVIE =
+            "INSERT IGNORE INTO Movies VALUES (?, ?, ?)";
+
     private final Vertx vertx;
     private final JsonObject config;
     private final JDBCClient client;
@@ -102,6 +105,17 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                         .add(LocalDateTime.now().plusHours(2).toString())
                         .add(wasFirst)
                         .add(wasCinema), updateResultHandler(conn, future))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
+        Future<JsonObject> future = Future.future();
+        client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
+                .add(id)
+                .add(movieTitle)
+                .add(year), updateResultHandler(conn, future))));
         return future;
     }
 

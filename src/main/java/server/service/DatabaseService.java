@@ -91,6 +91,8 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
 
+    Future<JsonObject> insertMovie(int id, String movieTitle, int year);
+
     Future<JsonObject> getSettings(String username);
 
     Future<JsonObject> update(Table table, Map<Column, String> data);

@@ -31,9 +31,9 @@ public class ServerVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx); //handles addresses client connects to
-        TmdbService tmdb = TmdbService.create(vertx, config());
-        BankLinkService bls = BankLinkService.create(vertx, config());
         DatabaseService database = DatabaseService.create(vertx, config());
+        TmdbService tmdb = TmdbService.create(vertx, config(), database);
+        BankLinkService bls = BankLinkService.create(vertx, config());
         MailService mail = MailService.create(vertx, config(), database);
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
