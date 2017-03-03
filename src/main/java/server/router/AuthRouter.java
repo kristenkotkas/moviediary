@@ -23,7 +23,6 @@ import static server.util.NetworkUtils.MAX_BODY_SIZE;
 import static server.util.NetworkUtils.isServer;
 
 public class AuthRouter extends Routable {
-    public static final String AUTH_API = "(?!\\/api\\/users\\/insert)(\\/api\\/.*)";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
     public static final String LANGUAGE = "lang";
@@ -53,7 +52,6 @@ public class AuthRouter extends Routable {
                 .withClients(getClientNames())
                 .withAuthorizers(AUTHORIZER));
         router.route(AUTH_PRIVATE).handler(securityHandler);
-        router.routeWithRegex(AUTH_API).handler(securityHandler);
         router.route(EVENTBUS_ALL).handler(securityHandler);
 
         CallbackHandler callback = new CallbackHandler(vertx, securityConfig.getPac4jConfig(),
@@ -71,7 +69,7 @@ public class AuthRouter extends Routable {
     /**
      * Verifies that user session contains language.
      * If it does not, it is retrieved from the user settings table.
-     * If it does not exist in table, user browser's locale is used and inserted into table.
+     * FIXME If it does not exist in table, user browser's locale is used and inserted into table.
      */
     private void handleLanguage(RoutingContext ctx) {
         if (!ctx.session().data().containsKey(LANGUAGE)) {
@@ -80,8 +78,6 @@ public class AuthRouter extends Routable {
                 if (ar.succeeded()) {
                     if (getNumRows(ar.result()) > 0) {
                         lang = getRows(ar.result()).getJsonObject(0).getString(DB_LANGUAGE);
-                    } else {
-                        database.insertSettings(getProfile(ctx).getEmail(), null, lang);
                     }
                 }
                 ctx.session().data().put(LANGUAGE, lang);

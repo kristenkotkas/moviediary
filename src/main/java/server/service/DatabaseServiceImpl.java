@@ -11,12 +11,16 @@ import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
+import static server.service.DatabaseService.Column.*;
+import static server.service.DatabaseService.SQLCommand.INSERT;
+import static server.service.DatabaseService.SQLCommand.UPDATE;
+import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
 import static server.util.StringUtils.*;
-
-//näited -> https://github.com/vert-x3/vertx-examples/tree/master/jdbc-examples
 
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
     private static final Logger log = LoggerFactory.getLogger(DatabaseServiceImpl.class);
@@ -25,7 +29,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
 
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
+    private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
+            "JOIN Settings ON Users.Username = Settings.Username";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
 
     private static final String SQL_INSERT_DEMO_VIEWS =
@@ -71,8 +76,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                 Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
                 Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
                 Future<JsonObject> future3 = insertDemoViews(username, 334543, 0, 1);
-                //teeme 3 sisestust korraga ja saame teada kas õnnestus
-                CompositeFuture.all(future1, future2, future3).setHandler(result -> {
+                Future<JsonObject> future4 = insert(Table.SETTINGS, createDataMap(username));
+                CompositeFuture.all(future1, future2, future3, future4).setHandler(result -> {
                     if (result.succeeded()) {
                         future.complete(ar.result().toJson());
                     } else {
@@ -109,28 +114,35 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
-    // TODO: 2.03.2017 only update what needed
     @Override
-    public Future<JsonObject> updateSettings(String username, String runtimeType, String language) {
+    public Future<JsonObject> update(Table table, Map<Column, String> data) {
         Future<JsonObject> future = Future.future();
-        // TODO: 01/03/2017 get previous settings -> if param null, replace
+        if (data.get(USERNAME) == null) {
+            future.fail("Username required.");
+            return future;
+        }
+        if (data.size() == 1) {
+            future.fail("No columns specified.");
+            return future;
+        }
+        List<Column> columns = getSortedColumns(data);
         client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_UPDATE_SETTINGS, new JsonArray()
-                        .add(runtimeType != null ? runtimeType : "default")
-                        .add(language)
-                        .add(username), updateResultHandler(conn, future))));
+                conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
+                        updateResultHandler(conn, future))));
         return future;
     }
 
     @Override
-    public Future<JsonObject> insertSettings(String username, String runtimeType, String language) {
+    public Future<JsonObject> insert(Table table, Map<Column, String> data) {
         Future<JsonObject> future = Future.future();
-        // TODO: 01/03/2017 get previous settings -> if param null, replace
+        if (data.get(USERNAME) == null) {
+            future.fail("Username required.");
+            return future;
+        }
+        List<Column> columns = getSortedColumns(data);
         client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_INSERT_SETTINGS, new JsonArray()
-                        .add(username)
-                        .add(runtimeType != null ? runtimeType : "default")
-                        .add(language), updateResultHandler(conn, future))));
+                conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
+                        updateResultHandler(conn, future))));
         return future;
     }
 

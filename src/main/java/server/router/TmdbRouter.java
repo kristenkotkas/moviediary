@@ -13,8 +13,8 @@ import static server.util.HandlerUtils.*;
 public class TmdbRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(TmdbRouter.class);
 
-    private static final String API_GET_SEARCH = "/search/:movieName";
-    private static final String API_GET_MOVIE = "/movie/:movieId";
+    private static final String API_TMDB_GET_SEARCH = "/private/search/:movieName";
+    private static final String API_TMDB_GET_MOVIE = "/private/movie/:movieId";
 
     private final TmdbService tmdb;
 
@@ -25,12 +25,12 @@ public class TmdbRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        router.get(API_GET_SEARCH).handler(this::handleApiGetSearch);
-        router.get(API_GET_MOVIE).handler(this::handleApiGetMovie);
+        router.get(API_TMDB_GET_SEARCH).handler(this::handleApiGetSearch);
+        router.get(API_TMDB_GET_MOVIE).handler(this::handleApiGetMovie);
     }
 
     private void handleApiGetSearch(RoutingContext ctx) {
-        String name = ctx.request().getParam(parseParam(API_GET_SEARCH));
+        String name = ctx.request().getParam(parseParam(API_TMDB_GET_SEARCH));
         if (name == null) {
             badRequest(ctx);
             return;
@@ -39,7 +39,7 @@ public class TmdbRouter extends Routable {
     }
 
     private void handleApiGetMovie(RoutingContext ctx) {
-        String id = ctx.request().getParam(parseParam(API_GET_MOVIE));
+        String id = ctx.request().getParam(parseParam(API_TMDB_GET_MOVIE));
         if (id == null) {
             badRequest(ctx);
             return;

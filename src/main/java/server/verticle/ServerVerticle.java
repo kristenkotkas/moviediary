@@ -10,6 +10,7 @@ import server.router.*;
 import server.security.SecurityConfig;
 import server.service.BankLinkService;
 import server.service.DatabaseService;
+import server.service.MailService;
 import server.service.TmdbService;
 
 import java.util.Arrays;
@@ -33,13 +34,15 @@ public class ServerVerticle extends AbstractVerticle {
         TmdbService tmdb = TmdbService.create(vertx, config());
         BankLinkService bls = BankLinkService.create(vertx, config());
         DatabaseService database = DatabaseService.create(vertx, config());
+        MailService mail = MailService.create(vertx, config(), database);
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
                 new AuthRouter(vertx, database, config(), securityConfig), //authentication
                 new TmdbRouter(vertx, tmdb), //tmdb rest api
                 new BankLinkRouter(vertx, bls), //pangalink
-                new DatabaseRouter(vertx, database, securityConfig), //database rest api
                 new EventBusRouter(vertx, database, tmdb), //eventbus
+                new DatabaseRouter(vertx, config(), database, mail, securityConfig), //database rest api
+                new MailRouter(vertx, mail), //mail
                 new UiRouter(vertx, securityConfig, database)); //ui
         routables.forEach(routable -> routable.route(router));
         router.route().last().handler(Status::notFound); //if no handler found for address -> 404

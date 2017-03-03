@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00bcd4">
     <title>Login</title>
-    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="cyan login-body">
 <!-- Page loader -->
@@ -21,9 +21,9 @@
                 <div class="input-field col s12 center">
                     <h5 class="center grey-text">{{i18n "LOGIN" locale=lang}}</h5>
                 </div>
-                {{#if error}}
+                {{#if errorMessage}}
                     <div class="input-field col s12 center">
-                        <h5 class="center red-text">Unauthorized</h5>
+                        <h5 class="center red-text">{{errorMessage}}</h5>
                     </div>
                 {{/if}}
             </div>
@@ -58,8 +58,8 @@
         </form>
     </div>
 </div>
-<script type="text/javascript" src="/static/js/fallback.min.js"></script>
-<script type="text/javascript" src="/static/js/loaders/ui.js"></script>
-<script type="text/javascript" src="/static/js/loaders/page-center.js"></script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/page-center.js"></script>
 </body>
 </html>

@@ -57,6 +57,8 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
                 addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, ERROR, UNAUTHORIZED)));
     }
 
+    // TODO: 3.03.2017 redirection is needed -> need to rewrite authorizer
+
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
@@ -75,6 +77,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
                 .filter(json -> json.getString(DB_USERNAME).equals(profile.getEmail()))
+                .filter(json -> json.getString(DB_VERIFIED).equals("1"))
                 .anyMatch(json -> hash(profile.getPassword(), profile.getSalt()).equals(json.getString(DB_PASSWORD))));
 
         private final Class type;
@@ -87,7 +90,6 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         }
 
         public static boolean isAuthorized(DatabaseService database, CommonProfile profile, JsonArray users) {
-            // TODO: 19.02.2017 profiles as enummap or smth -> get enum based on clientname from profile
             for (ProfileAuthorizer authorizer : values()) {
                 if (authorizer.type.isInstance(profile)) {
                     return authorizer.checker.apply(profile, users.stream().map(obj -> (JsonObject) obj), database);

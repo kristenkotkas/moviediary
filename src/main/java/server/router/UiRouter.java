@@ -15,15 +15,18 @@ import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.service.DatabaseService;
+import server.service.DatabaseService.Column;
+import server.service.DatabaseService.Table;
 import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
-import static server.router.DatabaseRouter.API_USERS_INSERT;
+import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.USER_EXISTS;
 import static server.router.EventBusRouter.EVENTBUS;
 import static server.security.DatabaseAuthorizer.ERROR;
@@ -31,6 +34,7 @@ import static server.security.DatabaseAuthorizer.URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
+import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 
@@ -109,7 +113,9 @@ public class UiRouter extends Routable {
         UserTemplate template = getSafe(ctx, TEMPL_USER, UserTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
-            database.updateSettings(getProfile(ctx).getEmail(), null, lang);
+            Map<Column, String> map = createDataMap(getProfile(ctx).getEmail());
+            map.put(Column.LANGUAGE, lang);
+            database.update(Table.SETTINGS, map);
             ctx.session().data().put(LANGUAGE, lang);
             template.setLang(lang);
         }
@@ -138,7 +144,7 @@ public class UiRouter extends Routable {
 
     private void handleLogin(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
-                .setError(ctx.request().getParam(ERROR) != null)
+                .setErrorMessage(ctx.request().getParam(ERROR))
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -157,7 +163,7 @@ public class UiRouter extends Routable {
     private void handleFormRegister(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
                 .setUserExists(ctx.request().getParam(USER_EXISTS) != null)
-                .setRegisterRestUrl(API_USERS_INSERT), endHandler(ctx));
+                .setRegisterRestUrl(API_USERS_FORM_INSERT), endHandler(ctx));
     }
 
     private void handleIdCardLogin(RoutingContext ctx) {
