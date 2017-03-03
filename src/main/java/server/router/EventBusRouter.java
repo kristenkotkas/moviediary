@@ -37,6 +37,7 @@ public class EventBusRouter extends Routable {
     public static final String DATABASE_USERS_SIZE = "database_users_size";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
     public static final String API_GET_SEARCH = "api_get_search";
+    public static final String API_GET_MOVIE = "api_get_movie";
 
     public static final String MESSENGER = "messenger";
 
@@ -64,6 +65,7 @@ public class EventBusRouter extends Routable {
             return json;
         }));
         listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
+        listen(API_GET_MOVIE, reply(name -> tmdb.getMovieById(new JsonObject(name).getString("movieId"))));
         gateway(MESSENGER, log());
     }
 
