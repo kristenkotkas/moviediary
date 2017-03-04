@@ -7,7 +7,7 @@
     <title>{{i18n "NAVBAR_MOVIES" locale=lang}}</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
-<body class="blue lighten-5">
+<body class="blue lighten-5" id="body">
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -35,7 +35,7 @@
     <div class="row">
         <div class="s12 m12 l12">
             <div class="col card s12 m8 offset-m2 l2 offset-l2" id="movie-poster-card"></div>
-            <div class="col card l6">
+            <div class="col card l6  search-result">
                 <pre id="movie-result" hidden>
                     <!-- Siia tuleb filmi sisu jqueryga -->
                 </pre>

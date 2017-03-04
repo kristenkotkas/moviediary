@@ -15,6 +15,7 @@ var searchMovie = function (eventbus, movieId) {
               '<img src="http://image.tmdb.org/t/p/w500' + data.poster_path + '" width="100%">'
           )
         );
+        $("#body").attr("background", 'http://image.tmdb.org/t/p/original' + data.backdrop_path);
     });
 };
 
@@ -24,7 +25,6 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         $("#search").keyup(function (e) {
             if (e.keyCode == 13) {
                 $("#search-result").empty();
-                $("#movie-poster-card").empty();
                 eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
                     var data = reply.body.results;
                     console.log(data);

@@ -3,6 +3,17 @@
     vertical-align: middle;
 }
 
+body {
+    background-attachment: fixed;
+}
+
+/*body: {
+    -webkit-filter: blur(15px);
+}*/
+.search-result {
+    opacity: 0.8;
+}
+
 .login-form {
     width: 280px;
 }
