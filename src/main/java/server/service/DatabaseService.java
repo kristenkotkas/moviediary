@@ -13,6 +13,9 @@ import java.util.function.BiFunction;
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
 
+/**
+ * Service which interacts with database.
+ */
 public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_ALL = "all";
     String CACHE_VIEWS = "views_";
@@ -105,6 +108,10 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getViews(String username, String param);
 
+    /**
+     * Creates a SQL command string from given Table and list of Columns.
+     * Does not set values.
+     */
     enum SQLCommand {
         UPDATE((table, columns) -> {
             StringBuilder sb = new StringBuilder("UPDATE ")
@@ -148,6 +155,9 @@ public interface DatabaseService extends CachingService<JsonObject> {
         }
     }
 
+    /**
+     * Tables used in database.
+     */
     enum Table {
         MOVIES("Movies"),
         SETTINGS("Settings"),
@@ -166,6 +176,9 @@ public interface DatabaseService extends CachingService<JsonObject> {
         }
     }
 
+    /**
+     * Columns used in database.
+     */
     enum Column {
         FIRSTNAME("Firstname"),
         LASTNAME("Lastname"),

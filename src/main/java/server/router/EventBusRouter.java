@@ -18,6 +18,7 @@ import org.pac4j.vertx.auth.Pac4jUser;
 import server.service.DatabaseService;
 import server.service.TmdbService;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -27,11 +28,12 @@ import java.util.stream.Stream;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static server.util.StringUtils.*;
 
+/**
+ * Contains addresses that eventbus listens and gateways on.
+ */
 public class EventBusRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(EventBusRouter.class);
-
     public static final String EVENTBUS_ALL = "/eventbus/*";
-    public static final String EVENTBUS = "/eventbus";
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
@@ -41,8 +43,8 @@ public class EventBusRouter extends Routable {
 
     public static final String MESSENGER = "messenger";
 
-    private final ConcurrentHashMap<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
+    private final Map<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
+    private final Map<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
 
     public EventBusRouter(Vertx vertx, DatabaseService database, TmdbService tmdb) {
         super(vertx);

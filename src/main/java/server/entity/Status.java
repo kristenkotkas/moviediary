@@ -34,12 +34,18 @@ public class Status {
         ctx.response().setStatusCode(BAD_REQUEST).end();
     }
 
+    /**
+     * Respond with Service Unavailable message and exception cause.
+     */
     public static void serviceUnavailable(RoutingContext ctx, Throwable cause) {
         ctx.response()
                 .setStatusCode(SERVICE_UNAVAILABLE)
                 .end(SERVICE_UNAVAILABLE + ": Service unavailable\n" + "Cause: " + cause.getMessage());
     }
 
+    /**
+     * Redirect client to location.
+     */
     public static void redirect(RoutingContext ctx, String location) {
         ctx.response()
                 .putHeader(LOCATION, location)

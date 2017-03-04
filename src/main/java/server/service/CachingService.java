@@ -2,6 +2,9 @@ package server.service;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Service which allows caching data as CacheItems for a set period of time.
+ */
 public interface CachingService<T> {
 
     /**

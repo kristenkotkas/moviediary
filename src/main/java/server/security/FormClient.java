@@ -14,6 +14,9 @@ import static server.router.UiRouter.UI_FORM_LOGIN;
 import static server.util.CommonUtils.nonNull;
 import static server.util.NetworkUtils.isServer;
 
+/**
+ * Indirect client for form login.
+ */
 public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
     private static final Logger log = LoggerFactory.getLogger(FormClient.class);
     public static final String FORM_USERNAME = "username";

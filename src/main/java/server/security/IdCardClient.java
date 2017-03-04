@@ -18,6 +18,9 @@ import static server.router.UiRouter.UI_IDCARDLOGIN;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
 
+/**
+ * Indirect client for ID Card login.
+ */
 public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProfile> {
     private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
     private static final String URL = "https://id.movies.kyngas.eu" + UI_IDCARDLOGIN;

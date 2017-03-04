@@ -25,6 +25,9 @@ import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
 
+/**
+ * Authorizer that checks against database whether authenticated user is allowed to access resources.
+ */
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private static final String UNAUTHORIZED = "Unauthorized";
     public static final String URL = "url";

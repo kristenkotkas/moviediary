@@ -15,6 +15,9 @@ import static server.util.CommonUtils.nonNull;
 import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
 
+/**
+ * Contains routes that handle email services.
+ */
 public class MailRouter extends Routable {
     private static final String API_MAIL_SEND = "/private/api/mail/send";
     public static final String API_MAIL_VERIFY = "/public/api/mail/verify";

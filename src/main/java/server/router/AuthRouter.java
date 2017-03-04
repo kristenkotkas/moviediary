@@ -22,6 +22,10 @@ import static server.util.CommonUtils.getProfile;
 import static server.util.NetworkUtils.MAX_BODY_SIZE;
 import static server.util.NetworkUtils.isServer;
 
+/**
+ * Contains routes that require authentication and authorization.
+ * Sets up body handling, cookie handling and user session handling.
+ */
 public class AuthRouter extends Routable {
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";

@@ -17,6 +17,9 @@ import static server.entity.Status.RATE_LIMIT;
 import static server.service.TmdbServiceImpl.Cache.MOVIE;
 import static server.service.TmdbServiceImpl.Cache.SEARCH;
 
+/**
+ * TheMovieDatabase service implementation.
+ */
 public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements TmdbService {
     private static final Logger log = LoggerFactory.getLogger(TmdbServiceImpl.class);
     private static final int HTTPS = 443;
