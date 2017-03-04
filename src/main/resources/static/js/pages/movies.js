@@ -9,13 +9,13 @@ var searchMovie = function (eventbus, movieId) {
                 JSON.stringify(data, null, 2)
             )
         ).show();
-        $("#search").val(data.title);
+        $("#search").val(data.original_title);
         $("#movie-poster-card").empty().append(
           $.parseHTML(
               '<img src="http://image.tmdb.org/t/p/w500' + data.poster_path + '" width="100%">'
           )
         );
-        $("#body").attr("background", 'http://image.tmdb.org/t/p/original' + data.backdrop_path);
+        $("#body").attr("background", 'http://image.tmdb.org/t/p/w1920' + data.backdrop_path);
     });
 };
 

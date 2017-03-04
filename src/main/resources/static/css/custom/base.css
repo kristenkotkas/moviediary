@@ -5,12 +5,13 @@
 
 body {
     background-attachment: fixed;
+    background-size: 100%;
 }
 
 /*body: {
     -webkit-filter: blur(15px);
 }*/
-.search-result {
+.opacity-object {
     opacity: 0.8;
 }
 
