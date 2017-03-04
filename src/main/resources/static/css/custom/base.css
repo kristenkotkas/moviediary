@@ -38,6 +38,10 @@
     font-size: xx-large;
 }
 
+.poster-image {
+    vertical-align: middle;
+}
+
 @media only screen and (min-width: 1071px) {
     #forgot-password {
         padding-left: 0;

@@ -16,15 +16,26 @@
 {{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_MOVIES" locale=lang}}</h3>
 <div class="row">
-    <div class="col movies-search-bar m10 offset-m1 l6 offset-l3">
-        <div class="card z-depth-0">
-            <div class="search-wrapper input-field">
-                <input class="movies-search-bar" id="search" type="search" required>
-                <label class="label-icon" for="search">
-                    <i class="fa fa-search left"></i></label>
-                <div class="collection" id="search-result" hidden>
-                    <!-- Siia tuleb otsingu sisu jqueryga -->
+    <div class="col s12 m12 l12">
+        <div class="row">
+            <div class="col movies-search-bar m10 offset-m1 l6 offset-l3">
+                <div class="card z-depth-0">
+                    <div class="search-wrapper input-field">
+                        <input class="movies-search-bar" id="search" type="search" required>
+                        <label class="label-icon" for="search">
+                            <i class="fa fa-search left"></i></label>
+                        <div class="collection" id="search-result" hidden>
+                            <!-- Siia tuleb otsingu sisu jqueryga -->
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="s12 m12 l12">
+            <div class="col card s12 m8 offset-m2 l2 offset-l2" id="movie-poster-card"></div>
+            <div class="col card l6">
                 <pre id="movie-result" hidden>
                     <!-- Siia tuleb filmi sisu jqueryga -->
                 </pre>

@@ -52,8 +52,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
         Future<JsonObject> future = get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
         // FIXME: 4. märts. 2017 filmi lisamine andmebaasi
-        /*JsonObject json = future.result();
-        Future<JsonObject> future1 = database.insertMovie(json.getInteger("movieId"), json.getString("title"), json.getInteger("year"));
+        /*Future<JsonObject> future1 = database.insertMovie(json.getInteger("movieId"), json.getString("title"), json.getInteger("year"));
         */
         return future;
     }
