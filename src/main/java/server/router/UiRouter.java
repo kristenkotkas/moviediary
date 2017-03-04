@@ -37,6 +37,9 @@ import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 
+/**
+ * Contains routes which user interface is handled on.
+ */
 public class UiRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");

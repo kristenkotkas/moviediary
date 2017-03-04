@@ -17,6 +17,9 @@ import static server.security.SecurityConfig.AuthClient.getCallback;
 import static server.security.SecurityConfig.AuthClient.values;
 import static server.util.NetworkUtils.isServer;
 
+/**
+ * Contains login clients used for user authentication.
+ */
 public class SecurityConfig {
     public static final String CLIENT_VERIFIED_STATE = "SSL_CLIENT_VERIFY";
     public static final String CLIENT_CERTIFICATE = "SSL_CLIENT_CERT";

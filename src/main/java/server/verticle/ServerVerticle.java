@@ -21,6 +21,8 @@ import static server.util.NetworkUtils.*;
 
 /**
  * Main server logic.
+ * Creates services, security configuration and routes.
+ * Creates a HTTP server.
  */
 public class ServerVerticle extends AbstractVerticle {
     private static final Logger log = LoggerFactory.getLogger(ServerVerticle.class);

@@ -29,6 +29,9 @@ import static server.util.NetworkUtils.isServer;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
 
+/**
+ * Contains routes that interact with database.
+ */
 public class DatabaseRouter extends Routable {
     public static final String USER_EXISTS = "userExists";
     public static final String API_USERS_ALL = "/private/api/users/all";

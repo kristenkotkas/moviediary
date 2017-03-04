@@ -15,6 +15,7 @@ import static server.util.VertxUtils.setLoggingToSLF4J;
 
 /**
  * Launches the server.
+ * Forces DNS resolver to use Google's DNS servers.
  */
 public class Launcher {
     private static final Logger log = LoggerFactory.getLogger(Launcher.class);

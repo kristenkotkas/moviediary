@@ -14,6 +14,9 @@ import static server.router.MailRouter.API_MAIL_VERIFY;
 import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
 
+/**
+ * Mail service implementation.
+ */
 public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements MailService {
     private static final String FROM = "moviediary@kyngas.eu";
 

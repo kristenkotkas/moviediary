@@ -8,6 +8,9 @@ import server.service.DatabaseService;
 import static server.security.SecurityConfig.*;
 import static server.service.DatabaseService.*;
 
+/**
+ * Profile for form client.
+ */
 public class FormProfile extends CommonProfile {
     // TODO: 19.02.2017 define attributes
 

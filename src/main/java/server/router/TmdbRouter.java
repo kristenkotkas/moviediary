@@ -10,6 +10,9 @@ import server.service.TmdbService;
 import static server.entity.Status.badRequest;
 import static server.util.HandlerUtils.*;
 
+/**
+ * Contains routes that handle TheMovieDatabase services.
+ */
 public class TmdbRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(TmdbRouter.class);
 
@@ -46,6 +49,4 @@ public class TmdbRouter extends Routable {
         }
         tmdb.getMovieById(id).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
-
-
 }

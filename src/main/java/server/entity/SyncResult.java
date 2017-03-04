@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  */
 public class SyncResult<T> {
     private static final Logger log = LoggerFactory.getLogger(SyncResult.class);
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
     private final CountDownLatch latch = new CountDownLatch(1);
 
     private T value;

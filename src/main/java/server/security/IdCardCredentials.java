@@ -5,6 +5,9 @@ import org.pac4j.core.util.CommonHelper;
 
 import static server.util.StringUtils.capitalizeName;
 
+/**
+ * Credentials for ID Card client.
+ */
 public class IdCardCredentials extends Credentials {
     private final String serial;
     private final String firstName;
