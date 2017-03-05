@@ -68,6 +68,7 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
+    private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -109,6 +110,7 @@ public class UiRouter extends Routable {
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
                 .setIncludeHidden(false));
+        router.route().last().handler(this::handleNotFound);
     }
 
     private void handleUser(RoutingContext ctx) {
@@ -178,6 +180,11 @@ public class UiRouter extends Routable {
                         .getClients()
                         .findClient(IdCardClient.class)
                         .getCallbackUrl()), endHandler(ctx));
+    }
+
+    private void handleNotFound(RoutingContext ctx) {
+        ctx.response().setStatusCode(404);
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
     }
 
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {

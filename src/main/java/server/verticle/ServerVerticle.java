@@ -5,7 +5,6 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
-import server.entity.Status;
 import server.router.*;
 import server.security.SecurityConfig;
 import server.service.BankLinkService;
@@ -47,9 +46,6 @@ public class ServerVerticle extends AbstractVerticle {
                 new MailRouter(vertx, mail), //mail
                 new UiRouter(vertx, securityConfig, database)); //ui
         routables.forEach(routable -> routable.route(router));
-        router.route().last().handler(Status::notFound); //if no handler found for address -> 404
-        // TODO: 20.02.2017 mingi ilus 404 leht?
-
         vertx.createHttpServer()
                 .requestHandler(router::accept)
                 .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
