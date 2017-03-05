@@ -6,13 +6,15 @@
 body {
     background-attachment: fixed;
     background-size: 100%;
+    /*-webkit-filter: blur(10px);*/
 }
 
-/*body: {
-    -webkit-filter: blur(15px);
-}*/
 .opacity-object {
     opacity: 0.8;
+}
+
+.opacity-object-full {
+    opacity: 1;
 }
 
 .login-form {
@@ -32,6 +34,13 @@ body {
     margin: 3% 0 1% 4%;
 }
 
+.movies-heading {
+    padding: 1% 0 1% 4%;
+    margin: 5% 0 5% 0;
+    background: white;
+    opacity: 0.8;
+}
+
 .logout-button {
     margin: 0 0 2% 4%;
 }
@@ -41,7 +50,7 @@ body {
 }
 
 .btn:focus,
-.btn:hover{
+.btn:hover {
     /*background-color: ButtonHighlight !important;*/
 }
 
