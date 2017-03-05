@@ -27,8 +27,7 @@ import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
-import static server.router.DatabaseRouter.USER_EXISTS;
-import static server.security.DatabaseAuthorizer.ERROR;
+import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
@@ -148,7 +147,7 @@ public class UiRouter extends Routable {
 
     private void handleLogin(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
-                .setErrorMessage(ctx.request().getParam(ERROR))
+                .setDisplayMessage(ctx.request().getParam(DISPLAY_MESSAGE))
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -166,7 +165,7 @@ public class UiRouter extends Routable {
 
     private void handleFormRegister(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
-                .setUserExists(ctx.request().getParam(USER_EXISTS) != null)
+                .setDisplayMessage(ctx.request().getParam(DISPLAY_MESSAGE))
                 .setRegisterRestUrl(API_USERS_FORM_INSERT), endHandler(ctx));
     }
 

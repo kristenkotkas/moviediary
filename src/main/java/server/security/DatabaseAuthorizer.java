@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import static org.pac4j.core.exception.HttpAction.redirect;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
@@ -31,7 +32,6 @@ import static server.util.StringUtils.hash;
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private static final String UNAUTHORIZED = "Unauthorized";
     public static final String URL = "url";
-    public static final String ERROR = "error";
 
     private final DatabaseService database;
 
@@ -57,7 +57,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     @Override
     protected boolean handleError(WebContext context) throws HttpAction {
         throw redirect(UNAUTHORIZED, context,
-                addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, ERROR, UNAUTHORIZED)));
+                addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED)));
     }
 
     // TODO: 3.03.2017 redirection is needed -> need to rewrite authorizer

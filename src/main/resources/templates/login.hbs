@@ -20,9 +20,9 @@
                 <div class="input-field col s12 center">
                     <h5 class="center grey-text">{{i18n "LOGIN_TITLE" locale=lang}}</h5>
                 </div>
-                {{#if errorMessage}}
+                {{#if displayMessage}}
                     <div class="input-field col s12 center">
-                        <h5 class="center red-text">{{errorMessage}}</h5>
+                        <h5 class="center red-text">{{displayMessage}}</h5>
                     </div>
                 {{/if}}
             </div>

@@ -3,11 +3,13 @@ package server.router;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import server.entity.Status;
 import server.service.MailService;
 
+import static server.entity.Language.getString;
 import static server.entity.Status.badRequest;
-import static server.security.DatabaseAuthorizer.ERROR;
+import static server.entity.Status.redirect;
+import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
+import static server.router.UiRouter.UI_LOGIN;
 import static server.service.MailService.EMAIL;
 import static server.service.MailService.UNIQUE;
 import static server.util.CommonUtils.getProfile;
@@ -44,14 +46,14 @@ public class MailRouter extends Routable {
             return;
         }
         mail.verifyEmail(email, unique).setHandler(resultHandler(ctx,
-                json -> Status.redirect(ctx, UiRouter.UI_LOGIN + verified())));
+                json -> redirect(ctx, UI_LOGIN + verified(ctx))));
     }
 
     private void handleMailSend(RoutingContext ctx) {
-        mail.sendVerificationEmail(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        mail.sendVerificationEmail(ctx, getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private String verified() {
-        return "?" + ERROR + "=You can log in now.";
+    private String verified(RoutingContext ctx) {
+        return "?" + DISPLAY_MESSAGE + "=" + getString("LOGIN_VERIFIED", ctx);
     }
 }

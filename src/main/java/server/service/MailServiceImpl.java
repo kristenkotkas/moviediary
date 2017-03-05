@@ -6,10 +6,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
+import io.vertx.ext.web.RoutingContext;
 import server.service.DatabaseService.*;
 
 import java.util.Map;
 
+import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
 import static server.service.DatabaseService.*;
 import static server.util.StringUtils.genString;
@@ -33,24 +35,15 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
         this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
     }
 
-    /*
-    * verified
-    * 0 -> false
-    * 1 -> true
-    * else -> false, contains unique verification string
-    *
-    * */
-
-    // TODO: 3.03.2017 different languages?
     @Override
-    public Future<JsonObject> sendVerificationEmail(String userEmail) {
+    public Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail) {
         Future<JsonObject> future = Future.future();
         String unique = genString();
         MailMessage email = new MailMessage()
                 .setFrom(FROM)
                 .setTo(userEmail)
-                .setSubject("MovieDiary account registration verification")
-                .setHtml(createContent(userEmail, unique));
+                .setSubject(getString("MAIL_REGISTER_TITLE", ctx))
+                .setHtml(createContent(ctx, userEmail, unique));
         Map<Column, String> data = createDataMap(userEmail);
         data.put(Column.VERIFIED, unique);
         database.update(Table.SETTINGS, data).setHandler(ar -> {
@@ -94,11 +87,11 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
         return future;
     }
 
-    private String createContent(String userEmail, String unique) {
-        return "<p>Thank you for registering, click the following link to verify your account.</p>" +
+    private String createContent(RoutingContext ctx, String userEmail, String unique) {
+        return "<p>" + getString("MAIL_REGISTER_TEXT", ctx) + "</p>" +
                 "<a href=\"https://movies.kyngas.eu" + API_MAIL_VERIFY +
                 "?" + EMAIL + "=" + userEmail +
                 "&" + UNIQUE + "=" + unique +
-                "\">Click me</a>";
+                "\">" + getString("MAIL_REGISTER_CLICK_ME", ctx) + "</a>";
     }
 }

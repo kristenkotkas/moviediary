@@ -15,11 +15,11 @@ import server.service.MailService;
 
 import java.util.Map;
 
+import static server.entity.Language.getString;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
-import static server.security.DatabaseAuthorizer.ERROR;
 import static server.security.FormClient.*;
 import static server.service.DatabaseService.*;
 import static server.util.CommonUtils.contains;
@@ -33,7 +33,7 @@ import static server.util.StringUtils.hash;
  * Contains routes that interact with database.
  */
 public class DatabaseRouter extends Routable {
-    public static final String USER_EXISTS = "userExists";
+    public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USERS_ALL = "/private/api/users/all";
     public static final String API_USERS_FORM_INSERT = "/public/api/users/form/insert";
     private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
@@ -83,12 +83,12 @@ public class DatabaseRouter extends Routable {
                 Future<JsonObject> future2 = database.insert(Table.SETTINGS, settingsMap);
                 CompositeFuture.all(future1, future2).setHandler(resultHandler(ctx, ar -> {
                     if (isServer(config)) {
-                        mail.sendVerificationEmail(username);
+                        mail.sendVerificationEmail(ctx, username);
                     }
-                    redirect(ctx, UI_LOGIN + verifyEmail());
+                    redirect(ctx, UI_LOGIN + verifyEmail(ctx));
                 }));
             } else {
-                redirect(ctx, UI_FORM_REGISTER + userExists());
+                redirect(ctx, UI_FORM_REGISTER + userExists(ctx));
             }
         }));
     }
@@ -97,15 +97,11 @@ public class DatabaseRouter extends Routable {
         database.getAllUsers().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private String formAuthData(String username, String password) {
-        return "&username=" + username + "&password=" + password;
+    private String userExists(RoutingContext ctx) {
+        return "?" + DISPLAY_MESSAGE + "=" + getString("FORM_REGISTER_EXISTS", ctx);
     }
 
-    private String userExists() {
-        return "?" + USER_EXISTS + "=true";
-    }
-
-    private String verifyEmail() {
-        return "?" + ERROR + "=Please verify your email.";
+    private String verifyEmail(RoutingContext ctx) {
+        return "?" + DISPLAY_MESSAGE + "=" + getString("FORM_REGISTER_VERIFY_EMAIL", ctx);
     }
 }
