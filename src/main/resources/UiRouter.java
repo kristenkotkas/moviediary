@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.pac4j.core.util.CommonHelper.addParameter;
+import static server.entity.Language.getString;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
@@ -144,8 +145,9 @@ public class UiRouter extends Routable {
     }
 
     private void handleLogin(RoutingContext ctx) {
+        String key = ctx.request().getParam(DISPLAY_MESSAGE);
         engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
-                .setDisplayMessage(ctx.request().getParam(DISPLAY_MESSAGE))
+                .setDisplayMessage(key != null ? getString(key, ctx) : null)
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -162,8 +164,9 @@ public class UiRouter extends Routable {
     }
 
     private void handleFormRegister(RoutingContext ctx) {
+        String key = ctx.request().getParam(DISPLAY_MESSAGE);
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
-                .setDisplayMessage(ctx.request().getParam(DISPLAY_MESSAGE))
+                .setDisplayMessage(key != null ? getString(key, ctx) : null)
                 .setRegisterRestUrl(API_USERS_FORM_INSERT), endHandler(ctx));
     }
 
