@@ -15,7 +15,6 @@ import server.service.MailService;
 
 import java.util.Map;
 
-import static server.entity.Language.getString;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.UiRouter.UI_FORM_REGISTER;
@@ -98,10 +97,10 @@ public class DatabaseRouter extends Routable {
     }
 
     private String userExists(RoutingContext ctx) {
-        return "?" + DISPLAY_MESSAGE + "=" + getString("FORM_REGISTER_EXISTS", ctx);
+        return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_EXISTS";
     }
 
     private String verifyEmail(RoutingContext ctx) {
-        return "?" + DISPLAY_MESSAGE + "=" + getString("FORM_REGISTER_VERIFY_EMAIL", ctx);
+        return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_VERIFY_EMAIL";
     }
 }

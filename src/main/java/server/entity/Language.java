@@ -1,5 +1,7 @@
 package server.entity;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
 
 import java.io.IOException;
@@ -22,12 +24,12 @@ public enum Language {
     ESTONIAN(new Locale.Builder().setLanguage("et").setScript("Latn").setRegion("EE").build()),
     GERMAN(new Locale.Builder().setLanguage("de").setScript("Latn").setRegion("GR").build());
 
+    private static final Logger log = LoggerFactory.getLogger(Language.class);
     private final Locale locale;
     private final ResourceBundle bundle;
 
     Language(Locale locale) {
         this.locale = locale;
-        // FIXME: 6.03.2017 ikka on probleeme täpitähtedega
         this.bundle = ResourceBundle.getBundle("messages", locale, new UTF8Control());
     }
 
@@ -48,6 +50,7 @@ public enum Language {
     }
 
     public String getString(String key) {
+        log.info("i18n: lang:" + locale.getLanguage() + ", key: " + key + ", val: " + bundle.getString(key));
         return bundle.getString(key);
     }
 

@@ -5,7 +5,6 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.service.MailService;
 
-import static server.entity.Language.getString;
 import static server.entity.Status.badRequest;
 import static server.entity.Status.redirect;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
@@ -54,6 +53,6 @@ public class MailRouter extends Routable {
     }
 
     private String verified(RoutingContext ctx) {
-        return "?" + DISPLAY_MESSAGE + "=" + getString("LOGIN_VERIFIED", ctx);
+        return "?" + DISPLAY_MESSAGE + "=" + "LOGIN_VERIFIED";
     }
 }
