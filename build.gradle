@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'org.hidetake.ssh' version '2.7.0'
 }
 
 targetCompatibility = 1.8
@@ -22,7 +23,9 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: '2.1.0'
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: '1.9.5'
+    compile group: 'io.vertx', name: 'vertx-mail-client', version: '3.3.3'
 
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.3.3'
 }
 
@@ -32,4 +35,35 @@ group 'org.movies'
 shadowJar {
     baseName = 'moviediary'
     classifier = ''
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+remotes {
+    master {
+        role 'master'
+        host = 'kyngas.eu'
+        user = 'kristjan'
+        identity = file('C:\\grapes\\keys\\kristjan\\id_rsa')
+    }
+}
+
+ssh.settings {
+    knownHosts = file("/misc/known_hosts")
+}
+
+task deployMovieDiary(dependsOn: shadowJar) {
+    doLast {
+        ssh.run {
+            session(remotes.master) {
+                File server = file('C:\\Users\\Kristjan\\ownCloud\\java\\moviediary\\build\\libs\\moviediary.jar')
+                if (server.exists()) {
+                    put from: server, into: '/home/kristjan/Downloads/'
+                }
+            }
+        }
+        println ':deploy:done'
+    }
 }

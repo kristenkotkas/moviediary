@@ -3,6 +3,20 @@
     vertical-align: middle;
 }
 
+body {
+    background-attachment: fixed;
+    background-size: 100%;
+    /*-webkit-filter: blur(10px);*/
+}
+
+.opacity-object {
+    opacity: 0.8;
+}
+
+.opacity-object-full {
+    opacity: 1;
+}
+
 .login-form {
     width: 280px;
 }
@@ -16,16 +30,37 @@
     margin-left: -10px !important;
 }
 
-.page-heading{
+.page-heading {
     margin: 3% 0 1% 4%;
 }
 
-.logout-button{
+.movies-heading {
+    padding: 1% 0 1% 4%;
+    margin: 5% 0 5% 0;
+    background: white;
+    opacity: 0.8;
+}
+
+.logout-button {
     margin: 0 0 2% 4%;
 }
 
 .table-row {
     padding: 0 0 0 3%;
+}
+
+.btn:focus,
+.btn:hover {
+    /*background-color: ButtonHighlight !important;*/
+}
+
+.not-found {
+    margin: 15px 15px 15px 15px;
+    font-size: xx-large;
+}
+
+.poster-image {
+    vertical-align: middle;
 }
 
 @media only screen and (min-width: 1071px) {
@@ -135,6 +170,9 @@ header .brand-logo img {
         top: 10px;
     }
 
+    .movies-search-bar {
+        width: 100%;
+    }
 }
 
 /* Tablet mode */

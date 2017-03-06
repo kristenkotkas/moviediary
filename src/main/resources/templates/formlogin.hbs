@@ -4,11 +4,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00bcd4">
-    <title>Form Login</title>
-    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <title>{{i18n "FORM_LOGIN_TITLE" locale=lang}}</title>
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="cyan login-body">
-<!-- Page loader -->
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -19,34 +18,34 @@
         <form class="login-form" method="post" action="{{callbackUrl}}">
             <div class="row">
                 <div class="input-field col s12 center">
-                    <h5 class="center grey-text">Log in</h5>
+                    <h5 class="center grey-text">{{i18n "LOGIN_TITLE" locale=lang}}</h5>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <i class="fa fa-user-o prefix" aria-hidden="true"></i>
                     <input id="username" type="email" name="username" required>
-                    <label for="username">E-mail</label>
+                    <label for="username">{{i18n "FORM_LOGIN_EMAIL" locale=lang}}</label>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <i class="fa fa-lock prefix" aria-hidden="true"></i>
                     <input id="password" type="password" name="password" required>
-                    <label for="password">Password</label>
+                    <label for="password">{{i18n "FORM_LOGIN_PASSWORD" locale=lang}}</label>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
-                        <i class="fa fa-sign-in left"></i>Login
+                        <i class="fa fa-sign-in left"></i>{{i18n "LOGIN_TITLE" locale=lang}}
                     </button>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <a href="{{registerUrl}}" type="submit" class="btn waves-effect waves-light col s12 btn z-depth-0">
-                        <i class="fa fa-pencil-square-o left "></i>Register
+                        <i class="fa fa-pencil-square-o left "></i>{{i18n "FORM_LOGIN_REGISTER" locale=lang}}
                     </a>
                 </div>
             </div>
@@ -54,8 +53,8 @@
         </form>
     </div>
 </div>
-<script type="text/javascript" src="/static/js/fallback.min.js"></script>
-<script type="text/javascript" src="/static/js/loaders/ui.js"></script>
-<script type="text/javascript" src="/static/js/loaders/page-center.js"></script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/page-center.js"></script>
 </body>
 </html>

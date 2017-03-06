@@ -3,6 +3,9 @@ package server.security;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.util.CommonHelper;
 
+/**
+ * Credentials for form client.
+ */
 public class FormCredentials extends Credentials {
     private final String email;
     private final String password;

@@ -16,7 +16,9 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
 import server.service.DatabaseService;
+import server.service.TmdbService;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -26,22 +28,25 @@ import java.util.stream.Stream;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static server.util.StringUtils.*;
 
+/**
+ * Contains addresses that eventbus listens and gateways on.
+ */
 public class EventBusRouter extends Routable {
     private static final Logger log = LoggerFactory.getLogger(EventBusRouter.class);
-
     public static final String EVENTBUS_ALL = "/eventbus/*";
-    public static final String EVENTBUS = "/eventbus";
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
+    public static final String API_GET_SEARCH = "api_get_search";
+    public static final String API_GET_MOVIE = "api_get_movie";
 
     public static final String MESSENGER = "messenger";
 
-    private final ConcurrentHashMap<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
+    private final Map<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
+    private final Map<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
 
-    public EventBusRouter(Vertx vertx, DatabaseService database) {
+    public EventBusRouter(Vertx vertx, DatabaseService database, TmdbService tmdb) {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
@@ -61,6 +66,8 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
+        listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
+        listen(API_GET_MOVIE, reply(tmdb::getMovieById));
         gateway(MESSENGER, log());
     }
 

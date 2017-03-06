@@ -41,7 +41,8 @@ fallback.ready(function () {
     });
     $('.tooltipped').tooltip({ //tooltips
         delay: 100,
-        position: 'top'
+        position: 'top',
+        html:true
     });
     $('body').addClass('loaded'); //loader
 });

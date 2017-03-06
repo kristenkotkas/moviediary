@@ -4,7 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.ext.web.impl.ConcurrentLRUCache;
 
 /**
- * Caching for services.
+ * Caching implementation for services.
  **/
 public abstract class CachingServiceImpl<T> implements CachingService<T> {
     protected static final int DEFAULT_MAX_CACHE_SIZE = 10000;

@@ -5,16 +5,31 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+import static java.util.stream.Collectors.toList;
+import static server.service.DatabaseService.Column.USERNAME;
+
+/**
+ * Service which interacts with database.
+ */
 public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_ALL = "all";
     String CACHE_VIEWS = "views_";
     String CACHE_USER = "user_";
+    String CACHE_SETTINGS = "settings_";
 
     String DB_USERNAME = "Username";
     String DB_FIRSTNAME = "Firstname";
     String DB_LASTNAME = "Lastname";
     String DB_PASSWORD = "Password";
     String DB_SALT = "Salt";
+    String DB_RUNTIME_TYPE = "RuntimeType";
+    String DB_LANGUAGE = "Language";
+    String DB_VERIFIED = "Verified";
 
     String COLUMNS = "columnNames";
     String ROWS = "rows";
@@ -22,17 +37,15 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String COLUMN_NUMS = "numColumns";
     String ROWS_NUMS = "numRows";
 
+    static EnumMap<Column, String> createDataMap(String username) {
+        EnumMap<Column, String> map = new EnumMap<>(Column.class);
+        map.put(USERNAME, username);
+        return map;
+    }
+
     static DatabaseService create(Vertx vertx, JsonObject config) {
         return new DatabaseServiceImpl(vertx, config);
     }
-
-    Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
-
-    Future<JsonObject> getUser(String username);
-
-    Future<JsonObject> getAllUsers();
-
-    Future<JsonObject> getViews(String username, String param);
 
     /**
      * Gets columns as json array.
@@ -77,5 +90,127 @@ public interface DatabaseService extends CachingService<JsonObject> {
      */
     static Integer getNumRows(JsonObject json) {
         return json.getInteger(ROWS_NUMS);
+    }
+
+    Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
+
+    Future<JsonObject> insertMovie(int id, String movieTitle, int year);
+
+    Future<JsonObject> getSettings(String username);
+
+    Future<JsonObject> update(Table table, Map<Column, String> data);
+
+    Future<JsonObject> insert(Table table, Map<Column, String> data);
+
+    Future<JsonObject> getUser(String username);
+
+    Future<JsonObject> getAllUsers();
+
+    Future<JsonObject> getViews(String username, String param);
+
+    /**
+     * Creates a SQL command string from given Table and list of Columns.
+     * Does not set values.
+     */
+    enum SQLCommand {
+        UPDATE((table, columns) -> {
+            StringBuilder sb = new StringBuilder("UPDATE ")
+                    .append(table.getName())
+                    .append(" SET ");
+            columns.stream()
+                    .filter(column -> column != USERNAME)
+                    .forEach(column -> sb
+                            .append(columns.indexOf(column) == 0 ? "" : ", ")
+                            .append(column.getName())
+                            .append(" = ?"));
+            return sb.append(" WHERE Username = ?").toString();
+        }),
+        INSERT((table, columns) -> {
+            StringBuilder sb = new StringBuilder("INSERT INTO ")
+                    .append(table.getName())
+                    .append(" (");
+            columns.forEach(column -> sb
+                    .append(columns.indexOf(column) == 0 ? "" : ", ")
+                    .append(column.getName()));
+            sb.append(") VALUES (");
+            columns.forEach(column -> sb
+                    .append(columns.indexOf(column) == 0 ? "" : ", ")
+                    .append("?"));
+            return sb.append(")").toString();
+        });
+
+        private final BiFunction<Table, List<Column>, String> commandCreator;
+
+        SQLCommand(BiFunction<Table, List<Column>, String> commandCreator) {
+            this.commandCreator = commandCreator;
+        }
+
+        public String create(Table table, List<Column> columns) {
+            String cmd = commandCreator.apply(table, columns);
+            System.out.println("--------------------sql-----------------");
+            System.out.println("--------------------sql-----------------");
+            System.out.println("--------------------sql-----------------");
+            System.out.println(cmd);
+            return cmd;
+        }
+    }
+
+    /**
+     * Tables used in database.
+     */
+    enum Table {
+        MOVIES("Movies"),
+        SETTINGS("Settings"),
+        USERS("Users"),
+        VIEWS("Views"),
+        WISHLIST("Wishlist");
+
+        private final String tableName;
+
+        Table(String tableName) {
+            this.tableName = tableName;
+        }
+
+        public String getName() {
+            return tableName;
+        }
+    }
+
+    /**
+     * Columns used in database.
+     */
+    enum Column {
+        FIRSTNAME("Firstname"),
+        LASTNAME("Lastname"),
+        USERNAME("Username"),
+        PASSWORD("Password"),
+        SALT("Salt"),
+        RUNTIMETYPE("RuntimeType"),
+        LANGUAGE("Language"),
+        VERIFIED("Verified");
+
+        private final String columnName;
+
+        Column(String columnName) {
+            this.columnName = columnName;
+        }
+
+        public static List<Column> getSortedColumns(Map<Column, String> data) {
+            List<Column> columns = data.keySet().stream()
+                    .filter(column -> column != USERNAME)
+                    .collect(toList());
+            columns.add(USERNAME);
+            return columns;
+        }
+
+        public static JsonArray getSortedValues(List<Column> columns, Map<Column, String> data) {
+            return columns.stream()
+                    .map(data::get)
+                    .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+        }
+
+        public String getName() {
+            return columnName;
+        }
     }
 }

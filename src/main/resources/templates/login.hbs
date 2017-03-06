@@ -4,11 +4,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00bcd4">
-    <title>Login</title>
-    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <title>{{i18n "LOGIN_TITLE" locale=lang}}</title>
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
 <body class="cyan login-body">
-<!-- Page loader -->
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -19,47 +18,47 @@
         <form class="login-form" method="get" action="{{formUrl}}">
             <div class="row">
                 <div class="input-field col s12 center">
-                    <h5 class="center grey-text">{{i18n "LOGIN" locale=lang}}</h5>
+                    <h5 class="center grey-text">{{i18n "LOGIN_TITLE" locale=lang}}</h5>
                 </div>
-                {{#if error}}
+                {{#if displayMessage}}
                     <div class="input-field col s12 center">
-                        <h5 class="center red-text">Unauthorized</h5>
+                        <h5 class="center red-text">{{displayMessage}}</h5>
                     </div>
                 {{/if}}
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
-                    <button type="submit" class="btn waves-effect waves-light col s12 z-depth-0">
-                        <i class="fa fa-sign-in left"></i>Login with Password
+                    <button type="submit" class="waves-effect waves-light col s12 z-depth-0 btn">
+                        <i class="fa fa-sign-in left"></i>{{i18n "LOGIN_PASSWORD" locale=lang}}
                     </button>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <a href="{{facebookUrl}}" class="btn waves-effect waves-light col s12 blue darken-4 z-depth-0">
-                        <i class="fa fa-facebook-f left"></i>Login with Facebook
+                        <i class="fa fa-facebook-f left"></i>{{i18n "LOGIN_FACEBOOK" locale=lang}}
                     </a>
                 </div>
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
                     <a href="{{googleUrl}}" class="btn waves-effect waves-light col s12 red z-depth-0">
-                        <i class="fa fa-google-plus left"></i>Login with Google
+                        <i class="fa fa-google-plus left"></i>{{i18n "LOGIN_GOOGLE" locale=lang}}
                     </a>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
                     <a href="{{idCardUrl}}" class="btn waves-effect waves-light col s12 blue lighten-2 z-depth-0">
-                        <i class="fa fa-id-card-o left"></i>Login with ID-Card
+                        <i class="fa fa-id-card-o left"></i>{{i18n "LOGIN_IDCARD" locale=lang}}
                     </a>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<script type="text/javascript" src="/static/js/fallback.min.js"></script>
-<script type="text/javascript" src="/static/js/loaders/ui.js"></script>
-<script type="text/javascript" src="/static/js/loaders/page-center.js"></script>
+<script async type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/page-center.js"></script>
 </body>
 </html>

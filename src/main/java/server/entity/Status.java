@@ -17,6 +17,7 @@ public class Status {
     public static final int FORBIDDEN = 403;
     public static final int NOT_FOUND = 404;
     public static final int PRECONDITION_FAILED = 412;
+    public static final int RATE_LIMIT = 429;
     public static final int INTERNAL_SERVER_ERROR = 500;
     public static final int NOT_IMPLEMENTED = 501;
     public static final int SERVICE_UNAVAILABLE = 503;
@@ -33,12 +34,18 @@ public class Status {
         ctx.response().setStatusCode(BAD_REQUEST).end();
     }
 
+    /**
+     * Respond with Service Unavailable message and exception cause.
+     */
     public static void serviceUnavailable(RoutingContext ctx, Throwable cause) {
         ctx.response()
                 .setStatusCode(SERVICE_UNAVAILABLE)
                 .end(SERVICE_UNAVAILABLE + ": Service unavailable\n" + "Cause: " + cause.getMessage());
     }
 
+    /**
+     * Redirect client to location.
+     */
     public static void redirect(RoutingContext ctx, String location) {
         ctx.response()
                 .putHeader(LOCATION, location)

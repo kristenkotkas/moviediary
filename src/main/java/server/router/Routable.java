@@ -3,6 +3,9 @@ package server.router;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 
+/**
+ * Generic class that contains routes.
+ */
 public abstract class Routable implements AutoCloseable {
     protected final Vertx vertx;
 

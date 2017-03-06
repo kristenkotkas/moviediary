@@ -11,40 +11,56 @@ import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import static server.service.DatabaseService.Column.*;
+import static server.service.DatabaseService.SQLCommand.INSERT;
+import static server.service.DatabaseService.SQLCommand.UPDATE;
+import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
 import static server.util.StringUtils.*;
 
-//näited -> https://github.com/vert-x3/vertx-examples/tree/master/jdbc-examples
-
+/**
+ * Database service implementation.
+ */
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
     private static final Logger log = LoggerFactory.getLogger(DatabaseServiceImpl.class);
-
     private static final String MYSQL = "mysql";
 
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users";
+
+    private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
+            "JOIN Settings ON Users.Username = Settings.Username";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
+
     private static final String SQL_INSERT_DEMO_VIEWS =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
-
     private static final String SQL_QUERY_VIEWS =
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND End <= ?";
 
+    private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
+
+    private static final String SQL_INSERT_MOVIE =
+            "INSERT IGNORE INTO Movies VALUES (?, ?, ?)";
+
     private final Vertx vertx;
     private final JsonObject config;
     private final JDBCClient client;
+    private long lastConnectionTime;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(DEFAULT_MAX_CACHE_SIZE);
         this.vertx = vertx;
         this.config = config;
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
+        this.lastConnectionTime = System.currentTimeMillis();
     }
 
     @Override
@@ -55,42 +71,95 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             return future;
         }
         String salt = genString();
-        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                .add(username)
-                .add(firstname)
-                .add(lastname)
-                .add(hash(password, salt))
-                .add(salt), ar -> {
-            if (ar.succeeded()) {
-                Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
-                Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
-                Future<JsonObject> future3 = insertDemoViews(username, 334543, 0, 1);
-                //teeme 3 sisestust korraga ja saame teada kas õnnestus
-                CompositeFuture.all(future1, future2, future3).setHandler(result -> {
-                    if (result.succeeded()) {
-                        future.complete(ar.result().toJson());
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
+                        .add(username)
+                        .add(firstname)
+                        .add(lastname)
+                        .add(hash(password, salt))
+                        .add(salt), ar -> {
+                    if (ar.succeeded()) {
+                        Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
+                        Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
+                        Future<JsonObject> future3 = insertDemoViews(username, 334543, 0, 1);
+                        Future<JsonObject> future4 = insert(Table.SETTINGS, createDataMap(username));
+                        CompositeFuture.all(future1, future2, future3, future4).setHandler(result -> {
+                            if (result.succeeded()) {
+                                future.complete(ar.result().toJson());
+                            } else {
+                                future.fail(result.cause());
+                            }
+                        });
                     } else {
-                        future.fail(result.cause());
+                        future.fail(ar.cause());
                     }
-                });
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        })));
+                    conn.close();
+                }))));
         return future;
     }
 
     private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
         Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
                         .add(username)
                         .add(movieId)
                         .add(LocalDateTime.now().toString())
                         .add(LocalDateTime.now().plusHours(2).toString())
                         .add(wasFirst)
-                        .add(wasCinema), updateResultHandler(conn, future))));
+                        .add(wasCinema), updateResultHandler(conn, future)))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
+        Future<JsonObject> future = Future.future();
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
+                        .add(id)
+                        .add(movieTitle)
+                        .add(year), updateResultHandler(conn, future)))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> getSettings(String username) {
+        Future<JsonObject> future = Future.future();
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
+                        resultSetHandler(conn, CACHE_SETTINGS + username, future)))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> update(Table table, Map<Column, String> data) {
+        Future<JsonObject> future = Future.future();
+        if (data.get(USERNAME) == null) {
+            future.fail("Username required.");
+            return future;
+        }
+        if (data.size() == 1) {
+            future.fail("No columns specified.");
+            return future;
+        }
+        List<Column> columns = getSortedColumns(data);
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
+                        updateResultHandler(conn, future)))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> insert(Table table, Map<Column, String> data) {
+        Future<JsonObject> future = Future.future();
+        if (data.get(USERNAME) == null) {
+            future.fail("Username required.");
+            return future;
+        }
+        List<Column> columns = getSortedColumns(data);
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
+                        updateResultHandler(conn, future)))));
         return future;
     }
 
@@ -99,9 +168,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_USER + username);
         if (!tryCachedResult(false, cache, future)) {
-            client.getConnection(connHandler(future,
+            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
-                            resultSetHandler(conn, CACHE_USER + username, future))));
+                            resultSetHandler(conn, CACHE_USER + username, future)))));
         }
         return future;
     }
@@ -110,9 +179,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     public Future<JsonObject> getAllUsers() {
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
-        if (!tryCachedResult(false, cache, future)) { //cache timeout peaks väikseks panema või mitte kasutama
-            client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future))));
+        if (!tryCachedResult(false, cache, future)) {
+            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future)))));
         }
         return future;
     }
@@ -140,12 +209,12 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username);
         if (!tryCachedResult(false, cache, future)) {
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
-            client.getConnection(connHandler(future,
+            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
                                     .add(username)
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
-                            resultSetHandler(conn, CACHE_VIEWS + username, future))));
+                            resultSetHandler(conn, CACHE_VIEWS + username, future)))));
         }
         return future;
     }
@@ -156,6 +225,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                 handler.handle(conn.result());
             } else {
                 future.fail(conn.cause());
+                // TODO: 4.03.2017 failed connection still needs to be closed?
             }
         };
     }
@@ -181,5 +251,27 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             }
             conn.close();
         };
+    }
+
+    /**
+     * If there have not been any database connections for 1 hour,
+     * a test query is made to check whether connection is still alive.
+     */
+    private Future<Boolean> testConnection() {
+        Future<Boolean> future = Future.future();
+        if (System.currentTimeMillis() - lastConnectionTime >= TimeUnit.HOURS.toMillis(1)) {
+            // TODO: 4.03.2017 single test connection is enough to restore connection?
+            client.getConnection(connHandler(future, conn -> conn.query("SELECT version()", ar -> {
+                if (ar.failed()) {
+                    log.error("Database test connection failed.");
+                }
+                lastConnectionTime = System.currentTimeMillis();
+                future.complete(true);
+            })));
+        } else {
+            lastConnectionTime = System.currentTimeMillis();
+            future.complete(true);
+        }
+        return future;
     }
 }
