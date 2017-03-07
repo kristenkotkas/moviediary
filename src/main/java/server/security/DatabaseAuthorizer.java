@@ -33,7 +33,7 @@ import static server.util.StringUtils.hash;
  */
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseAuthorizer.class);
-    private static final String UNAUTHORIZED = "Unauthorized";
+    private static final String UNAUTHORIZED = "UNAUTHORIZED";
     public static final String URL = "url";
 
     private final DatabaseService database;
