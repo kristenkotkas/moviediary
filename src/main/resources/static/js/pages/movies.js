@@ -15,7 +15,7 @@ var searchMovie = function (eventbus, movieId) {
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
           $.parseHTML(
-              '<img src="http://image.tmdb.org/t/p/w500' + data.poster_path + '" width="100%">'
+              '<img src="https://image.tmdb.org/t/p/w500' + data.poster_path + '" width="100%">'
           )
         );
         $("#body").attr("background", 'http://image.tmdb.org/t/p/w1920' + data.backdrop_path);
@@ -35,10 +35,11 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                         var movie = data[i];
                         var arrayOfNodes = $.parseHTML(
                             '<div>' +
-                            '<a href="#" class="collection-item">' +
-                            movie.release_date.split('-')[0] + ' . . . . ' +
-                            movie.original_title +
-                            '</a>' +
+                                '<a href="#" class="collection-item">' +
+                                    movie.release_date.split('-')[0] + ' . . . . ' +
+                                    movie.original_title +
+                                '</a>' +
+                            '<img src="https://image.tmdb.org/t/p/w92/' + movie.poster_path + '" width="10%">' +
                             '</div>');
                         arrayOfNodes[0].firstChild.onclick = function () {
                             searchMovie(eventbus, movie.id);
