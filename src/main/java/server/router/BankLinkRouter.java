@@ -13,7 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Signature;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
+import static server.entity.Status.OK;
 import static server.entity.Status.badRequest;
 import static server.entity.Status.serviceUnavailable;
 import static server.util.CommonUtils.getPemPrivateKey;
@@ -47,8 +49,8 @@ public class BankLinkRouter extends Routable {
     }
 
     private void handleApiCreatePayment(RoutingContext ctx){
-        String vk_service = "1011";
-        String vk_version = "008";
+        String vk_service = "1011"; // default=1011
+        String vk_version = "008"; // default=008
         String vk_snd_id = ""; // kliendi tunnuskood pangale edastamiseks kujul uid100023
         String vk_stamp = ""; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
         String vk_amount = ctx.getBodyAsJson().getString("amount"); // Makse summa
@@ -60,14 +62,16 @@ public class BankLinkRouter extends Routable {
         String vk_msg = ctx.getBodyAsJson().getString("product"); // Toode/makse kirjeldus
         String vk_return = RETURN_URL;
         String vk_cancel = CANCEL_URL;
-        String vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toString();
+        String vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String vk_encoding = "utf-8";
 
         String toBeSigned = "004" + vk_service + vk_version + vk_snd_id + vk_stamp + vk_amount +
                 vk_curr + vk_acc + vk_name + vk_ref + vk_lang + vk_msg + vk_return + vk_cancel +
                 vk_datetime;
 
         try {
-            Signature instance = Signature.getInstance("SHA1withRSA");vertx.fileSystem().readFile("path", result ->{
+            Signature instance = Signature.getInstance("SHA1withRSA");
+            vertx.fileSystem().readFile("path", result ->{
                 try{
                     instance.initSign(getPemPrivateKey(result.result().toString(StandardCharsets.UTF_8), "RSA"));
 
@@ -77,8 +81,31 @@ public class BankLinkRouter extends Routable {
                 }
             });
             instance.update((toBeSigned).getBytes());
+            String vk_mac = "";
             byte[] signature = instance.sign();
-            String vk_mac = Base64.encodeBase64(signature).toString();
+            for (byte b : signature) {
+                vk_mac += b;
+            }
+
+            String params =
+                    "VK_SERVICE=" + vk_service+
+                    "&VK_VERSION=" + vk_version +
+                    "&VK_SND_ID=" + vk_snd_id +
+                    "&VK_STAMP=" + vk_stamp +
+                    "&VK_AMOUNT=" + vk_amount +
+                    "&VK_CURR=" + vk_curr +
+                    "&VK_ACC=" + vk_acc +
+                    "&VK_NAME=" + vk_name +
+                    "&VK_REF=" + vk_ref +
+                    "&VK_MSG=" + vk_msg +
+                    "&VK_RETURN=" + vk_return +
+                    "&VK_CANCEL=" + vk_cancel +
+                    "&VK_DATETIME=" + vk_datetime +
+                    "&VK_ENCODING=" + vk_encoding +
+                    "&VK_MAC=" + vk_mac;
+
+            bls.createPayment(params);
+
 
 
         } catch (Exception e) {
