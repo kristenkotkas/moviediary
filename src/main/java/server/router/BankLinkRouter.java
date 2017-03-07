@@ -6,25 +6,21 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import org.apache.commons.codec.binary.Base64;
 import server.service.BankLinkService;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Signature;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 
-import static server.entity.Status.OK;
 import static server.entity.Status.badRequest;
 import static server.entity.Status.serviceUnavailable;
+import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.getPemPrivateKey;
 import static server.util.HandlerUtils.*;
 
-import static server.util.CommonUtils.contains;
-
 public class BankLinkRouter extends Routable {
-    private static final Logger log = LoggerFactory.getLogger(BankLinkRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BankLinkRouter.class);
     private static final String API_CREATE_PAYMENT = "/api/solutions/pay";
     private static final String API_GET_PAYMENTSOLUTIONS = "/api/solutions";
     private static final String API_GET_PAYMENTSOLUTION = "/api/solutions/:solutionId";
@@ -33,11 +29,11 @@ public class BankLinkRouter extends Routable {
     private static final String RETURN_URL = ""; //TODO 23.02: define url where to return after payment completion
     private static final String CANCEL_URL = ""; //TODO 23.02: define url where to return after payment cancellation
 
-    private final BankLinkService bls;
+    private final BankLinkService bankLink;
 
-    public BankLinkRouter(Vertx vertx, BankLinkService bls) {
+    public BankLinkRouter(Vertx vertx, BankLinkService bankLink) {
         super(vertx);
-        this.bls = bls;
+        this.bankLink = bankLink;
     }
 
     @Override
@@ -104,7 +100,7 @@ public class BankLinkRouter extends Routable {
                     "&VK_ENCODING=" + vk_encoding +
                     "&VK_MAC=" + vk_mac;
 
-            bls.createPayment(params);
+            bankLink.createPayment(params);
 
 
 
@@ -116,7 +112,7 @@ public class BankLinkRouter extends Routable {
     }
 
     private void handleApiGetPayments(RoutingContext ctx) { // handleb kõikide makselahenduste json päringut /payments/: -> localhost:8083/api/project
-        bls.getPaymentSolutions().setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        bankLink.getPaymentSolutions().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
     private void handleApiCreatePaymentSolution(RoutingContext ctx){ // handleb makselahenduse loomist
@@ -137,7 +133,7 @@ public class BankLinkRouter extends Routable {
                 .put("account_nr", account_nr)
                 .put("return url", RETURN_URL);
 
-        bls.createPaymentSolution(jso)
+        bankLink.createPaymentSolution(jso)
                 .setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
@@ -147,7 +143,7 @@ public class BankLinkRouter extends Routable {
             badRequest(ctx);
             return;
         }
-        bls.getPaymentSolutionById(id).setHandler(resultHandler(ctx, jsonResponse(ctx)));
+        bankLink.getPaymentSolutionById(id).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
 

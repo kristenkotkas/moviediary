@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
  */
 public class SyncResult<T> {
-    private static final Logger log = LoggerFactory.getLogger(SyncResult.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyncResult.class);
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final CountDownLatch latch = new CountDownLatch(1);
 
@@ -66,7 +66,7 @@ public class SyncResult<T> {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            log.error("SyncResult was interrupted.", e);
+            LOG.error("SyncResult was interrupted.", e);
         }
         return this;
     }
@@ -75,7 +75,7 @@ public class SyncResult<T> {
         try {
             latch.await(timeout, unit);
         } catch (InterruptedException e) {
-            log.error("SyncResult was interrupted.", e);
+            LOG.error("SyncResult was interrupted.", e);
         }
         return this;
     }

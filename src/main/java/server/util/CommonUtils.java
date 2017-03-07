@@ -14,7 +14,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Objects;
 
 public class CommonUtils {
-    private static final Logger log = LoggerFactory.getLogger(CommonUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommonUtils.class);
 
     public static boolean nonNull(Object... objects) {
         for (Object obj : objects) {

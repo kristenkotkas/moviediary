@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import static server.entity.Status.serviceUnavailable;
 
 public class HandlerUtils {
-    private static final Logger log = LoggerFactory.getLogger(HandlerUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HandlerUtils.class);
     private static final String CONTENT_JSON = "application/json";
 
     public static String parseParam(String requestUri) {
@@ -32,7 +32,7 @@ public class HandlerUtils {
             if (ar.succeeded()) {
                 success.accept(ar.result());
             } else {
-                log.error(ar.cause());
+                LOG.error(ar.cause());
                 serviceUnavailable(ctx, ar.cause());
             }
         };

@@ -24,7 +24,7 @@ public enum Language {
     ESTONIAN(new Locale.Builder().setLanguage("et").setScript("Latn").setRegion("EE").build()),
     GERMAN(new Locale.Builder().setLanguage("de").setScript("Latn").setRegion("GR").build());
 
-    private static final Logger log = LoggerFactory.getLogger(Language.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Language.class);
     private final Locale locale;
     private final ResourceBundle bundle;
 
@@ -50,7 +50,7 @@ public enum Language {
     }
 
     public String getString(String key) {
-        log.info("i18n: lang:" + locale.getLanguage() + ", key: " + key + ", val: " + bundle.getString(key));
+        LOG.info("i18n: lang:" + locale.getLanguage() + ", key: " + key + ", val: " + bundle.getString(key));
         return bundle.getString(key);
     }
 

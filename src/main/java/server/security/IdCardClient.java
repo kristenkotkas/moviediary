@@ -22,7 +22,7 @@ import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
  * Indirect client for ID Card login.
  */
 public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProfile> {
-    private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final String URL = "https://id.movies.kyngas.eu" + UI_IDCARDLOGIN;
     private static final String CERT_TYPE = "X.509";
     private static final String VERIFIED = "SUCCESS";
@@ -42,11 +42,11 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
             String verify = webContext.getRequestParameter(CLIENT_VERIFIED_STATE);
             String cert = webContext.getRequestParameter(CLIENT_CERTIFICATE);
             if (verify == null || !VERIFIED.equals(verify)) {
-                log.error("Client certificate is invalid: " + verify + "; " + cert);
+                LOG.error("Client certificate is invalid: " + verify + "; " + cert);
                 return null;
             }
             if (cert == null) {
-                log.error("Client certificate is missing, verification state: " + verify);
+                LOG.error("Client certificate is missing, verification state: " + verify);
                 return null;
             }
             try {
@@ -55,7 +55,7 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
                         .getSubjectDN()
                         .getName());
             } catch (CertificateException e) {
-                log.error("Client certificate is invalid: " + cert, e);
+                LOG.error("Client certificate is invalid: " + cert, e);
             }
             return null;
         });

@@ -18,7 +18,7 @@ import static server.util.NetworkUtils.isServer;
  * Indirect client for form login.
  */
 public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
-    private static final Logger log = LoggerFactory.getLogger(FormClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FormClient.class);
     public static final String FORM_USERNAME = "username";
     public static final String FORM_PASSWORD = "password";
     public static final String FORM_FIRSTNAME = "firstname";

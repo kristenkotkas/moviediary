@@ -14,7 +14,6 @@ import org.pac4j.core.profile.CommonProfile;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
-import server.service.DatabaseService;
 import server.template.ui.*;
 
 import java.nio.file.Path;
@@ -37,7 +36,7 @@ import static server.util.FileUtils.isRunningFromJar;
  * Contains routes which user interface is handled on.
  */
 public class UiRouter extends Routable {
-    private static final Logger log = LoggerFactory.getLogger(UiRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
@@ -68,13 +67,11 @@ public class UiRouter extends Routable {
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
-    private final DatabaseService database;
 
-    public UiRouter(Vertx vertx, SecurityConfig securityConfig, DatabaseService database) throws Exception {
+    public UiRouter(Vertx vertx, SecurityConfig securityConfig) throws Exception {
         super(vertx);
         this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : RESOURCES);
         this.securityConfig = securityConfig;
-        this.database = database;
     }
 
     public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {

@@ -12,8 +12,8 @@ public interface MailService extends CachingService<JsonObject> {
     String EMAIL = "email";
     String UNIQUE = "unique";
 
-    static MailService create(Vertx vertx, JsonObject config, DatabaseService database) {
-        return new MailServiceImpl(vertx, config, database);
+    static MailService create(Vertx vertx, DatabaseService database) {
+        return new MailServiceImpl(vertx, database);
     }
 
     Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail);

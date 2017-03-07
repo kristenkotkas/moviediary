@@ -1,6 +1,8 @@
 package server.security;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.oauth.client.FacebookClient;
@@ -21,6 +23,7 @@ import static server.util.NetworkUtils.isServer;
  * Contains login clients used for user authentication.
  */
 public class SecurityConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     public static final String CLIENT_VERIFIED_STATE = "SSL_CLIENT_VERIFY";
     public static final String CLIENT_CERTIFICATE = "SSL_CLIENT_CERT";
     public static final String AUTHORIZER = "CommonAuthorizer";
@@ -54,6 +57,8 @@ public class SecurityConfig {
     }
 
     public enum AuthClient {
+        // TODO: 7.03.2017 redirectclient -> redirect to login page, save previous page to session?
+        // TODO: 7.03.2017 if session -> databaseAuthorizer should redirect
         FORM("form", FormClient.class, (key, secret) -> new FormClient()),
         FACEBOOK("facebook", FacebookClient.class, (key, secret) -> {
             FacebookClient fb = new FacebookClient(key, secret);

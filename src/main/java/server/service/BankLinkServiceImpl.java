@@ -13,7 +13,7 @@ import static server.entity.Status.OK;
 import static server.service.BankLinkServiceImpl.Cache.PAYMENT;
 
 public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implements BankLinkService {
-    private static final Logger log = LoggerFactory.getLogger(BankLinkServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BankLinkServiceImpl.class);
     private static final int HTTP = 8083;
     private static final String ENDPOINT = "localhost" ;
     private static final String ENABLED = "use_pangalink";

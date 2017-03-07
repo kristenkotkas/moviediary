@@ -14,7 +14,7 @@ import static server.util.HandlerUtils.*;
  * Contains routes that handle TheMovieDatabase services.
  */
 public class TmdbRouter extends Routable {
-    private static final Logger log = LoggerFactory.getLogger(TmdbRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TmdbRouter.class);
 
     private static final String API_TMDB_GET_SEARCH = "/private/search/:movieName";
     private static final String API_TMDB_GET_MOVIE = "/private/movie/:movieId";

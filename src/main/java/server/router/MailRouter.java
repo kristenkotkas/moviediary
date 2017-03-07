@@ -1,6 +1,8 @@
 package server.router;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.service.MailService;
@@ -20,6 +22,7 @@ import static server.util.HandlerUtils.resultHandler;
  * Contains routes that handle email services.
  */
 public class MailRouter extends Routable {
+    private static final Logger LOG = LoggerFactory.getLogger(MailRouter.class);
     private static final String API_MAIL_SEND = "/private/api/mail/send";
     public static final String API_MAIL_VERIFY = "/public/api/mail/verify";
 

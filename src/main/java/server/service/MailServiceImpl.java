@@ -3,6 +3,8 @@ package server.service;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
@@ -20,17 +22,14 @@ import static server.util.StringUtils.genString;
  * Mail service implementation.
  */
 public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements MailService {
+    private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
     private static final String FROM = "moviediary@kyngas.eu";
 
-    private final Vertx vertx;
-    private final JsonObject config;
     private final DatabaseService database;
     private final MailClient client;
 
-    protected MailServiceImpl(Vertx vertx, JsonObject config, DatabaseService database) {
+    protected MailServiceImpl(Vertx vertx, DatabaseService database) {
         super(DEFAULT_MAX_CACHE_SIZE);
-        this.vertx = vertx;
-        this.config = config;
         this.database = database;
         this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
     }

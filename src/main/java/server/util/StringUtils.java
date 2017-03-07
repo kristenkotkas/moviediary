@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
 public class StringUtils {
-    private static final Logger log = LoggerFactory.getLogger(StringUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class);
     public static final int SHORT_DATE = 1;
     public static final int LONG_DATE = 2;
     private static Map<String, String> months = new HashMap<String, String>() {{
@@ -120,7 +120,7 @@ public class StringUtils {
         try {
             return toString(MessageDigest.getInstance("SHA-256").digest(input.concat(salt).getBytes(UTF_8)));
         } catch (NoSuchAlgorithmException e) {
-            log.error("Hashing uses an invalid algorithm.", e);
+            LOG.error("Hashing uses an invalid algorithm.", e);
         }
         return "null";
     }
@@ -140,7 +140,7 @@ public class StringUtils {
             SecureRandom.getInstance("SHA1PRNG").nextBytes(bytes);
             return toString(bytes);
         } catch (NoSuchAlgorithmException e) {
-            log.error("String generating uses an invalid algorithm.", e);
+            LOG.error("String generating uses an invalid algorithm.", e);
         }
         return "default";
     }

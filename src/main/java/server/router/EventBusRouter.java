@@ -32,7 +32,7 @@ import static server.util.StringUtils.*;
  * Contains addresses that eventbus listens and gateways on.
  */
 public class EventBusRouter extends Routable {
-    private static final Logger log = LoggerFactory.getLogger(EventBusRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventBusRouter.class);
     public static final String EVENTBUS_ALL = "/eventbus/*";
 
     public static final String DATABASE_USERS = "database_users";
@@ -113,7 +113,7 @@ public class EventBusRouter extends Routable {
     }
 
     private <T> Handler<Message<T>> log() {
-        return msg -> log.info("Gateway: " + messageToString(msg));
+        return msg -> LOG.info("Gateway: " + messageToString(msg));
     }
 
     private <T> String messageToString(Message<T> msg) {

@@ -16,8 +16,7 @@ var searchMovie = function (eventbus, movieId) {
             )
         ).show();
         $("#search").val(data.original_title);
-        $('#movie-title').text(data.original_title);
-        $('#movie-title').addClass('movies-heading');
+        $('#movie-title').text(data.original_title).addClass('movies-heading');
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(

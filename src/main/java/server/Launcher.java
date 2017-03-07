@@ -18,7 +18,7 @@ import static server.util.VertxUtils.setLoggingToSLF4J;
  * Forces DNS resolver to use Google's DNS servers.
  */
 public class Launcher {
-    private static final Logger log = LoggerFactory.getLogger(Launcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Launcher.class);
 
     public static void main(String[] args) throws IOException {
         setLoggingToSLF4J();
@@ -29,9 +29,9 @@ public class Launcher {
         DeploymentOptions dOptions = new DeploymentOptions().setConfig(getConfig(args));
         Vertx.vertx(vOptions).deployVerticle(new ServerVerticle(), dOptions, ar -> {
             if (ar.succeeded()) {
-                log.info("Server up!");
+                LOG.info("Server up!");
             } else {
-                log.error(ar.cause());
+                LOG.error(ar.cause());
             }
         });
     }

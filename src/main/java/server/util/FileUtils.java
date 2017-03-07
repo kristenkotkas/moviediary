@@ -4,17 +4,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import server.entity.JsonObj;
-import sun.misc.BASE64Decoder;
 
 import java.io.*;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class FileUtils {
-    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
     private static final String SECRET = "/server.json";
     private static final String CONFIG = "/config.json";
 
@@ -28,12 +24,12 @@ public class FileUtils {
         try {
             config.mergeIn(new JsonObj(readToString(CONFIG)));
         } catch (IOException e) {
-            log.error(CONFIG + " not found.");
+            LOG.error(CONFIG + " not found.");
         }
         try {
             config.mergeIn(new JsonObj(readToString(SECRET)));
         } catch (IOException e) {
-            log.error(SECRET + " not found.");
+            LOG.error(SECRET + " not found.");
         }
         return config.mergeIn(parseArguments(args));
     }

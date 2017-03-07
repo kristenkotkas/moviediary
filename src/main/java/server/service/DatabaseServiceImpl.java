@@ -28,7 +28,7 @@ import static server.util.StringUtils.*;
  * Database service implementation.
  */
 public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
-    private static final Logger log = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String MYSQL = "mysql";
 
     private static final String SQL_INSERT_USER =
@@ -53,14 +53,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
 
-    private final Vertx vertx;
-    private final JsonObject config;
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(DEFAULT_MAX_CACHE_SIZE);
-        this.vertx = vertx;
-        this.config = config;
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
         vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
     }
@@ -116,11 +112,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
         Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
-                        .add(id)
-                        .add(movieTitle)
-                        .add(year), updateResultHandler(conn, future))));
+        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
+                .add(id)
+                .add(movieTitle)
+                .add(year), updateResultHandler(conn, future))));
         return future;
     }
 
@@ -279,7 +274,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             client.getConnection(connHandler(future, conn -> conn.query("SELECT version()", futureHandler(future))));
             future.setHandler(ar -> {
                 if (ar.failed()) {
-                    log.error("Connection heartbeat failed: ", ar.cause());
+                    LOG.error("Connection heartbeat failed: ", ar.cause());
                 }
             });
         };

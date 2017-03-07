@@ -2,6 +2,8 @@ package server.security;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.pac4j.core.authorization.authorizer.ProfileAuthorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
@@ -30,6 +32,7 @@ import static server.util.StringUtils.hash;
  * Authorizer that checks against database whether authenticated user is allowed to access resources.
  */
 public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseAuthorizer.class);
     private static final String UNAUTHORIZED = "Unauthorized";
     public static final String URL = "url";
 

@@ -8,18 +8,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class NetworkUtils {
-    private static final Logger log = LoggerFactory.getLogger(NetworkUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetworkUtils.class);
 
     public static final String HTTP_HOST = "http_host";
     public static final String HTTP_PORT = "http_port";
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final int DEFAULT_PORT = 8081;
-
     public static final String SSL_HOST = "production_host";
-
-    private static final int KB = 1024;
-    private static final int MB = 1024 * KB;
-    public static final int MAX_BODY_SIZE = 25 * MB;
+    public static final int MAX_BODY_SIZE = 25 * 1024 * 1024;
 
     private static int s_isServer = -1;
 
@@ -34,7 +30,7 @@ public class NetworkUtils {
             try {
                 return InetAddress.getByName(host).isLoopbackAddress();
             } catch (UnknownHostException e) {
-                log.error("Failed to check for loopback address.", e);
+                LOG.error("Failed to check for loopback address.", e);
             }
         }
         return false;

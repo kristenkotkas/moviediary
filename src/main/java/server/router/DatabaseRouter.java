@@ -8,7 +8,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import server.security.SecurityConfig;
 import server.service.DatabaseService;
 import server.service.DatabaseService.*;
 import server.service.MailService;
@@ -32,7 +31,7 @@ import static server.util.StringUtils.hash;
  * Contains routes that interact with database.
  */
 public class DatabaseRouter extends Routable {
-    private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USERS_ALL = "/private/api/users/all";
     public static final String API_VIEWS_COUNT = "/private/api/views/count";
@@ -41,15 +40,12 @@ public class DatabaseRouter extends Routable {
     private final JsonObject config;
     private final DatabaseService database;
     private final MailService mail;
-    private final SecurityConfig securityConfig;
 
-    public DatabaseRouter(Vertx vertx, JsonObject config, DatabaseService database, MailService mail,
-                          SecurityConfig securityConfig) {
+    public DatabaseRouter(Vertx vertx, JsonObject config, DatabaseService database, MailService mail) {
         super(vertx);
         this.config = config;
         this.database = database;
         this.mail = mail;
-        this.securityConfig = securityConfig;
     }
 
     @Override

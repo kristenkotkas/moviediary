@@ -2,6 +2,8 @@ package server.router;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -27,6 +29,7 @@ import static server.util.NetworkUtils.isServer;
  * Sets up body handling, cookie handling and user session handling.
  */
 public class AuthRouter extends Routable {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthRouter.class);
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
     public static final String LANGUAGE = "lang";

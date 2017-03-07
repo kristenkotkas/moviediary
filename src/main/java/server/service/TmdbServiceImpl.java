@@ -21,7 +21,7 @@ import static server.service.TmdbServiceImpl.Cache.SEARCH;
  * TheMovieDatabase service implementation.
  */
 public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements TmdbService {
-    private static final Logger log = LoggerFactory.getLogger(TmdbServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TmdbServiceImpl.class);
     private static final int HTTPS = 443;
     private static final long DEFAULT_DELAY = TimeUnit.SECONDS.toMillis(1);
     private static final String ENDPOINT = "api.themoviedb.org";
@@ -53,10 +53,18 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
-        Future<JsonObject> future = get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
-        // FIXME: 4. märts. 2017 filmi lisamine andmebaasi
-        /*Future<JsonObject> future1 = database.insertMovie(json.getInteger("movieId"), json.getString("title"), json.getInteger("year"));
-        */
+        Future<JsonObject> future = Future.future();
+        Future<JsonObject> tmdb = get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
+        tmdb.setHandler(ar -> {
+            if (ar.succeeded()) {
+                JsonObject json = ar.result();
+                future.complete(json);
+                database.insertMovie(json.getInteger("id"), json.getString("title"),
+                        Integer.parseInt(json.getString("release_date").split("-")[0]));
+            } else {
+                LOG.error("TMDB getMovieByID failed, could not add movie to DB: " + ar.cause());
+            }
+        });
         return future;
     }
 

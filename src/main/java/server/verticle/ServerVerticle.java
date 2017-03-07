@@ -25,27 +25,27 @@ import static server.util.NetworkUtils.*;
  * Creates a HTTP server.
  */
 public class ServerVerticle extends AbstractVerticle {
-    private static final Logger log = LoggerFactory.getLogger(ServerVerticle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
 
     private List<Routable> routables;
     // TODO: 02/03/2017 pass in services with constructor for testing
 
     @Override
     public void start(Future<Void> future) throws Exception {
-        Router router = Router.router(vertx); //handles addresses client connects to
+        Router router = Router.router(vertx);
         DatabaseService database = DatabaseService.create(vertx, config());
         TmdbService tmdb = TmdbService.create(vertx, config(), database);
         BankLinkService bls = BankLinkService.create(vertx, config());
-        MailService mail = MailService.create(vertx, config(), database);
+        MailService mail = MailService.create(vertx, database);
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
-                new AuthRouter(vertx, database, config(), securityConfig), //authentication
-                new TmdbRouter(vertx, tmdb), //tmdb rest api
-                new BankLinkRouter(vertx, bls), //pangalink
-                new EventBusRouter(vertx, database, tmdb), //eventbus
-                new DatabaseRouter(vertx, config(), database, mail, securityConfig), //database rest api
-                new MailRouter(vertx, mail), //mail
-                new UiRouter(vertx, securityConfig, database)); //ui
+                new AuthRouter(vertx, database, config(), securityConfig),
+                new TmdbRouter(vertx, tmdb),
+                new BankLinkRouter(vertx, bls),
+                new EventBusRouter(vertx, database, tmdb),
+                new DatabaseRouter(vertx, config(), database, mail),
+                new MailRouter(vertx, mail),
+                new UiRouter(vertx, securityConfig));
         routables.forEach(routable -> routable.route(router));
         vertx.createHttpServer(new HttpServerOptions().setCompressionSupported(true))
                 .requestHandler(router::accept)
