@@ -63,8 +63,6 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
                 addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED)));
     }
 
-    // TODO: 3.03.2017 redirection is needed -> need to rewrite authorizer
-
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),

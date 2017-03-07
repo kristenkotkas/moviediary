@@ -57,8 +57,7 @@ public class SecurityConfig {
     }
 
     public enum AuthClient {
-        // TODO: 7.03.2017 redirectclient -> redirect to login page, save previous page to session?
-        // TODO: 7.03.2017 if session -> databaseAuthorizer should redirect
+        REDIRECT("redirect", RedirectClient.class, (key, secret) -> new RedirectClient()),
         FORM("form", FormClient.class, (key, secret) -> new FormClient()),
         FACEBOOK("facebook", FacebookClient.class, (key, secret) -> {
             FacebookClient fb = new FacebookClient(key, secret);

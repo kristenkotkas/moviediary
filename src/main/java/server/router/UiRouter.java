@@ -21,11 +21,13 @@ import java.nio.file.Paths;
 
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.getString;
+import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.URL;
+import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
@@ -111,6 +113,10 @@ public class UiRouter extends Routable {
     }
 
     private void handleHome(RoutingContext ctx) {
+        if (ctx.session().data().containsKey(REDIRECT_URL)) {
+            redirect(ctx, (String) ctx.session().data().remove(REDIRECT_URL));
+            return;
+        }
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
     }
 
