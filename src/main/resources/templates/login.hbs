@@ -8,7 +8,7 @@
     <title>{{i18n "LOGIN_TITLE" locale=lang}}</title>
     <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
 </head>
-<body class="cyan login-body">
+<body class="cyan login-body" id="login-body">
 <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -59,17 +59,17 @@
             <div class="row">
                 <div class="input-field col s3">
                     <a href="{{loginPage}}?lang=en">
-                        <img src="/static/img/eng.svg" class="flag">
+                        <img src="/static/img/eng.svg" class="flag" id="lang-eng">
                     </a>
                 </div>
                 <div class="input-field col s3">
                     <a href="{{loginPage}}?lang=et">
-                        <img src="/static/img/est.svg" class="flag">
+                        <img src="/static/img/est.svg" class="flag" id="lang-est">
                     </a>
                 </div>
                 <div class="input-field col s3">
                     <a href="{{loginPage}}?lang=de">
-                        <img src="/static/img/ger.svg" class="flag">
+                        <img src="/static/img/ger.svg" class="flag" id="lang-ger">
                     </a>
                 </div>
             </div>
@@ -79,5 +79,6 @@
 <script type="text/javascript" src="/static/js/fallback.min.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/page-center.js"></script>
+<script async type="text/javascript" src="/static/js/pages/login.js"></script>
 </body>
 </html>
