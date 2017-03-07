@@ -2,6 +2,7 @@ package server.verticle;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
@@ -46,7 +47,7 @@ public class ServerVerticle extends AbstractVerticle {
                 new MailRouter(vertx, mail), //mail
                 new UiRouter(vertx, securityConfig, database)); //ui
         routables.forEach(routable -> routable.route(router));
-        vertx.createHttpServer()
+        vertx.createHttpServer(new HttpServerOptions().setCompressionSupported(true))
                 .requestHandler(router::accept)
                 .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
                         config().getString(HTTP_HOST, DEFAULT_HOST), futureHandler(future));

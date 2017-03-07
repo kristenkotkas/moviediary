@@ -13,14 +13,15 @@ import io.vertx.ext.sql.UpdateResult;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
 import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.nonNull;
+import static server.util.HandlerUtils.futureHandler;
 import static server.util.StringUtils.*;
 
 /**
@@ -55,14 +56,13 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final Vertx vertx;
     private final JsonObject config;
     private final JDBCClient client;
-    private long lastConnectionTime;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(DEFAULT_MAX_CACHE_SIZE);
         this.vertx = vertx;
         this.config = config;
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
-        this.lastConnectionTime = System.currentTimeMillis();
+        vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
     }
 
     @Override
@@ -73,7 +73,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             return future;
         }
         String salt = genString();
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
                         .add(username)
                         .add(firstname)
@@ -96,40 +96,40 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                         future.fail(ar.cause());
                     }
                     conn.close();
-                }))));
+                })));
         return future;
     }
 
     private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
         Future<JsonObject> future = Future.future();
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
                         .add(username)
                         .add(movieId)
                         .add(LocalDateTime.now().toString())
                         .add(LocalDateTime.now().plusHours(2).toString())
                         .add(wasFirst)
-                        .add(wasCinema), updateResultHandler(conn, future)))));
+                        .add(wasCinema), updateResultHandler(conn, future))));
         return future;
     }
 
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
         Future<JsonObject> future = Future.future();
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
                         .add(id)
                         .add(movieTitle)
-                        .add(year), updateResultHandler(conn, future)))));
+                        .add(year), updateResultHandler(conn, future))));
         return future;
     }
 
     @Override
     public Future<JsonObject> getSettings(String username) {
         Future<JsonObject> future = Future.future();
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
-                        resultSetHandler(conn, CACHE_SETTINGS + username, future)))));
+                        resultSetHandler(conn, CACHE_SETTINGS + username, future))));
         return future;
     }
 
@@ -145,9 +145,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             return future;
         }
         List<Column> columns = getSortedColumns(data);
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
-                        updateResultHandler(conn, future)))));
+                        updateResultHandler(conn, future))));
         return future;
     }
 
@@ -159,9 +159,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             return future;
         }
         List<Column> columns = getSortedColumns(data);
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
-                        updateResultHandler(conn, future)))));
+                        updateResultHandler(conn, future))));
         return future;
     }
 
@@ -170,9 +170,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_USER + username);
         if (!tryCachedResult(false, cache, future)) {
-            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+            client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
-                            resultSetHandler(conn, CACHE_USER + username, future)))));
+                            resultSetHandler(conn, CACHE_USER + username, future))));
         }
         return future;
     }
@@ -182,8 +182,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_ALL);
         if (!tryCachedResult(false, cache, future)) {
-            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future)))));
+            client.getConnection(connHandler(future,
+                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future))));
         }
         return future;
     }
@@ -211,12 +211,12 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username);
         if (!tryCachedResult(false, cache, future)) {
             String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
-            testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+            client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
                                     .add(username)
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
-                            resultSetHandler(conn, CACHE_VIEWS + username, future)))));
+                            resultSetHandler(conn, CACHE_VIEWS + username, future))));
         }
         return future;
     }
@@ -224,7 +224,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     @Override
     public Future<String> getUsersCount() {
         Future<String> future = Future.future();
-        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+        client.getConnection(connHandler(future,
                 conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
                     if (ar.succeeded()) {
                         future.complete(ar.result().getRows().get(0).getLong("Count").toString());
@@ -232,7 +232,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                         future.fail(ar.cause());
                     }
                     conn.close();
-                }))));
+                })));
         return future;
     }
 
@@ -271,24 +271,17 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     /**
-     * If there have not been any database connections for 1 hour,
-     * a test query is made to check whether connection is still alive.
+     * Makes a connetion to database and logs if it fails.
      */
-    private Future<Boolean> testConnection() {
-        Future<Boolean> future = Future.future();
-        if (System.currentTimeMillis() - lastConnectionTime >= TimeUnit.HOURS.toMillis(1)) {
-            // TODO: 4.03.2017 single test connection is enough to restore connection?
-            client.getConnection(connHandler(future, conn -> conn.query("SELECT version()", ar -> {
+    private Handler<Long> connectionHeartbeat() {
+        return timer -> {
+            Future<Void> future = Future.future();
+            client.getConnection(connHandler(future, conn -> conn.query("SELECT version()", futureHandler(future))));
+            future.setHandler(ar -> {
                 if (ar.failed()) {
-                    log.error("Database test connection failed.");
+                    log.error("Connection heartbeat failed: ", ar.cause());
                 }
-                lastConnectionTime = System.currentTimeMillis();
-                future.complete(true);
-            })));
-        } else {
-            lastConnectionTime = System.currentTimeMillis();
-            future.complete(true);
-        }
-        return future;
+            });
+        };
     }
 }
