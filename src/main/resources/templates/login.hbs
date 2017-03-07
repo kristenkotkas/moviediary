@@ -15,7 +15,7 @@
 </div>
 <div class="row">
     <div class="col s12 z-depth-0 card-panel">
-        <form class="login-form" method="get" action="{{formUrl}}">
+        <form class="login-form">
             <div class="row">
                 <div class="input-field col s12 center">
                     <h5 class="center grey-text">{{i18n "LOGIN_TITLE" locale=lang}}</h5>
@@ -28,9 +28,9 @@
             </div>
             <div class="row margin">
                 <div class="input-field col s12">
-                    <button type="submit" class="waves-effect waves-light col s12 z-depth-0 btn">
+                    <a href="{{formUrl}}" class="btn waves-effect waves-light col s12 z-depth-0 ">
                         <i class="fa fa-sign-in left"></i>{{i18n "LOGIN_PASSWORD" locale=lang}}
-                    </button>
+                    </a>
                 </div>
             </div>
             <div class="row margin">
