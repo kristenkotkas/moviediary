@@ -2,6 +2,12 @@ var searchMovie = function (eventbus, movieId) {
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
         var data = reply.body;
+        var posterPath = "";
+        if (data.poster_path === null) {
+            posterPath = '/static/img/nanPosterBig.jpg'
+        } else {
+            posterPath =  'https://image.tmdb.org/t/p/w500/' + data.poster_path;
+        }
         console.log(data);
         $("#search-result").empty().hide();
         $("#movie-result").empty().append(
@@ -14,11 +20,17 @@ var searchMovie = function (eventbus, movieId) {
         $('#movie-title').addClass('movies-heading');
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
-          $.parseHTML(
-              '<img src="https://image.tmdb.org/t/p/w500' + data.poster_path + '" width="100%">'
-          )
+            $.parseHTML(
+                '<img src="' + posterPath + '" width="100%">'
+            )
         );
-        $("#body").attr("background", 'http://image.tmdb.org/t/p/w1920' + data.backdrop_path);
+        var backgroundPath = "";
+        if (data.backdrop_path === null) {
+            backgroundPath = "";
+        } else {
+            backgroundPath = 'http://image.tmdb.org/t/p/w1920' + data.backdrop_path;
+        }
+        $("#body").attr("background", backgroundPath);
     });
 };
 
@@ -33,15 +45,23 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                     console.log(data);
                     $.each(data, function (i) {
                         var movie = data[i];
+                        var posterPath = "";
+                        if (movie.poster_path !== null) {
+                            posterPath =  'https://image.tmdb.org/t/p/w92/' + movie.poster_path;
+                        } else {
+                            posterPath = '/static/img/nanPosterSmall.jpg'
+                        }
                         var arrayOfNodes = $.parseHTML(
-                            '<div>' +
-                                '<a href="#" class="collection-item">' +
-                                    movie.release_date.split('-')[0] + ' . . . . ' +
-                                    movie.original_title +
-                                '</a>' +
-                            '<img src="https://image.tmdb.org/t/p/w92/' + movie.poster_path + '" width="10%">' +
-                            '</div>');
-                        arrayOfNodes[0].firstChild.onclick = function () {
+                            '<li class="collection-item search-object">' +
+                            '<div class="row">' +
+                            '<img src="' + posterPath + '" alt="" class="search-image" width="10%">' +
+                            '<span class="title search-object-text">' +
+                            movie.original_title +
+                            '</span>' +
+                            '</li>' +
+                            '</div>'
+                        );
+                        arrayOfNodes[0].onclick = function () {
                             searchMovie(eventbus, movie.id);
                         };
                         $("#search-result").append(arrayOfNodes).show();
