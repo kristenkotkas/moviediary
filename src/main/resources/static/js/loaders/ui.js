@@ -14,9 +14,9 @@ fallback.load({
         '//localhost:8081/static/css/custom/base.css'
     ],
     jQuery: [
-        '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js',
-        '//movies.kyngas.eu/static/js/jquery-2.2.4.min.js',
-        '//localhost:8081/static/js/jquery-2.2.4.min.js'
+        '//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js',
+        '//movies.kyngas.eu/static/js/jquery.min.js',
+        '//localhost:8081/static/js/jquery.min.js'
     ],
     Materialize: [
         '//cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js',

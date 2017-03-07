@@ -1,8 +1,8 @@
 fallback.load({
     SockJS: [
-        '//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js',
-        '//movies.kyngas.eu/static/js/sockjs-0.3.4.min.js',
-        '//localhost:8081/static/js/sockjs-0.3.4.min.js'
+        '//cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.2/sockjs.min.js',
+        '//movies.kyngas.eu/static/js/sockjs.min.js',
+        '//localhost:8081/static/js/sockjs.min.js'
     ],
     EventBus: [
         '//movies.kyngas.eu/static/js/vertx-eventbus.js',
