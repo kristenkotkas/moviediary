@@ -108,6 +108,8 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getViews(String username, String param);
 
+    Future<String> getUsersCount();
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.
@@ -146,12 +148,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
         }
 
         public String create(Table table, List<Column> columns) {
-            String cmd = commandCreator.apply(table, columns);
-            System.out.println("--------------------sql-----------------");
-            System.out.println("--------------------sql-----------------");
-            System.out.println("--------------------sql-----------------");
-            System.out.println(cmd);
-            return cmd;
+            return commandCreator.apply(table, columns);
         }
     }
 

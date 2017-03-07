@@ -50,6 +50,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?)";
 
+    private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
+
     private final Vertx vertx;
     private final JsonObject config;
     private final JDBCClient client;
@@ -216,6 +218,21 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                                     .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_VIEWS + username, future)))));
         }
+        return future;
+    }
+
+    @Override
+    public Future<String> getUsersCount() {
+        Future<String> future = Future.future();
+        testConnection().setHandler(ok -> client.getConnection(connHandler(future,
+                conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
+                    if (ar.succeeded()) {
+                        future.complete(ar.result().getRows().get(0).getLong("Count").toString());
+                    } else {
+                        future.fail(ar.cause());
+                    }
+                    conn.close();
+                }))));
         return future;
     }
 

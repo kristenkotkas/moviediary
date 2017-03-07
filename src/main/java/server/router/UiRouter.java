@@ -1,3 +1,5 @@
+package server.router;
+
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

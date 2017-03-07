@@ -34,6 +34,7 @@ import static server.util.StringUtils.hash;
 public class DatabaseRouter extends Routable {
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USERS_ALL = "/private/api/users/all";
+    public static final String API_VIEWS_COUNT = "/private/api/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/users/form/insert";
     private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
     private final JsonObject config;
@@ -53,7 +54,12 @@ public class DatabaseRouter extends Routable {
     @Override
     public void route(Router router) {
         router.get(API_USERS_ALL).handler(this::handleUsersAll);
+        router.get(API_VIEWS_COUNT).handler(this::handleViewsCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
+    }
+
+    private void handleViewsCount(RoutingContext ctx) {
+        database.getUsersCount().setHandler(resultHandler(ctx, count -> ctx.response().end(count)));
     }
 
     private void handleUsersFormInsert(RoutingContext ctx) {
@@ -84,10 +90,10 @@ public class DatabaseRouter extends Routable {
                     if (isServer(config)) {
                         mail.sendVerificationEmail(ctx, username);
                     }
-                    redirect(ctx, UI_LOGIN + verifyEmail(ctx));
+                    redirect(ctx, UI_LOGIN + verifyEmail());
                 }));
             } else {
-                redirect(ctx, UI_FORM_REGISTER + userExists(ctx));
+                redirect(ctx, UI_FORM_REGISTER + userExists());
             }
         }));
     }
@@ -96,11 +102,11 @@ public class DatabaseRouter extends Routable {
         database.getAllUsers().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private String userExists(RoutingContext ctx) {
+    private String userExists() {
         return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_EXISTS";
     }
 
-    private String verifyEmail(RoutingContext ctx) {
+    private String verifyEmail() {
         return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_VERIFY_EMAIL";
     }
 }
