@@ -45,6 +45,7 @@ public class CommonUtils {
         privKeyPEM = privKeyPEM.replace("-----END " + algorithm + " PRIVATE KEY-----", "");
         //System.out.println("Private key\n"+privKeyPEM);
 
+        // TODO: 07/03/2017 replace old sun stuff
         BASE64Decoder b64=new BASE64Decoder();
         byte[] decoded = b64.decodeBuffer(privKeyPEM);
 
