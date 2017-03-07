@@ -79,6 +79,16 @@ body {
     vertical-align: middle;
     padding: 0 0 0 0;
 }
+.flag {
+    border-radius: 50%;
+    -webkit-transition: -webkit-transform .8s ease-in-out;
+    transition: transform .8s ease-in-out;
+}
+
+.flag:hover {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+}
 
 @media only screen and (min-width: 1071px) {
     #forgot-password {
