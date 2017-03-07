@@ -28,7 +28,7 @@ var searchMovie = function (eventbus, movieId) {
         if (data.backdrop_path === null) {
             backgroundPath = "";
         } else {
-            backgroundPath = 'http://image.tmdb.org/t/p/w1920' + data.backdrop_path;
+            backgroundPath = 'http://image.tmdb.org/t/p/original' + data.backdrop_path;
         }
         $("#body").attr("background", backgroundPath);
     });
