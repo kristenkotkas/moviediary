@@ -15,7 +15,25 @@
 </div>
 {{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_WISHLIST" locale=lang}}</h3>
+<div class="row">
+    <div class="col s12 m6">
+        <div class="card white small z-depth-0">
+            <div class="card-content grey-text">
+                <span class="card-title">{{i18n "HOME_MESSENGER" locale=lang}}</span>
+                <label for="MessageInput">{{i18n "HOME_INSERT_MESSAGE" locale=lang}}</label>
+                <input id="MessageInput" type="text">
+                <div class="card-action">
+                    <a id="SendMessage" class="btn waves-effect waves-light z-depth-0">
+                        {{i18n "HOME_SEND" locale=lang}}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script async type="text/javascript" src="/static/js/fallback.min.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/eventbus.js"></script>
+<script async type="text/javascript" src="/static/js/pages/wishlist.js"></script>
 </body>
 </html>

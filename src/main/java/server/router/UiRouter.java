@@ -15,13 +15,10 @@ import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.service.DatabaseService;
-import server.service.DatabaseService.Column;
-import server.service.DatabaseService.Table;
 import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.getString;
@@ -33,7 +30,6 @@ import static server.security.DatabaseAuthorizer.URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
-import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 
@@ -114,16 +110,7 @@ public class UiRouter extends Routable {
     }
 
     private void handleUser(RoutingContext ctx) {
-        UserTemplate template = getSafe(ctx, TEMPL_USER, UserTemplate.class);
-        String lang = ctx.request().getParam(LANGUAGE);
-        if (lang != null) {
-            Map<Column, String> map = createDataMap(getProfile(ctx).getEmail());
-            map.put(Column.LANGUAGE, lang);
-            database.update(Table.SETTINGS, map);
-            ctx.session().data().put(LANGUAGE, lang);
-            template.setLang(lang);
-        }
-        engine.render(template, endHandler(ctx));
+        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
     }
 
     private void handleHome(RoutingContext ctx) {
@@ -147,9 +134,14 @@ public class UiRouter extends Routable {
     }
 
     private void handleLogin(RoutingContext ctx) {
+        LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
+        String lang = ctx.request().getParam(LANGUAGE);
+        if (lang != null) {
+            ctx.session().data().put(LANGUAGE, lang);
+            template.setLang(lang);
+        }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
-        engine.render(getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class)
-                .setDisplayMessage(key != null ? getString(key, ctx) : null)
+        engine.render(template.setDisplayMessage(key != null ? getString(key, ctx) : null)
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -193,6 +185,7 @@ public class UiRouter extends Routable {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLang((String) ctx.session().data().get(LANGUAGE));
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
+        baseTemplate.setLoginPage(UI_LOGIN);
         baseTemplate.setUserPage(UI_USER);
         baseTemplate.setHomePage(UI_HOME);
         baseTemplate.setMoviesPage(UI_MOVIES);

@@ -67,7 +67,7 @@ public class AuthRouter extends Routable {
         router.get(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx,
                 new ApplicationLogoutHandlerOptions(), securityConfig.getPac4jConfig()));
 
-        router.get(AUTH_PRIVATE).handler(this::handleLanguage);
+        //router.get(AUTH_PRIVATE).handler(this::handleLanguage);
     }
 
     /**

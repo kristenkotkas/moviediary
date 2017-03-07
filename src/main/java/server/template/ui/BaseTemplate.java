@@ -7,6 +7,8 @@ public interface BaseTemplate extends TypeSafeTemplate {
 
     void setLogoutUrl(String logoutUrl);
 
+    void setLoginPage(String loginPage);
+
     void setUserPage(String userPage);
 
     void setHomePage(String homePage);

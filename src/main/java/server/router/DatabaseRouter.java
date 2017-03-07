@@ -32,11 +32,12 @@ import static server.util.StringUtils.hash;
  * Contains routes that interact with database.
  */
 public class DatabaseRouter extends Routable {
+    private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USERS_ALL = "/private/api/users/all";
     public static final String API_VIEWS_COUNT = "/private/api/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/users/form/insert";
-    private static final Logger log = LoggerFactory.getLogger(DatabaseRouter.class);
+
     private final JsonObject config;
     private final DatabaseService database;
     private final MailService mail;
