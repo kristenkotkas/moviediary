@@ -35,26 +35,58 @@ var searchMovie = function (eventbus, movieId) {
         $('#movie-poster-card').removeClass('scale-out').addClass('scale-in');
 
         $("#body").attr("background", backgroundPath);
-        $('#year').empty().append(data.release_date.split('-')[0]);
-        $('#release').empty().append(data.release_date);
-        $('#runtime').empty().append(toNormalRuntime(data.runtime));
-        $('#language').empty().append(data.original_language);
-        $('#genre').empty().append(data.genres);
-        $('#budget').empty().append(data.budget);
-        $('#revenue').empty().append(data.revenue);
-        $('#country').empty().append(data.production_countries);
-        $('#rating').empty().append(data.vote_average);
+        $('#year').empty().append(nullCheck(data.release_date).split('-')[0]);
+        $('#release').empty().append(nullCheck(data.release_date));
+        $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime)));
+        $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages)));
+        $('#genre').empty().append(getStringFormArray(nullCheck(data.genres)));
+        $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget)));
+        $('#revenue').empty().append(toNormalRevenue(nullCheck(data.revenue)));
+        $('#country').empty().append(getStringFormArray(nullCheck(data.production_countries)));
+        $('#rating').empty().append(nullCheck(data.vote_average));
     });
 };
 
+var nullCheck = function (data) {
+    if (data == 0 || data.length == 0) {
+        return 'Unknown';
+    } else return data;
+};
+
 var toNormalRuntime = function (runtime) {
-    if (runtime === 0) {
-        return 'Unknown'
+    if (runtime == 'Unknown') {
+        return 'Unknown';
     } else {
         var hour = ~~(runtime / 60);
         var min = runtime - 60 * hour;
         return hour + ' h ' + min + ' min';
     }
+};
+
+var getStringFormArray = function (jsonArray) {
+    if (jsonArray == 'Unknown') {
+        return 'Unknown';
+    } else {
+        console.log(jsonArray);
+        if (jsonArray.length === 0) {
+            return 'Unknown';
+        }
+        var result = "";
+
+        $.each(jsonArray, function (i) {
+            if (jsonArray[i].name !== '') {
+                result += jsonArray[i].name + ', ';
+            }
+        });
+
+        return result.slice(0, -2);
+    }
+};
+
+var toNormalRevenue = function (revenue) {
+    if (revenue === 'Unknown') {
+        return 'Unknown';
+    } else return revenue.toLocaleString() + ' $';
 };
 
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
@@ -68,8 +100,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                 $('#add-info-box').removeClass('scale-in').addClass('scale-out');
                 $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
                 setTimeout(
-                    function()
-                    {
+                    function () {
                         eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
                             var data = reply.body.results;
                             console.log(data);
