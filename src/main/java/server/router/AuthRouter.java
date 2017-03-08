@@ -34,7 +34,7 @@ public class AuthRouter extends Routable {
     public static final String AUTH_LOGOUT = "/logout";
     public static final String LANGUAGE = "lang";
     private static final String CALLBACK = "/callback";
-    private static final String XSS_PROTECTION = "XSSProtectionHeader";
+    private static final String XSS_PROTECTION = "xssprotection";
     private final DatabaseService database;
     private final JsonObject config;
     private final SecurityConfig securityConfig;
