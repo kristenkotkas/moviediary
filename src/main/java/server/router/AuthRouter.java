@@ -34,6 +34,7 @@ public class AuthRouter extends Routable {
     public static final String AUTH_LOGOUT = "/logout";
     public static final String LANGUAGE = "lang";
     private static final String CALLBACK = "/callback";
+    private static final String XSS_PROTECTION = "XSSProtectionHeader";
     private final DatabaseService database;
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -57,7 +58,7 @@ public class AuthRouter extends Routable {
         SecurityHandler securityHandler = new SecurityHandler(vertx, securityConfig.getPac4jConfig(),
                 securityConfig.getAuthProvider(), new SecurityHandlerOptions()
                 .withClients(getClientNames())
-                .withAuthorizers(AUTHORIZER));
+                .withAuthorizers(AUTHORIZER + "," + XSS_PROTECTION));
         router.route(AUTH_PRIVATE).handler(securityHandler);
         router.route(EVENTBUS_ALL).handler(securityHandler);
 
