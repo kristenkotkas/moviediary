@@ -40,6 +40,7 @@ public class EventBusRouter extends Routable {
     public static final String DATABASE_GET_HISTORY = "database_get_history";
     public static final String API_GET_SEARCH = "api_get_search";
     public static final String API_GET_MOVIE = "api_get_movie";
+    public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
 
     public static final String MESSENGER = "messenger";
 
@@ -49,7 +50,15 @@ public class EventBusRouter extends Routable {
     public EventBusRouter(Vertx vertx, DatabaseService database, TmdbService tmdb) {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
-        listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
+
+        listen(DATABASE_USERS_SIZE, reply(new BiFunction<String, String, Future<JsonObject>>() {
+            @Override
+            public Future<JsonObject> apply(String user, String param) {
+                return database.getAllUsers();
+            }
+        }, (user, json) -> json.size()));
+
+
         listen(DATABASE_GET_HISTORY, reply(database::getViews, (user, json) -> {
             json.remove("results");
             JsonArray array = json.getJsonArray("rows");
@@ -68,6 +77,27 @@ public class EventBusRouter extends Routable {
         }));
         listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
+
+        listen(DATABASE_GET_MOVIE_HISTORY, reply(new BiFunction<String, String, Future<JsonObject>>() {
+            @Override
+            public Future<JsonObject> apply(String user, String param) {
+                return database.getMovieViews(user, param);
+            }
+        }, new BiFunction<String, JsonObject, Object>() {
+            @Override
+            public Object apply(String user, JsonObject json) {
+                json.remove("results");
+                JsonArray array = json.getJsonArray("rows");
+                for (int i = 0; i < array.size(); i++) {
+                    array.getJsonObject(i).put("WasCinema", getCinema(
+                            array.getJsonObject(i).getBoolean("WasCinema")));
+                    array.getJsonObject(i).put("Start", getNormalDTFromDB(
+                            array.getJsonObject(i).getString("Start"), LONG_DATE));
+                }
+                return json;
+            }
+        }));
+
         gateway(MESSENGER, log());
     }
 

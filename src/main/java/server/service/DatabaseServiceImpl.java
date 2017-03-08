@@ -53,6 +53,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
 
+    private static final String SQL_GET_MOVIE_VIEWS =
+            "SELECT Start, WasCinema From Views" +
+            " WHERE Username = ? AND MovieId = ?";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -212,6 +216,24 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                                     .add(json.getString("start"))
                                     .add(json.getString("end")),
                             resultSetHandler(conn, CACHE_VIEWS + username, future))));
+        }
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> getMovieViews(String username, String param) {
+        System.out.println("---------------------------------------------");
+        System.out.println("USERNAME: " + username);
+        System.out.println("PARAM: " + param);
+        System.out.println("---------------------------------------------");
+        Future<JsonObject> future = Future.future();
+        CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username + param);
+        if (!tryCachedResult(false, cache, future)) {
+            client.getConnection(connHandler(future,
+                    conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
+                    .add(username)
+                    .add(param),
+                            resultSetHandler(conn, CACHE_VIEWS + username + param, future))));
         }
         return future;
     }
