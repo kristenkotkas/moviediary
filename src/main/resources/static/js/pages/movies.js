@@ -37,6 +37,7 @@ var searchMovie = function (eventbus, movieId) {
         $("#body").attr("background", backgroundPath);
         $('#year').empty().append(data.release_date.split('-')[0]);
         $('#release').empty().append(data.release_date);
+        $('#runtime').empty().append(toNormalRuntime(data.runtime));
         $('#language').empty().append(data.original_language);
         $('#genre').empty().append(data.genres);
         $('#budget').empty().append(data.budget);
