@@ -11,7 +11,7 @@ body {
 }
 
 .opacity-object {
-    opacity: 0.8;
+    opacity: 0.88;
 }
 
 .opacity-object-full {
@@ -37,7 +37,7 @@ body {
 
 .movies-heading {
     padding: 1% 0 1% 4%;
-    margin: 5% 0 5% 0;
+    margin: 1% 0 1% 0;
     background: white;
     opacity: 0.8;
 }
@@ -53,6 +53,13 @@ body {
 .btn:focus,
 .btn:hover {
     /*background-color: ButtonHighlight !important;*/
+}
+
+.content-key {
+    font-weight: bold;
+}
+
+.custom-card {
 }
 
 .not-found {

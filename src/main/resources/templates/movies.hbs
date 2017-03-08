@@ -21,25 +21,111 @@
             <div class="col movies-search-bar m10 offset-m1 l6 offset-l3">
                 <div class="card z-depth-0 opacity-object">
                     <div class="search-wrapper input-field">
-                        <input class="movies-search-bar" id="search" type="search" required>
+                        <input class="movies-search-bar movies-heading" id="search" type="search" required>
                         <label class="label-icon" for="search">
                             <i class="fa fa-search left"></i></label>
-                        <ul class="collection" id="search-result" hidden>
-                            <!-- Siia tuleb otsingu sisu jqueryga -->
-                        </ul>
                     </div>
                 </div>
+                <ul class="collection movie-search" id="search-result" hidden>
+                    <!-- Siia tuleb otsingu sisu jqueryga -->
+                </ul>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="s12 m12 l12">
-            <div class="col s12 m8 offset-m2 l2 offset-l2" id="movie-poster-card"></div>
-            <div class="col card l6  opacity-object">
+        <div class="col m10 l10 offset-l1">
+            <div class="col s12 m8 l2 scale-transition scale-out" id="movie-poster-card"></div>
+            <div class="col s12 m6 l5">
+                <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="basic-info-box">
+                    <div class="card-content">
+                        <h5>Basic info</h5>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td class="content-key grey-text">Year</td>
+                                <td class="grey-text" id="year"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Release</td>
+                                <td class="grey-text" id="release"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Runtime</td>
+                                <td class="grey-text" id="runtime"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="seen-times">
+                    <div class="card-content">
+                        <h5>Seen 4 times</h5>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td class="content-key grey-text">20 February 2015</td>
+                                <td class="grey-text"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">15 May 2013</td>
+                                <td class="grey-text"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">25 October 2011</td>
+                                <td class="grey-text"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">2 December 2010</td>
+                                <td class="grey-text">
+                                    <i class="fa fa-ticket"></i>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6 l5">
+                <div class="card z-depth-0 scale-transition scale-out opacity-object" id="add-info-box">
+                    <div class="card-content">
+                        <h5>Additional info</h5>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td class="content-key grey-text">Language</td>
+                                <td class="grey-text" id="language"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Genre</td>
+                                <td class="grey-text" id="genre"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Budget</td>
+                                <td class="grey-text" id="budget"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Revenue</td>
+                                <td class="grey-text" id="revenue"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Country</td>
+                                <td class="grey-text" id="country"></td>
+                            </tr>
+                            <tr>
+                                <td class="content-key grey-text">Rating</td>
+                                <td class="grey-text" id="rating"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col card l6  opacity-object">
                 <pre id="movie-result" hidden>
                     <!-- Siia tuleb filmi sisu jqueryga -->
                 </pre>
-            </div>
         </div>
     </div>
 </div>
