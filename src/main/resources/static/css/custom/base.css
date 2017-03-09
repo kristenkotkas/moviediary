@@ -83,9 +83,14 @@ body {
     cursor: hand;
 }
 
-.add-hand:hover{
+.load-more:hover{
+    font-weight: bold;
     cursor: pointer;
     cursor: hand;
+}
+
+.load-more{
+    font-weight: bold;
 }
 
 .search-image {

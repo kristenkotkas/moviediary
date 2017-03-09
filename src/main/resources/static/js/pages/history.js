@@ -35,11 +35,13 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                 $("#load-more-holder").empty().append(
                                     $.parseHTML(
                                         '<tr>' +
-                                        '<td></td>' +
-                                        '<td id="load-more" class="add-hand">Load more...</td>' +
+                                        '<td class="load-more"></td>' +
+                                        '<td id="load-more" class="load-more">Load more...</td>' +
                                         '</tr>'
                                     )
                                 ).show();
+                            } else {
+                                $("#load-more-holder").empty();
                             }
 
                             var i = 0;
@@ -55,12 +57,13 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     }, function (error, reply) {
                                         var addData = reply.body['rows'];
                                         console.log(addData.length);
-                                        if (addData.length == 0 || addData.length < 10) {
+                                        if (addData.length < 10) {
                                             $("#load-more-holder").hide();
                                         }
                                         addHistory(addData, lang);
+                                        $(document).scrollTop($(document).height());
                                     });
-                            })
+                            });
 
                         } else {
                             $("#table").empty();
