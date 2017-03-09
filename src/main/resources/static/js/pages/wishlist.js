@@ -1,5 +1,5 @@
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-    var eventbus = new EventBus("{{eventbusUrl}}");
+    var eventbus = new EventBus("/eventbus");
     eventbus.onopen = function () {
         eventbus.registerHandler("messenger", function (err, msg) {
             console.log(msg);

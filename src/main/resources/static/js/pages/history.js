@@ -1,55 +1,62 @@
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-    var eventbus = new EventBus("{{eventbusUrl}}");
+    var eventbus = new EventBus("/eventbus");
     eventbus.onopen = function () {
-        $("#Search").click(function () {
-            eventbus.send("database_get_history",
-                {
-                    'is-first': $("#seenFirst").is(':checked'),
-                    'is-cinema': $("#wasCinema").is(':checked'),
-                    'start': $("#startingDay").pickadate('picker').get(),
-                    'end': $("#endDay").pickadate('picker').get()
-                }, function (error, reply) {
-                    console.log(reply);
-                    var data = reply.body['rows'];
-                    console.log(data.length);
-                    if (data.length > 0) {
-                        $("#viewsTitle").empty();
-                        $("#table").empty().append(
-                            '<tr>' +
-                            '<th class="table-row">{{i18n "HISTORY_TITLE" locale=lang}}</th>' +
-                            '<th>{{i18n "HISTORY_DATE" locale=lang}}</th>' +
-                            '<th>{{i18n "HISTORY_TIME" locale=lang}}</th>' +
-                            '<th></th>' +
-                            '<th></th>' +
-                            '<th></th>' +
-                            '</tr>');
-                        $.each(data, function (i) {
-                            $("#table").append(
-                                $.parseHTML('<tr>' +
-                                    '<td class="table-row">' + data[i].Title + '</td>' +
-                                    '<td>' + getMonth(data[i].Start) + '</td>' +
-                                    '<td>' + data[i].Time + '</td>' +
-                                    '<td>' + data[i].DayOfWeek + '</td>' +
-                                    '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
-                                    '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
-                                    '</tr>')
+        var lang;
+        eventbus.send("translations", getCookie("lang"), function (error, reply) {
+            lang = reply.body;
+            console.log(lang);
+            $("#Search").click(function () {
+                eventbus.send("database_get_history",
+                    {
+                        'is-first': $("#seenFirst").is(':checked'),
+                        'is-cinema': $("#wasCinema").is(':checked'),
+                        'start': $("#startingDay").pickadate('picker').get(),
+                        'end': $("#endDay").pickadate('picker').get()
+                    }, function (error, reply) {
+                        console.log(reply);
+                        var data = reply.body['rows'];
+                        console.log(data.length);
+                        if (data.length > 0) {
+                            $("#viewsTitle").empty();
+                            $("#table").empty().append(
+                                '<tr>' +
+                                '<th class="table-row">{{i18n "HISTORY_TITLE" locale=lang}}</th>' +
+                                '<th>{{i18n "HISTORY_DATE" locale=lang}}</th>' +
+                                '<th>{{i18n "HISTORY_TIME" locale=lang}}</th>' +
+                                '<th></th>' +
+                                '<th></th>' +
+                                '<th></th>' +
+                                '</tr>');
+                            $.each(data, function (i) {
+                                $("#table").append(
+                                    $.parseHTML('<tr>' +
+                                        '<td class="table-row">' + data[i].Title + '</td>' +
+                                        '<td>' + getMonth(data[i].Start) + '</td>' +
+                                        '<td>' + data[i].Time + '</td>' +
+                                        '<td>' + data[i].DayOfWeek + '</td>' +
+                                        '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
+                                        '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
+                                        '</tr>')
+                                );
+                            });
+                        } else {
+                            $("#table").empty();
+                            $("#viewsTitle").empty().append(
+                                '<div class="card z-depth-0">' +
+                                '<div class="card-title">' +
+                                '<a class="light grey-text text-lighten-1 not-found">{{i18n "HISTORY_NOT_PRESENT" locale=lang}}</a>' +
+                                '</div>' +
+                                '</div>'
                             );
-                        });
-                    } else {
-                        $("#table").empty();
-                        $("#viewsTitle").empty().append(
-                            '<div class="card z-depth-0">' +
-                            '<div class="card-title">' +
-                            '<a class="light grey-text text-lighten-1 not-found">{{i18n "HISTORY_NOT_PRESENT" locale=lang}}</a>' +
-                            '</div>' +
-                            '</div>'
-                        );
-                    }
-                });
+                        }
+                    });
+            });
         });
+
     };
 });
 
+/*
 var getMonth = function (start) {
     var startArray = start.split(' ');
     var month = startArray[1];
@@ -67,4 +74,4 @@ var getMonth = function (start) {
         case 'November':return startArray[0] + "{{i18n "NOVEMBER" locale=lang}}" + ' ' +  startArray[2];
         case 'December':return startArray[0] + "{{i18n "DECEMBER" locale=lang}}" + ' ' +  startArray[2];
     }
-}
+}*/

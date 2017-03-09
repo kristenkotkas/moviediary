@@ -118,7 +118,7 @@ var toNormalRevenue = function (revenue) {
 };
 
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-    var eventbus = new EventBus("{{eventbusUrl}}");
+    var eventbus = new EventBus("/eventbus");
     eventbus.onopen = function () {
         $("#search").keyup(function (e) {
             if (e.keyCode == 13) {
