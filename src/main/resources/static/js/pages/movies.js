@@ -33,14 +33,14 @@ var searchMovie = function (eventbus, movieId, lang) {
         $("#body").attr("background", backgroundPath);
         $('#year').empty().append(nullCheck(data.release_date).split('-')[0]);
         $('#release').empty().append(nullCheck(data.release_date));
-        $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime), lang));
+        $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime, lang), lang));
 
-        $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages), lang));
-        $('#genre').empty().append(getStringFormArray(nullCheck(data.genres), lang));
-        $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget), lang));
-        $('#revenue').empty().append(toNormalRevenue(nullCheck(data.revenue), lang));
-        $('#country').empty().append(getStringFormArray(nullCheck(data.production_countries), lang));
-        $('#rating').empty().append(nullCheck(data.vote_average));
+        $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages, lang), lang));
+        $('#genre').empty().append(getStringFormArray(nullCheck(data.genres, lang), lang));
+        $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget, lang), lang));
+        $('#revenue').empty().append(toNormalRevenue(nullCheck(data.revenue, lang), lang));
+        $('#country').empty().append(getStringFormArray(nullCheck(data.production_countries, lang), lang));
+        $('#rating').empty().append(nullCheck(data.vote_average, lang));
 
         $('#basic-info-box').removeClass('scale-out').addClass('scale-in');
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
@@ -75,14 +75,14 @@ var getMovieViews = function (eventbus, movieId, lang) {
     });
 };
 
-var nullCheck = function (data) {
+var nullCheck = function (data, lang) {
     if (data == 0 || data.length == 0) {
-        return 'Unknown';
+        return lang.MOVIES_JS_UNKNOWN;
     } else return data;
 };
 
 var toNormalRuntime = function (runtime, lang) {
-    if (runtime == 'Unknown') {
+    if (runtime == lang.MOVIES_JS_UNKNOWN) {
         return lang.MOVIES_JS_UNKNOWN;
     } else {
         var hour = ~~(runtime / 60);
@@ -92,7 +92,7 @@ var toNormalRuntime = function (runtime, lang) {
 };
 
 var getStringFormArray = function (jsonArray, lang) {
-    if (jsonArray == 'Unknown') {
+    if (jsonArray == lang.MOVIES_JS_UNKNOWN) {
         return lang.MOVIES_JS_UNKNOWN;
     } else {
         console.log(jsonArray);
@@ -112,7 +112,7 @@ var getStringFormArray = function (jsonArray, lang) {
 };
 
 var toNormalRevenue = function (revenue, lang) {
-    if (revenue === 'Unknown') {
+    if (revenue === lang.MOVIES_JS_UNKNOWN) {
         return lang.MOVIES_JS_UNKNOWN;
     } else return revenue.toLocaleString() + ' $';
 };
