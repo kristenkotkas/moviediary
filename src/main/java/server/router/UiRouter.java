@@ -19,6 +19,8 @@ import server.template.ui.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static io.vertx.ext.web.Cookie.cookie;
+import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.getString;
 import static server.entity.Status.redirect;
@@ -141,7 +143,8 @@ public class UiRouter extends Routable {
         LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
-            ctx.session().data().put(LANGUAGE, lang);
+            ctx.removeCookie(LANGUAGE);
+            ctx.addCookie(cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
             template.setLang(lang);
         }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
@@ -187,7 +190,7 @@ public class UiRouter extends Routable {
 
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
-        baseTemplate.setLang((String) ctx.session().data().get(LANGUAGE));
+        baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() : null);
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
         baseTemplate.setEventbusUrl(EVENTBUS);
         baseTemplate.setLoginPage(UI_LOGIN);
