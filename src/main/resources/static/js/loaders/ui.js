@@ -10,7 +10,7 @@ fallback.load({
         '//localhost:8081/static/css/materialize.min.css'
     ],
     base_css: [
-        /*'//movies.kyngas.eu/static/css/custom/base.css',*/
+        '//movies.kyngas.eu/static/css/custom/base.css',
         '//localhost:8081/static/css/custom/base.css'
     ],
     jQuery: [
@@ -42,7 +42,7 @@ fallback.ready(function () {
     $('.tooltipped').tooltip({ //tooltips
         delay: 100,
         position: 'top',
-        html:true
+        html: true
     });
     $('body').addClass('loaded'); //loader
 });
