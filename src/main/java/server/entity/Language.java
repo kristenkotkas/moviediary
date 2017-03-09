@@ -1,5 +1,7 @@
 package server.entity;
 
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
@@ -45,12 +47,28 @@ public enum Language {
         return getString(key, (String) ctx.session().data().get(LANGUAGE));
     }
 
+    public static Future<JsonObject> getJsonTranslations(String lang) {
+        Future<JsonObject> future = Future.future();
+        JsonObject json = new JsonObject();
+        ResourceBundle bundle = Stream.of(values())
+                .filter(language -> language.getLocale().getLanguage().equals(lang))
+                .findAny()
+                .orElse(ENGLISH)
+                .getBundle();
+        bundle.keySet().forEach(key -> json.put(key, bundle.getString(key)));
+        future.complete(json);
+        return future;
+    }
+
     public Locale getLocale() {
         return locale;
     }
 
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
     public String getString(String key) {
-        LOG.info("i18n: lang:" + locale.getLanguage() + ", key: " + key + ", val: " + bundle.getString(key));
         return bundle.getString(key);
     }
 

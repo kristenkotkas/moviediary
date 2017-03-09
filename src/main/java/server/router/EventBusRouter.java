@@ -15,6 +15,7 @@ import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
+import server.entity.Language;
 import server.service.DatabaseService;
 import server.service.TmdbService;
 
@@ -42,6 +43,7 @@ public class EventBusRouter extends Routable {
     public static final String API_GET_SEARCH = "api_get_search";
     public static final String API_GET_MOVIE = "api_get_movie";
     public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
+    public static final String TRANSLATIONS = "translations";
 
     public static final String MESSENGER = "messenger";
 
@@ -81,7 +83,7 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
-
+        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
         gateway(MESSENGER, log());
     }
 
