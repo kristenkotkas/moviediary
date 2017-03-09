@@ -8,15 +8,11 @@ var searchMovie = function (eventbus, movieId) {
         } else {
             posterPath = 'https://image.tmdb.org/t/p/w500/' + data.poster_path;
         }
+
+        document.title = data.title;
         console.log(data);
         $("#search-result").empty().hide();
         $('#movie-views-table').empty();
-        /*$("#movie-result").empty().append(
-            $.parseHTML(
-                JSON.stringify(data, null, 2)
-            )
-        ).show();*/
-        //$("#search").val(data.original_title);
         $('#movie-title').text(data.original_title).addClass('movies-heading');
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
@@ -173,9 +169,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     )
                                 ).show();
                             }
-
                             $("#movie-poster-card").empty();
-                            //$("#movie-result").hide();
                         });
                     }, 205);
 
