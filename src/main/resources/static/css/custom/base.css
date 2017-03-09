@@ -11,7 +11,7 @@ body {
 }
 
 .opacity-object {
-    opacity: 0.91;
+    opacity: 0.95;
 }
 
 .opacity-object-full {
@@ -39,7 +39,7 @@ body {
     padding: 1% 0 1% 4%;
     margin: 1% 0 1% 0;
     background: white;
-    opacity: 0.8;
+    opacity: 0.95;
 }
 
 .logout-button {

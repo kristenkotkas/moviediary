@@ -1,5 +1,5 @@
 var searchMovie = function (eventbus, movieId, lang) {
-    console.log("LANG: " + JSON.stringify(lang));
+    //console.log("LANG: " + JSON.stringify(lang));
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
         var data = reply.body;
@@ -18,7 +18,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(
-                '<img src="' + posterPath + '" width="100%">'
+                '<img src="' + posterPath + '" width="100%" alt="Poster">'
             )
         );
         var backgroundPath = "";
@@ -32,7 +32,7 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         $("#body").attr("background", backgroundPath);
         $('#year').empty().append(nullCheck(data.release_date, lang).split('-')[0]);
-        $('#release').empty().append(nullCheck(data.release_date, lang));
+        $('#release').empty().append(getNormalDate(nullCheck(data.release_date, lang), lang));
         $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime, lang), lang));
 
         $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages, lang), lang));
@@ -40,7 +40,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget, lang), lang));
         $('#revenue').empty().append(toNormalRevenue(nullCheck(data.revenue, lang), lang));
         $('#country').empty().append(getStringFormArray(nullCheck(data.production_countries, lang), lang));
-        $('#rating').empty().append(nullCheck(data.vote_average, lang));
+        $('#rating').empty().append(getRating(nullCheck(data.vote_average, lang), lang));
 
         $('#basic-info-box').removeClass('scale-out').addClass('scale-in');
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
@@ -75,17 +75,26 @@ var getMovieViews = function (eventbus, movieId, lang) {
     });
 };
 
-var getNormalDate = function (date) {
+var getNormalDate = function (date, lang) {
+    var startArray = date.split('-');
     var dateFormat = new Date(date),
         locale = "en-us";
-    var month = dateFormat.toLocaleString(locale, {month: "long"});
-    console.log(month);
+    var month = dateFormat.toLocaleString(locale,{month: "long"});
+    return startArray[2] +  lang[month.toUpperCase()] + ' ' + startArray[0];
 };
 
 var nullCheck = function (data, lang) {
     if (data == 0 || data.length == 0) {
         return lang.MOVIES_JS_UNKNOWN;
     } else return data;
+};
+
+var getRating = function (data, lang) {
+    if (data == lang.MOVIES_JS_UNKNOWN) {
+        return lang.MOVIES_JS_UNKNOWN;
+    } else {
+        return data + ' / 10.0'
+    }
 };
 
 var toNormalRuntime = function (runtime, lang) {
@@ -102,7 +111,7 @@ var getStringFormArray = function (jsonArray, lang) {
     if (jsonArray == lang.MOVIES_JS_UNKNOWN) {
         return lang.MOVIES_JS_UNKNOWN;
     } else {
-        console.log(jsonArray);
+        //console.log(jsonArray);
         if (jsonArray.length === 0) {
             return lang.MOVIES_JS_UNKNOWN;
         }
@@ -110,7 +119,7 @@ var getStringFormArray = function (jsonArray, lang) {
 
         $.each(jsonArray, function (i) {
             if (jsonArray[i].name !== '') {
-                result += jsonArray[i].name + ', ';
+                result += jsonArray[i].name + '<br>';
             }
         });
 
@@ -131,7 +140,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         var lang;
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
-            console.log(lang);
+            //console.log(lang);
             $("#search").keyup(function (e) {
                 if (e.keyCode == 13) {
                     $("#search-result").empty();
