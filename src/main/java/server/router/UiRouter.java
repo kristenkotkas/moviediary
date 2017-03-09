@@ -28,7 +28,6 @@ import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
-import static server.router.EventBusRouter.EVENTBUS;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
@@ -192,7 +191,6 @@ public class UiRouter extends Routable {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() : null);
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
-        baseTemplate.setEventbusUrl(EVENTBUS);
         baseTemplate.setLoginPage(UI_LOGIN);
         baseTemplate.setUserPage(UI_USER);
         baseTemplate.setHomePage(UI_HOME);

@@ -48,16 +48,13 @@ public enum Language {
     }
 
     public static Future<JsonObject> getJsonTranslations(String lang) {
-        Future<JsonObject> future = Future.future();
-        JsonObject json = new JsonObject();
         ResourceBundle bundle = Stream.of(values())
                 .filter(language -> language.getLocale().getLanguage().equals(lang))
                 .findAny()
                 .orElse(ENGLISH)
                 .getBundle();
-        bundle.keySet().forEach(key -> json.put(key, bundle.getString(key)));
-        future.complete(json);
-        return future;
+        return Future.succeededFuture(bundle.keySet().stream()
+                .collect(JsonObject::new, (json, key) -> json.put(key, bundle.getString(key)), JsonObject::mergeIn));
     }
 
     public Locale getLocale() {

@@ -5,8 +5,6 @@ import eu.kyngas.template.engine.TypeSafeTemplate;
 public interface BaseTemplate extends TypeSafeTemplate {
     void setLang(String lang);
 
-    void setEventbusUrl(String eventbusUrl);
-
     void setLogoutUrl(String logoutUrl);
 
     void setLoginPage(String loginPage);

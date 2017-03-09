@@ -35,7 +35,6 @@ import static server.util.StringUtils.*;
 public class EventBusRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(EventBusRouter.class);
     public static final String EVENTBUS_ALL = "/eventbus/*";
-    public static final String EVENTBUS = "/eventbus";
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
