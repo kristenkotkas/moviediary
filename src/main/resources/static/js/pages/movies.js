@@ -1,4 +1,5 @@
 var searchMovie = function (eventbus, movieId, lang) {
+    console.log("LANG: " + JSON.stringify(lang));
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
         var data = reply.body;
@@ -32,11 +33,11 @@ var searchMovie = function (eventbus, movieId, lang) {
         $("#body").attr("background", backgroundPath);
         $('#year').empty().append(nullCheck(data.release_date).split('-')[0]);
         $('#release').empty().append(nullCheck(data.release_date));
-        $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime)));
+        $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime), lang));
 
         $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages), lang));
         $('#genre').empty().append(getStringFormArray(nullCheck(data.genres), lang));
-        $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget, lang)));
+        $('#budget').empty().append(toNormalRevenue(nullCheck(data.budget), lang));
         $('#revenue').empty().append(toNormalRevenue(nullCheck(data.revenue), lang));
         $('#country').empty().append(getStringFormArray(nullCheck(data.production_countries), lang));
         $('#rating').empty().append(nullCheck(data.vote_average));

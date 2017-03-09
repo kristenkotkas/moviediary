@@ -191,10 +191,6 @@ header .brand-logo img {
         width: 48px;
     }
 
-    .table-row {
-        padding: 20px 0 0 0;
-    }
-
     /* Left side nav bar height */
     ul.side-nav.leftside-navigation {
         top: 60px !important;
@@ -217,10 +213,6 @@ header .brand-logo img {
         margin: 3px 0;
     }
 
-    .table-row {
-        padding: 20px 0 0 0;
-    }
-
     /* Left side nav bar height */
     ul.side-nav.leftside-navigation {
         top: 64px !important;
@@ -235,11 +227,6 @@ header .brand-logo img {
 #accounts-dropdown .account-type {
     position: relative;
     color: #000;
-}
-
-/* Mobile table headers */
-td, th {
-    padding: 15px 5px;
 }
 
 /* Loading text */

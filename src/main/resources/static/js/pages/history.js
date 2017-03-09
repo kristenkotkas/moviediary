@@ -23,9 +23,9 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                 '<th class="table-row">' + lang.HISTORY_TITLE + '</th>' +
                                 '<th>' + lang.HISTORY_DATE + '</th>' +
                                 '<th>' + lang.HISTORY_TIME + '</th>' +
-                                '<th></th>' +
-                                '<th></th>' +
-                                '<th></th>' +
+                                '<th class="hide-on-med-and-down"></th>' +
+                                '<th class="hide-on-small-only"></th>' +
+                                '<th class="hide-on-small-only"></th>' +
                                 '</tr>');
                             $.each(data, function (i) {
                                 $("#table").append(
@@ -33,9 +33,9 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                         '<td class="table-row">' + data[i].Title + '</td>' +
                                         '<td>' + getMonth(data[i].Start, lang) + '</td>' +
                                         '<td>' + data[i].Time + '</td>' +
-                                        '<td>' + lang[data[i].DayOfWeek] + '</td>' +
-                                        '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
-                                        '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
+                                        '<td class="hide-on-med-and-down">' + lang[data[i].DayOfWeek] + '</td>' +
+                                        '<td class="center hide-on-small-only"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
+                                        '<td class="center hide-on-small-only"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
                                         '</tr>')
                                 );
                             });
