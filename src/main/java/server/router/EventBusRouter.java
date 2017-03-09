@@ -62,8 +62,8 @@ public class EventBusRouter extends Routable {
                         array.getJsonObject(i).getBoolean("WasFirst")));
                 array.getJsonObject(i).put("WasCinema", getCinema(
                         array.getJsonObject(i).getBoolean("WasCinema")));
-                array.getJsonObject(i).put("DayOfWeek", toCapital(getWeekdayFromDB(array.getJsonObject(i)
-                        .getString("Start")).substring(0, 3)));
+                array.getJsonObject(i).put("DayOfWeek", getWeekdayFromDB(array.getJsonObject(i)
+                        .getString("Start")));
                 array.getJsonObject(i).put("Time", toNormalTime(array.getJsonObject(i).getString("Start")));
                 array.getJsonObject(i).put("Start", getNormalDTFromDB(
                         array.getJsonObject(i).getString("Start"), LONG_DATE));

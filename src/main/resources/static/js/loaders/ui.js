@@ -52,3 +52,9 @@ function getCookie(name) {
     var parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
+
+function getMonth(start, lang) {
+    var startArray = start.split(' ');
+    var month = startArray[1];
+    return startArray[0] +  lang[month.toUpperCase()] + ' ' + startArray[2];
+}

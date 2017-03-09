@@ -20,9 +20,9 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                             $("#viewsTitle").empty();
                             $("#table").empty().append(
                                 '<tr>' +
-                                '<th class="table-row">{{i18n "HISTORY_TITLE" locale=lang}}</th>' +
-                                '<th>{{i18n "HISTORY_DATE" locale=lang}}</th>' +
-                                '<th>{{i18n "HISTORY_TIME" locale=lang}}</th>' +
+                                '<th class="table-row">' + lang.HISTORY_TITLE + '</th>' +
+                                '<th>' + lang.HISTORY_DATE + '</th>' +
+                                '<th>' + lang.HISTORY_TIME + '</th>' +
                                 '<th></th>' +
                                 '<th></th>' +
                                 '<th></th>' +
@@ -31,9 +31,9 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                 $("#table").append(
                                     $.parseHTML('<tr>' +
                                         '<td class="table-row">' + data[i].Title + '</td>' +
-                                        '<td>' + getMonth(data[i].Start) + '</td>' +
+                                        '<td>' + getMonth(data[i].Start, lang) + '</td>' +
                                         '<td>' + data[i].Time + '</td>' +
-                                        '<td>' + data[i].DayOfWeek + '</td>' +
+                                        '<td>' + lang[data[i].DayOfWeek] + '</td>' +
                                         '<td class="center"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
                                         '<td class="center"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
                                         '</tr>')
@@ -44,7 +44,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                             $("#viewsTitle").empty().append(
                                 '<div class="card z-depth-0">' +
                                 '<div class="card-title">' +
-                                '<a class="light grey-text text-lighten-1 not-found">{{i18n "HISTORY_NOT_PRESENT" locale=lang}}</a>' +
+                                '<a class="light grey-text text-lighten-1 not-found">' + lang.HISTORY_NOT_PRESENT + '</a>' +
                                 '</div>' +
                                 '</div>'
                             );
@@ -55,23 +55,3 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
 
     };
 });
-
-/*
-var getMonth = function (start) {
-    var startArray = start.split(' ');
-    var month = startArray[1];
-    switch (month) {
-        case 'January':return startArray[0] + "{{i18n "JANUARY" locale=lang}}" + ' ' +  startArray[2];
-        case 'February':return startArray[0] + "{{i18n "FEBRUARY" locale=lang}}" + ' ' +  startArray[2];
-        case 'March':return startArray[0] + "{{i18n "MARCH" locale=lang}}" + ' ' +  startArray[2];
-        case 'April':return startArray[0] + "{{i18n "APRIL" locale=lang}}" + ' ' +  startArray[2];
-        case 'May':return startArray[0] + "{{i18n "MAY" locale=lang}}" + ' ' +  startArray[2];
-        case 'June':return startArray[0] + "{{i18n "JUNE" locale=lang}}" + ' ' +  startArray[2];
-        case 'July':return startArray[0] + "{{i18n "JULY" locale=lang}}" + ' ' +  startArray[2];
-        case 'August':return startArray[0] + "{{i18n "AUGUST" locale=lang}}" + ' ' +  startArray[2];
-        case 'September':return startArray[0] + "{{i18n "SEPTEMBER" locale=lang}}" + ' ' +  startArray[2];
-        case 'October':return startArray[0] + "{{i18n "OCTOBER" locale=lang}}" + ' ' +  startArray[2];
-        case 'November':return startArray[0] + "{{i18n "NOVEMBER" locale=lang}}" + ' ' +  startArray[2];
-        case 'December':return startArray[0] + "{{i18n "DECEMBER" locale=lang}}" + ' ' +  startArray[2];
-    }
-}*/
