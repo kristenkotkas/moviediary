@@ -105,7 +105,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
 
     Future<JsonObject> getAllUsers();
 
-    Future<JsonObject> getViews(String username, String param);
+    Future<JsonObject> getViews(String username, String param, int page);
 
     Future<JsonObject> getMovieViews(String username, String param);
 

@@ -53,7 +53,15 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
-        listen(DATABASE_GET_HISTORY, reply(database::getViews, (user, json) -> {
+
+
+        listen(DATABASE_GET_HISTORY, reply((BiFunction<String, String, Future<JsonObject>>) new BiFunction<String, String, Future<JsonObject>>() {
+            @Override
+            public Future<JsonObject> apply(String username, String param) {
+                System.out.println("PARAM: " + param);
+                return database.getViews(username, param, new JsonObject(param).getInteger("page"));
+            }
+        }, (user, json) -> {
             json.remove("results");
             JsonArray array = json.getJsonArray("rows");
             for (int i = 0; i < array.size(); i++) {
@@ -69,6 +77,8 @@ public class EventBusRouter extends Routable {
             }
             return json;
         }));
+
+
         listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, (user, json) -> {

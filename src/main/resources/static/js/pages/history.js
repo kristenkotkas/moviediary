@@ -11,7 +11,8 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                         'is-first': $("#seenFirst").is(':checked'),
                         'is-cinema': $("#wasCinema").is(':checked'),
                         'start': $("#startingDay").pickadate('picker').get(),
-                        'end': $("#endDay").pickadate('picker').get()
+                        'end': $("#endDay").pickadate('picker').get(),
+                        'page': 0
                     }, function (error, reply) {
                         console.log(reply);
                         var data = reply.body['rows'];
@@ -27,18 +28,40 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                 '<th class="hide-on-small-only"></th>' +
                                 '<th class="hide-on-small-only"></th>' +
                                 '</tr>');
-                            $.each(data, function (i) {
-                                $("#table").append(
-                                    $.parseHTML('<tr>' +
-                                        '<td class="table-row">' + data[i].Title + '</td>' +
-                                        '<td>' + getMonth(data[i].Start, lang) + '</td>' +
-                                        '<td>' + data[i].Time + '</td>' +
-                                        '<td class="hide-on-med-and-down">' + lang[data[i].DayOfWeek] + '</td>' +
-                                        '<td class="center hide-on-small-only"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
-                                        '<td class="center hide-on-small-only"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
-                                        '</tr>')
-                                );
-                            });
+
+                            addHistory(data, lang);
+
+                            if (data.length == 10) {
+                                $("#load-more-holder").empty().append(
+                                    $.parseHTML(
+                                        '<tr>' +
+                                        '<td></td>' +
+                                        '<td id="load-more" class="add-hand">Load more...</td>' +
+                                        '</tr>'
+                                    )
+                                ).show();
+                            }
+
+                            var i = 0;
+
+                            $("#load-more").click(function () {
+                                eventbus.send("database_get_history",
+                                    {
+                                        'is-first': $("#seenFirst").is(':checked'),
+                                        'is-cinema': $("#wasCinema").is(':checked'),
+                                        'start': $("#startingDay").pickadate('picker').get(),
+                                        'end': $("#endDay").pickadate('picker').get(),
+                                        'page': ++i
+                                    }, function (error, reply) {
+                                        var addData = reply.body['rows'];
+                                        console.log(addData.length);
+                                        if (addData.length == 0 || addData.length < 10) {
+                                            $("#load-more-holder").hide();
+                                        }
+                                        addHistory(addData, lang);
+                                    });
+                            })
+
                         } else {
                             $("#table").empty();
                             $("#viewsTitle").empty().append(
@@ -55,3 +78,18 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
 
     };
 });
+
+function addHistory(data, lang) {
+    $.each(data, function (i) {
+        $("#table").append(
+            $.parseHTML('<tr>' +
+                '<td class="table-row">' + data[i].Title + '</td>' +
+                '<td>' + getMonth(data[i].Start, lang) + '</td>' +
+                '<td>' + data[i].Time + '</td>' +
+                '<td class="hide-on-med-and-down">' + lang[data[i].DayOfWeek] + '</td>' +
+                '<td class="center hide-on-small-only"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
+                '<td class="center hide-on-small-only"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
+                '</tr>')
+        );
+    });
+}

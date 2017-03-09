@@ -21,6 +21,7 @@ var searchMovie = function (eventbus, movieId, lang) {
                 '<img src="' + posterPath + '" width="100%" alt="Poster">'
             )
         );
+
         var backgroundPath = "";
         if (data.backdrop_path === null) {
             backgroundPath = "";

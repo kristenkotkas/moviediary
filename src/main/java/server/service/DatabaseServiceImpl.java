@@ -55,7 +55,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Start, WasCinema From Views" +
-            " WHERE Username = ? AND MovieId = ?" +
+                    " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
 
     private final JDBCClient client;
@@ -189,7 +189,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<JsonObject> getViews(String username, String param) {
+    public Future<JsonObject> getViews(String username, String param, int page) {
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
@@ -203,7 +203,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         if (json.getBoolean("is-cinema")) {
             SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
         }
-        SQL_QUERY_VIEWS_TEMP += " ORDER BY Start DESC";
+        SQL_QUERY_VIEWS_TEMP += " ORDER BY Start DESC LIMIT ?, ?";
 
         System.out.println("QUERY:" + SQL_QUERY_VIEWS);
 
@@ -215,7 +215,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
                                     .add(username)
                                     .add(json.getString("start"))
-                                    .add(json.getString("end")),
+                                    .add(json.getString("end"))
+                                    .add(page * 10)
+                                    .add(10),
                             resultSetHandler(conn, CACHE_VIEWS + username, future))));
         }
         return future;
@@ -228,8 +230,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         if (!tryCachedResult(false, cache, future)) {
             client.getConnection(connHandler(future,
                     conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
-                    .add(username)
-                    .add(param),
+                                    .add(username)
+                                    .add(param),
                             resultSetHandler(conn, CACHE_VIEWS + username + param, future))));
         }
         return future;
