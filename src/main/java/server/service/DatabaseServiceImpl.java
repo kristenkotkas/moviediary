@@ -44,7 +44,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
             "SELECT Title, Start, WasFirst, WasCinema " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
-                    "WHERE Username = ? AND Start >= ? AND End <= ?";
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
 
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
 
@@ -55,7 +55,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Start, WasCinema From Views" +
-            " WHERE Username = ? AND MovieId = ?";
+            " WHERE Username = ? AND MovieId = ?" +
+                    " ORDER BY Start DESC";
 
     private final JDBCClient client;
 
@@ -222,10 +223,6 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     @Override
     public Future<JsonObject> getMovieViews(String username, String param) {
-        System.out.println("---------------------------------------------");
-        System.out.println("USERNAME: " + username);
-        System.out.println("PARAM: " + param);
-        System.out.println("---------------------------------------------");
         Future<JsonObject> future = Future.future();
         CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username + param);
         if (!tryCachedResult(false, cache, future)) {

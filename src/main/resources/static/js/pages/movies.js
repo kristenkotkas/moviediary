@@ -54,9 +54,10 @@ var getMovieViews = function (eventbus, movieId) {
         console.log(data);
         if (data.length > 0) {
             if (data.length > 1) {
-                $('#seen-header').empty().append('You have seen this ' + data.length + ' times');
+                $('#seen-header').empty().append('{{i18n "MOVIES_JS_SEEN_THIS" locale=lang}} ' + data.length +
+                    ' {{i18n "MOVIES_JS_SEEN_TIMES" locale=lang}}');
             } else {
-                $('#seen-header').empty().append('You have seen this 1 time');
+                $('#seen-header').empty().append('{{i18n "MOVIES_JS_SEEN_ONCE" locale=lang}}');
             }
             $.each(data, function (i) {
                 $('#movie-views-table').append(
@@ -69,20 +70,20 @@ var getMovieViews = function (eventbus, movieId) {
                 );
             });
         } else {
-            $('#seen-header').empty().append('You have not seen this movie yet');
+            $('#seen-header').empty().append('{{i18n "MOVIES_JS_NOT_SEEN" locale=lang}}');
         }
     });
 };
 
 var nullCheck = function (data) {
     if (data == 0 || data.length == 0) {
-        return 'Unknown';
+        return '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}';
     } else return data;
 };
 
 var toNormalRuntime = function (runtime) {
-    if (runtime == 'Unknown') {
-        return 'Unknown';
+    if (runtime == '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}') {
+        return '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}';
     } else {
         var hour = ~~(runtime / 60);
         var min = runtime - 60 * hour;
@@ -91,12 +92,12 @@ var toNormalRuntime = function (runtime) {
 };
 
 var getStringFormArray = function (jsonArray) {
-    if (jsonArray == 'Unknown') {
-        return 'Unknown';
+    if (jsonArray == '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}') {
+        return '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}';
     } else {
         console.log(jsonArray);
         if (jsonArray.length === 0) {
-            return 'Unknown';
+            return '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}';
         }
         var result = "";
 
@@ -111,13 +112,13 @@ var getStringFormArray = function (jsonArray) {
 };
 
 var toNormalRevenue = function (revenue) {
-    if (revenue === 'Unknown') {
-        return 'Unknown';
+    if (revenue === '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}') {
+        return '{{i18n "MOVIES_JS_UNKNOWN" locale=lang}}';
     } else return revenue.toLocaleString() + ' $';
 };
 
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
-    var eventbus = new EventBus("/eventbus");
+    var eventbus = new EventBus("{{eventbusUrl}}");
     eventbus.onopen = function () {
         $("#search").keyup(function (e) {
             if (e.keyCode == 13) {
@@ -163,12 +164,13 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     $.parseHTML(
                                         '<li class="collection-item">' +
                                         '<div class="row">' +
-                                        '<h5>No movies found</h5>' +
+                                        '<h5>{{i18n "MOVIES_JS_NO_MOVIES" locale=lang}}</h5>' +
                                         '</div>' +
                                         '</li>'
                                     )
                                 ).show();
                             }
+
                             $("#movie-poster-card").empty();
                         });
                     }, 205);
