@@ -75,6 +75,13 @@ var getMovieViews = function (eventbus, movieId, lang) {
     });
 };
 
+var getNormalDate = function (date) {
+    var dateFormat = new Date(date),
+        locale = "en-us";
+    var month = dateFormat.toLocaleString(locale, {month: "long"});
+    console.log(month);
+};
+
 var nullCheck = function (data, lang) {
     if (data == 0 || data.length == 0) {
         return lang.MOVIES_JS_UNKNOWN;
@@ -178,7 +185,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
 
                                 $("#movie-poster-card").empty();
                             });
-                        }, 205);
+                        }, 405);
 
                 }
             });
