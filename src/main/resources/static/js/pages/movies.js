@@ -31,8 +31,8 @@ var searchMovie = function (eventbus, movieId, lang) {
         getMovieViews(eventbus, movieId, lang);
 
         $("#body").attr("background", backgroundPath);
-        $('#year').empty().append(nullCheck(data.release_date).split('-')[0]);
-        $('#release').empty().append(nullCheck(data.release_date));
+        $('#year').empty().append(nullCheck(data.release_date, lang).split('-')[0]);
+        $('#release').empty().append(nullCheck(data.release_date, lang));
         $('#runtime').empty().append(toNormalRuntime(nullCheck(data.runtime, lang), lang));
 
         $('#language').empty().append(getStringFormArray(nullCheck(data.spoken_languages, lang), lang));
