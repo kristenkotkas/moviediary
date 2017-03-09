@@ -28,7 +28,6 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String DB_PASSWORD = "Password";
     String DB_SALT = "Salt";
     String DB_RUNTIME_TYPE = "RuntimeType";
-    String DB_LANGUAGE = "Language";
     String DB_VERIFIED = "Verified";
 
     String COLUMNS = "columnNames";
@@ -185,7 +184,6 @@ public interface DatabaseService extends CachingService<JsonObject> {
         PASSWORD("Password"),
         SALT("Salt"),
         RUNTIMETYPE("RuntimeType"),
-        LANGUAGE("Language"),
         VERIFIED("Verified");
 
         private final String columnName;
