@@ -34,6 +34,7 @@ import static server.util.StringUtils.*;
 public class EventBusRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(EventBusRouter.class);
     public static final String EVENTBUS_ALL = "/eventbus/*";
+    public static final String EVENTBUS = "/eventbus";
 
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
@@ -51,12 +52,7 @@ public class EventBusRouter extends Routable {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
 
-        listen(DATABASE_USERS_SIZE, reply(new BiFunction<String, String, Future<JsonObject>>() {
-            @Override
-            public Future<JsonObject> apply(String user, String param) {
-                return database.getAllUsers();
-            }
-        }, (user, json) -> json.size()));
+        listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
 
 
         listen(DATABASE_GET_HISTORY, reply(database::getViews, (user, json) -> {
