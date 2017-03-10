@@ -6,14 +6,15 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import server.entity.Status;
 import server.service.BankLinkService;
 
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.Base64;
 
 import static server.entity.Status.badRequest;
-import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.getDerPrivateKey;
@@ -91,7 +92,8 @@ public class BankLinkRouter extends Routable {
                     instance.update((toBeSigned).getBytes());
                     String vk_mac = "";
                     byte[] signature = instance.sign();
-                    vk_mac = Base64.getEncoder().encode(signature).toString();
+                    //vk_mac = Base64.getEncoder().encode(signature).toString();
+                    vk_mac = new String(Base64.getEncoder().encode(signature), StandardCharsets.UTF_8);
                     System.out.println(vk_mac);
 
                     String params =
@@ -112,18 +114,20 @@ public class BankLinkRouter extends Routable {
                                     "&VK_ENCODING=" + vk_encoding +
                                     "&VK_MAC=" + vk_mac;
 
-                    bankLink.createPayment(params);
-                    redirect(ctx, API_CREATE_PAYMENT);
-                }
-                catch (Exception e){
+                    bankLink.createPayment(params).setHandler(ar -> {
+                        if (ar.succeeded()) {
+                            ctx.response().setStatusCode(200).end(ar.result());
+                        } else {
+                            Status.serviceUnavailable(ctx, new Throwable("BankLink createPayment failed"));
+                        }
+                    });
+                } catch (Exception e){
                     e.printStackTrace();
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void handleApiGetPayments(RoutingContext ctx) { // handleb kõikide makselahenduste json päringut /payments/: -> localhost:8083/api/project

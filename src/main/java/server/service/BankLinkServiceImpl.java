@@ -90,7 +90,7 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
     private void handleResponse(HttpClientResponse response, Future<String> future){
         if (response.statusCode() == OK){
-            response.bodyHandler(body -> future.complete());
+            response.bodyHandler(body -> future.complete(body.toString()));
         } else {
             future.fail("API returned code: " + response.statusCode() +
                     "; message: " + response.statusMessage());

@@ -17,6 +17,7 @@ import server.entity.TriFunction;
 import server.service.DatabaseService;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.pac4j.core.exception.HttpAction.redirect;
@@ -49,7 +50,8 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         }
         SyncResult<JsonObject> result = new SyncResult<>();
         result.executeAsync(() -> database.getAllUsers().setHandler(ar -> result.setReady(ar.result())));
-        return ProfileAuthorizer.isAuthorized(database, profile, getRows(result.await().get(new JsonObj())));
+        return ProfileAuthorizer.isAuthorized(database, profile,
+                getRows(result.await(5, TimeUnit.SECONDS).get(new JsonObj())));
     }
 
     @Override
