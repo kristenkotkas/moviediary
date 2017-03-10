@@ -8,15 +8,15 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.service.BankLinkService;
 
-import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
 import java.security.Signature;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 import static server.entity.Status.badRequest;
+import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.util.CommonUtils.contains;
-import static server.util.CommonUtils.getPemPrivateKey;
+import static server.util.CommonUtils.getDerPrivateKey;
 import static server.util.HandlerUtils.*;
 
 public class BankLinkRouter extends Routable {
@@ -26,8 +26,8 @@ public class BankLinkRouter extends Routable {
     private static final String API_GET_PAYMENTSOLUTION = "/api/solutions/:solutionId";
 
     private static final String BANK_TYPE = "ipizza";
-    private static final String RETURN_URL = ""; //TODO 23.02: define url where to return after payment completion
-    private static final String CANCEL_URL = ""; //TODO 23.02: define url where to return after payment cancellation
+    private static final String RETURN_URL = "http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=success"; //TODO 23.02: define url where to return after payment completion
+    private static final String CANCEL_URL = "http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=cancel"; //TODO 23.02: define url where to return after payment cancellation
 
     private final BankLinkService bankLink;
 
@@ -47,60 +47,76 @@ public class BankLinkRouter extends Routable {
     private void handleApiCreatePayment(RoutingContext ctx){
         String vk_service = "1011"; // default=1011
         String vk_version = "008"; // default=008
-        String vk_snd_id = ""; // kliendi tunnuskood pangale edastamiseks kujul uid100023
-        String vk_stamp = ""; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
-        String vk_amount = ctx.getBodyAsJson().getString("amount"); // Makse summa
+        String vk_snd_id = "uid100039"; // kliendi tunnuskood pangale edastamiseks kujul uid100023
+        String vk_stamp = "12345"; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
+        String vk_amount = "150"; // Makse summa
         String vk_curr = "EUR"; // Makse valuuta
-        String vk_acc = ctx.getBodyAsJson().getString("account_nr"); // Saaja konto nr
-        String vk_name = ""; // Maksja nimi
-        String vk_ref = ""; // Viitenumber
+        String vk_acc = "123456789"; // Saaja konto nr
+        String vk_name = "alar"; // Saaja nimi
+        String vk_ref = "1234561"; // Viitenumber
         String vk_lang = "EST"; //tehingu keel
-        String vk_msg = ctx.getBodyAsJson().getString("product"); // Toode/makse kirjeldus
+        String vk_msg = "Torso Tiger"; // Toode/makse kirjeldus
         String vk_return = RETURN_URL;
         String vk_cancel = CANCEL_URL;
-        String vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String vk_datetime = "2017-03-09T14:19:37+0200";//ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         String vk_encoding = "utf-8";
 
-        String toBeSigned = "004" + vk_service + vk_version + vk_snd_id + vk_stamp + vk_amount +
-                vk_curr + vk_acc + vk_name + vk_ref + vk_lang + vk_msg + vk_return + vk_cancel +
-                vk_datetime;
 
+        String toBeSigned = String.format("%03d", vk_service.length()) + vk_service +
+                String.format("%03d", vk_version.length()) + vk_version +
+                String.format("%03d", vk_snd_id.length()) + vk_snd_id +
+                String.format("%03d", vk_stamp.length()) + vk_stamp +
+                String.format("%03d", vk_amount.length()) + vk_amount +
+                String.format("%03d", vk_curr.length()) + vk_curr +
+                String.format("%03d", vk_acc.length()) + vk_acc +
+                String.format("%03d", vk_name.length()) + vk_name +
+                String.format("%03d", vk_ref.length()) + vk_ref +
+                //String.format("%03d", vk_lang.length()) + vk_lang +
+                String.format("%03d", vk_msg.length()) + vk_msg +
+                String.format("%03d", vk_return.length()) + vk_return +
+                String.format("%03d", vk_cancel.length()) + vk_cancel +
+                String.format("%03d", vk_datetime.length()) + vk_datetime;
+
+        System.out.println(toBeSigned);
         try {
-            Signature instance = Signature.getInstance("SHA1withRSA");
-            vertx.fileSystem().readFile("path", result ->{
-                try{
-                    instance.initSign(getPemPrivateKey(result.result().toString(StandardCharsets.UTF_8), "RSA"));
 
+            // Pangalingi poolt genereeritud võti tuleb konverteerida der-formaati, et java seda süüa saaks.
+            // Käsk selleks: openssl pkcs8 -topk8 -inform PEM -outform DER -in /pangalingi_genereeritud_rsavõti.pem/ -out /konverteeritud_rsavõti.der/ -nocrypt
+            Signature instance = Signature.getInstance("SHA1withRSA");
+            vertx.fileSystem().readFile("banklink_private_key.der", result ->{
+                try{
+                    PrivateKey key = getDerPrivateKey(result.result().getBytes(), "RSA");
+                    instance.initSign(key);
+                    instance.update((toBeSigned).getBytes());
+                    String vk_mac = "";
+                    byte[] signature = instance.sign();
+                    vk_mac = Base64.getEncoder().encode(signature).toString();
+
+                    String params =
+                            "VK_SERVICE=" + vk_service+
+                                    "&VK_VERSION=" + vk_version +
+                                    "&VK_SND_ID=" + vk_snd_id +
+                                    "&VK_STAMP=" + vk_stamp +
+                                    "&VK_AMOUNT=" + vk_amount +
+                                    "&VK_CURR=" + vk_curr +
+                                    "&VK_ACC=" + vk_acc +
+                                    "&VK_NAME=" + vk_name +
+                                    "&VK_REF=" + vk_ref +
+                                    "&VK_LANG=" + vk_lang +
+                                    "&VK_MSG=" + vk_msg +
+                                    "&VK_RETURN=" + vk_return +
+                                    "&VK_CANCEL=" + vk_cancel +
+                                    "&VK_DATETIME=" + vk_datetime +
+                                    "&VK_ENCODING=" + vk_encoding +
+                                    "&VK_MAC=" + vk_mac;
+
+                    bankLink.createPayment(params);
+                    redirect(ctx, API_CREATE_PAYMENT);
                 }
                 catch (Exception e){
                     e.printStackTrace();
                 }
             });
-            instance.update((toBeSigned).getBytes());
-            String vk_mac = "";
-            byte[] signature = instance.sign();
-            for (byte b : signature) {
-                vk_mac += b;
-            }
-
-            String params =
-                    "VK_SERVICE=" + vk_service+
-                    "&VK_VERSION=" + vk_version +
-                    "&VK_SND_ID=" + vk_snd_id +
-                    "&VK_STAMP=" + vk_stamp +
-                    "&VK_AMOUNT=" + vk_amount +
-                    "&VK_CURR=" + vk_curr +
-                    "&VK_ACC=" + vk_acc +
-                    "&VK_NAME=" + vk_name +
-                    "&VK_REF=" + vk_ref +
-                    "&VK_MSG=" + vk_msg +
-                    "&VK_RETURN=" + vk_return +
-                    "&VK_CANCEL=" + vk_cancel +
-                    "&VK_DATETIME=" + vk_datetime +
-                    "&VK_ENCODING=" + vk_encoding +
-                    "&VK_MAC=" + vk_mac;
-
-            bankLink.createPayment(params);
 
 
 

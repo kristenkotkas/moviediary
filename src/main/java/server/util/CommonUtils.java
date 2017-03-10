@@ -6,7 +6,6 @@ import io.vertx.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
-import sun.misc.BASE64Decoder;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -39,17 +38,9 @@ public class CommonUtils {
         return new VertxProfileManager(new VertxWebContext(ctx)).get(true).orElse(null);
     }
 
-    public static PrivateKey getPemPrivateKey(String temp, String algorithm) throws Exception {
-
-        String privKeyPEM = temp.replace("-----BEGIN " + algorithm + " PRIVATE KEY-----", "");
-        privKeyPEM = privKeyPEM.replace("-----END " + algorithm + " PRIVATE KEY-----", "");
-        //System.out.println("Private key\n"+privKeyPEM);
-
-        // TODO: 07/03/2017 replace old sun stuff
-        BASE64Decoder b64=new BASE64Decoder();
-        byte[] decoded = b64.decodeBuffer(privKeyPEM);
-
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
+    public static PrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {
+        PKCS8EncodedKeySpec spec =
+                new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance(algorithm);
         return kf.generatePrivate(spec);
     }
