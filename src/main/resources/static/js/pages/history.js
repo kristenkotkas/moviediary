@@ -21,9 +21,9 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                             $("#viewsTitle").empty();
                             $("#table").empty().append(
                                 '<tr>' +
-                                '<th class="table-row">' + lang.HISTORY_TITLE + '</th>' +
-                                '<th>' + lang.HISTORY_DATE + '</th>' +
-                                '<th>' + lang.HISTORY_TIME + '</th>' +
+                                '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
+                                '<th>' + lang['HISTORY_DATE'] + '</th>' +
+                                '<th>' + lang['HISTORY_TIME'] + '</th>' +
                                 '<th class="hide-on-med-and-down"></th>' +
                                 '<th class="hide-on-small-only"></th>' +
                                 '<th class="hide-on-small-only"></th>' +
@@ -36,7 +36,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     $.parseHTML(
                                         '<tr>' +
                                         '<td class="load-more"></td>' +
-                                        '<td id="load-more" class="load-more">Load more...</td>' +
+                                        '<td id="load-more" class="load-more">' + lang['HISTORY_LOAD_MORE'] + '</td>' +
                                         '</tr>'
                                     )
                                 ).show();
@@ -70,7 +70,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                             $("#viewsTitle").empty().append(
                                 '<div class="card z-depth-0">' +
                                 '<div class="card-title">' +
-                                '<a class="light grey-text text-lighten-1 not-found">' + lang.HISTORY_NOT_PRESENT + '</a>' +
+                                '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
                                 '</div>' +
                                 '</div>'
                             );
@@ -86,12 +86,12 @@ function addHistory(data, lang) {
     $.each(data, function (i) {
         $("#table").append(
             $.parseHTML('<tr>' +
-                '<td class="table-row">' + data[i].Title + '</td>' +
-                '<td>' + getMonth(data[i].Start, lang) + '</td>' +
-                '<td>' + data[i].Time + '</td>' +
-                '<td class="hide-on-med-and-down">' + lang[data[i].DayOfWeek] + '</td>' +
-                '<td class="center hide-on-small-only"><i class=' + data[i].WasFirst + ' aria-hidden="true"></i></td>' +
-                '<td class="center hide-on-small-only"><i class=' + data[i].WasCinema + ' aria-hidden="true"></i></td>' +
+                '<td class="table-row">' + data[i]['Title'] + '</td>' +
+                '<td>' + getMonth(data[i]['Start'], lang) + '</td>' +
+                '<td>' + data[i]['Time'] + '</td>' +
+                '<td class="hide-on-med-and-down">' + lang[data[i]['DayOfWeek']] + '</td>' +
+                '<td class="center hide-on-small-only"><i class=' + data[i]['WasFirst'] + ' aria-hidden="true"></i></td>' +
+                '<td class="center hide-on-small-only"><i class=' + data[i]['WasCinema'] + ' aria-hidden="true"></i></td>' +
                 '</tr>')
         );
     });
