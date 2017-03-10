@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
+    <title>{{i18n "NAVBAR_DONATE" locale=lang}}</title>
+    <link href="/static/css/custom/loader.css" type="text/css" rel="stylesheet" media="screen">
+</head>
+<body class="blue lighten-5">
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+{{> templates/navbar.hbs}}
+
+<h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_DONATE" locale=lang}}</h3>
+<script type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+</body>
+</html>

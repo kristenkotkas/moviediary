@@ -21,7 +21,7 @@ import static server.util.HandlerUtils.*;
 
 public class BankLinkRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(BankLinkRouter.class);
-    private static final String API_CREATE_PAYMENT = "/api/solutions/pay";
+    private static final String API_CREATE_PAYMENT = "/api/donate";
     private static final String API_GET_PAYMENTSOLUTIONS = "/api/solutions";
     private static final String API_GET_PAYMENTSOLUTION = "/api/solutions/:solutionId";
 
@@ -47,7 +47,7 @@ public class BankLinkRouter extends Routable {
     private void handleApiCreatePayment(RoutingContext ctx){
         String vk_service = "1011"; // default=1011
         String vk_version = "008"; // default=008
-        String vk_snd_id = "uid100039"; // kliendi tunnuskood pangale edastamiseks kujul uid100023
+        String vk_snd_id = "uid100036"; // kliendi tunnuskood pangale edastamiseks kujul uid100023
         String vk_stamp = "12345"; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
         String vk_amount = "150"; // Makse summa
         String vk_curr = "EUR"; // Makse valuuta
@@ -58,8 +58,9 @@ public class BankLinkRouter extends Routable {
         String vk_msg = "Torso Tiger"; // Toode/makse kirjeldus
         String vk_return = RETURN_URL;
         String vk_cancel = CANCEL_URL;
-        String vk_datetime = "2017-03-09T14:19:37+0200";//ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         String vk_encoding = "utf-8";
+        String vk_datetime = "2017-03-09T14:19:37+0200";//ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+
 
 
         String toBeSigned = String.format("%03d", vk_service.length()) + vk_service +
@@ -91,6 +92,7 @@ public class BankLinkRouter extends Routable {
                     String vk_mac = "";
                     byte[] signature = instance.sign();
                     vk_mac = Base64.getEncoder().encode(signature).toString();
+                    System.out.println(vk_mac);
 
                     String params =
                             "VK_SERVICE=" + vk_service+
@@ -103,7 +105,7 @@ public class BankLinkRouter extends Routable {
                                     "&VK_NAME=" + vk_name +
                                     "&VK_REF=" + vk_ref +
                                     "&VK_LANG=" + vk_lang +
-                                    "&VK_MSG=" + vk_msg +
+                                    "&VK_MSG=" + "Torso+Tiger" +
                                     "&VK_RETURN=" + vk_return +
                                     "&VK_CANCEL=" + vk_cancel +
                                     "&VK_DATETIME=" + vk_datetime +
@@ -117,9 +119,6 @@ public class BankLinkRouter extends Routable {
                     e.printStackTrace();
                 }
             });
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }

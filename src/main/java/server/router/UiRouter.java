@@ -56,6 +56,7 @@ public class UiRouter extends Routable {
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
+    public static final String UI_DONATE = "/donate";
 
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
@@ -68,6 +69,7 @@ public class UiRouter extends Routable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
+    private static final String TEMPL_DONATE = "templates/donate.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -102,6 +104,7 @@ public class UiRouter extends Routable {
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
+        router.get(UI_DONATE).handler(this::handleDonate);
 
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
@@ -136,6 +139,10 @@ public class UiRouter extends Routable {
 
     private void handleWishlist(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
+    }
+
+    private void handleDonate(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_DONATE, DonateTemplate.class), endHandler(ctx));
     }
 
     private void handleLogin(RoutingContext ctx) {
@@ -198,6 +205,7 @@ public class UiRouter extends Routable {
         baseTemplate.setHistoryPage(UI_HISTORY);
         baseTemplate.setStatisticsPage(UI_STATISTICS);
         baseTemplate.setWishlistPage(UI_WISHLIST);
+        baseTemplate.setDonatePage(UI_DONATE);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
             baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
