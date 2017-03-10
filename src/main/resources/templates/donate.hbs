@@ -14,8 +14,82 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navbar.hbs}}
-
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_DONATE" locale=lang}}</h3>
+<form method="post" action="http://localhost:8081/api/donate">
+    <table>
+        <tbody><tr>
+            <td><strong><code>VK_SERVICE</code></strong></td>
+            <td><code>1011</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_VERSION</code></strong></td>
+            <td><code>008</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_SND_ID</code></strong></td>
+            <td><code>uid100036</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_STAMP</code></strong></td>
+            <td><code>12345</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_AMOUNT</code></strong></td>
+            <td><code>150</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_CURR</code></strong></td>
+            <td><code>EUR</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_ACC</code></strong></td>
+            <td><code>123456789</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_NAME</code></strong></td>
+            <td><code>alar</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_REF</code></strong></td>
+            <td><code>1234561</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_LANG</code></strong></td>
+            <td><code>EST</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_MSG</code></strong></td>
+            <td><code>Torso Tiger</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_RETURN</code></strong></td>
+            <td><code>http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=success</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_CANCEL</code></strong></td>
+            <td><code>http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=cancel</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_DATETIME</code></strong></td>
+            <td><code>2017-03-09T14:19:37+0200</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_ENCODING</code></strong></td>
+            <td><code>utf-8</code></td>
+        </tr>
+        <tr>
+            <td><strong><code>VK_MAC</code></strong></td>
+            <td><code>eddcr7prEYm1sxxrbDN%2F%2BtsLFov1UIgQHSBuuPImPZT4Z0h41eeKmPz2kV8TYY4pRW4z479mD8LAnxC7%2BlKUtf46P2VhucG76s1Q4TnXceHVBtgbZfNIhPOEsJclU8mv5%2FpwSWq39NKjLYVFpEp4E5Xl3nlSr6F6Vw%2BZTYcfoHw%3D</code></td>
+        </tr>
+
+        <!-- when the user clicks "Edasi panga lehele" form data is sent to the bank -->
+        <tr><td colspan="2"><input type="submit" value="Edasi panga lehele"></td></tr>
+        </tbody>
+    </table>
+
+</form>
+
+
 <script type="text/javascript" src="/static/js/fallback.min.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
 </body>

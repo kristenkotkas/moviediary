@@ -52,11 +52,12 @@ public class UiRouter extends Routable {
     public static final String UI_HISTORY = "/private/history";
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
+    public static final String UI_DONATE = "/private/donate";
     public static final String UI_LOGIN = "/login";
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
-    public static final String UI_DONATE = "/donate";
+
 
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
