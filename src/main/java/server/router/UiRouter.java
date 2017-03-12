@@ -19,8 +19,7 @@ import java.nio.file.Paths;
 import static io.vertx.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
-import static server.entity.Language.LANGUAGE;
-import static server.entity.Language.getString;
+import static server.entity.Language.*;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
@@ -207,7 +206,8 @@ public class UiRouter extends Routable {
      */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
-        baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() : null);
+        baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
+                ENGLISH.getLocale().getLanguage());
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
         baseTemplate.setLoginPage(UI_LOGIN);
         baseTemplate.setUserPage(UI_USER);
