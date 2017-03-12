@@ -34,5 +34,5 @@ public class Launcher {
                 LOG.error(ar.cause());
             }
         });
-    }
+    }/**/
 }
