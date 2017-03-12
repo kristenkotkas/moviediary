@@ -6,7 +6,6 @@
 body {
     background-attachment: fixed;
     background-size: cover;
-    /*-webkit-filter: blur(10px);*/
 
 }
 
@@ -76,7 +75,7 @@ body {
 }
 
 .not-found {
-    margin: 15px 15px 15px 15px;
+    margin: 15px;
     font-size: xx-large;
 }
 
@@ -159,8 +158,8 @@ body {
 
 .scale-transition {
     transition: -webkit-transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3) !important;
-    transition: transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3) !important;
-    transition: transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3), -webkit-transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3) !important;
+    transition: transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3),
+    -webkit-transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3) !important;
 }
 
 .scale-transition.scale-out {
@@ -168,7 +167,6 @@ body {
     transform: scale(0);
     transition: -webkit-transform .4s !important;
     transition: transform .4s !important;
-    transition: transform .4s, -webkit-transform .4s !important;
 }
 
 /* Mobile nav bar button */
@@ -178,34 +176,12 @@ body {
     top: 20px;
 }
 
-/* Logo positions */
-header .brand-logo {
-    height: 52px;
-    width: 52px;
-    margin: 6px 20px 0 20px;
-    padding: 0;
-}
-
 header .brand-logo:hover {
     background-color: transparent;
 }
 
-header .brand-logo img {
-    height: 52px;
-    width: 52px;
-}
-
 /* Mobile mode */
 @media only screen and (max-width: 601px) {
-    /* Logo position */
-    header .brand-logo {
-        margin: 3px 0;
-    }
-
-    header .brand-logo img {
-        height: 48px;
-        width: 48px;
-    }
 
     /* Left side nav bar height */
     ul.side-nav.leftside-navigation {
@@ -224,10 +200,6 @@ header .brand-logo img {
 
 /* Tablet mode */
 @media only screen and (min-width: 500px) and (max-width: 992px) {
-    /* Logo position */
-    header .brand-logo {
-        margin: 3px 0;
-    }
 
     /* Left side nav bar height */
     ul.side-nav.leftside-navigation {
