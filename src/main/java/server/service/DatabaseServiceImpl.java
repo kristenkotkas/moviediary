@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -63,7 +62,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         super(DEFAULT_MAX_CACHE_SIZE);
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
-        vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
+        //vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
     }
 
     /**
