@@ -10,6 +10,18 @@ body {
 
 }
 
+/*.bc-image {
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: contain;
+    min-width: 100%;
+    min-height: 100%;
+    position: absolute;
+    background-size: cover;
+}*/
+
 .opacity-object {
     opacity: 0.95;
 }
@@ -52,6 +64,7 @@ body {
 
 .btn:focus,
 .btn:hover {
+    opacity: 0.6;
     /*background-color: ButtonHighlight !important;*/
 }
 
@@ -77,19 +90,21 @@ body {
     font-weight: bold;
 }
 
-.search-object:hover {
+.search-object:hover,
+.search-object:focus {
     background: #bfc2be;
     cursor: pointer;
     cursor: hand;
 }
 
-.load-more:hover{
-    font-weight: bold;
+.load-more:hover,
+.load-more:focus,
+.search-button:hover {
     cursor: pointer;
     cursor: hand;
 }
 
-.load-more{
+.load-more {
     font-weight: bold;
 }
 
@@ -97,6 +112,7 @@ body {
     vertical-align: middle;
     padding: 0 0 0 0;
 }
+
 .flag {
     border-radius: 50%;
     -webkit-transition: -webkit-transform .8s ease-in-out;
@@ -219,6 +235,13 @@ header .brand-logo img {
     ul.side-nav.leftside-navigation {
         top: 64px !important;
     }
+
+    /* h3 {
+         position: absolute;
+         top: -8px;
+         padding-left: 2%;
+         width: 100%;
+     }*/
 }
 
 /* Nav bar accounts dropdown */
