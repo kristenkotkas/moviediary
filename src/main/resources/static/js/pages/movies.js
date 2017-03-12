@@ -18,7 +18,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(
-                '<img src="' + posterPath + '" width="100%" alt="Poster">'
+                '<img src="' + posterPath + '" width="100%" alt="Poster for movie: ' + data.title + '">'
             )
         );
 
@@ -146,8 +146,6 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         var lang;
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
-            //console.log(lang);
-
 
             $("#search").keyup(function (e) {
                 if (e.keyCode == 13) {
@@ -178,7 +176,8 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     var arrayOfNodes = $.parseHTML(
                                         '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
                                         '<div class="row">' +
-                                        '<img src="' + posterPath + '" alt="" class="search-image" width="10%">' +
+                                        '<img src="' + posterPath + '" alt="Poster for movie: '
+                                         + movie['original_title'] + '" class="search-image" width="10%">' +
                                         '<span class="title search-object-text">' +
                                         movie['original_title'] +
                                         '</span>' +
