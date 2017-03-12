@@ -79,21 +79,8 @@
     position: absolute;
     left: 48%;
     top: 46%;
-    background: url("../images/user-bg-2.jpg") no-repeat center center;
+    /*background: url("../images/user-bg-2.jpg") no-repeat center center;*/
     z-index: 1001;
-}
-
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        -ms-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-        -ms-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
 }
 
 @keyframes spin {
