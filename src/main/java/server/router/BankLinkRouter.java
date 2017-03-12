@@ -22,9 +22,9 @@ import static server.util.HandlerUtils.*;
 
 public class BankLinkRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(BankLinkRouter.class);
-    private static final String API_CREATE_PAYMENT = "/api/donate";
-    private static final String API_GET_PAYMENTSOLUTIONS = "/api/solutions";
-    private static final String API_GET_PAYMENTSOLUTION = "/api/solutions/:solutionId";
+    private static final String API_CREATE_PAYMENT = "/private/api/v1/donate";
+    private static final String API_GET_PAYMENTSOLUTIONS = "/private/v1/api/solutions";
+    private static final String API_GET_PAYMENTSOLUTION = "/private/v1/api/solutions/:solutionId";
 
     private static final String BANK_TYPE = "ipizza";
     private static final String RETURN_URL = "http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=success"; //TODO 23.02: define url where to return after payment completion

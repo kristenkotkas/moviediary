@@ -19,9 +19,9 @@ import server.entity.Language;
 import server.service.DatabaseService;
 import server.service.TmdbService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -36,6 +36,7 @@ public class EventBusRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(EventBusRouter.class);
     public static final String EVENTBUS_ALL = "/eventbus/*";
 
+    //Addresses that are used in eventbus
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
@@ -43,67 +44,93 @@ public class EventBusRouter extends Routable {
     public static final String API_GET_MOVIE = "api_get_movie";
     public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
     public static final String TRANSLATIONS = "translations";
-
     public static final String MESSENGER = "messenger";
 
-    private final Map<String, MessageConsumer> consumers = new ConcurrentHashMap<>();
-    private final Map<String, MessageConsumer> gateways = new ConcurrentHashMap<>();
+    private final Map<String, MessageConsumer> consumers = new HashMap<>();
+    private final Map<String, MessageConsumer> gateways = new HashMap<>();
 
+    /**
+     * Sets up addresses and their responses.
+     */
     public EventBusRouter(Vertx vertx, DatabaseService database, TmdbService tmdb) {
         super(vertx);
         listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
         listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
-
-
-        listen(DATABASE_GET_HISTORY, reply((BiFunction<String, String, Future<JsonObject>>) new BiFunction<String, String, Future<JsonObject>>() {
-            @Override
-            public Future<JsonObject> apply(String username, String param) {
-                System.out.println("PARAM: " + param);
-                return database.getViews(username, param, new JsonObject(param).getInteger("page"));
-            }
-        }, (user, json) -> {
-            json.remove("results");
-            JsonArray array = json.getJsonArray("rows");
-            for (int i = 0; i < array.size(); i++) {
-                array.getJsonObject(i).put("WasFirst", getFirstSeen(
-                        array.getJsonObject(i).getBoolean("WasFirst")));
-                array.getJsonObject(i).put("WasCinema", getCinema(
-                        array.getJsonObject(i).getBoolean("WasCinema")));
-                array.getJsonObject(i).put("DayOfWeek", getWeekdayFromDB(array.getJsonObject(i)
-                        .getString("Start")));
-                array.getJsonObject(i).put("Time", toNormalTime(array.getJsonObject(i).getString("Start")));
-                array.getJsonObject(i).put("Start", getNormalDTFromDB(
-                        array.getJsonObject(i).getString("Start"), LONG_DATE));
-            }
-            return json;
-        }));
-
-
+        listen(DATABASE_GET_HISTORY, reply((username, param) -> database.getViews(username, param,
+                new JsonObject(param).getInteger("page")), getDatabaseHistory()));
         listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
-        listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, (user, json) -> {
-            json.remove("results");
-            JsonArray array = json.getJsonArray("rows");
-            for (int i = 0; i < array.size(); i++) {
-                array.getJsonObject(i).put("WasCinema", getCinema(
-                        array.getJsonObject(i).getBoolean("WasCinema")));
-                array.getJsonObject(i).put("Start", getNormalDTFromDB(
-                        array.getJsonObject(i).getString("Start"), LONG_DATE));
-            }
-            return json;
-        }));
+        listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
         listen(TRANSLATIONS, reply(Language::getJsonTranslations));
         gateway(MESSENGER, log());
     }
 
+    /**
+     * Based on username and JsonObject parameter -> returns database history results.
+     */
+    private BiFunction<String, JsonObject, Object> getDatabaseHistory() {
+        return (user, json) -> {
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject jsonObject = array.getJsonObject(i);
+                jsonObject.put("WasFirst", getFirstSeen(jsonObject.getBoolean("WasFirst")));
+                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
+                jsonObject.put("DayOfWeek", getWeekdayFromDB(jsonObject.getString("Start")));
+                jsonObject.put("Time", toNormalTime(jsonObject.getString("Start")));
+                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
+            }
+            return json;
+        };
+    }
+
+    /**
+     * Based on username and JsonObject parameter -> returns database movie history results.
+     */
+    private BiFunction<String, JsonObject, Object> getDatabaseMovieHistory() {
+        return (user, json) -> {
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject jsonObject = array.getJsonObject(i);
+                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
+                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
+            }
+            return json;
+        };
+    }
+
+    /**
+     * Request-response type of messaging.
+     * Listens on address and replies.
+     * Only inbound messages are allowed (and replies).
+     *
+     * @param address      to listen on
+     * @param replyHandler to call for reply handling
+     */
     private <T> void listen(String address, Handler<Message<T>> replyHandler) {
         consumers.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
+    /**
+     * Request-response type of messaging.
+     * Listens on address and replies.
+     * Both inbound and outbound messages are allowed.
+     *
+     * @param address      to listen on
+     * @param replyHandler to call for reply handling
+     */
     private <T> void gateway(String address, Handler<Message<T>> replyHandler) {
         gateways.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
+    /**
+     * Reply to message.
+     *
+     * @param processor to get some data from some service
+     * @param compiler  to transform service data into usable form
+     * @return replyHandler
+     */
     private <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
                                           BiFunction<String, T, Object> compiler) {
         return msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body())).setHandler(ar -> {
@@ -115,22 +142,16 @@ public class EventBusRouter extends Routable {
         });
     }
 
+    /**
+     * Reply to message.
+     *
+     * @param processor to get some data from some service
+     * @return replyHandler
+     */
     private <T> Handler<Message<T>> reply(Function<String, Future<T>> processor) {
         return msg -> processor.apply(String.valueOf(msg.body())).setHandler(ar -> {
             if (ar.succeeded()) {
                 msg.reply(ar.result());
-            } else {
-                msg.reply("Failure: " + ar.cause().getMessage());
-            }
-        });
-    }
-
-    // publish received reply to everyone registered (listening) on the address
-    private <T> Handler<Message<T>> publish(String address, Function<String, Future<T>> processor,
-                                            Function<T, Object> compiler) {
-        return msg -> processor.apply(String.valueOf(msg.body())).setHandler(ar -> {
-            if (ar.succeeded()) {
-                vertx.eventBus().publish(address, compiler.apply(ar.result()));
             } else {
                 msg.reply("Failure: " + ar.cause().getMessage());
             }
@@ -147,6 +168,11 @@ public class EventBusRouter extends Routable {
                 ", body=" + msg.body() + '}';
     }
 
+    /**
+     * Permits messages to move on eventbus that have been specified in listeners and gateways.
+     * Enables eventbus.
+     * Adds current users username and firstname to message headers.
+     */
     @Override
     public void route(Router router) {
         BridgeOptions options = new BridgeOptions();
@@ -163,7 +189,7 @@ public class EventBusRouter extends Routable {
                         .findAny()
                         .orElse(null);
                 event.setRawMessage(event.getRawMessage()
-                        .put("headers", new JsonObject()
+                        .put("headers", event.getRawMessage().getJsonObject("headers", new JsonObject())
                                 .put("user", profile.getEmail())
                                 .put("name", profile.getFirstName())));
             }
@@ -171,6 +197,9 @@ public class EventBusRouter extends Routable {
         }));
     }
 
+    /**
+     * Unregisters all listener and gateway addresses.
+     */
     @Override
     public void close() throws Exception {
         Stream.of(consumers, gateways)

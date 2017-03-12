@@ -20,6 +20,7 @@ public class FormProfile extends CommonProfile {
         addAttribute(PAC4J_PASSWORD, password);
         SyncResult<JsonObject> result = new SyncResult<>();
         result.executeAsync(() -> database.getUser(email).setHandler(ar -> result.setReady(ar.result())));
+        // TODO: 12/03/2017 timeout + retryable
         getRows(result.await().get()).stream()
                 .map(obj -> (JsonObject) obj)
                 .filter(json -> email.equals(json.getString(DB_USERNAME)))

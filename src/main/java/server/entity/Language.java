@@ -4,6 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
 import java.io.IOException;
@@ -16,8 +17,6 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-import static server.router.AuthRouter.LANGUAGE;
-
 /**
  * Handles getting strings from ResourceBundles.
  */
@@ -27,6 +26,7 @@ public enum Language {
     GERMAN(new Locale.Builder().setLanguage("de").setScript("Latn").setRegion("GR").build());
 
     private static final Logger LOG = LoggerFactory.getLogger(Language.class);
+    public static final String LANGUAGE = "lang";
     private final Locale locale;
     private final ResourceBundle bundle;
 
@@ -44,7 +44,8 @@ public enum Language {
     }
 
     public static String getString(String key, RoutingContext ctx) {
-        return getString(key, (String) ctx.session().data().get(LANGUAGE));
+        Cookie lang = ctx.getCookie(LANGUAGE);
+        return getString(key, lang != null ? lang.getValue() : ENGLISH.getLocale().getLanguage());
     }
 
     public static Future<JsonObject> getJsonTranslations(String lang) {

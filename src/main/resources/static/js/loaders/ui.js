@@ -25,7 +25,6 @@ fallback.load({
     ]
 }, {
     shim: {
-        //base.css requires materialize.css to be loaded before etc...
         base_css: ['materialize_css'],
         Materialize: ['jQuery']
     }
@@ -33,18 +32,18 @@ fallback.load({
 
 // Enables various UI functionality after css and javascript have been loaded.
 fallback.ready(function () {
-    $(".sidebar-collapse").sideNav(); //sidebar
-    $(".datepicker").pickadate({ //calendar
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
+    $(".datepicker").pickadate({ //calendar initialization
         //http://amsul.ca/pickadate.js/date/#options
         selectMonths: true,
         selectYears: 15
     });
-    $('.tooltipped').tooltip({ //tooltips
-        delay: 100,
+    $('.tooltipped').tooltip({ //tooltips initialization
+        delay: 150,
         position: 'top',
         html: true
     });
-    $('body').addClass('loaded'); //loader
+    $('body').addClass('loaded'); //remove loader
 });
 
 function getCookie(name) {

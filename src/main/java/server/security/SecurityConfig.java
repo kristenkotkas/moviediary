@@ -40,6 +40,9 @@ public class SecurityConfig {
     private final Pac4jAuthProvider authProvider = new Pac4jAuthProvider();
     private final Config pac4jConfig;
 
+    /**
+     * Initializes Pac4j security engine with authentication clients and database authorizer.
+     */
     public SecurityConfig(JsonObject config, DatabaseService database) {
         this.pac4jConfig = new Config(getCallback(config), Arrays.stream(values())
                 .map(client -> client.create(config))
@@ -56,6 +59,9 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Defined user authenticators.
+     */
     public enum AuthClient {
         REDIRECT("redirect", RedirectClient.class, (key, secret) -> new RedirectClient()),
         FORM("form", FormClient.class, (key, secret) -> new FormClient()),

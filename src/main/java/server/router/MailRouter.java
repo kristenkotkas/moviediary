@@ -13,9 +13,7 @@ import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.service.MailService.EMAIL;
 import static server.service.MailService.UNIQUE;
-import static server.util.CommonUtils.getProfile;
 import static server.util.CommonUtils.nonNull;
-import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
 
 /**
@@ -23,8 +21,7 @@ import static server.util.HandlerUtils.resultHandler;
  */
 public class MailRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(MailRouter.class);
-    private static final String API_MAIL_SEND = "/private/api/mail/send";
-    public static final String API_MAIL_VERIFY = "/public/api/mail/verify";
+    public static final String API_MAIL_VERIFY = "/public/api/v1/mail/verify";
 
     private final MailService mail;
 
@@ -35,11 +32,12 @@ public class MailRouter extends Routable {
 
     @Override
     public void route(Router router) {
-        // TODO: 3.03.2017 remove? 
-        router.post(API_MAIL_SEND).handler(this::handleMailSend);
         router.get(API_MAIL_VERIFY).handler(this::handleMailVerify);
     }
 
+    /**
+     * Verifies user email and redirects to login page.
+     */
     private void handleMailVerify(RoutingContext ctx) {
         String email = ctx.request().getParam(EMAIL);
         String unique = ctx.request().getParam(UNIQUE);
@@ -47,15 +45,10 @@ public class MailRouter extends Routable {
             badRequest(ctx);
             return;
         }
-        mail.verifyEmail(email, unique).setHandler(resultHandler(ctx,
-                json -> redirect(ctx, UI_LOGIN + verified(ctx))));
+        mail.verifyEmail(email, unique).setHandler(resultHandler(ctx, json -> redirect(ctx, userVerified())));
     }
 
-    private void handleMailSend(RoutingContext ctx) {
-        mail.sendVerificationEmail(ctx, getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, jsonResponse(ctx)));
-    }
-
-    private String verified(RoutingContext ctx) {
-        return "?" + DISPLAY_MESSAGE + "=" + "LOGIN_VERIFIED";
+    public static String userVerified() {
+        return UI_LOGIN + "?" + DISPLAY_MESSAGE + "=" + "LOGIN_VERIFIED";
     }
 }

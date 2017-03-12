@@ -30,18 +30,35 @@ public class ServerVerticle extends AbstractVerticle {
     private List<Routable> routables;
     // TODO: 02/03/2017 pass in services with constructor for testing
 
+    /**
+     * Creates service for interacting with database.
+     * Creates service for interacting with TheMovieDatabase API.
+     * Creates service for interacting with bankLink application.
+     * Creates service for interacting with mail server.
+     * Creates Pac4j security engine configuration.
+     * <p>
+     * Creates authentication for routes.
+     * Creates external API for TheMovieDatabase services.
+     * Creates external API for bankLink services.
+     * Creates Eventbus (aka Websocket for browsers) addresses for various services.
+     * Creates external API for database services.
+     * Creates external API for mail services.
+     * Creates routes for UI rendering.
+     * <p>
+     * Starts the HTTP server.
+     */
     @Override
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx);
         DatabaseService database = DatabaseService.create(vertx, config());
         TmdbService tmdb = TmdbService.create(vertx, config(), database);
-        BankLinkService bls = BankLinkService.create(vertx, config());
+        BankLinkService bankLink = BankLinkService.create(vertx, config());
         MailService mail = MailService.create(vertx, database);
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
         routables = Arrays.asList(
-                new AuthRouter(vertx, database, config(), securityConfig),
+                new AuthRouter(vertx, config(), securityConfig),
                 new TmdbRouter(vertx, tmdb),
-                new BankLinkRouter(vertx, bls),
+                new BankLinkRouter(vertx, bankLink),
                 new EventBusRouter(vertx, database, tmdb),
                 new DatabaseRouter(vertx, config(), database, mail),
                 new MailRouter(vertx, mail),

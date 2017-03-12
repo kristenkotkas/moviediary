@@ -39,8 +39,7 @@ public class CommonUtils {
     }
 
     public static PrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {
-        PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec(keyBytes);
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance(algorithm);
         return kf.generatePrivate(spec);
     }

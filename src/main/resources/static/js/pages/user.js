@@ -1,6 +1,6 @@
 fallback.ready(['jQuery'], function () {
     $.ajax({
-        url: '/private/api/views/count',
+        url: '/private/api/v1/views/count',
         type: 'GET',
         contentType: 'application/json',
         success: function (data) {

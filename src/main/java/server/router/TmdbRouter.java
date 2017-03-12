@@ -15,9 +15,8 @@ import static server.util.HandlerUtils.*;
  */
 public class TmdbRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(TmdbRouter.class);
-
-    private static final String API_TMDB_GET_SEARCH = "/private/search/:movieName";
-    private static final String API_TMDB_GET_MOVIE = "/private/movie/:movieId";
+    private static final String API_TMDB_GET_SEARCH = "/private/api/v1/search/:movieName";
+    private static final String API_TMDB_GET_MOVIE = "/private/api/v1/movie/:movieId";
 
     private final TmdbService tmdb;
 

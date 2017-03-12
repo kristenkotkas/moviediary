@@ -12,7 +12,6 @@ import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import org.pac4j.vertx.handler.impl.*;
 import server.security.SecurityConfig;
-import server.service.DatabaseService;
 
 import static server.router.EventBusRouter.EVENTBUS_ALL;
 import static server.router.UiRouter.UI_HOME;
@@ -27,23 +26,29 @@ import static server.util.NetworkUtils.isServer;
  */
 public class AuthRouter extends Routable {
     private static final Logger LOG = LoggerFactory.getLogger(AuthRouter.class);
+    private static final String XSS_PROTECTION = "xssprotection";
+    private static final String CALLBACK = "/callback";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
-    public static final String LANGUAGE = "lang";
-    private static final String CALLBACK = "/callback";
-    private static final String XSS_PROTECTION = "xssprotection";
 
-    private final DatabaseService database;
     private final JsonObject config;
     private final SecurityConfig securityConfig;
 
-    public AuthRouter(Vertx vertx, DatabaseService database, JsonObject config, SecurityConfig securityConfig) {
+    public AuthRouter(Vertx vertx, JsonObject config, SecurityConfig securityConfig) {
         super(vertx);
-        this.database = database;
         this.config = config;
         this.securityConfig = securityConfig;
     }
 
+    /**
+     * Enables HTML body handling.
+     * Enables cookie handling.
+     * Enables user session handling.
+     * Sets up Pac4j security engine to authenticate users on /private/* and /eventbus/* addresses.
+     * Sets up Pac4j security engine to authorize users against database.
+     * Enables Pac4j indirect client callbacks.
+     * Enables Pac4j user deauthentication.
+     */
     @Override
     public void route(Router router) {
         router.route().handler(BodyHandler.create()
@@ -66,7 +71,7 @@ public class AuthRouter extends Routable {
                         .setMultiProfile(false));
         router.route(CALLBACK).handler(callback);
 
-        router.get(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx,
+        router.route(AUTH_LOGOUT).handler(new ApplicationLogoutHandler(vertx,
                 new ApplicationLogoutHandlerOptions(), securityConfig.getPac4jConfig()));
     }
 

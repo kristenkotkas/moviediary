@@ -43,6 +43,9 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         this.database = database;
     }
 
+    /**
+     * Checks whether Pac4j user profile is authorized.
+     */
     @Override
     protected boolean isProfileAuthorized(WebContext context, CommonProfile profile) throws HttpAction {
         if (profile == null) {
@@ -50,6 +53,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         }
         SyncResult<JsonObject> result = new SyncResult<>();
         result.executeAsync(() -> database.getAllUsers().setHandler(ar -> result.setReady(ar.result())));
+        // TODO: 12/03/2017 retryable
         return ProfileAuthorizer.isAuthorized(database, profile,
                 getRows(result.await(5, TimeUnit.SECONDS).get(new JsonObj())));
     }
@@ -59,12 +63,18 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         return isAnyAuthorized(context, profiles);
     }
 
+    /**
+     * On error user is deauthenticated and redirected to login screen with appropriate message.
+     */
     @Override
     protected boolean handleError(WebContext context) throws HttpAction {
         throw redirect(UNAUTHORIZED, context,
                 addParameter(AUTH_LOGOUT, URL, addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED)));
     }
 
+    /**
+     * Defines authorization methods for different Pac4j profiles.
+     */
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
@@ -79,6 +89,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
                     profile.getFirstName(),
                     profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
             return result.await().get();
+            // TODO: 11/03/2017 timeout + retryable
         }),
 
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
@@ -95,6 +106,9 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
             this.checker = uncheckedCast(checker);
         }
 
+        /**
+         * Checks profile against defined authorizers.
+         */
         public static boolean isAuthorized(DatabaseService database, CommonProfile profile, JsonArray users) {
             for (ProfileAuthorizer authorizer : values()) {
                 if (authorizer.type.isInstance(profile)) {
@@ -104,12 +118,16 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
             return false;
         }
 
+        // TODO: 12/03/2017 ilusamalt
         @SuppressWarnings("unchecked")
         private static <S extends CommonProfile> TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService,
                 Boolean> uncheckedCast(TriFunction<S, Stream<JsonObject>, DatabaseService, Boolean> authChecker) {
             return (TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean>) authChecker;
         }
 
+        /**
+         * Authorization for Facebook and Google profiles.
+         */
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
                 boolean isAuthorized = stream.anyMatch(json -> json.getString(DB_USERNAME).equals(profile.getEmail()));
@@ -127,6 +145,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
                         profile.getFirstName(),
                         profile.getFamilyName()).setHandler(ar -> result.setReady(ar.succeeded())));
                 return result.await().get();
+                // TODO: 11/03/2017 timeout + retryable
             };
         }
     }

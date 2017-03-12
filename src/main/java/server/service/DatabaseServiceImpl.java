@@ -66,6 +66,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
     }
 
+    /**
+     * Inserts a Facebook, Google or IdCard user into database.
+     * Also inserts 3 movie views for demonstration purposes.
+     */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
         Future<JsonObject> future = Future.future();
@@ -101,6 +105,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Inserts a view into views table.
+     */
     private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
         Future<JsonObject> future = Future.future();
         client.getConnection(connHandler(future,
@@ -114,6 +121,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Inserts a movie to movies table.
+     */
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
         Future<JsonObject> future = Future.future();
@@ -124,6 +134,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets settings for a user.
+     */
     @Override
     public Future<JsonObject> getSettings(String username) {
         Future<JsonObject> future = Future.future();
@@ -133,6 +146,13 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Updates data in a table.
+     *
+     * @param table to update data in
+     * @param data map of columns to update and data to be updated
+     * @return future of JsonObject containing update results
+     */
     @Override
     public Future<JsonObject> update(Table table, Map<Column, String> data) {
         Future<JsonObject> future = Future.future();
@@ -151,6 +171,13 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Inserts data to a table.
+     *
+     * @param table to insert data to
+     * @param data map of columns to insert to and data to be inserted
+     * @return future of JsonObject containing insertion results
+     */
     @Override
     public Future<JsonObject> insert(Table table, Map<Column, String> data) {
         Future<JsonObject> future = Future.future();
@@ -165,6 +192,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets data for a single user.
+     */
     @Override
     public Future<JsonObject> getUser(String username) {
         Future<JsonObject> future = Future.future();
@@ -177,6 +207,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets all users.
+     */
     @Override
     public Future<JsonObject> getAllUsers() {
         Future<JsonObject> future = Future.future();
@@ -188,6 +221,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets all movies views for user.
+     */
     @Override
     public Future<JsonObject> getViews(String username, String param, int page) {
         JsonObject json = new JsonObject(param);
@@ -223,6 +259,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets a specific movie views for user.
+     */
     @Override
     public Future<JsonObject> getMovieViews(String username, String param) {
         Future<JsonObject> future = Future.future();
@@ -237,6 +276,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Gets users count in database.
+     */
     @Override
     public Future<String> getUsersCount() {
         Future<String> future = Future.future();
@@ -252,6 +294,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         return future;
     }
 
+    /**
+     * Convenience method for handling failed sql connections.
+     */
     private Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
         return conn -> {
             if (conn.succeeded()) {
@@ -263,6 +308,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         };
     }
 
+    /**
+     * Convenience method for handling sql select commands result.
+     */
     private Handler<AsyncResult<ResultSet>> resultSetHandler(SQLConnection conn, String key,
                                                              Future<JsonObject> future) {
         return ar -> {
@@ -275,6 +323,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
         };
     }
 
+    /**
+     * Convenience method for handling sql update commands result.
+     */
     private Handler<AsyncResult<UpdateResult>> updateResultHandler(SQLConnection conn, Future<JsonObject> future) {
         return ar -> {
             if (ar.succeeded()) {
@@ -287,7 +338,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     /**
-     * Makes a connetion to database and logs if it fails.
+     * Makes a connection to database and logs if it fails.
      */
     private Handler<Long> connectionHeartbeat() {
         return timer -> {

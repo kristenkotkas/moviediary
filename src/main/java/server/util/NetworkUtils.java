@@ -16,8 +16,7 @@ public class NetworkUtils {
     public static final int DEFAULT_PORT = 8081;
     public static final String SSL_HOST = "production_host";
     public static final int MAX_BODY_SIZE = 25 * 1024 * 1024;
-
-    private static int s_isServer = -1;
+    private static int IS_SERVER = -1;
 
     /**
      * Checks if given host is resolved to localhost.
@@ -43,9 +42,9 @@ public class NetworkUtils {
      * @return boolean
      */
     public static boolean isServer(JsonObject config) {
-        if (s_isServer == -1) {
-            s_isServer = isLoopbackInterface(config.getString(SSL_HOST)) ? 1 : 0;
+        if (IS_SERVER == -1) {
+            IS_SERVER = isLoopbackInterface(config.getString(SSL_HOST)) ? 1 : 0;
         }
-        return s_isServer == 1;
+        return IS_SERVER == 1;
     }
 }

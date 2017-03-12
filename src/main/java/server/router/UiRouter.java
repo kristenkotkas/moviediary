@@ -1,10 +1,7 @@
 package server.router;
 
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
@@ -22,10 +19,10 @@ import java.nio.file.Paths;
 import static io.vertx.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
+import static server.entity.Language.LANGUAGE;
 import static server.entity.Language.getString;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
-import static server.router.AuthRouter.LANGUAGE;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.URL;
@@ -35,6 +32,7 @@ import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
+import static server.util.HandlerUtils.endHandler;
 
 /**
  * Contains routes which user interface is handled on.
@@ -58,7 +56,6 @@ public class UiRouter extends Routable {
     public static final String UI_FORM_REGISTER = "/formregister";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
 
-
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
     private static final String TEMPL_MOVIES = "templates/movies.hbs";
@@ -81,16 +78,10 @@ public class UiRouter extends Routable {
         this.securityConfig = securityConfig;
     }
 
-    public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
-        return ar -> {
-            if (ar.succeeded()) {
-                ctx.response().end(ar.result());
-            } else {
-                ctx.fail(ar.cause());
-            }
-        };
-    }
-
+    /**
+     * Enables UI routes.
+     * Enables static files.
+     */
     @Override
     public void route(Router router) {
         router.get(UI_INDEX).handler(this::handleLogin);
@@ -110,14 +101,19 @@ public class UiRouter extends Routable {
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
-                .setIncludeHidden(false));
-        router.route().last().handler(this::handleNotFound);
+                .setIncludeHidden(false)
+                .setDirectoryListing(true));
+        router.get().last().handler(this::handleNotFound);
     }
 
     private void handleUser(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
     }
 
+    /**
+     * Renders home page.
+     * Redirects user to some other page if session contains specified url.
+     */
     private void handleHome(RoutingContext ctx) {
         if (ctx.session().data().containsKey(REDIRECT_URL)) {
             redirect(ctx, (String) ctx.session().data().remove(REDIRECT_URL));
@@ -146,6 +142,11 @@ public class UiRouter extends Routable {
         engine.render(getSafe(ctx, TEMPL_DONATE, DonateTemplate.class), endHandler(ctx));
     }
 
+    /**
+     * Renders login page.
+     * Changes users language if user pressed any of language buttons.
+     * Displays message if one is specified.
+     */
     private void handleLogin(RoutingContext ctx) {
         LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
@@ -195,6 +196,15 @@ public class UiRouter extends Routable {
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
     }
 
+    /**
+     * Gets template from TemplateEngine that is at least instance of BaseTemplate.
+     * Sets parameters to template that are available to all subclasses of BaseTemplate.
+     *
+     * @param ctx to use
+     * @param fileName to load
+     * @param type of template to load
+     * @return template of specified type
+     */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
         S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
         baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() : null);

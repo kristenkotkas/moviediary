@@ -3,6 +3,7 @@ package server.util;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -21,12 +22,18 @@ public class HandlerUtils {
         return requestUri.split(":")[1];
     }
 
+    /**
+     * End response with a JSON string.
+     */
     public static <T> Consumer<T> jsonResponse(RoutingContext ctx) {
         return result -> ctx.response()
                 .putHeader(HttpHeaders.CONTENT_TYPE, CONTENT_JSON)
                 .end(Json.encodePrettily(result));
     }
 
+    /**
+     * A result handler that will call consumer of success and send service unavailable response on failure.
+     */
     public static <T> Handler<AsyncResult<T>> resultHandler(RoutingContext ctx, Consumer<T> success) {
         return ar -> {
             if (ar.succeeded()) {
@@ -50,6 +57,22 @@ public class HandlerUtils {
                 future.complete();
             } else {
                 future.fail(ar.cause());
+            }
+        };
+    }
+
+    /**
+     * Ends the response and sends client the result.
+     *
+     * @param ctx to use
+     * @return this handler
+     */
+    public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
+        return ar -> {
+            if (ar.succeeded()) {
+                ctx.response().end(ar.result());
+            } else {
+                ctx.fail(ar.cause());
             }
         };
     }

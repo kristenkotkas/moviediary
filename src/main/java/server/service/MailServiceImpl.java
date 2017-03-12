@@ -34,6 +34,9 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
         this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
     }
 
+    /**
+     * Sends verification mail to user.
+     */
     @Override
     public Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail) {
         Future<JsonObject> future = Future.future();
@@ -61,6 +64,9 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
         return future;
     }
 
+    /**
+     * Verifies user email based on unique code.
+     */
     @Override
     public Future<JsonObject> verifyEmail(String email, String unique) {
         Future<JsonObject> future = Future.future();
@@ -86,6 +92,9 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
         return future;
     }
 
+    /**
+     * Creates email content that is displayed in users verification email.
+     */
     private String createContent(RoutingContext ctx, String userEmail, String unique) {
         return "<p>" + getString("MAIL_REGISTER_TEXT", ctx) + "</p>" +
                 "<a href=\"https://movies.kyngas.eu" + API_MAIL_VERIFY +
