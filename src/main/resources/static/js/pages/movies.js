@@ -56,7 +56,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
         console.log(data);
         if (data.length > 0) {
             if (data.length > 1) {
-                $('#seen-header').empty().append(lang['MOVIES_JS_SEEN_THIS'] + data.length + lang['MOVIES_JS_SEEN_TIMES']);
+                $('#seen-header').empty().append(lang['MOVIES_JS_SEEN_THIS'] + ' ' + data.length + lang['MOVIES_JS_SEEN_TIMES']);
             } else {
                 $('#seen-header').empty().append(lang['MOVIES_JS_SEEN_ONCE']);
             }
@@ -66,7 +66,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
                         '<tr>' +
                         '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
                         '<td class="grey-text"><i class=' + data[i]['WasCinema'] + 'aria-hidden="true"></i></td>' +
-                        '<tr>'
+                        '</tr>'
                     )
                 );
             });
