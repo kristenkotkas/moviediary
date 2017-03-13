@@ -84,7 +84,6 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                     });
             });
         });
-
     };
 });
 

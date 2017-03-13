@@ -57,6 +57,12 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
 
+    public static final String SQL_INSERT_WISHLIST =
+            "INSERT IGNORE INTO Wishlist (Username, MovieId) VALUES (?, ?)";
+
+    public static final String SQL_IS_IN_WISHLIST =
+            "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -134,6 +140,29 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     /**
+     * Inserts an entry to wishlist table.
+     */
+    @Override
+    public Future<JsonObject> insertWishlist(String username, int movieId) {
+        Future<JsonObject> future = Future.future();
+        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
+                .add(username)
+                .add(movieId), updateResultHandler(conn, future))));
+        return future;
+    }
+
+    @Override
+    public Future<JsonObject> isInWishlist(String username, int movieId) {
+        System.out.println("WISHLIST: " + username + ": " + movieId);
+        Future<JsonObject> future = Future.future();
+        client.getConnection(connHandler(future,
+                conn -> conn.queryWithParams(SQL_IS_IN_WISHLIST, new JsonArray()
+                .add(username)
+                .add(movieId), resultSetHandler(conn, CACHE_WISHLIST + username + movieId, future))));
+        return future;
+    }
+
+    /**
      * Gets settings for a user.
      */
     @Override
@@ -149,7 +178,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      * Updates data in a table.
      *
      * @param table to update data in
-     * @param data map of columns to update and data to be updated
+     * @param data  map of columns to update and data to be updated
      * @return future of JsonObject containing update results
      */
     @Override
@@ -174,7 +203,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      * Inserts data to a table.
      *
      * @param table to insert data to
-     * @param data map of columns to insert to and data to be inserted
+     * @param data  map of columns to insert to and data to be inserted
      * @return future of JsonObject containing insertion results
      */
     @Override

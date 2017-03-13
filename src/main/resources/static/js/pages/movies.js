@@ -47,8 +47,66 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
         $('#add-info-box').removeClass('scale-out').addClass('scale-in');
         $('#movie-poster-card').removeClass('scale-out').addClass('scale-in');
+        $('#add-wishlist').removeClass('scale-out').addClass('scale-in');
+
+        /*if (inWishlist(eventbus, movieId) == true) {
+            console.log("In WISHLIST");
+            movieInWishlist();
+        } else {
+            console.log("NOT IN WISHLIST");
+            movieNotInWishlist();
+        }*/
+
+        //console.log('In wishlist?: ' + inWishlist(eventbus, movieId));
+
+        $("#add-wishlist").click(function () {
+            addToWishlist(eventbus, movieId);
+        });
+
+        $("#add-wishlist").keyup(function (e) {
+            if (e.keyCode == 13) {
+                $("#add-wishlist").click();
+            }
+        });
+
     });
 };
+
+function addToWishlist(eventbus, movieId) {
+    eventbus.send("database_insert_wishlist", movieId, function (error, reply) {
+        console.log(movieId + ' added to wishlist.');
+        //movieInWishlist();
+    });
+}
+
+function movieInWishlist() {
+    $("#add-wishlist").removeClass('add-wishlist');
+    $("#wishlist-text").empty().append(
+        $.parseHTML(
+            '<i class="fa fa-check left" aria-hidden="true"></i>' +
+            "It's in wishlist"
+        )
+    ).removeClass('content-key');
+}
+
+function movieNotInWishlist() {
+    $("#add-wishlist").addClass('add-wishlist');
+    $("#wishlist-text").empty().append(
+        $.parseHTML('Add to wishlist')
+    ).addClass('content-key');
+}
+
+function inWishlist(eventbus, movieId) {
+    eventbus.send("database_get_in_wishlist", movieId, function (error, reply) {
+        console.log('In wishlist: ' + reply.body['rows'].length);
+        //console.log(reply.body['rows'].length != 0);
+        if (reply.body['rows'].length != 0) {
+            movieInWishlist();
+        } else {
+            movieNotInWishlist();
+        }
+    });
+}
 
 var getMovieViews = function (eventbus, movieId, lang) {
     eventbus.send("database_get_movie_history", movieId.toString(), function (error, reply) {
@@ -83,8 +141,8 @@ var getNormalDate = function (date, lang) {
         var startArray = date.split('-');
         var dateFormat = new Date(date),
             locale = "en-us";
-        var month = dateFormat.toLocaleString(locale,{month: "long"});
-        return startArray[2] +  lang[month.toUpperCase()] + ' ' + startArray[0];
+        var month = dateFormat.toLocaleString(locale, {month: "long"});
+        return startArray[2] + lang[month.toUpperCase()] + ' ' + startArray[0];
     }
 };
 
@@ -159,6 +217,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                 $('#seen-times').removeClass('scale-in').addClass('scale-out');
                 $('#add-info-box').removeClass('scale-in').addClass('scale-out');
                 $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
+                $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
                 setTimeout(
                     function () {
                         eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
@@ -177,7 +236,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                         '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
                                         '<div class="row">' +
                                         '<img src="' + posterPath + '" alt="Poster for movie: '
-                                         + movie['original_title'] + '" class="search-image" width="10%">' +
+                                        + movie['original_title'] + '" class="search-image" width="10%">' +
                                         '<span class="title search-object-text">' +
                                         movie['original_title'] +
                                         '</span>' +
@@ -210,7 +269,6 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     )
                                 ).show();
                             }
-
                             $("#movie-poster-card").empty();
                         });
                     }, 405);

@@ -71,9 +71,6 @@ body {
     font-weight: bold;
 }
 
-.custom-card {
-}
-
 .not-found {
     margin: 15px;
     font-size: xx-large;
@@ -87,6 +84,24 @@ body {
     margin-left: 5%;
     font-size: larger;
     font-weight: bold;
+}
+
+.add-wishlist:hover {
+    background: #dbded9;
+    cursor: pointer;
+}
+
+.movie-in-wishlist {
+    background: #21ff6e;
+}
+
+.wishlist-text {
+    color: white;
+}
+
+.hover-text:hover,
+.hover-text:focus {
+    color: white;
 }
 
 .search-object:hover,

@@ -45,6 +45,8 @@ public class EventBusRouter extends Routable {
     public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
     public static final String TRANSLATIONS = "translations";
     public static final String MESSENGER = "messenger";
+    public static final String DATABASE_INSERT_WISHLIST = "database_insert_wishlist";
+    public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
 
     private final Map<String, MessageConsumer> consumers = new HashMap<>();
     private final Map<String, MessageConsumer> gateways = new HashMap<>();
@@ -62,6 +64,13 @@ public class EventBusRouter extends Routable {
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
         listen(TRANSLATIONS, reply(Language::getJsonTranslations));
+
+        listen(DATABASE_INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, Integer.parseInt(param)),
+                (user, json) -> json.size())); // FIXME: 13. märts. 2017 ümber muuta, et poleks reply, kuna seda pole vaja
+
+        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, Integer.parseInt(param)),
+                (user, json) -> json));
+
         gateway(MESSENGER, log());
     }
 

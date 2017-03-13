@@ -21,6 +21,7 @@ public interface DatabaseService extends CachingService<JsonObject> {
     String CACHE_VIEWS = "views_";
     String CACHE_USER = "user_";
     String CACHE_SETTINGS = "settings_";
+    String CACHE_WISHLIST = "wishlist_";
 
     String DB_USERNAME = "Username";
     String DB_FIRSTNAME = "Firstname";
@@ -94,6 +95,10 @@ public interface DatabaseService extends CachingService<JsonObject> {
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
 
     Future<JsonObject> insertMovie(int id, String movieTitle, int year);
+
+    Future<JsonObject> insertWishlist(String username, int movieId);
+
+    Future<JsonObject> isInWishlist(String username, int movieId);
 
     Future<JsonObject> getSettings(String username);
 
