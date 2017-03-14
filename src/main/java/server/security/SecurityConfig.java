@@ -26,7 +26,7 @@ public class SecurityConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     public static final String CLIENT_VERIFIED_STATE = "SSL_CLIENT_VERIFY";
     public static final String CLIENT_CERTIFICATE = "SSL_CLIENT_CERT";
-    public static final String AUTHORIZER = "CommonAuthorizer";
+    public static final String AUTHORIZER = "DatabaseAuthorizer";
 
     public static final String PAC4J_EMAIL = "email";
     public static final String PAC4J_PASSWORD = "password";

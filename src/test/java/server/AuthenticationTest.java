@@ -55,7 +55,7 @@ public class AuthenticationTest {
         Async async = ctx.async();
         client.getNow(PORT, DEFAULT_HOST, API_USERS_ALL, response -> {
             ctx.assertEquals(FOUND, response.statusCode());
-            ctx.assertEquals(URI + "/formlogin", response.getHeader(LOCATION));
+            ctx.assertEquals("/login", response.getHeader(LOCATION));
             client.close();
             async.complete();
         });
@@ -68,8 +68,10 @@ public class AuthenticationTest {
         client.getNow(PORT, DEFAULT_HOST, UI_FORM_LOGIN, response -> {
             ctx.assertEquals(OK, response.statusCode());
             response.bodyHandler(body -> {
-                // TODO: 02/03/2017 allow callback port changing
-                ctx.assertTrue(body.toString(UTF_8).contains("http://localhost:8081/callback?client_name=FormClient"));
+                String b = body.toString(UTF_8);
+                System.out.println(b);
+                ctx.assertTrue(b.contains("<!DOCTYPE html>"));
+                ctx.assertTrue(b.contains("Form Login"));
                 client.close();
                 async.complete();
             });

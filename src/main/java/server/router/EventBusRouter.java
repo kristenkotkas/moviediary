@@ -65,9 +65,7 @@ public class EventBusRouter extends Routable {
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
         listen(TRANSLATIONS, reply(Language::getJsonTranslations));
 
-        listen(DATABASE_INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, Integer.parseInt(param)),
-                (user, json) -> json.size())); // FIXME: 13. märts. 2017 ümber muuta, et poleks reply, kuna seda pole vaja
-
+        listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, Integer.parseInt(param)));
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, Integer.parseInt(param)),
                 (user, json) -> json));
 
@@ -119,6 +117,16 @@ public class EventBusRouter extends Routable {
      */
     private <T> void listen(String address, Handler<Message<T>> replyHandler) {
         consumers.put(address, vertx.eventBus().consumer(address, replyHandler));
+    }
+
+    /**
+     * Listen for messages on address and processes them.
+     *
+     * @param address to listen on
+     */
+    private <T> void listen(String address, BiFunction<String, String, Future<T>> processor) {
+        consumers.put(address, vertx.eventBus().consumer(address,
+                msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body()))));
     }
 
     /**
