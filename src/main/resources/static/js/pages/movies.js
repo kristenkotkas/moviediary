@@ -47,20 +47,12 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
         $('#add-info-box').removeClass('scale-out').addClass('scale-in');
         $('#movie-poster-card').removeClass('scale-out').addClass('scale-in');
-        $('#add-wishlist').removeClass('scale-out').addClass('scale-in');
+        $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
 
-        /*if (inWishlist(eventbus, movieId) == true) {
-            console.log("In WISHLIST");
-            movieInWishlist();
-        } else {
-            console.log("NOT IN WISHLIST");
-            movieNotInWishlist();
-        }*/
-
-        //console.log('In wishlist?: ' + inWishlist(eventbus, movieId));
+        inWishlist(eventbus, movieId, lang);
 
         $("#add-wishlist").click(function () {
-            addToWishlist(eventbus, movieId);
+            addToWishlist(eventbus, movieId, lang);
         });
 
         $("#add-wishlist").keyup(function (e) {
@@ -68,42 +60,39 @@ var searchMovie = function (eventbus, movieId, lang) {
                 $("#add-wishlist").click();
             }
         });
-
     });
 };
 
-function addToWishlist(eventbus, movieId) {
-    eventbus.send("database_insert_wishlist", movieId, function (error, reply) {
-        console.log(movieId + ' added to wishlist.');
-        //movieInWishlist();
-    });
+function addToWishlist(eventbus, movieId, lang) {
+    eventbus.send("database_insert_wishlist", movieId);
+    console.log(movieId + ' added to wishlist.');
+    decorateInWishlist(lang);
 }
 
-function movieInWishlist() {
+function decorateInWishlist(lang) {
     $("#add-wishlist").removeClass('add-wishlist');
     $("#wishlist-text").empty().append(
         $.parseHTML(
             '<i class="fa fa-check left" aria-hidden="true"></i>' +
-            "It's in wishlist"
+            lang['MOVIES_IN_WISHLIST']
         )
     ).removeClass('content-key');
 }
 
-function movieNotInWishlist() {
+function decorateNotInWIshlist(lang) {
     $("#add-wishlist").addClass('add-wishlist');
     $("#wishlist-text").empty().append(
-        $.parseHTML('Add to wishlist')
+        $.parseHTML(lang['MOVIES_ADD_WISHLIST'])
     ).addClass('content-key');
 }
 
-function inWishlist(eventbus, movieId) {
+function inWishlist(eventbus, movieId, lang) {
     eventbus.send("database_get_in_wishlist", movieId, function (error, reply) {
         console.log('In wishlist: ' + reply.body['rows'].length);
-        //console.log(reply.body['rows'].length != 0);
         if (reply.body['rows'].length != 0) {
-            movieInWishlist();
+            decorateInWishlist(lang);
         } else {
-            movieNotInWishlist();
+            decorateNotInWIshlist(lang);
         }
     });
 }

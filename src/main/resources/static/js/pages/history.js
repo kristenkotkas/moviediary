@@ -6,6 +6,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
             lang = reply.body;
             console.log(lang);
             $("#Search").click(function () {
+                $("#load-more").show();
                 eventbus.send("database_get_history",
                     {
                         'is-first': $("#seenFirst").is(':checked'),
