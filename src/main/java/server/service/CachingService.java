@@ -1,6 +1,9 @@
 package server.service;
 
+import io.vertx.core.Future;
+
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 /**
  * Service which allows caching data as CacheItems for a set period of time.
@@ -38,8 +41,23 @@ public interface CachingService<T> {
             return this;
         }
 
+        public CacheItem<T> invalidate() {
+            timestamp = 0;
+            return this;
+        }
+
         public boolean isUpToDate() {
             return System.currentTimeMillis() - timestamp <= timeout;
+        }
+
+        public Future<T> get(boolean use, BiConsumer<Future<T>, CacheItem<T>> updater) {
+            Future<T> future = Future.future();
+            if (use && isUpToDate()) {
+                future.complete(value);
+            } else {
+                updater.accept(future, this);
+            }
+            return future;
         }
     }
 }

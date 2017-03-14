@@ -1,32 +1,29 @@
 package server.service;
 
-import io.vertx.core.*;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static io.vertx.core.CompositeFuture.all;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
-import static server.service.DatabaseService.createDataMap;
-import static server.util.CommonUtils.contains;
-import static server.util.CommonUtils.nonNull;
-import static server.util.HandlerUtils.futureHandler;
+import static server.service.DatabaseService.*;
+import static server.util.CommonUtils.*;
 import static server.util.StringUtils.*;
 
 /**
  * Database service implementation.
  */
-public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implements DatabaseService {
+public class DatabaseServiceImpl implements DatabaseService {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String MYSQL = "mysql";
 
@@ -66,9 +63,7 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        super(DEFAULT_MAX_CACHE_SIZE);
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
-        //vertx.setPeriodic(MINUTES.toMillis(15), connectionHeartbeat());
     }
 
     /**
@@ -77,53 +72,51 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
-        Future<JsonObject> future = Future.future();
-        if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
-            future.fail(new Throwable("Email, firstname and lastname must exist!"));
-            return future;
-        }
-        String salt = genString();
-        client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                        .add(username)
-                        .add(firstname)
-                        .add(lastname)
-                        .add(hash(password, salt))
-                        .add(salt), ar -> {
-                    if (ar.succeeded()) {
-                        Future<JsonObject> future1 = insertDemoViews(username, 157336, 1, 0);
-                        Future<JsonObject> future2 = insertDemoViews(username, 334541, 1, 1);
-                        Future<JsonObject> future3 = insertDemoViews(username, 334543, 0, 1);
-                        Future<JsonObject> future4 = insert(Table.SETTINGS, createDataMap(username));
-                        CompositeFuture.all(future1, future2, future3, future4).setHandler(result -> {
-                            if (result.succeeded()) {
-                                future.complete(ar.result().toJson());
-                            } else {
-                                future.fail(result.cause());
-                            }
-                        });
-                    } else {
-                        future.fail(ar.cause());
-                    }
-                    conn.close();
-                })));
-        return future;
+        return future(fut -> {
+            if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
+                fut.fail(new Throwable("Email, firstname and lastname must exist!"));
+                return;
+            }
+            String salt = genString();
+            client.getConnection(connHandler(fut,
+                    conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
+                            .add(username)
+                            .add(firstname)
+                            .add(lastname)
+                            .add(hash(password, salt))
+                            .add(salt), ar -> {
+                        if (ar.succeeded()) {
+                            Future<JsonObject> f1 = insertDemoViews(username, 157336, 1, 0);
+                            Future<JsonObject> f2 = insertDemoViews(username, 334541, 1, 1);
+                            Future<JsonObject> f3 = insertDemoViews(username, 334543, 0, 1);
+                            Future<JsonObject> f4 = insert(Table.SETTINGS, createDataMap(username));
+                            all(f1, f2, f3, f4).setHandler(result -> {
+                                if (result.succeeded()) {
+                                    fut.complete(ar.result().toJson());
+                                } else {
+                                    fut.fail(result.cause());
+                                }
+                            });
+                        } else {
+                            fut.fail(ar.cause());
+                        }
+                        conn.close();
+                    })));
+        });
     }
 
     /**
      * Inserts a view into views table.
      */
     private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
-        Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
+        return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
                         .add(username)
                         .add(movieId)
                         .add(LocalDateTime.now().toString())
                         .add(LocalDateTime.now().plusHours(2).toString())
                         .add(wasFirst)
-                        .add(wasCinema), updateResultHandler(conn, future))));
-        return future;
+                        .add(wasCinema), updateHandler(conn, fut)))));
     }
 
     /**
@@ -131,12 +124,11 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
-        Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
-                .add(id)
-                .add(movieTitle)
-                .add(year), updateResultHandler(conn, future))));
-        return future;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
+                        .add(id)
+                        .add(movieTitle)
+                        .add(year), updateHandler(conn, fut)))));
     }
 
     /**
@@ -144,22 +136,19 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> insertWishlist(String username, int movieId) {
-        Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future, conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
-                .add(username)
-                .add(movieId), updateResultHandler(conn, future))));
-        return future;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
+                        .add(username)
+                        .add(movieId), updateHandler(conn, fut)))));
     }
 
     @Override
     public Future<JsonObject> isInWishlist(String username, int movieId) {
         System.out.println("WISHLIST: " + username + ": " + movieId);
-        Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
+        return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_IS_IN_WISHLIST, new JsonArray()
-                .add(username)
-                .add(movieId), resultSetHandler(conn, CACHE_WISHLIST + username + movieId, future))));
-        return future;
+                        .add(username)
+                        .add(movieId), resultHandler(conn, fut)))));
     }
 
     /**
@@ -167,11 +156,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> getSettings(String username) {
-        Future<JsonObject> future = Future.future();
-        client.getConnection(connHandler(future,
+        return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
-                        resultSetHandler(conn, CACHE_SETTINGS + username, future))));
-        return future;
+                        resultHandler(conn, fut)))));
     }
 
     /**
@@ -183,20 +170,20 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> update(Table table, Map<Column, String> data) {
-        Future<JsonObject> future = Future.future();
-        if (data.get(USERNAME) == null) {
-            future.fail("Username required.");
-            return future;
-        }
-        if (data.size() == 1) {
-            future.fail("No columns specified.");
-            return future;
-        }
-        List<Column> columns = getSortedColumns(data);
-        client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
-                        updateResultHandler(conn, future))));
-        return future;
+        return future(fut -> {
+            if (data.get(USERNAME) == null) {
+                fut.fail("Username required.");
+                return;
+            }
+            if (data.size() == 1) {
+                fut.fail("No columns specified.");
+                return;
+            }
+            List<Column> columns = getSortedColumns(data);
+            client.getConnection(connHandler(fut,
+                    conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
+                            updateHandler(conn, fut))));
+        });
     }
 
     /**
@@ -208,16 +195,16 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> insert(Table table, Map<Column, String> data) {
-        Future<JsonObject> future = Future.future();
-        if (data.get(USERNAME) == null) {
-            future.fail("Username required.");
-            return future;
-        }
-        List<Column> columns = getSortedColumns(data);
-        client.getConnection(connHandler(future,
-                conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
-                        updateResultHandler(conn, future))));
-        return future;
+        return future(fut -> {
+            if (data.get(USERNAME) == null) {
+                fut.fail("Username required.");
+                return;
+            }
+            List<Column> columns = getSortedColumns(data);
+            client.getConnection(connHandler(fut,
+                    conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
+                            updateHandler(conn, fut))));
+        });
     }
 
     /**
@@ -225,14 +212,9 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> getUser(String username) {
-        Future<JsonObject> future = Future.future();
-        CacheItem<JsonObject> cache = getCached(CACHE_USER + username);
-        if (!tryCachedResult(false, cache, future)) {
-            client.getConnection(connHandler(future,
-                    conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
-                            resultSetHandler(conn, CACHE_USER + username, future))));
-        }
-        return future;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
+                        resultHandler(conn, fut)))));
     }
 
     /**
@@ -240,13 +222,8 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> getAllUsers() {
-        Future<JsonObject> future = Future.future();
-        CacheItem<JsonObject> cache = getCached(CACHE_ALL);
-        if (!tryCachedResult(false, cache, future)) {
-            client.getConnection(connHandler(future,
-                    conn -> conn.query(SQL_QUERY_USERS, resultSetHandler(conn, CACHE_ALL, future))));
-        }
-        return future;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.query(SQL_QUERY_USERS, resultHandler(conn, fut)))));
     }
 
     /**
@@ -271,20 +248,14 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
 
         System.out.println("QUERY:" + SQL_QUERY_VIEWS);
 
-        Future<JsonObject> future = Future.future();
-        CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username);
-        if (!tryCachedResult(false, cache, future)) {
-            String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
-            client.getConnection(connHandler(future,
-                    conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
-                                    .add(username)
-                                    .add(json.getString("start"))
-                                    .add(json.getString("end"))
-                                    .add(page * 10)
-                                    .add(10),
-                            resultSetHandler(conn, CACHE_VIEWS + username, future))));
-        }
-        return future;
+        String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
+                        .add(username)
+                        .add(json.getString("start"))
+                        .add(json.getString("end"))
+                        .add(page * 10)
+                        .add(10), resultHandler(conn, fut)))));
     }
 
     /**
@@ -292,16 +263,10 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<JsonObject> getMovieViews(String username, String param) {
-        Future<JsonObject> future = Future.future();
-        CacheItem<JsonObject> cache = getCached(CACHE_VIEWS + username + param);
-        if (!tryCachedResult(false, cache, future)) {
-            client.getConnection(connHandler(future,
-                    conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
-                                    .add(username)
-                                    .add(param),
-                            resultSetHandler(conn, CACHE_VIEWS + username + param, future))));
-        }
-        return future;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
+                        .add(username)
+                        .add(param), resultHandler(conn, fut)))));
     }
 
     /**
@@ -309,74 +274,14 @@ public class DatabaseServiceImpl extends CachingServiceImpl<JsonObject> implemen
      */
     @Override
     public Future<String> getUsersCount() {
-        Future<String> future = Future.future();
-        client.getConnection(connHandler(future,
+        return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
                     if (ar.succeeded()) {
-                        future.complete(ar.result().getRows().get(0).getLong("Count").toString());
+                        fut.complete(ar.result().getRows().get(0).getLong("Count").toString());
                     } else {
-                        future.fail(ar.cause());
+                        fut.fail(ar.cause());
                     }
                     conn.close();
-                })));
-        return future;
-    }
-
-    /**
-     * Convenience method for handling failed sql connections.
-     */
-    private Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> {
-            if (conn.succeeded()) {
-                handler.handle(conn.result());
-            } else {
-                future.fail(conn.cause());
-                // TODO: 4.03.2017 failed connection still needs to be closed?
-            }
-        };
-    }
-
-    /**
-     * Convenience method for handling sql select commands result.
-     */
-    private Handler<AsyncResult<ResultSet>> resultSetHandler(SQLConnection conn, String key,
-                                                             Future<JsonObject> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                future.complete(getCached(key).set(ar.result().toJson()));
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        };
-    }
-
-    /**
-     * Convenience method for handling sql update commands result.
-     */
-    private Handler<AsyncResult<UpdateResult>> updateResultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                future.complete(ar.result().toJson());
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        };
-    }
-
-    /**
-     * Makes a connection to database and logs if it fails.
-     */
-    private Handler<Long> connectionHeartbeat() {
-        return timer -> {
-            Future<Void> future = Future.future();
-            client.getConnection(connHandler(future, conn -> conn.query("SELECT version()", futureHandler(future))));
-            future.setHandler(ar -> {
-                if (ar.failed()) {
-                    LOG.error("Connection heartbeat failed: ", ar.cause());
-                }
-            });
-        };
+                }))));
     }
 }

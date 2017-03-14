@@ -10,8 +10,8 @@ import server.verticle.ServerVerticle;
 
 import java.io.IOException;
 
+import static server.util.CommonUtils.setLoggingToSLF4J;
 import static server.util.FileUtils.getConfig;
-import static server.util.VertxUtils.setLoggingToSLF4J;
 
 /**
  * Launches the server.
@@ -34,5 +34,5 @@ public class Launcher {
                 LOG.error(ar.cause());
             }
         });
-    }/**/
+    }
 }

@@ -1,5 +1,6 @@
 package server.util;
 
+import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
@@ -11,6 +12,7 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class CommonUtils {
     private static final Logger LOG = LoggerFactory.getLogger(CommonUtils.class);
@@ -42,5 +44,18 @@ public class CommonUtils {
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance(algorithm);
         return kf.generatePrivate(spec);
+    }
+
+    /**
+     * Changes vertx logging to SLF4J.
+     */
+    public static void setLoggingToSLF4J() {
+        System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
+    }
+
+    public static <T> Future<T> future(Consumer<Future<T>> consumer) {
+        Future<T> future = Future.future();
+        consumer.accept(future);
+        return future;
     }
 }

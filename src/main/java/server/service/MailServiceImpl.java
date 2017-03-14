@@ -16,12 +16,13 @@ import java.util.Map;
 import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
 import static server.service.DatabaseService.*;
+import static server.util.CommonUtils.future;
 import static server.util.StringUtils.genString;
 
 /**
  * Mail service implementation.
  */
-public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements MailService {
+public class MailServiceImpl implements MailService {
     private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
     private static final String FROM = "moviediary@kyngas.eu";
 
@@ -29,7 +30,6 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
     private final MailClient client;
 
     protected MailServiceImpl(Vertx vertx, DatabaseService database) {
-        super(DEFAULT_MAX_CACHE_SIZE);
         this.database = database;
         this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
     }
@@ -39,7 +39,6 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
      */
     @Override
     public Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail) {
-        Future<JsonObject> future = Future.future();
         String unique = genString();
         MailMessage email = new MailMessage()
                 .setFrom(FROM)
@@ -48,20 +47,19 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
                 .setHtml(createContent(ctx, userEmail, unique));
         Map<Column, String> data = createDataMap(userEmail);
         data.put(Column.VERIFIED, unique);
-        database.update(Table.SETTINGS, data).setHandler(ar -> {
+        return future(fut -> database.update(Table.SETTINGS, data).setHandler(ar -> {
             if (ar.succeeded()) {
                 client.sendMail(email, result -> {
                     if (result.succeeded()) {
-                        future.complete(result.result().toJson());
+                        fut.complete(result.result().toJson());
                     } else {
-                        future.fail("Failed to send email to user: " + result.cause());
+                        fut.fail("Failed to send email to user: " + result.cause());
                     }
                 });
             } else {
-                future.fail("Could not set unique verification string in DB: " + ar.cause());
+                fut.fail("Could not set unique verification string in DB: " + ar.cause());
             }
-        });
-        return future;
+        }));
     }
 
     /**
@@ -69,27 +67,25 @@ public class MailServiceImpl extends CachingServiceImpl<JsonObject> implements M
      */
     @Override
     public Future<JsonObject> verifyEmail(String email, String unique) {
-        Future<JsonObject> future = Future.future();
-        database.getSettings(email).setHandler(ar -> {
+        return future(fut -> database.getSettings(email).setHandler(ar -> {
             if (ar.succeeded()) {
                 if (getRows(ar.result()).getJsonObject(0).getString(DB_VERIFIED).equals(unique)) {
                     Map<Column, String> map = createDataMap(email);
                     map.put(Column.VERIFIED, "1");
                     database.update(Table.SETTINGS, map).setHandler(result -> {
                         if (result.succeeded()) {
-                            future.complete(result.result());
+                            fut.complete(result.result());
                         } else {
-                            future.fail("Failed to update user unique string in DB: " + result.cause());
+                            fut.fail("Failed to update user unique string in DB: " + result.cause());
                         }
                     });
                 } else {
-                    future.fail("User presented unique string does not match DB.");
+                    fut.fail("User presented unique string does not match DB.");
                 }
             } else {
-                future.fail("Failed to get user settings from DB: " + ar.cause());
+                fut.fail("Failed to get user settings from DB: " + ar.cause());
             }
-        });
-        return future;
+        }));
     }
 
     /**

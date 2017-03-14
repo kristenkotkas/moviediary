@@ -1,9 +1,14 @@
 package server.service;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -16,13 +21,7 @@ import static server.service.DatabaseService.Column.USERNAME;
 /**
  * Service which interacts with database.
  */
-public interface DatabaseService extends CachingService<JsonObject> {
-    String CACHE_ALL = "all";
-    String CACHE_VIEWS = "views_";
-    String CACHE_USER = "user_";
-    String CACHE_SETTINGS = "settings_";
-    String CACHE_WISHLIST = "wishlist_";
-
+public interface DatabaseService {
     String DB_USERNAME = "Username";
     String DB_FIRSTNAME = "Firstname";
     String DB_LASTNAME = "Lastname";
@@ -214,5 +213,40 @@ public interface DatabaseService extends CachingService<JsonObject> {
         public String getName() {
             return columnName;
         }
+    }
+
+    static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
+        return conn -> {
+            if (conn.succeeded()) {
+                handler.handle(conn.result());
+            } else {
+                future.fail(conn.cause());
+            }
+        };
+    }
+
+    static Handler<AsyncResult<ResultSet>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
+        return ar -> {
+            if (ar.succeeded()) {
+                future.complete(ar.result().toJson());
+            } else {
+                future.fail(ar.cause());
+            }
+            conn.close();
+        };
+    }
+
+    /**
+     * Convenience method for handling sql update commands result.
+     */
+    static Handler<AsyncResult<UpdateResult>> updateHandler(SQLConnection conn, Future future) {
+        return ar -> {
+            if (ar.succeeded()) {
+                future.complete();
+            } else {
+                future.fail(ar.cause());
+            }
+            conn.close();
+        };
     }
 }

@@ -2,12 +2,13 @@ package server.service;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
+import io.vertx.ext.web.codec.BodyCodec;
 import server.entity.Retryable;
 
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import static server.entity.Status.OK;
 import static server.entity.Status.RATE_LIMIT;
 import static server.service.TmdbServiceImpl.Cache.MOVIE;
 import static server.service.TmdbServiceImpl.Cache.SEARCH;
+import static server.util.CommonUtils.future;
 
 /**
  * TheMovieDatabase service implementation.
@@ -35,7 +37,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     private final Vertx vertx;
     private final JsonObject config;
-    private final HttpClient client;
+    private final WebClient client;
     private final DatabaseService database;
 
     protected TmdbServiceImpl(Vertx vertx, JsonObject config, DatabaseService database) {
@@ -43,7 +45,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
         this.vertx = vertx;
         this.config = config;
         this.database = database;
-        this.client = vertx.createHttpClient(new HttpClientOptions().setSsl(true));
+        this.client = WebClient.create(vertx, new WebClientOptions().setSsl(true).setKeepAlive(false));
     }
 
     @Override
@@ -53,12 +55,10 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
-        Future<JsonObject> future = Future.future();
-        Future<JsonObject> tmdb = get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)));
-        tmdb.setHandler(ar -> {
+        return future(fut -> get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id))).setHandler(ar -> {
             if (ar.succeeded()) {
                 JsonObject json = ar.result();
-                future.complete(json);
+                fut.complete(json);
                 if (!json.getString("release_date").equals("")) {
                     database.insertMovie(json.getInteger("id"), json.getString("title"),
                             Integer.parseInt(json.getString("release_date").split("-")[0]));
@@ -66,38 +66,34 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
             } else {
                 LOG.error("TMDB getMovieByID failed, could not add movie to DB: " + ar.cause());
             }
-        });
-        return future;
+        }));
     }
 
-    private Future<JsonObject> get(String uri, CacheItem<JsonObject> cache) {
-        Future<JsonObject> future = Future.future();
-        if (!tryCachedResult(true, cache, future)) {
-            get(uri + config.getString(APIKEY, ""), cache, future, Retryable.create(5)); //max 5 korda uuesti proovimisi
-        }
-        return future;
+    private Future<JsonObject> get(String uri, CacheItem<JsonObject> cacheItem) {
+        return cacheItem.get(true,
+                (fut, cache) -> get(uri + config.getString(APIKEY, ""), cache, fut, Retryable.create(5)));
     }
 
     private void get(String uri, CacheItem<JsonObject> cache, Future<JsonObject> future, Retryable retryable) {
-        client.get(HTTPS, ENDPOINT, uri, res -> handleResponse(res, uri, cache, future, retryable))
-                .exceptionHandler(event -> retryable.retry(
+        client.get(HTTPS, ENDPOINT, uri).timeout(5000L).as(BodyCodec.jsonObject()).send(ar -> {
+            if (ar.succeeded()) {
+                HttpResponse<JsonObject> res = ar.result();
+                if (res.statusCode() == OK) {
+                    future.complete(cache.set(res.body()));
+                } else if (res.statusCode() == RATE_LIMIT) {
+                    retryable.retry(
+                            () -> vertx.setTimer(getTimeTillReset(res), timer -> get(uri, cache, future, retryable)),
+                            () -> future.fail("Too many retries."));
+                } else {
+                    future.fail("TMDB API returned code: " + res.statusCode() +
+                            "; message: " + res.statusMessage());
+                }
+            } else {
+                retryable.retry(
                         () -> vertx.setTimer(DEFAULT_DELAY, timer -> get(uri, cache, future, retryable)),
-                        () -> future.fail("Too many failures.")))
-                .end();
-    }
-
-    private void handleResponse(HttpClientResponse res, String uri, CacheItem<JsonObject> cache,
-                                Future<JsonObject> future, Retryable retryable) {
-        if (res.statusCode() == OK) {
-            res.bodyHandler(body -> future.complete(cache.set(body.toJsonObject())));
-        } else if (res.statusCode() == RATE_LIMIT) { // TODO: 2.03.2017 test
-            retryable.retry(
-                    () -> vertx.setTimer(getTimeTillReset(res), timer -> get(uri, cache, future, retryable)),
-                    () -> future.fail("Too many retries."));
-        } else {
-            future.fail("API returned code: " + res.statusCode() +
-                    "; message: " + res.statusMessage());
-        }
+                        () -> future.fail("Too many failures."));
+            }
+        });
     }
 
     public enum Cache {
@@ -115,7 +111,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
         }
     }
 
-    private long getTimeTillReset(HttpClientResponse res) {
+    private long getTimeTillReset(HttpResponse res) {
         return Long.parseLong(res.getHeader(RATE_RESET_HEADER)) - System.currentTimeMillis() + 500L;
     }
 }
