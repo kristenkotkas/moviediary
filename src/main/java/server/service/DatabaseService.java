@@ -97,6 +97,8 @@ public interface DatabaseService {
 
     Future<JsonObject> insertWishlist(String username, int movieId);
 
+    Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema);
+
     Future<JsonObject> isInWishlist(String username, int movieId);
 
     Future<JsonObject> getSettings(String username);

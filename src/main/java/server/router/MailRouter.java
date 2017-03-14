@@ -19,7 +19,7 @@ import static server.util.HandlerUtils.resultHandler;
 /**
  * Contains routes that handle email services.
  */
-public class MailRouter extends Routable {
+public class MailRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(MailRouter.class);
     public static final String API_MAIL_VERIFY = "/public/api/v1/mail/verify";
 

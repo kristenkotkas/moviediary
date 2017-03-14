@@ -36,7 +36,7 @@ import static server.util.HandlerUtils.endHandler;
 /**
  * Contains routes which user interface is handled on.
  */
-public class UiRouter extends Routable {
+public class UiRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";

@@ -1,8 +1,8 @@
 package server.router;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -13,7 +13,9 @@ import server.service.DatabaseService.*;
 import server.service.MailService;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 
+import static io.vertx.core.CompositeFuture.all;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.MailRouter.userVerified;
@@ -25,18 +27,24 @@ import static server.util.CommonUtils.contains;
 import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
-import static server.util.StringUtils.genString;
-import static server.util.StringUtils.hash;
+import static server.util.StringUtils.*;
 
 /**
  * Contains routes that interact with database.
  */
-public class DatabaseRouter extends Routable {
+public class DatabaseRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USERS_ALL = "/private/api/v1/users/all";
     public static final String API_VIEWS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
+
+    public static final String DATABASE_USERS = "database_users";
+    public static final String DATABASE_USERS_SIZE = "database_users_size";
+    public static final String DATABASE_GET_HISTORY = "database_get_history";
+    public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
+    public static final String DATABASE_INSERT_WISHLIST = "database_insert_wishlist";
+    public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -47,6 +55,14 @@ public class DatabaseRouter extends Routable {
         this.config = config;
         this.database = database;
         this.mail = mail;
+        listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
+        listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
+        listen(DATABASE_GET_HISTORY, reply((username, param) -> database.getViews(username, param,
+                new JsonObject(param).getInteger("page")), getDatabaseHistory()));
+        listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
+        listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, Integer.parseInt(param)));
+        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, Integer.parseInt(param)),
+                (user, json) -> json));
     }
 
     @Override
@@ -54,6 +70,41 @@ public class DatabaseRouter extends Routable {
         router.get(API_USERS_ALL).handler(this::handleUsersAll);
         router.get(API_VIEWS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
+    }
+
+    /**
+     * Based on username and JsonObject parameter -> returns database history results.
+     */
+    private BiFunction<String, JsonObject, Object> getDatabaseHistory() {
+        return (user, json) -> {
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject jsonObject = array.getJsonObject(i);
+                jsonObject.put("WasFirst", getFirstSeen(jsonObject.getBoolean("WasFirst")));
+                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
+                jsonObject.put("DayOfWeek", getWeekdayFromDB(jsonObject.getString("Start")));
+                jsonObject.put("Time", toNormalTime(jsonObject.getString("Start")));
+                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
+            }
+            return json;
+        };
+    }
+
+    /**
+     * Based on username and JsonObject parameter -> returns database movie history results.
+     */
+    private BiFunction<String, JsonObject, Object> getDatabaseMovieHistory() {
+        return (user, json) -> {
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject jsonObject = array.getJsonObject(i);
+                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
+                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
+            }
+            return json;
+        };
     }
 
     /**
@@ -92,10 +143,12 @@ public class DatabaseRouter extends Routable {
                 userMap.put(Column.PASSWORD, hash(password, salt));
                 userMap.put(Column.SALT, salt);
                 settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
-                Future<JsonObject> future1 = database.insert(Table.USERS, userMap);
-                Future<JsonObject> future2 = database.insert(Table.SETTINGS, settingsMap);
-                // TODO: 12/03/2017 insert demo views 
-                CompositeFuture.all(future1, future2).setHandler(resultHandler(ctx, ar -> {
+                Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
+                Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
+                Future<JsonObject> f3 = database.insertDemoViews(username, 157336, 1, 0);
+                Future<JsonObject> f4 = database.insertDemoViews(username, 334541, 1, 1);
+                Future<JsonObject> f5 = database.insertDemoViews(username, 334543, 0, 1);
+                all(f1, f2, f3, f4, f5).setHandler(resultHandler(ctx, ar -> {
                     if (isServer(config)) {
                         mail.sendVerificationEmail(ctx, username);
                         redirect(ctx, UI_LOGIN + verifyEmail());

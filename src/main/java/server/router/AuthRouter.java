@@ -11,9 +11,9 @@ import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import org.pac4j.vertx.handler.impl.*;
+import server.entity.Language;
 import server.security.SecurityConfig;
 
-import static server.router.EventBusRouter.EVENTBUS_ALL;
 import static server.router.UiRouter.UI_HOME;
 import static server.security.SecurityConfig.AUTHORIZER;
 import static server.security.SecurityConfig.AuthClient.getClientNames;
@@ -24,12 +24,15 @@ import static server.util.NetworkUtils.isServer;
  * Contains routes that require authentication and authorization.
  * Sets up body handling, cookie handling and user session handling.
  */
-public class AuthRouter extends Routable {
+public class AuthRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(AuthRouter.class);
     private static final String XSS_PROTECTION = "xssprotection";
     private static final String CALLBACK = "/callback";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
+
+    public static final String TRANSLATIONS = "translations";
+    public static final String MESSENGER = "messenger";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -38,6 +41,8 @@ public class AuthRouter extends Routable {
         super(vertx);
         this.config = config;
         this.securityConfig = securityConfig;
+        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
+        gateway(MESSENGER, log());
     }
 
     /**

@@ -20,7 +20,7 @@ import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.getDerPrivateKey;
 import static server.util.HandlerUtils.*;
 
-public class BankLinkRouter extends Routable {
+public class BankLinkRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(BankLinkRouter.class);
     private static final String API_CREATE_PAYMENT = "/private/api/v1/donate";
     private static final String API_GET_PAYMENTSOLUTIONS = "/private/v1/api/solutions";

@@ -14,7 +14,6 @@ import server.service.MailService;
 import server.service.TmdbService;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static server.util.HandlerUtils.futureHandler;
 import static server.util.NetworkUtils.*;
@@ -27,7 +26,6 @@ import static server.util.NetworkUtils.*;
 public class ServerVerticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
 
-    private List<Routable> routables;
     // TODO: 02/03/2017 pass in services with constructor for testing
 
     /**
@@ -55,15 +53,15 @@ public class ServerVerticle extends AbstractVerticle {
         BankLinkService bankLink = BankLinkService.create(vertx, config());
         MailService mail = MailService.create(vertx, database);
         SecurityConfig securityConfig = new SecurityConfig(config(), database);
-        routables = Arrays.asList(
+        Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig),
                 new TmdbRouter(vertx, tmdb),
                 new BankLinkRouter(vertx, bankLink),
-                new EventBusRouter(vertx, database, tmdb),
                 new DatabaseRouter(vertx, config(), database, mail),
                 new MailRouter(vertx, mail),
-                new UiRouter(vertx, securityConfig));
-        routables.forEach(routable -> routable.route(router));
+                new UiRouter(vertx, securityConfig))
+                .forEach(routable -> routable.route(router));
+        EventBusRoutable.startEventbus(router, vertx);
         vertx.createHttpServer(new HttpServerOptions().setCompressionSupported(true))
                 .requestHandler(router::accept)
                 .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
@@ -72,8 +70,6 @@ public class ServerVerticle extends AbstractVerticle {
 
     @Override
     public void stop() throws Exception {
-        for (Routable routable : routables) {
-            routable.close();
-        }
+        EventBusRoutable.closeEventbus();
     }
 }

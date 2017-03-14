@@ -108,7 +108,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     /**
      * Inserts a view into views table.
      */
-    private Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
+    @Override
+    public Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
                         .add(username)
@@ -274,14 +275,13 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<String> getUsersCount() {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
-                    if (ar.succeeded()) {
-                        fut.complete(ar.result().getRows().get(0).getLong("Count").toString());
-                    } else {
-                        fut.fail(ar.cause());
-                    }
-                    conn.close();
-                }))));
+        return future(fut -> client.getConnection(connHandler(fut, conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
+            if (ar.succeeded()) {
+                fut.complete(ar.result().getRows().get(0).getLong("Count").toString());
+            } else {
+                fut.fail(ar.cause());
+            }
+            conn.close();
+        }))));
     }
 }

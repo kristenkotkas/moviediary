@@ -13,16 +13,21 @@ import static server.util.HandlerUtils.*;
 /**
  * Contains routes that handle TheMovieDatabase services.
  */
-public class TmdbRouter extends Routable {
+public class TmdbRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(TmdbRouter.class);
     private static final String API_TMDB_GET_SEARCH = "/private/api/v1/search/:movieName";
     private static final String API_TMDB_GET_MOVIE = "/private/api/v1/movie/:movieId";
+
+    public static final String API_GET_SEARCH = "api_get_search";
+    public static final String API_GET_MOVIE = "api_get_movie";
 
     private final TmdbService tmdb;
 
     public TmdbRouter(Vertx vertx, TmdbService tmdb) {
         super(vertx);
         this.tmdb = tmdb;
+        listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
+        listen(API_GET_MOVIE, reply(tmdb::getMovieById));
     }
 
     @Override
