@@ -61,7 +61,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                 fut.complete(json);
                 if (!json.getString("release_date").equals("")) {
                     database.insertMovie(json.getInteger("id"), json.getString("title"),
-                            Integer.parseInt(json.getString("release_date").split("-")[0]));
+                            Integer.parseInt(json.getString("release_date").split("-")[0]),
+                            json.getString("poster_path") == null ? "" : json.getString("poster_path"));
                 }
             } else {
                 LOG.error("TMDB getMovieByID failed, could not add movie to DB: " + ar.cause());

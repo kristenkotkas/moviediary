@@ -93,7 +93,7 @@ public interface DatabaseService {
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
 
-    Future<JsonObject> insertMovie(int id, String movieTitle, int year);
+    Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath);
 
     Future<JsonObject> insertWishlist(String username, int movieId);
 

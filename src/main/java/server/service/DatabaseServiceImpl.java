@@ -45,7 +45,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
 
     private static final String SQL_INSERT_MOVIE =
-            "INSERT IGNORE INTO Movies VALUES (?, ?, ?)";
+            "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
 
     private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
 
@@ -128,12 +128,13 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Inserts a movie to movies table.
      */
     @Override
-    public Future<JsonObject> insertMovie(int id, String movieTitle, int year) {
+    public Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath) {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
                         .add(id)
                         .add(movieTitle)
-                        .add(year), updateHandler(conn, fut)))));
+                        .add(year)
+                        .add(posterPath), updateHandler(conn, fut)))));
     }
 
     /**
