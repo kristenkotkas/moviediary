@@ -96,7 +96,7 @@ public class BankLinkRouter extends EventBusRoutable {
         }
     }
 
-    private void handleApiGetPayments(RoutingContext ctx) { // handleb kõikide makselahenduste json päringut /payments/: -> localhost:8083/api/project
+    private void handleApiGetPayments(RoutingContext ctx) { // handleb kõikide makselahenduste väljastamise json päringut
         bankLink.getPaymentSolutions().setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
@@ -122,7 +122,7 @@ public class BankLinkRouter extends EventBusRoutable {
                 .setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 
-    private void handleApiGetPaymentSolution(RoutingContext ctx) { // handleb vastava makselahenduse json päringut /payments/:tehingu id -> localhost:8083/api/project/1234
+    private void handleApiGetPaymentSolution(RoutingContext ctx) { // handleb vastava makselahenduse json päringut
         String id = ctx.request().getParam(parseParam(API_GET_PAYMENTSOLUTION));
         if (id == null) {
             badRequest(ctx);

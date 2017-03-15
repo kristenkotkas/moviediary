@@ -101,8 +101,8 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
         router.get(UI_DONATE).handler(this::handleDonate);
-        router.get(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
-        router.get(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
+        router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
+        router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
 
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
