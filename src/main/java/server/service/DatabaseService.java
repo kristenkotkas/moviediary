@@ -101,6 +101,8 @@ public interface DatabaseService {
 
     Future<JsonObject> isInWishlist(String username, int movieId);
 
+    Future<JsonObject> getWishlist(String username);
+
     Future<JsonObject> getSettings(String username);
 
     Future<JsonObject> update(Table table, Map<Column, String> data);

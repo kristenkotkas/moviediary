@@ -55,21 +55,21 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
 
                             $("#load-more").click(function () {
                                 eventbus.send("database_get_history",
-                                {
-                                    'is-first': $("#seenFirst").is(':checked'),
-                                    'is-cinema': $("#wasCinema").is(':checked'),
-                                    'start': $("#startingDay").pickadate('picker').get(),
-                                    'end': $("#endDay").pickadate('picker').get(),
-                                    'page': ++i
-                                }, function (error, reply) {
-                                    var addData = reply.body['rows'];
-                                    console.log(addData.length);
-                                    if (addData.length < 10) {
-                                        $("#load-more-holder").hide();
-                                    }
-                                    addHistory(addData, lang);
-                                    $(document).scrollTop($(document).height());
-                                });
+                                    {
+                                        'is-first': $("#seenFirst").is(':checked'),
+                                        'is-cinema': $("#wasCinema").is(':checked'),
+                                        'start': $("#startingDay").pickadate('picker').get(),
+                                        'end': $("#endDay").pickadate('picker').get(),
+                                        'page': ++i
+                                    }, function (error, reply) {
+                                        var addData = reply.body['rows'];
+                                        console.log(addData.length);
+                                        if (addData.length < 10) {
+                                            $("#load-more-holder").hide();
+                                        }
+                                        addHistory(addData, lang);
+                                        $(document).scrollTop($(document).height());
+                                    });
                             });
 
                         } else {

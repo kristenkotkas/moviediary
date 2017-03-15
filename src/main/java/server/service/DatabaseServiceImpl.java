@@ -60,6 +60,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
+    public static final String SQL_GET_WISHLIST =
+            "SELECT Title, Time FROM Wishlist " +
+                    "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
+                    "WHERE Username = ?";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -150,6 +155,14 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.queryWithParams(SQL_IS_IN_WISHLIST, new JsonArray()
                         .add(username)
                         .add(movieId), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getWishlist(String username) {
+        System.out.println("USRNAME: " + username);
+        return future(fut -> client.getConnection(DatabaseService.connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username),
+                        DatabaseService.resultHandler(conn, fut)))));
     }
 
     /**

@@ -45,6 +45,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
     public static final String DATABASE_INSERT_WISHLIST = "database_insert_wishlist";
     public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
+    public static final String DATABASE_GET_WISHLIST = "database_get_wishlist";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -63,6 +64,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, Integer.parseInt(param)));
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, Integer.parseInt(param)),
                 (user, json) -> json));
+        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), getDatabaseWishlist()));
     }
 
     @Override
@@ -70,6 +72,19 @@ public class DatabaseRouter extends EventBusRoutable {
         router.get(API_USERS_ALL).handler(this::handleUsersAll);
         router.get(API_VIEWS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
+    }
+
+    private BiFunction<String, JsonObject, Object> getDatabaseWishlist() {
+        return (user, json) -> {
+            System.out.println(json.encodePrettily());
+            json.remove("results");
+            JsonArray array = json.getJsonArray("rows");
+            for (int i = 0; i < array.size(); i++) {
+                JsonObject jsonObject = array.getJsonObject(i);
+                //jsonObject.put("Time", getNormalDTFromDB(jsonObject.getString("Time"), LONG_DATE));
+            }
+            return json;
+        };
     }
 
     /**
