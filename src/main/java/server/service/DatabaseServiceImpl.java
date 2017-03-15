@@ -55,7 +55,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     " ORDER BY Start DESC";
 
     public static final String SQL_INSERT_WISHLIST =
-            "INSERT IGNORE INTO Wishlist (Username, MovieId) VALUES (?, ?)";
+            "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
 
     public static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
@@ -83,30 +83,29 @@ public class DatabaseServiceImpl implements DatabaseService {
                 return;
             }
             String salt = genString();
-            client.getConnection(connHandler(fut,
-                    conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                            .add(username)
-                            .add(firstname)
-                            .add(lastname)
-                            .add(hash(password, salt))
-                            .add(salt), ar -> {
-                        if (ar.succeeded()) {
-                            Future<JsonObject> f1 = insertDemoViews(username, 157336, 1, 0);
-                            Future<JsonObject> f2 = insertDemoViews(username, 334541, 1, 1);
-                            Future<JsonObject> f3 = insertDemoViews(username, 334543, 0, 1);
-                            Future<JsonObject> f4 = insert(Table.SETTINGS, createDataMap(username));
-                            all(f1, f2, f3, f4).setHandler(result -> {
-                                if (result.succeeded()) {
-                                    fut.complete(ar.result().toJson());
-                                } else {
-                                    fut.fail(result.cause());
-                                }
-                            });
+            client.getConnection(connHandler(fut, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
+                    .add(username)
+                    .add(firstname)
+                    .add(lastname)
+                    .add(hash(password, salt))
+                    .add(salt), ar -> {
+                if (ar.succeeded()) {
+                    Future<JsonObject> f1 = insertDemoViews(username, 157336, 1, 0);
+                    Future<JsonObject> f2 = insertDemoViews(username, 334541, 1, 1);
+                    Future<JsonObject> f3 = insertDemoViews(username, 334543, 0, 1);
+                    Future<JsonObject> f4 = insert(Table.SETTINGS, createDataMap(username));
+                    all(f1, f2, f3, f4).setHandler(result -> {
+                        if (result.succeeded()) {
+                            fut.complete(ar.result().toJson());
                         } else {
-                            fut.fail(ar.cause());
+                            fut.fail(result.cause());
                         }
-                        conn.close();
-                    })));
+                    });
+                } else {
+                    fut.fail(ar.cause());
+                }
+                conn.close();
+            })));
         });
     }
 
@@ -145,7 +144,8 @@ public class DatabaseServiceImpl implements DatabaseService {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
                         .add(username)
-                        .add(movieId), updateHandler(conn, fut)))));
+                        .add(movieId)
+                        .add(System.currentTimeMillis()), updateHandler(conn, fut)))));
     }
 
     @Override

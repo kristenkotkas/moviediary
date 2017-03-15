@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import static io.vertx.core.CompositeFuture.all;
+import static java.lang.Integer.parseInt;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.MailRouter.userVerified;
@@ -61,8 +62,8 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_HISTORY, reply((username, param) -> database.getViews(username, param,
                 new JsonObject(param).getInteger("page")), getDatabaseHistory()));
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
-        listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, Integer.parseInt(param)));
-        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, Integer.parseInt(param)),
+        listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, parseInt(param)));
+        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param)),
                 (user, json) -> json));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), getDatabaseWishlist()));
     }
