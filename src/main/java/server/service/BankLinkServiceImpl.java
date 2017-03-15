@@ -33,11 +33,6 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
     }
 
     @Override
-    public Future<String> createPayment(String paymentDetails) {
-        return post(PAYMENTS, paymentDetails);
-    }
-
-    @Override
     public Future<JsonObject> getPaymentSolutions(){
         return get(SOLUTIONS, getCached(PAYMENT.prefix));
     }
@@ -67,15 +62,6 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
                     .putHeader("content-type", "application/json; charset=utf-8").end(Json.encodePrettily(body));
         }
 
-        return future;
-    }
-
-    private Future<String> post(String uri, String body){
-        Future<String> future = Future.future();
-        if (isEnabled(future)){
-            client.post(HTTP, ENDPOINT, uri, response -> handleResponse(response, future))
-                    .putHeader("content-type", "text/html; charset=utf-8").end(body);
-        }
         return future;
     }
 

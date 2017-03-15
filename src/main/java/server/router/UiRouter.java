@@ -22,6 +22,7 @@ import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.*;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
+import static server.router.BankLinkRouter.*;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.URL;
@@ -54,6 +55,8 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
+    public static final String UI_DONATE_SUCCESS = "/private/success";
+    public static final String UI_DONATE_FAILURE = "/private/failure";
 
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
@@ -67,6 +70,8 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
     private static final String TEMPL_DONATE = "templates/donate.hbs";
+    private static final String TEMPL_DONATE_SUCCESS = "templates/donatesuccess.hbs";
+    private static final String TEMPL_DONATE_FAILURE = "templates/donatefailure.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -96,6 +101,9 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
         router.get(UI_DONATE).handler(this::handleDonate);
+        router.get(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
+        router.get(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
+
 
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
@@ -138,7 +146,23 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleDonate(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_DONATE, DonateTemplate.class), endHandler(ctx));
+        engine.render(getSafe(ctx, TEMPL_DONATE, DonateTemplate.class)
+                .setVK_SERVICE(vk_service)
+                .setVK_VERSION(vk_version)
+                .setVK_SND_ID(vk_snd_id)
+                .setVK_STAMP(vk_stamp)
+                .setVK_AMOUNT(vk_amount)
+                .setVK_CURR(vk_curr)
+                .setVK_ACC(vk_acc)
+                .setVK_NAME(vk_name)
+                .setVK_REF(vk_ref)
+                .setVK_LANG(vk_lang)
+                .setVK_MSG(vk_msg)
+                .setVK_RETURN(vk_return)
+                .setVK_CANCEL(vk_cancel)
+                .setVK_ENCODING(vk_encoding)
+                .setVK_DATETIME(vk_datetime)
+                .setVK_MAC(vk_mac), endHandler(ctx));
     }
 
     /**
@@ -193,6 +217,14 @@ public class UiRouter extends EventBusRoutable {
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
+    }
+
+    private void handleDonateSuccess(RoutingContext ctx){
+        engine.render(getSafe(ctx, TEMPL_DONATE_SUCCESS, DonateSuccessTemplate.class), endHandler(ctx));
+    }
+
+    private void handleDonateFailure(RoutingContext ctx){
+        engine.render(getSafe(ctx, TEMPL_DONATE_FAILURE, DonateFailureTemplate.class), endHandler(ctx));
     }
 
     /**

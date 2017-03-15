@@ -10,8 +10,6 @@ public interface BankLinkService {
         return new BankLinkServiceImpl(vertx, config);
     }
 
-    Future<String> createPayment(String paymentDetails);
-
     Future<JsonObject> getPaymentSolutionById(String id);
 
     Future<JsonObject> getPaymentSolutions();

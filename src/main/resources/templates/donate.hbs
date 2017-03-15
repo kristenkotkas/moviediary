@@ -15,78 +15,92 @@
 </div>
 {{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_DONATE" locale=lang}}</h3>
-<form method="post" action="http://localhost:8081/api/donate">
+<form method="post" action="http://localhost:8083/banklink/ipizza">
+        <!-- include all values as hidden form fields -->
+        <input type="hidden" name="VK_SERVICE" value="{{vK_SERVICE}}">
+        <input type="hidden" name="VK_VERSION" value="{{vK_VERSION}}">
+        <input type="hidden" name="VK_SND_ID" value="{{vK_SND_ID}}">
+        <input type="hidden" name="VK_STAMP" value="{{vK_STAMP}}">
+        <input type="hidden" name="VK_AMOUNT" value="{{vK_AMOUNT}}">
+        <input type="hidden" name="VK_CURR" value="{{vK_CURR}}">
+        <input type="hidden" name="VK_ACC" value="{{vK_ACC}}">
+        <input type="hidden" name="VK_NAME" value="{{vK_NAME}}">
+        <input type="hidden" name="VK_REF" value="{{vK_REF}}">
+        <input type="hidden" name="VK_LANG" value="{{vK_LANG}}">
+        <input type="hidden" name="VK_MSG" value="{{vK_MSG}}">
+        <input type="hidden" name="VK_RETURN" value="{{vK_RETURN}}">
+        <input type="hidden" name="VK_CANCEL" value="{{vK_CANCEL}}">
+        <input type="hidden" name="VK_DATETIME" value="{{vK_DATETIME}}">
+        <input type="hidden" name="VK_ENCODING" value="{{vK_ENCODING}}">
+        <input type="hidden" name="VK_MAC" value="{{vK_MAC}}">
     <table>
         <tbody><tr>
             <td><strong><code>VK_SERVICE</code></strong></td>
-            <td><code>1011</code></td>
+            <td><code>{{vK_SERVICE}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_VERSION</code></strong></td>
-            <td><code>008</code></td>
+            <td><code>{{vK_VERSION}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_SND_ID</code></strong></td>
-            <td><code>uid100036</code></td>
+            <td><code>{{vK_SND_ID}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_STAMP</code></strong></td>
-            <td><code>12345</code></td>
+            <td><code>{{vK_STAMP}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_AMOUNT</code></strong></td>
-            <td><code>150</code></td>
+            <td><code>{{vK_AMOUNT}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_CURR</code></strong></td>
-            <td><code>EUR</code></td>
+            <td><code>{{vK_CURR}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_ACC</code></strong></td>
-            <td><code>123456789</code></td>
+            <td><code>{{vK_ACC}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_NAME</code></strong></td>
-            <td><code>alar</code></td>
+            <td><code>{{vK_NAME}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_REF</code></strong></td>
-            <td><code>1234561</code></td>
+            <td><code>{{vK_REF}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_LANG</code></strong></td>
-            <td><code>EST</code></td>
+            <td><code>{{vK_LANG}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_MSG</code></strong></td>
-            <td><code>Torso Tiger</code></td>
+            <td><code>{{vK_MSG}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_RETURN</code></strong></td>
-            <td><code>http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=success</code></td>
+            <td><code>{{vK_RETURN}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_CANCEL</code></strong></td>
-            <td><code>http://localhost:8083/project/k9a3bsY5Fxs4ZMQd?payment_action=cancel</code></td>
+            <td><code>{{vK_CANCEL}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_DATETIME</code></strong></td>
-            <td><code>2017-03-09T14:19:37+0200</code></td>
+            <td><code>{{vK_DATETIME}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_ENCODING</code></strong></td>
-            <td><code>utf-8</code></td>
+            <td><code>{{vK_ENCODING}}</code></td>
         </tr>
         <tr>
             <td><strong><code>VK_MAC</code></strong></td>
-            <td><code>eddcr7prEYm1sxxrbDN%2F%2BtsLFov1UIgQHSBuuPImPZT4Z0h41eeKmPz2kV8TYY4pRW4z479mD8LAnxC7%2BlKUtf46P2VhucG76s1Q4TnXceHVBtgbZfNIhPOEsJclU8mv5%2FpwSWq39NKjLYVFpEp4E5Xl3nlSr6F6Vw%2BZTYcfoHw%3D</code></td>
+            <td><code>{{vK_MAC}}</code></td>
         </tr>
 
-        <!-- when the user clicks "Edasi panga lehele" form data is sent to the bank -->
-        <tr><td colspan="2"><input type="submit" value="Edasi panga lehele"></td></tr>
-        </tbody>
+    <tr><td colspan="2"><input type="submit" value="Edasi panga lehele" /></td></tr>
     </table>
-
 </form>
 
 
