@@ -32,7 +32,7 @@ function addTableData(data, lang) {
             var movie = data[i];
             console.log(movie['Title']);
             if (movie['Image'] != "") {
-                posterPath = 'https://image.tmdb.org/t/p/w185' + movie['Image'];
+                posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
             } else {
                 posterPath = '/static/img/nanPosterSmall.jpg'
             }
@@ -40,10 +40,10 @@ function addTableData(data, lang) {
             $("#wishlist-result").append(
                 $.parseHTML(
                     '<div class="col s6 m4 l2">' +
-                    '<div class="card">' +
+                    '<div class="card card-small z-depth-2">' +
                     '<div class="card-image">' +
                     '<img src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '" class="search-image" width="15%">' +
+                    movie['Title'] + '" class="search-image">' +
                     '</div>' +
                     '</div>' +
                     '</div>'

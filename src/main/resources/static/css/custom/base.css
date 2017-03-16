@@ -70,6 +70,13 @@ body {
     font-weight: bold;
 }
 
+.card .card-image img {
+    display: block;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    height: 100%;
+}
+
 .not-found {
     margin: 15px;
     font-size: xx-large;
