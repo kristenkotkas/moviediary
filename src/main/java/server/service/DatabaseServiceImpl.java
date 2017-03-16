@@ -61,7 +61,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
     public static final String SQL_GET_WISHLIST =
-            "SELECT Title, Time FROM Wishlist " +
+            "SELECT Title, Time, Image FROM Wishlist " +
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username = ?";
 

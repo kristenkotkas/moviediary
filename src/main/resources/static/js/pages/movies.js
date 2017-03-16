@@ -12,6 +12,7 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         document.title = lang['NAVBAR_MOVIES'] + ' - ' + data.title;
         console.log(data);
+
         $("#search-result").empty().hide();
         $('#movie-views-table').empty();
         $('#movie-title').text(data['original_title']).addClass('movies-heading');

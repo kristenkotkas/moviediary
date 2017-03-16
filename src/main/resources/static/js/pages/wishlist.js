@@ -9,7 +9,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                 {}, function (error, reply) {
                     var data = reply.body['rows'];
                     console.log(data);
-                    addTableHead(lang);
+                    //addTableHead(lang);
                     addTableData(data, lang);
                 });
         });
@@ -28,12 +28,26 @@ function addTableData(data, lang) {
     var timeout = 100;
     $.each(data, function (i) {
         setTimeout(function () {
-            $("#wishlist-table").append(
-                $.parseHTML('<tr>' +
-                    '<td class="table-row">' + data[i]['Title'] + '</td>' +
-                    //'<td class="center">' + getMonth(data[i]['Time'], lang) + '</td>' +
-                    '<td class="center">' + data[i]['Time'] + '</td>' +
-                    '</tr>')
+            var posterPath = "";
+            var movie = data[i];
+            console.log(movie['Title']);
+            if (movie['Image'] != "") {
+                posterPath = 'https://image.tmdb.org/t/p/w185' + movie['Image'];
+            } else {
+                posterPath = '/static/img/nanPosterSmall.jpg'
+            }
+
+            $("#wishlist-result").append(
+                $.parseHTML(
+                    '<div class="col s6 m4 l2">' +
+                    '<div class="card">' +
+                    '<div class="card-image">' +
+                    '<img src="' + posterPath + '" alt="Poster for movie: ' +
+                    movie['Title'] + '" class="search-image" width="15%">' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                )
             );
         }, timeout += 25);
     });
