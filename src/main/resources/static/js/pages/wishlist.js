@@ -25,7 +25,7 @@ function addTableHead(lang) {
 }
 
 function addTableData(data, lang) {
-    var timeout = 100;
+    var timeout = 0;
     $.each(data, function (i) {
         setTimeout(function () {
             var posterPath = "";
@@ -34,7 +34,7 @@ function addTableData(data, lang) {
             if (movie['Image'] != "") {
                 posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
             } else {
-                posterPath = '/static/img/nanPosterSmall.jpg'
+                posterPath = '/static/img/nanPosterBig.jpg'
             }
 
             $("#wishlist-result").append(
