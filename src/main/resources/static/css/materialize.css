@@ -3264,7 +3264,6 @@ input[type=range] + .thumb {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select: none;
 }
 
 .circle {
@@ -3339,7 +3338,6 @@ nav ul a span.badge {
 
 /* This is needed for some mobile phones to display the Google Icon font properly */
 .material-icons {
-  text-rendering: optimizeLegibility;
   -webkit-font-feature-settings: 'liga';
      -moz-font-feature-settings: 'liga';
           font-feature-settings: 'liga';
@@ -4894,7 +4892,6 @@ small {
   overflow: hidden;
   left: 0;
   top: 0;
-  pointer-events: none;
   visibility: hidden;
 }
 
@@ -4938,7 +4935,6 @@ small {
 .btn-floating[disabled],
 .btn-large[disabled],
 .btn-flat[disabled] {
-  pointer-events: none;
   background-color: #DFDFDF !important;
   box-shadow: none;
   color: #9F9F9F !important;
@@ -5284,7 +5280,6 @@ button.btn-floating {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
-          user-select: none;
   -webkit-tap-highlight-color: transparent;
   vertical-align: middle;
   z-index: 1;
@@ -5306,7 +5301,6 @@ button.btn-floating {
   transition-property: transform, opacity, -webkit-transform;
   -webkit-transform: scale(0);
           transform: scale(0);
-  pointer-events: none;
 }
 
 .waves-effect.waves-light .waves-ripple {
@@ -5988,7 +5982,6 @@ input[type=number].validate + label,
 input[type=search].validate + label,
 textarea.materialize-textarea.validate + label {
   width: 100%;
-  pointer-events: none;
 }
 
 input:not([type]) + label:after,
@@ -6195,7 +6188,6 @@ textarea.materialize-textarea {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
-          user-select: none;
 }
 
 [type="radio"] + label:before,
@@ -7026,7 +7018,6 @@ input[type=range]:focus::-ms-fill-upper {
 
 .side-nav .subheader {
   cursor: initial;
-  pointer-events: none;
   color: rgba(0, 0, 0, 0.54);
   font-size: 14px;
   font-weight: 500;
@@ -7854,7 +7845,6 @@ input[type=range]:focus::-ms-fill-upper {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select: none;
 }
 
 /**
