@@ -5,9 +5,8 @@ fallback.load({
         '//localhost:8081/static/css/font-awesome-4.7.0/css/font-awesome.min.css'
     ],
     materialize_css: [
-        '//cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css',
-        '//movies.kyngas.eu/static/css/materialize.min.css',
-        '//localhost:8081/static/css/materialize.min.css'
+        //'//movies.kyngas.eu/static/css/materialize.css',
+        '//localhost:8081/static/css/materialize.css'
     ],
     base_css: [
         //'//movies.kyngas.eu/static/css/custom/base.css',

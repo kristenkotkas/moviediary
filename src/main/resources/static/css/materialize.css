@@ -2604,7 +2604,7 @@ a {
 
 .hoverable {
   transition: box-shadow .25s;
-  box-shadow: 0;
+  box-shadow: none;
 }
 
 .hoverable:hover {
@@ -4216,21 +4216,21 @@ nav .input-field label.active i {
 
 @font-face {
   font-family: "Roboto";
-  src: local(Roboto Thin), url("../fonts/roboto/Roboto-Thin.eot");
+  src: url("../fonts/roboto/Roboto-Thin.eot");
   src: url("../fonts/roboto/Roboto-Thin.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto-Thin.woff2") format("woff2"), url("../fonts/roboto/Roboto-Thin.woff") format("woff"), url("../fonts/roboto/Roboto-Thin.ttf") format("truetype");
   font-weight: 200;
 }
 
 @font-face {
   font-family: "Roboto";
-  src: local(Roboto Light), url("../fonts/roboto/Roboto-Light.eot");
+  src: url("../fonts/roboto/Roboto-Light.eot");
   src: url("../fonts/roboto/Roboto-Light.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto-Light.woff2") format("woff2"), url("../fonts/roboto/Roboto-Light.woff") format("woff"), url("../fonts/roboto/Roboto-Light.ttf") format("truetype");
   font-weight: 300;
 }
 
 @font-face {
   font-family: "Roboto";
-  src: local(Roboto Regular), url("../fonts/roboto/Roboto-Regular.eot");
+  src: url("../fonts/roboto/Roboto-Regular.eot");
   src: url("../fonts/roboto/Roboto-Regular.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto/Roboto-Regular.woff2") format("woff2"), url("../fonts/roboto/Roboto-Regular.woff") format("woff"), url("../fonts/roboto/Roboto-Regular.ttf") format("truetype");
   font-weight: 400;
 }
@@ -6915,7 +6915,7 @@ input[type=range]:focus::-ms-fill-upper {
   padding-left: 20px;
   height: 1.5rem;
   line-height: 1.5rem;
-  letter-spacing: .4;
+  letter-spacing: 0.4px;
   display: inline-block;
 }
 
@@ -7980,7 +7980,6 @@ input[type=range]:focus::-ms-fill-upper {
   top: 0;
   background: transparent;
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1E000000,endColorstr=#1E000000)";
-  zoom: 1;
   background: rgba(0, 0, 0, 0.32);
   transition: background 0.15s ease-out;
 }
@@ -8159,7 +8158,7 @@ input[type=range]:focus::-ms-fill-upper {
 .picker__day--today {
   position: relative;
   color: #595959;
-  letter-spacing: -.3;
+  letter-spacing: -0.3px;
   padding: .75rem 0;
   font-weight: 400;
   border: 1px solid transparent;
@@ -8337,7 +8336,7 @@ input[type=range]:focus::-ms-fill-upper {
   background-color: #1f897f;
   padding: 10px;
   font-weight: 200;
-  letter-spacing: .5;
+  letter-spacing: 0.5px;
   font-size: 1rem;
   margin-bottom: 15px;
 }
@@ -8376,7 +8375,7 @@ input[type=range]:focus::-ms-fill-upper {
 
 .picker__day--infocus {
   color: #595959;
-  letter-spacing: -.3;
+  letter-spacing: -0.3px;
   padding: .75rem 0;
   font-weight: 400;
   border: 1px solid transparent;

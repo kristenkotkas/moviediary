@@ -160,7 +160,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getWishlist(String username) {
-        System.out.println("USRNAME: " + username);
+        System.out.println("USERNAME: " + username);
         return future(fut -> client.getConnection(DatabaseService.connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username),
                         DatabaseService.resultHandler(conn, fut)))));
