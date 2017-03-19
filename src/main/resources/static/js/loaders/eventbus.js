@@ -5,8 +5,8 @@ fallback.load({
         '//localhost:8081/static/js/sockjs.min.js'
     ],
     EventBus: [
-        '//movies.kyngas.eu/static/js/vertx-eventbus.js',
-        '//localhost:8081/static/js/vertx-eventbus.js'
+        '//movies.kyngas.eu/static/js/custom/vertx-eventbus.js',
+        '//localhost:8081/static/js/custom/vertx-eventbus.js'
     ]
 }, {
     shim: {

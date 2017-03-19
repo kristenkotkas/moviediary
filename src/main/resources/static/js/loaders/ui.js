@@ -5,8 +5,8 @@ fallback.load({
         '//localhost:8081/static/css/font-awesome-4.7.0/css/font-awesome.min.css'
     ],
     materialize_css: [
-        //'//movies.kyngas.eu/static/css/materialize.css',
-        '//localhost:8081/static/css/materialize.css'
+        '//movies.kyngas.eu/static/css/custom/materialize.css',
+        '//localhost:8081/static/css/custom/materialize.css'
     ],
     base_css: [
         //'//movies.kyngas.eu/static/css/custom/base.css',
@@ -18,9 +18,8 @@ fallback.load({
         '//localhost:8081/static/js/jquery.min.js'
     ],
     Materialize: [
-        '//cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js',
-        '//movies.kyngas.eu/static/js/materialize.min.js',
-        '//localhost:8081/static/js/materialize.min.js'
+        '//movies.kyngas.eu/static/js/custom/materialize.js',
+        '//localhost:8081/static/js/custom/materialize.js'
     ]
 }, {
     shim: {
