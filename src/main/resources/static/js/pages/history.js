@@ -99,7 +99,7 @@ function addHistory(data, lang) {
         }
         $("#table").append(
             $.parseHTML(
-                '<li class="z-depth-0">' +
+                '<li class="z-depth-0 search-object">' +
                     '<div class="collapsible-header content-key grey-text">' +
                         data[i]['Title'] +
                     '</div>' +
@@ -123,9 +123,9 @@ function addHistory(data, lang) {
                             '<div class="row"></div>' +
                             '<div class="row">' +
                                 '<div class="col s12 m12 l12">' +
-                                '<span>' +
+                                '<div>' +
                                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'+
-                                '</span>' +
+                                '</div>' +
                                 '</div>'+
                             '</div>' +
                         '</div>' +
