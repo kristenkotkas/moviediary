@@ -82,11 +82,11 @@ public class StringUtils {
     }
 
     public static String getFirstSeen(boolean string) {
-        return string ? "\"fa fa-eye text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
+        return string ? "\"fa fa-eye green-text\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
     }
 
     public static String getCinema(boolean string) {
-        return string ? "\"fa fa-ticket text-green\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
+        return string ? "\"fa fa-ticket green-text\"" : ""; // FIXME: 21. veebr. 2017 PARANDADA
     }
 
     public static String formToDBDate(String date, boolean isEnd) {

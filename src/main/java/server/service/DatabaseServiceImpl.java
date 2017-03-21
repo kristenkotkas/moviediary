@@ -37,7 +37,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_DEMO_VIEWS =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Title, Start, WasFirst, WasCinema " +
+            "SELECT Title, Start, WasFirst, WasCinema, Image " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";

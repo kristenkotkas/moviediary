@@ -20,15 +20,16 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                         console.log(data.length);
                         if (data.length > 0) {
                             $("#viewsTitle").empty();
-                            $("#table").empty().append(
-                                '<tr>' +
-                                '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
-                                '<th>' + lang['HISTORY_DATE'] + '</th>' +
-                                '<th>' + lang['HISTORY_TIME'] + '</th>' +
-                                '<th class="hide-on-med-and-down"></th>' +
-                                '<th class="hide-on-small-only"></th>' +
-                                '<th class="hide-on-small-only"></th>' +
-                                '</tr>');
+                            $("#table").empty();
+                            /*$("#table").empty().append(
+                             '<tr>' +
+                             '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
+                             '<th>' + lang['HISTORY_DATE'] + '</th>' +
+                             '<th>' + lang['HISTORY_TIME'] + '</th>' +
+                             '<th class="hide-on-med-and-down"></th>' +
+                             '<th class="hide-on-small-only"></th>' +
+                             '<th class="hide-on-small-only"></th>' +
+                             '</tr>');*/
 
                             addHistory(data, lang);
 
@@ -90,15 +91,47 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
 
 function addHistory(data, lang) {
     $.each(data, function (i) {
+        var posterPath = "";
+        if (data[i]['Image'] != "") {
+            posterPath = 'https://image.tmdb.org/t/p/w342' + data[i]['Image'];
+        } else {
+            posterPath = '/static/img/nanPosterBig.jpg'
+        }
         $("#table").append(
-            $.parseHTML('<tr>' +
-                '<td class="table-row">' + data[i]['Title'] + '</td>' +
-                '<td>' + getMonth(data[i]['Start'], lang) + '</td>' +
-                '<td>' + data[i]['Time'] + '</td>' +
-                '<td class="hide-on-med-and-down">' + lang[data[i]['DayOfWeek']] + '</td>' +
-                '<td class="center hide-on-small-only"><i class=' + data[i]['WasFirst'] + ' aria-hidden="true"></i></td>' +
-                '<td class="center hide-on-small-only"><i class=' + data[i]['WasCinema'] + ' aria-hidden="true"></i></td>' +
-                '</tr>')
+            $.parseHTML(
+                '<li class="z-depth-0">' +
+                    '<div class="collapsible-header content-key grey-text">' +
+                        data[i]['Title'] +
+                    '</div>' +
+                    '<div class="collapsible-body white">' +
+                        '<div class="row search-image">' +
+                            '<div class="col m4 l3 search-image hide-on-small-only">' +
+                                '<img src="' + posterPath + '" alt="Poster for movie: ' +
+                                data[i]['Title'] + '" width="80%">' +
+                            '</div>'+
+                            '<div class="col">' +
+                                '<ul>' +
+                                    '<li>' +
+                                    '<h4 class="grey-text">' + getMonth(data[i]['Start'], lang) + '</h4></li>' +
+                                    '<li><i class="fa fa-clock-o left grey-text" aria-hidden="true"></i>' +
+                                    '<span class="content-key grey-text">' + data[i]['Time'] + '</span></li>' +
+                                    '<li><span class="content-key grey-text">' + lang[data[i]['DayOfWeek']] + '</span></li>' +
+                                    '<li><i class=' + data[i]['WasFirst'] + ' aria-hidden="true"></i></li>' +
+                                    '<li><i class=' + data[i]['WasCinema'] + ' aria-hidden="true"></i></li>' +
+                                '</ul>' +
+                            '</div>' +
+                            '<div class="row"></div>' +
+                            '<div class="row">' +
+                                '<div class="col s12 m12 l12">' +
+                                '<span>' +
+                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'+
+                                '</span>' +
+                                '</div>'+
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</li>'
+            )
         );
     });
 }
