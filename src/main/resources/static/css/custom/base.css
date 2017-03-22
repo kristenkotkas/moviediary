@@ -81,6 +81,10 @@ body {
     font-weight: bold;
 }
 
+span.badge.new:after {
+    content: "";
+}
+
 .card .card-image img {
     display: block;
     border-radius: 2px 2px 0 0;

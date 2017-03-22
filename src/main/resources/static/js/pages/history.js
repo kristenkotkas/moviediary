@@ -102,6 +102,8 @@ function addHistory(data, lang) {
                 '<li class="z-depth-0 search-object">' +
                     '<div class="collapsible-header content-key grey-text">' +
                         data[i]['Title'] +
+                        '<span class="badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
+                        '<span class="badge new ">' + data[i]['Start'] + '</span>' +
                     '</div>' +
                     '<div class="collapsible-body white">' +
                         '<div class="row search-image">' +
@@ -116,8 +118,8 @@ function addHistory(data, lang) {
                                     '<li><i class="fa fa-clock-o left grey-text" aria-hidden="true"></i>' +
                                     '<span class="content-key grey-text">' + data[i]['Time'] + '</span></li>' +
                                     '<li><span class="content-key grey-text">' + lang[data[i]['DayOfWeek']] + '</span></li>' +
-                                    '<li><i class=' + data[i]['WasFirst'] + ' aria-hidden="true"></i></li>' +
-                                    '<li><i class=' + data[i]['WasCinema'] + ' aria-hidden="true"></i></li>' +
+                                    '<li><i class="grey-text ' + data[i]['WasFirst'] + '" aria-hidden="true"></i></li>' +
+                                    '<li><i class="grey-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></li>' +
                                 '</ul>' +
                             '</div>' +
                             '<div class="row"></div>' +

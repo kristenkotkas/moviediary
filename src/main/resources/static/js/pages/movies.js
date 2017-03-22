@@ -113,7 +113,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
                     $.parseHTML(
                         '<tr>' +
                         '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
-                        '<td class="grey-text"><i class=' + data[i]['WasCinema'] + 'aria-hidden="true"></i></td>' +
+                        '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
                         '</tr>'
                     )
                 );
