@@ -5,7 +5,7 @@ fallback.load({
         '//localhost:8081/static/css/font-awesome-4.7.0/css/font-awesome.min.css'
     ],
     materialize_css: [
-        '//movies.kyngas.eu/static/css/custom/materialize.css',
+        //'//movies.kyngas.eu/static/css/custom/materialize.css',
         '//localhost:8081/static/css/custom/materialize.css'
     ],
     base_css: [
@@ -18,7 +18,7 @@ fallback.load({
         '//localhost:8081/static/js/jquery.min.js'
     ],
     Materialize: [
-        '//movies.kyngas.eu/static/js/custom/materialize.js',
+        //'//movies.kyngas.eu/static/js/custom/materialize.js',
         '//localhost:8081/static/js/custom/materialize.js'
     ]
 }, {
@@ -41,18 +41,33 @@ fallback.ready(function () {
         position: 'top',
         html: true
     });
+    $('.collapsible').collapsible();
     $('body').addClass('loaded'); //remove loader
 });
 
 function getCookie(name) {
     var value = "; " + document.cookie;
     var parts = value.split("; " + name + "=");
-    if (parts.length == 2) return parts.pop().split(";").shift();
+    if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
 function getMonth(start, lang) {
     console.log(start);
     var startArray = start.split(' ');
     var month = startArray[1];
-    return startArray[0] +  lang[month.toUpperCase()] + ' ' + startArray[2];
+    return startArray[0] + lang[month.toUpperCase()] + ' ' + startArray[2];
+}
+
+function getUrlParam(param) {
+    location.search.substr(1)
+        .split("&")
+        .some(function (item) { // returns first occurence and stops
+            return item.split("=")[0] === param && (param = item.split("=")[1]);
+        });
+    return param;
+}
+
+function isNormalInteger(str) {
+    var n = Math.floor(Number(str));
+    return String(n) === str && n >= 0;
 }

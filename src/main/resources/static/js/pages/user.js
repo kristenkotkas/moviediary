@@ -10,7 +10,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
             eventbus.publish("messenger", input);
         };
         $("#MessageInput").keyup(function (e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 sendMessage();
             }
         });

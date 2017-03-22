@@ -57,10 +57,12 @@ var searchMovie = function (eventbus, movieId, lang) {
         });
 
         $("#add-wishlist").keyup(function (e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
                 $("#add-wishlist").click();
             }
         });
+
+        replaceUrlParameter("id", movieId);
     });
 };
 
@@ -90,7 +92,7 @@ function decorateNotInWIshlist(lang) {
 function inWishlist(eventbus, movieId, lang) {
     eventbus.send("database_get_in_wishlist", movieId, function (error, reply) {
         console.log('In wishlist: ' + reply.body['rows'].length);
-        if (reply.body['rows'].length != 0) {
+        if (reply.body['rows'].length !== 0) {
             decorateInWishlist(lang);
         } else {
             decorateNotInWIshlist(lang);
@@ -125,7 +127,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
 };
 
 var getNormalDate = function (date, lang) {
-    if (date == lang['MOVIES_JS_UNKNOWN']) {
+    if (date === lang['MOVIES_JS_UNKNOWN']) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else {
         var startArray = date.split('-');
@@ -138,13 +140,13 @@ var getNormalDate = function (date, lang) {
 
 var nullCheck = function (data, lang) {
     console.log(data);
-    if (data == 0 || data.length == 0) {
+    if (data === 0 || data.length === 0) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else return data;
 };
 
 var getRating = function (data, lang) {
-    if (data == lang['MOVIES_JS_UNKNOWN']) {
+    if (data === lang['MOVIES_JS_UNKNOWN']) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else {
         return data + ' / 10.0'
@@ -152,7 +154,7 @@ var getRating = function (data, lang) {
 };
 
 var toNormalRuntime = function (runtime, lang) {
-    if (runtime == lang['MOVIES_JS_UNKNOWN']) {
+    if (runtime === lang['MOVIES_JS_UNKNOWN']) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else {
         var hour = ~~(runtime / 60);
@@ -162,7 +164,7 @@ var toNormalRuntime = function (runtime, lang) {
 };
 
 var getStringFormArray = function (jsonArray, lang) {
-    if (jsonArray == lang['MOVIES_JS_UNKNOWN']) {
+    if (jsonArray === lang['MOVIES_JS_UNKNOWN']) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else {
         //console.log(jsonArray);
@@ -187,6 +189,23 @@ var toNormalRevenue = function (revenue, lang) {
     } else return revenue.toLocaleString() + ' $';
 };
 
+
+function replaceUrlParameter(param, value) {
+    var url = location.href;
+    var splitted = url.split('?');
+    var shouldPushHistory = true;
+    if (splitted.length > 1) {
+        url = splitted[0];
+        if (splitted[1].indexOf(value) !== -1) {
+            shouldPushHistory = false;
+        }
+    }
+    url = url + "?" + param + "=" + value;
+    if (shouldPushHistory) {
+        window.history.pushState('', '', url);
+    }
+}
+
 fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
     var eventbus = new EventBus("/eventbus");
     eventbus.onopen = function () {
@@ -194,9 +213,10 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         var lang;
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
+            enableParameterMovieLoading(eventbus, lang);
 
             $("#search").keyup(function (e) {
-                if (e.keyCode == 13) {
+                if (e.keyCode === 13) {
                     $("#search-button").click();
                 }
             });
@@ -238,7 +258,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                                     };
 
                                     arrayOfNodes[0].addEventListener("keyup", function (e) {
-                                        if (e.keyCode == 13) {
+                                        if (e.keyCode === 13) {
                                             searchMovie(eventbus, movie.id, lang);
                                         }
                                     });
@@ -266,4 +286,17 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
             });
         });
     };
+
+    var enableParameterMovieLoading = function (eventbus, lang) {
+        var loadMovie = function (eventbus, lang) {
+            var query = getUrlParam("id");
+            if (query !== null && isNormalInteger(query)) {
+                searchMovie(eventbus, query, lang);
+            }
+        };
+        window.onpopstate = function() { //try to load movie on back/forward page movement
+            loadMovie(eventbus, lang);
+        };
+        loadMovie(eventbus, lang); //load movie if url has param
+    }
 });
