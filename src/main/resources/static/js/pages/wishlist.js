@@ -40,10 +40,10 @@ function addTableData(data, lang) {
             $("#wishlist-result").append(
                 $.parseHTML(
                     '<div class="col s6 m4 l2">' +
-                    '<div class="card card-small z-depth-2">' +
+                    '<div class="card z-depth-2">' +
                     '<div class="card-image">' +
                     '<img src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '" class="search-image">' +
+                    movie['Title'] + '">' +
                     '</div>' +
                     '</div>' +
                     '</div>'
