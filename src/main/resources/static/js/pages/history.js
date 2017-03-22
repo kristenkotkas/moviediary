@@ -103,7 +103,7 @@ function addHistory(data, lang) {
                     '<div class="collapsible-header content-key grey-text">' +
                         data[i]['Title'] +
                         '<span class="badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
-                        '<span class="badge new ">' + data[i]['Start'] + '</span>' +
+                        '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
                     '</div>' +
                     '<div class="collapsible-body white">' +
                         '<div class="row search-image">' +
