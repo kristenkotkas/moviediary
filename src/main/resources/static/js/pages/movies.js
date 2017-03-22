@@ -48,6 +48,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
         $('#add-info-box').removeClass('scale-out').addClass('scale-in');
         $('#movie-poster-card').removeClass('scale-out').addClass('scale-in');
+        $('#add-watch').removeClass('scale-out').addClass('scale-in');
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
 
         inWishlist(eventbus, movieId, lang);
@@ -228,6 +229,7 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
                 $('#add-info-box').removeClass('scale-in').addClass('scale-out');
                 $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
                 $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
+                $('#add-watch').removeClass('scale-in').addClass('scale-out');
                 setTimeout(
                     function () {
                         eventbus.send("api_get_search", $("#search").val(), function (error, reply) {

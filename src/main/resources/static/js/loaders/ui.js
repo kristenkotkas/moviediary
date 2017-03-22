@@ -43,6 +43,7 @@ fallback.ready(function () {
     });
     $('.collapsible').collapsible();
     $('body').addClass('loaded'); //remove loader
+    $('.modal').modal();
 });
 
 function getCookie(name) {

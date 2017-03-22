@@ -37,7 +37,8 @@
         <div class="col m12 l10 offset-l2">
             <div class="col s12 m3 l2 scale-transition scale-out hide-on-small-only" id="movie-poster-card"></div>
             <div class="col s12 m4 l4">
-                <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="basic-info-box">
+                <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object"
+                     id="basic-info-box">
                     <div class="card-content">
                         <h5>{{i18n "MOVIES_BASIC_INFO" locale=lang}}</h5>
                         <table class="bordered">
@@ -102,9 +103,143 @@
                         </table>
                     </div>
                 </div>
-                <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist" tabindex="7" id="add-wishlist">
+
+                <!-- Modal Trigger -->
+                <div class="s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" tabindex="7"
+                     id="add-watch">
+                    <a href="#modal1" class="waves-effect waves-light btn">Add to watch</a>
+                </div>
+
+                <!-- Modal Structure -->
+                <div id="modal1" class="modal modal-fixed-footer">
+                    <div class="modal-content">
+                        <h5>Add Avatar to watch</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l10 offset-l1">
+                                <!-- Start -->
+                                <div class="row">
+                                    <div class="col s12 m12 l12">
+                                        <h5 class="grey-text">Start of the viewing</h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12 m6 l4">
+                                        <div class="input-field login-text">
+                                            <input id="watchStartDay" type="text" class="datepicker">
+                                            <label for="watchStartDay">Date</label>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m6 l4">
+                                        <div class="input-field login-text">
+                                            <input id="watchStartTime" type="text" class="validate">
+                                            <label for="watchStartTime">Time</label>
+                                        </div>
+                                    </div>
+                                    <div class="col s6 m6 l2">
+                                        <div class="input-field">
+                                            <button id="watchStartNow" type="submit"
+                                                    class="btn waves-effect waves-light z-depth-0">Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m12 l12">
+                                        <div class="input-field">
+                                            <button id="watchStartNow" type="submit"
+                                                    class="btn waves-effect waves-light z-depth-0 tooltipped"
+                                                    data-position="right"
+                                                    data-tooltip="Arvuta algusaeg lõppemise põhjal">Calculate
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l10 offset-l1">
+                                <!-- Start -->
+                                <div class="row">
+                                    <div class="col s12 m12 l12">
+                                        <h5 class="grey-text">End of the viewing</h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12 m6 l4">
+                                        <div class="input-field login-text">
+                                            <input id="watchStartDay" type="text" class="datepicker">
+                                            <label for="watchStartDay">Date</label>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m6 l4">
+                                        <div class="input-field login-text">
+                                            <input id="watchStartTime" type="text" class="validate">
+                                            <label for="watchStartTime">Time</label>
+                                        </div>
+                                    </div>
+                                    <div class="col s6 m6 l2">
+                                        <div class="input-field">
+                                            <button id="watchStartNow" type="submit"
+                                                    class="btn waves-effect waves-light z-depth-0">Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m12 l12">
+                                        <div class="input-field">
+                                            <button id="watchStartNow" type="submit"
+                                                    class="btn waves-effect waves-light z-depth-0 tooltipped"
+                                                    data-position="right"
+                                                    data-tooltip="Arvuta lõpuaeg alguse põhjal">Calculate
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l10 offset-l1">
+                                <div class="row">
+                                    <div class="input-field login-text">
+                                        <input id="watchSeenFirst" type="checkbox">
+                                        <label for="watchSeenFirst" class="tooltipped"
+                                               data-position="right"
+                                               data-tooltip="Kas see oli filmi esimene vaatamine?">
+                                            {{i18n "HISTORY_WAS_FIRST" locale=lang}}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field login-text">
+                                        <input id="watchWasCinema" type="checkbox">
+                                        <label for="watchWasCinema" class="tooltipped"
+                                               data-position="right"
+                                               data-tooltip="Kas sa vaatasid seda kinos?">
+                                            {{i18n "HISTORY_WAS_CINEMA" locale=lang}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="input-field col s12 m10 offset-m1 l10 offset-l1">
+                                <textarea id="watchComment" class="materialize-textarea" data-length="120"></textarea>
+                                <label for="watchComment">Kirjuta midagi vaatamisest</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Add</a>
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                    </div>
+                </div>
+
+                <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist"
+                     tabindex="8" id="add-wishlist">
                     <div class="card-content">
-                        <a class="grey-text content-key" id="wishlist-text">{{i18n "MOVIES_ADD_WISHLIST" locale=lang}}</a>
+                        <a class="grey-text content-key" id="wishlist-text">
+                            {{i18n "MOVIES_ADD_WISHLIST" locale=lang}}</a>
                     </div>
                 </div>
             </div>

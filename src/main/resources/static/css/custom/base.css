@@ -149,6 +149,11 @@ span.badge.new:after {
     padding: 0;
 }
 
+.history-object:hover,
+.history-object:focus {
+    background: #f2f5f0;
+}
+
 .flag {
     border-radius: 50%;
     -webkit-transition: -webkit-transform .8s ease-in-out;
