@@ -2,6 +2,7 @@
   <dictionary name="Kristjan">
     <words>
       <w>apikey</w>
+      <w>appcache</w>
       <w>authorizer</w>
       <w>authorizers</w>
       <w>deauthenticated</w>

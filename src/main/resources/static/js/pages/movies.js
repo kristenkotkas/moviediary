@@ -207,7 +207,7 @@ function replaceUrlParameter(param, value) {
     }
 }
 
-fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
+fallback.ready(['jQuery', 'EventBus'], function () {
     var eventbus = new EventBus("/eventbus");
     eventbus.onopen = function () {
 
@@ -301,10 +301,4 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
         };
         loadMovie(eventbus, lang); //load movie if url has param
     };
-
-    $('#watchStartTime').pickatime({
-        autoclose: false,
-        twelvehour: false,
-        default: 'now'
-    });
 });

@@ -20,11 +20,19 @@ fallback.load({
     Materialize: [
         //'//movies.kyngas.eu/static/js/custom/materialize.js',
         '//localhost:8081/static/js/custom/materialize.js'
+    ],
+    ClockPicker_css: [
+        '//localhost:8081/static/css/clockpicker.css'
+    ],
+    ClockPicker: [
+        '//localhost:8081/static/js/custom/clockpicker.js'
     ]
 }, {
     shim: {
         base_css: ['materialize_css'],
-        Materialize: ['jQuery']
+        Materialize: ['jQuery'],
+        ClockPicker_css: ['materialize_css'],
+        ClockPicker: ['Materialize']
     }
 });
 
@@ -44,6 +52,11 @@ fallback.ready(function () {
     $('.collapsible').collapsible();
     $('body').addClass('loaded'); //remove loader
     $('.modal').modal(); //movies modal initialization
+    $('.timepicker').pickatime({
+        autoclose: true,
+        twelvehour: false,
+        default: 'now'
+    });
 });
 
 function getCookie(name) {
