@@ -21,8 +21,8 @@ var searchMovie = function (eventbus, movieId, lang) {
             startNowPress(startDate, startTime);
         });
 
-        endNow.click(function () {
-            endNowPress(endDate, endTime);
+        endNow.click(function (e) {
+            endNowPress(endDate, endTime, e);
         });
 
         var data = reply.body;
@@ -160,15 +160,19 @@ var startCalcPress = function () {
 
 };
 
-var endNowPress = function (endDate, endTime) {
+var endNowPress = function (endDate, endTime, e) {
     var date = new Date();
-    var time = date.getHours() + ":" + date.getMinutes();
     var day = date.getDate() + ". " + (date.getMonth() + 1) + ". " + date.getFullYear();
+    var time = date.getHours() + ":" + date.getMinutes();
 
-    /*var date = endDate.pickadate('picker').get();
-    var time = endTime.pickatime().val();*/
-    console.log(day);
+    e.stopPropagation();
     console.log(time);
+
+    /*endTime.pickatime({
+        default: time
+    });*/
+    // fixme: vaja now ära fixida, et ka pärast ise aja valimist now töötaks
+    endTime.pickatime('show').pickatime('done');
 };
 
 var endCalcPress = function () {
