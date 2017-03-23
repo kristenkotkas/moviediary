@@ -1,0 +1,27 @@
+CACHE MANIFEST
+
+# Explicitly cached resources
+css/custom/loader.css
+css/custom/materialize.css
+css/custom/page-center.css
+css/custom/base.css
+css/custom/loader.css
+css/font-awesome-4.7.0/css/font-awesome.min.css
+
+js/custom/materialize.js
+js/custom/vertx-eventbus.js
+js/loaders/eventbus.js
+js/loaders/page-center.js
+js/loaders/ui.js
+js/pages/history.js
+js/pages/login.js
+js/pages/movies.js
+js/pages/user.js
+js/pages/wishlist.js
+js/fallback.min.js
+js/jquery.js
+js/sockjs.min.js
+
+# Resources that require user to be online
+NETWORK:
+*
