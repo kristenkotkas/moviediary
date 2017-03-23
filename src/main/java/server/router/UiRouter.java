@@ -50,7 +50,6 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_HISTORY = "/private/history";
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
-    public static final String UI_DONATE = "/private/donate";
     public static final String UI_LOGIN = "/login";
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
@@ -69,7 +68,6 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
-    private static final String TEMPL_DONATE = "templates/donate.hbs";
     private static final String TEMPL_DONATE_SUCCESS = "templates/donatesuccess.hbs";
     private static final String TEMPL_DONATE_FAILURE = "templates/donatefailure.hbs";
 
@@ -100,7 +98,6 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
-        router.get(UI_DONATE).handler(this::handleDonate);
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
         router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
@@ -114,7 +111,23 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleUser(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class), endHandler(ctx));
+        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class)
+                .setVK_SERVICE(vk_service)
+                .setVK_VERSION(vk_version)
+                .setVK_SND_ID(vk_snd_id)
+                .setVK_STAMP(vk_stamp)
+                .setVK_AMOUNT(vk_amount)
+                .setVK_CURR(vk_curr)
+                .setVK_ACC(vk_acc)
+                .setVK_NAME(vk_name)
+                .setVK_REF(vk_ref)
+                .setVK_LANG(vk_lang)
+                .setVK_MSG(vk_msg)
+                .setVK_RETURN(vk_return)
+                .setVK_CANCEL(vk_cancel)
+                .setVK_ENCODING(vk_encoding)
+                .setVK_MAC(BankLinkRouter.createMac())
+                .setVK_DATETIME(vk_datetime), endHandler(ctx));
     }
 
     /**
@@ -145,25 +158,7 @@ public class UiRouter extends EventBusRoutable {
         engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
     }
 
-    private void handleDonate(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_DONATE, DonateTemplate.class)
-                .setVK_SERVICE(vk_service)
-                .setVK_VERSION(vk_version)
-                .setVK_SND_ID(vk_snd_id)
-                .setVK_STAMP(vk_stamp)
-                .setVK_AMOUNT(vk_amount)
-                .setVK_CURR(vk_curr)
-                .setVK_ACC(vk_acc)
-                .setVK_NAME(vk_name)
-                .setVK_REF(vk_ref)
-                .setVK_LANG(vk_lang)
-                .setVK_MSG(vk_msg)
-                .setVK_RETURN(vk_return)
-                .setVK_CANCEL(vk_cancel)
-                .setVK_ENCODING(vk_encoding)
-                .setVK_DATETIME(vk_datetime)
-                .setVK_MAC(vk_mac), endHandler(ctx));
-    }
+
 
     /**
      * Renders login page.
@@ -248,7 +243,6 @@ public class UiRouter extends EventBusRoutable {
         baseTemplate.setHistoryPage(UI_HISTORY);
         baseTemplate.setStatisticsPage(UI_STATISTICS);
         baseTemplate.setWishlistPage(UI_WISHLIST);
-        baseTemplate.setDonatePage(UI_DONATE);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
             baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());

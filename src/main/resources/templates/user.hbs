@@ -15,13 +15,40 @@
 </div>
 {{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
-<div class="input-field col s12">
-    <a href="{{logoutUrl}}" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        <i class="fa fa-sign-out left re"></i>{{i18n "USER_LOGOUT" locale=lang}}
-    </a>
-    <a href="#" id="UserCount" class="btn waves-effect waves-light col s12 btn red logout-button z-depth-0">
-        User Count: Loading...
-    </a>
+<div class="input-field col s12 l10 offset-1">
+    <div class="row">
+        <a href="{{logoutUrl}}" class="btn waves-effect waves-light col s12 m3 l2 red z-depth-0">
+            <i class="fa fa-sign-out left re"></i>{{i18n "USER_LOGOUT" locale=lang}}
+        </a>
+        <a href="#" id="UserCount" class="btn waves-effect waves-light s12 m3 l2 btn red z-depth-0 col">
+            User Count: Loading...
+        </a>
+        <a class="col s12 m3 l2">
+            <form method="post" action="http://localhost:8083/banklink/ipizza">
+                <!-- include all values as hidden form fields -->
+                <input type="hidden" name="VK_SERVICE" value="{{vK_SERVICE}}">
+                <input type="hidden" name="VK_VERSION" value="{{vK_VERSION}}">
+                <input type="hidden" name="VK_SND_ID" value="{{vK_SND_ID}}">
+                <input type="hidden" name="VK_STAMP" value="{{vK_STAMP}}">
+                <input type="hidden" name="VK_AMOUNT" value="{{vK_AMOUNT}}">
+                <input type="hidden" name="VK_CURR" value="{{vK_CURR}}">
+                <input type="hidden" name="VK_ACC" value="{{vK_ACC}}">
+                <input type="hidden" name="VK_NAME" value="{{vK_NAME}}">
+                <input type="hidden" name="VK_REF" value="{{vK_REF}}">
+                <input type="hidden" name="VK_LANG" value="{{vK_LANG}}">
+                <input type="hidden" name="VK_MSG" value="{{vK_MSG}}">
+                <input type="hidden" name="VK_RETURN" value="{{vK_RETURN}}">
+                <input type="hidden" name="VK_CANCEL" value="{{vK_CANCEL}}">
+                <input type="hidden" name="VK_DATETIME" value="{{vK_DATETIME}}">
+                <input type="hidden" name="VK_ENCODING" value="{{vK_ENCODING}}">
+                <input type="hidden" name="VK_MAC" value="{{vK_MAC}}">
+
+                <input class="btn waves-effect waves-light z-depth-0" type="submit"
+                       value="{{i18n "DONATE_A_FIVER" locale=lang}}"/>
+            </form>
+        </a>
+    </div>
+
 </div>
 <div class="row">
     <div class="col s12 m6">

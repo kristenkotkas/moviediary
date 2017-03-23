@@ -28,29 +28,31 @@ public class BankLinkRouter extends EventBusRoutable {
 
     private static final String BANK_TYPE = "ipizza";
 
-    public static String vk_service = "1011"; // default=1011
-    public static String vk_version = "008"; // default=008
-    public static String vk_snd_id = "uid100036"; // kliendi tunnuskood pangale edastamiseks kujul uid100023
-    public static String vk_stamp = "12345"; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
-    public static String vk_amount = "5"; // Makse summa
-    public static String vk_curr = "EUR"; // Makse valuuta
-    public static String vk_acc = "EE371600000123456789"; // Saaja (arendajate) konto nr
-    public static String vk_name = "MovieDiary MTÜ"; // Saaja (arendajate) nimi
-    public static String vk_ref = "1234561"; // Viitenumber
-    public static String vk_lang = "EST"; //tehingu keel
-    public static String vk_msg = "Donation"; // Toode/makse kirjeldus
-    public static String vk_return = "http://localhost:8081/private/success";
-    public static String vk_cancel = "http://localhost:8081/private/failure";
-    public static String vk_encoding = "utf-8";
-    public static String vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
-    public static String vk_mac = "";
+    public static final String vk_service = "1011"; // default=1011
+    public static final String vk_version = "008"; // default=008
+    public static final String vk_snd_id = "uid100036"; // kliendi tunnuskood pangale edastamiseks kujul uid100023
+    public static final String vk_stamp = "12345"; // tehingu number, tuleks ise genereerida et üheselt tehing identifitseerida
+    public static final String vk_amount = "5"; // Makse summa
+    public static final String vk_curr = "EUR"; // Makse valuuta
+    public static final String vk_acc = "EE371600000123456789"; // Saaja (arendajate) konto nr
+    public static final String vk_name = "MovieDiary MTÜ"; // Saaja (arendajate) nimi
+    public static final String vk_ref = "1234561"; // Viitenumber
+    public static final String vk_lang = "EST"; //tehingu keel
+    public static final String vk_msg = "Donation"; // Toode/makse kirjeldus
+    public static final String vk_return = "http://localhost:8081/private/success";
+    public static final String vk_cancel = "http://localhost:8081/private/failure";
+    public static final String vk_encoding = "utf-8";
+    public static String vk_datetime;
 
     private final BankLinkService bankLink;
+    // Pangalingi poolt genereeritud võti tuleb konverteerida der-formaati, et java seda süüa saaks.
+    // Käsk selleks: openssl pkcs8 -topk8 -inform PEM -outform DER -in banklink_private_key.pem -out banklink_private_key.der -nocrypt
+    private static byte[] privKey;
 
     public BankLinkRouter(Vertx vertx, BankLinkService bankLink) {
         super(vertx);
         this.bankLink = bankLink;
-        createMac();
+        vertx.fileSystem().readFile("banklink_private_key.der", result -> privKey = result.result().getBytes());
     }
 
     @Override
@@ -60,7 +62,9 @@ public class BankLinkRouter extends EventBusRoutable {
         router.get(API_GET_PAYMENTSOLUTION).handler(this::handleApiGetPaymentSolution);
     }
 
-    private void createMac(){
+    public static String createMac(){
+        vk_datetime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+
         String toBeSigned = String.format("%03d", vk_service.length()) + vk_service +
                 String.format("%03d", vk_version.length()) + vk_version +
                 String.format("%03d", vk_snd_id.length()) + vk_snd_id +
@@ -70,30 +74,21 @@ public class BankLinkRouter extends EventBusRoutable {
                 String.format("%03d", vk_acc.length()) + vk_acc +
                 String.format("%03d", vk_name.length()) + vk_name +
                 String.format("%03d", vk_ref.length()) + vk_ref +
-                //String.format("%03d", vk_lang.length()) + vk_lang +
                 String.format("%03d", vk_msg.length()) + vk_msg +
                 String.format("%03d", vk_return.length()) + vk_return +
                 String.format("%03d", vk_cancel.length()) + vk_cancel +
                 String.format("%03d", vk_datetime.length()) + vk_datetime;
         try {
-
-            // Pangalingi poolt genereeritud võti tuleb konverteerida der-formaati, et java seda süüa saaks.
-            // Käsk selleks: openssl pkcs8 -topk8 -inform PEM -outform DER -in banklink_private_key.pem -out banklink_private_key.der -nocrypt
             Signature instance = Signature.getInstance("SHA1withRSA");
-            vertx.fileSystem().readFile("banklink_private_key.der", result ->{
-                try{
-                    RSAPrivateKey key = getDerPrivateKey(result.result().getBytes(), "RSA");
-                    instance.initSign(key);
-                    instance.update((toBeSigned).getBytes());
-                    byte[] signature = instance.sign();
-                    vk_mac = new String(Base64.getEncoder().encode(signature), StandardCharsets.UTF_8);
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
-            });
+            RSAPrivateKey key = getDerPrivateKey(privKey, "RSA");
+            instance.initSign(key);
+            instance.update((toBeSigned).getBytes());
+            byte[] signature = instance.sign();
+            return new String(Base64.getEncoder().encode(signature), StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
     }
 
     private void handleApiGetPayments(RoutingContext ctx) { // handleb kõikide makselahenduste väljastamise json päringut
