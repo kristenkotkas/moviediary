@@ -2,6 +2,29 @@ var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
+        var startDate = $("#watchStartDay");
+        var startTime = $("#watchStartTime");
+        var startNow = $("#watchStartNow");
+        var startCalculate = $("#watchStartCalculate");
+
+        var endDate = $("#watchEndDay");
+        var endTime = $("#watchEndTime");
+        var endNow = $("#watchEndNow");
+        var endCalculate = $("#watchEndCalculate");
+
+        var seenFirst = $("#watchSeenFirst");
+        var wasCinema = $("#watchWasCinema");
+
+        var commentFiled = $("#watchComment");
+
+        startNow.click(function () {
+            startNowPress(startDate, startTime);
+        });
+
+        endNow.click(function () {
+            endNowPress(endDate, endTime);
+        });
+
         var data = reply.body;
         var posterPath = "";
         if (data['poster_path'] === null) {
@@ -125,6 +148,31 @@ var getMovieViews = function (eventbus, movieId, lang) {
             $('#seen-header').empty().append(lang['MOVIES_JS_NOT_SEEN']);
         }
     });
+};
+
+var startNowPress = function (startDate, startTime) {
+    var date = startDate.pickadate('picker').get();
+    var time = startTime.pickatime().val();
+    console.log('start: ' + date + ' ' + time);
+};
+
+var startCalcPress = function () {
+
+};
+
+var endNowPress = function (endDate, endTime) {
+    var date = new Date();
+    var time = date.getHours() + ":" + date.getMinutes();
+    var day = date.getDate() + ". " + (date.getMonth() + 1) + ". " + date.getFullYear();
+
+    /*var date = endDate.pickadate('picker').get();
+    var time = endTime.pickatime().val();*/
+    console.log(day);
+    console.log(time);
+};
+
+var endCalcPress = function () {
+
 };
 
 var getNormalDate = function (date, lang) {

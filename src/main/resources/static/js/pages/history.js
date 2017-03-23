@@ -21,15 +21,6 @@ fallback.ready(['jQuery', 'EventBus'], function () {
                         if (data.length > 0) {
                             $("#viewsTitle").empty();
                             $("#table").empty();
-                            /*$("#table").empty().append(
-                             '<tr>' +
-                             '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
-                             '<th>' + lang['HISTORY_DATE'] + '</th>' +
-                             '<th>' + lang['HISTORY_TIME'] + '</th>' +
-                             '<th class="hide-on-med-and-down"></th>' +
-                             '<th class="hide-on-small-only"></th>' +
-                             '<th class="hide-on-small-only"></th>' +
-                             '</tr>');*/
 
                             addHistory(data, lang);
 
