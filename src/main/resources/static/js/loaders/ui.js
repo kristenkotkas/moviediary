@@ -43,7 +43,7 @@ fallback.ready(function () {
     });
     $('.collapsible').collapsible();
     $('body').addClass('loaded'); //remove loader
-    $('.modal').modal();
+    $('.modal').modal(); //movies modal initialization
 });
 
 function getCookie(name) {

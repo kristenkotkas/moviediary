@@ -300,5 +300,11 @@ fallback.ready(['jQuery', 'SockJS', 'EventBus'], function () {
             loadMovie(eventbus, lang);
         };
         loadMovie(eventbus, lang); //load movie if url has param
-    }
+    };
+
+    $('#watchStartTime').pickatime({
+        autoclose: false,
+        twelvehour: false,
+        default: 'now'
+    });
 });

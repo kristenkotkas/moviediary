@@ -124,16 +124,17 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col s12 m6 l4">
+                                    <div class="col s12 m6 l5">
                                         <div class="input-field login-text">
                                             <input id="watchStartDay" type="text" class="datepicker">
                                             <label for="watchStartDay">Date</label>
                                         </div>
                                     </div>
-                                    <div class="col s12 m6 l4">
-                                        <div class="input-field login-text">
-                                            <input id="watchStartTime" type="text" class="validate">
+                                    <div class="col s12 m6 l5">
+                                        <!-- https://github.com/chingyawhao/materialize-clockpicker#options -->
+                                        <div class="input-field">
                                             <label for="watchStartTime">Time</label>
+                                            <input id="watchStartTime" type="time" class="timepicker">
                                         </div>
                                     </div>
                                     <div class="col s6 m6 l2">
@@ -155,23 +156,22 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="col s12 m10 offset-m1 l10 offset-l1">
-                                <!-- Start -->
+                                <!-- End -->
                                 <div class="row">
                                     <div class="col s12 m12 l12">
                                         <h5 class="grey-text">End of the viewing</h5>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col s12 m6 l4">
+                                    <div class="col s12 m6 l5">
                                         <div class="input-field login-text">
                                             <input id="watchStartDay" type="text" class="datepicker">
                                             <label for="watchStartDay">Date</label>
                                         </div>
                                     </div>
-                                    <div class="col s12 m6 l4">
+                                    <div class="col s12 m6 l5">
                                         <div class="input-field login-text">
                                             <input id="watchStartTime" type="text" class="validate">
                                             <label for="watchStartTime">Time</label>
@@ -196,7 +196,6 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="col s12 m10 offset-m1 l10 offset-l1">
                                 <div class="row">
@@ -221,7 +220,6 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="input-field col s12 m10 offset-m1 l10 offset-l1">
                                 <textarea id="watchComment" class="materialize-textarea" data-length="120"></textarea>
@@ -234,7 +232,6 @@
                         <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
                     </div>
                 </div>
-
                 <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist"
                      tabindex="8" id="add-wishlist">
                     <div class="card-content">
@@ -247,6 +244,7 @@
     </div>
 </div>
 <script type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/custom/materialize.clockpicker.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
 <script async type="text/javascript" src="/static/js/loaders/eventbus.js"></script>
 <script async type="text/javascript" src="/static/js/pages/movies.js"></script>
