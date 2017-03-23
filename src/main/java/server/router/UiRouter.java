@@ -101,7 +101,6 @@ public class UiRouter extends EventBusRoutable {
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
         router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
-
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)

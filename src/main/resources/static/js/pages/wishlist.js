@@ -20,6 +20,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
         if (json.wasClean === false) { //connection lost
             if (typeof Storage !== 'undefined') {
                 var data = JSON.parse(localStorage.getItem("wishlist_data"));
+                $("#wishlist-result").empty();
                 addTableData(data);
             }
         }
