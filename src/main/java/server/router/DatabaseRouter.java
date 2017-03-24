@@ -47,6 +47,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_INSERT_WISHLIST = "database_insert_wishlist";
     public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
     public static final String DATABASE_GET_WISHLIST = "database_get_wishlist";
+    public static final String DATABASE_INSERT_VIEW = "database_insert_view";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -66,6 +67,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param)),
                 (user, json) -> json));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), getDatabaseWishlist()));
+        listen(DATABASE_INSERT_VIEW, database::insertView);
     }
 
     @Override
@@ -76,16 +78,7 @@ public class DatabaseRouter extends EventBusRoutable {
     }
 
     private BiFunction<String, JsonObject, Object> getDatabaseWishlist() {
-        return (user, json) -> {
-            System.out.println(json.encodePrettily());
-            json.remove("results");
-            JsonArray array = json.getJsonArray("rows");
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject jsonObject = array.getJsonObject(i);
-                //jsonObject.put("Time", getNormalDTFromDB(jsonObject.getString("Time"), LONG_DATE));
-            }
-            return json;
-        };
+        return (String user, JsonObject json) -> json;
     }
 
     /**
@@ -161,10 +154,7 @@ public class DatabaseRouter extends EventBusRoutable {
                 settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
                 Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
                 Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
-                Future<JsonObject> f3 = database.insertDemoViews(username, 157336, 1, 0);
-                Future<JsonObject> f4 = database.insertDemoViews(username, 334541, 1, 1);
-                Future<JsonObject> f5 = database.insertDemoViews(username, 334543, 0, 1);
-                all(f1, f2, f3, f4, f5).setHandler(resultHandler(ctx, ar -> {
+                all(f1, f2).setHandler(resultHandler(ctx, ar -> {
                     if (isServer(config)) {
                         mail.sendVerificationEmail(ctx, username);
                         redirect(ctx, UI_LOGIN + verifyEmail());

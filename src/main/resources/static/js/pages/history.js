@@ -99,8 +99,10 @@ function addHistory(data, lang) {
                     '<div class="collapsible-body white">' +
                         '<div class="row search-image">' +
                             '<div class="col m4 l3 search-image hide-on-small-only">' +
-                                '<img src="' + posterPath + '" alt="Poster for movie: ' +
-                                data[i]['Title'] + '" width="80%">' +
+                                '<a class="wishlist-object" href="movies/?id=' + data[i]['MovieId']  + '">' +
+                                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
+                                    data[i]['Title'] + '" width="80%">' +
+                                '</a>' +
                             '</div>'+
                             '<div class="col">' +
                                 '<ul>' +
@@ -117,7 +119,7 @@ function addHistory(data, lang) {
                             '<div class="row">' +
                                 '<div class="col s12 m12 l12">' +
                                 '<div>' +
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'+
+                                safe_tags_replace(data[i]['Comment'])+
                                 '</div>' +
                                 '</div>'+
                             '</div>' +

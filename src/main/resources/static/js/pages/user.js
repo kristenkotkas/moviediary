@@ -3,11 +3,11 @@ fallback.ready(['jQuery', 'EventBus'], function () {
     eventbus.onopen = function () {
         eventbus.registerHandler("messenger", function (err, msg) {
             console.log(msg);
-            Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
+            Materialize.toast(msg.headers.name + ": " +  msg.body, 2500);
         });
         var sendMessage = function () {
             var input = $("#MessageInput").val();
-            eventbus.publish("messenger", input);
+            eventbus.publish("messenger", safe_tags_replace(input));
         };
         $("#MessageInput").keyup(function (e) {
             if (e.keyCode === 13) {

@@ -131,7 +131,8 @@ span.badge.new:after {
 }
 
 .wishlist-object:hover {
-    background: #bfc2be;
+    opacity: 0.9;
+    filter: alpha(opacity=90)
 }
 
 .load-more:hover,

@@ -103,6 +103,13 @@ public class StringUtils {
         } return "";
     }
 
+    public static String movieDateToDBDate(String date) {
+        //24 March, 2017 22:01 -> 2017-03-24 22:01:00
+        String[] parts = date.split(" ");
+        return parts[2] + "-" + months.get(parts[1]) + "-" + parts[0] + " " + parts[3].split(":")[0] + ":" +
+                parts[3].split(":")[1] + ":00";
+    }
+
     /**
      * Lowercases and capitalizes given name.
      *

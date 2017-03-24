@@ -17,16 +17,74 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         var commentFiled = $("#watchComment");
 
-        startNow.click(function () {
-            startNowPress(startDate, startTime);
+        var addToWatchBtn = $("#add-watch-btn");
+        var addButton = $('#add-btn');
+
+        startNow.click(function (e) {
+            startNowPress(startDate, startTime, e);
         });
 
         endNow.click(function (e) {
             endNowPress(endDate, endTime, e);
         });
 
+        addToWatchBtn.click(function () {
+            console.log('click');
+            startDate.val('');
+            startTime.val('');
+            endDate.val('');
+            endTime.val('');
+            seenFirst.prop('checked', false);
+            wasCinema.prop('checked', false);
+            commentFiled.val('');
+        });
+
         var data = reply.body;
         var posterPath = "";
+
+        addButton.click(function () {
+            var start = startDate.val() + ' ' + startTime.val();
+            var end = endDate.val() + ' ' + endTime.val();
+
+            if (start != ' ' && end != ' ') {
+                eventbus.send("database_insert_view",
+                    {
+                        'movieId': movieId.toString(),
+                        'start': start,
+                        'end': end,
+                        'wasFirst': seenFirst.is(':checked'),
+                        'wasCinema': wasCinema.is(':checked'),
+                        'comment': commentFiled.val()
+                    }, function (error, reply) {
+                        console.log('hello');
+                        console.log('reply ' + reply);
+                    });
+                addButton.off('click').off('keyup');
+                $('#modal1').modal('close');
+                //Fixme: parandada topelt lisamine
+            }
+
+            setTimeout(function () {
+                getMovieViews(eventbus, movieId, lang);
+            }, 750);
+        });
+
+        endCalculate.click(function () {
+            endCalcPress(endDate, endTime, startDate, startTime, data['runtime']);
+        });
+
+        startCalculate.click(function () {
+            startCalcPress(endDate, endTime, startDate, startTime, data['runtime']);
+        });
+
+        if (data['runtime'] == 0) {
+            startCalculate.prop("disabled", true);
+            endCalculate.prop("disabled", true);
+        } else {
+            startCalculate.prop("disabled", false);
+            endCalculate.prop("disabled", false);
+        }
+
         if (data['poster_path'] === null) {
             posterPath = '/static/img/nanPosterBig.jpg'
         } else {
@@ -134,6 +192,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
             } else {
                 $('#seen-header').empty().append(lang['MOVIES_JS_SEEN_ONCE']);
             }
+            $('#movie-views-table').empty();
             $.each(data, function (i) {
                 $('#movie-views-table').append(
                     $.parseHTML(
@@ -150,33 +209,64 @@ var getMovieViews = function (eventbus, movieId, lang) {
     });
 };
 
-var startNowPress = function (startDate, startTime) {
-    var date = startDate.pickadate('picker').get();
-    var time = startTime.pickatime().val();
-    console.log('start: ' + date + ' ' + time);
-};
-
-var startCalcPress = function () {
-
+var startNowPress = function (startDate, startTime, e) {
+    var date = new Date();
+    var time = getDualTime(date.getHours()) + ":" + getDualTime(date.getMinutes());
+    e.stopPropagation();
+    startDate.pickadate('picker').set('select', date);
+    startTime.pickatime('show').pickatime('done');
+    startTime.val(time);
 };
 
 var endNowPress = function (endDate, endTime, e) {
     var date = new Date();
-    var day = date.getDate() + ". " + (date.getMonth() + 1) + ". " + date.getFullYear();
-    var time = date.getHours() + ":" + date.getMinutes();
-
+    var time = getDualTime(date.getHours()) + ":" + getDualTime(date.getMinutes());
     e.stopPropagation();
-    console.log(time);
-
-    /*endTime.pickatime({
-        default: time
-    });*/
-    // fixme: vaja now ära fixida, et ka pärast ise aja valimist now töötaks
+    endDate.pickadate('picker').set('select', date);
     endTime.pickatime('show').pickatime('done');
+    endTime.val(time);
 };
 
-var endCalcPress = function () {
+var endCalcPress = function (endDate, endTime, startDate, startTime, movieLength) {
+    var endingDate = new Date();
 
+    if (startDate.val() != '' && startTime.val() != '') {
+        var time = startTime.val().split(':');
+        var pickDate = new Date(startDate.pickadate('picker').get('select')['pick']);
+        var startingDate = new Date(pickDate.getFullYear(), pickDate.getMonth(), pickDate.getDate(), time[0], time[1], 0, 0);
+        endingDate = plusMins(startingDate, movieLength);
+    }
+
+    endDate.pickadate('picker').set('select', endingDate);
+    endTime.pickatime('show').pickatime('done');
+    endTime.val(getDualTime(endingDate.getHours()) + ":" + getDualTime(endingDate.getMinutes()));
+};
+
+var startCalcPress = function (endDate, endTime, startDate, startTime, movieLength) {
+    var endingDate = new Date();
+
+    if (endDate.val() != '' && endTime.val() != '') {
+        var time = endTime.val().split(':');
+        var pickDate = new Date(endDate.pickadate('picker').get('select')['pick']);
+        var startingDate = new Date(pickDate.getFullYear(), pickDate.getMonth(), pickDate.getDate(), time[0], time[1], 0, 0);
+        endingDate = plusMins(startingDate, -1 * movieLength);
+    }
+
+    startDate.pickadate('picker').set('select', endingDate);
+    startTime.pickatime('show').pickatime('done');
+    startTime.val(getDualTime(endingDate.getHours()) + ":" + getDualTime(endingDate.getMinutes()));
+};
+
+function plusMins(date, minutes) {
+    return new Date(date.getTime() + (minutes * 60000));
+}
+
+var getDualTime = function (digit) {
+    digit = digit.toString();
+    if (digit.length == 1) {
+        return '0' + digit;
+    }
+    return digit;
 };
 
 var getNormalDate = function (date, lang) {
@@ -348,7 +438,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
                 searchMovie(eventbus, query, lang);
             }
         };
-        window.onpopstate = function() { //try to load movie on back/forward page movement
+        window.onpopstate = function () { //try to load movie on back/forward page movement
             loadMovie(eventbus, lang);
         };
         loadMovie(eventbus, lang); //load movie if url has param

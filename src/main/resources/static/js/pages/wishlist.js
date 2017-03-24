@@ -41,7 +41,6 @@ function addTableData(data) {
         setTimeout(function () {
             var posterPath = "";
             var movie = data[i];
-            console.log(movie['Title']);
             if (movie['Image'] !== "") {
                 posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
             } else {
@@ -51,12 +50,14 @@ function addTableData(data) {
             $("#wishlist-result").append(
                 $.parseHTML(
                     '<div class="col s6 m4 l2">' +
-                    '<div class="card z-depth-2">' +
-                    '<div class="card-image">' +
-                    '<img src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '">' +
-                    '</div>' +
-                    '</div>' +
+                        '<div class="card z-depth-2 wishlist-object">' +
+                            '<div class="card-image wishlist-object">' +
+                                '<a class="wishlist-object" href="movies/?id=' + movie['MovieId']  + '">' +
+                                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
+                                    movie['Title'] + '">' +
+                                '</a>' +
+                            '</div>' +
+                        '</div>' +
                     '</div>'
                 )
             );

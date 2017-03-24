@@ -107,7 +107,7 @@
                 <!-- Modal Trigger -->
                 <div class="s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" tabindex="7"
                      id="add-watch">
-                    <a href="#modal1" class="waves-effect waves-light btn">Add to watch</a>
+                    <a href="#modal1" class="waves-effect waves-light btn" id="add-watch-btn">Add to watch</a>
                 </div>
 
                 <!-- Modal Structure -->
@@ -221,13 +221,13 @@
                         </div>
                         <div class="row">
                             <div class="input-field col s12 m10 offset-m1 l10 offset-l1">
-                                <textarea id="watchComment" class="materialize-textarea" data-length="120"></textarea>
+                                <textarea id="watchComment" class="materialize-textarea" data-length="500"></textarea>
                                 <label for="watchComment">Kirjuta midagi vaatamisest</label>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Add</a>
+                        <a class="modal-action waves-effect waves-green btn-flat" id="add-btn">Add</a>
                         <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
                     </div>
                 </div>

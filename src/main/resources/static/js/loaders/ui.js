@@ -42,7 +42,7 @@ fallback.ready(function () {
     $(".datepicker").pickadate({ //calendar initialization
         //http://amsul.ca/pickadate.js/date/#options
         selectMonths: true,
-        selectYears: 15
+        selectYears: 10
     });
     $('.tooltipped').tooltip({ //tooltips initialization
         delay: 150,
@@ -58,6 +58,20 @@ fallback.ready(function () {
         default: 'now'
     });
 });
+
+var tagsToReplace = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;'
+};
+
+function replaceTag(tag) {
+    return tagsToReplace[tag] || tag;
+}
+
+function safe_tags_replace(str) {
+    return str.replace(/[&<>]/g, replaceTag);
+}
 
 function getCookie(name) {
     var value = "; " + document.cookie;

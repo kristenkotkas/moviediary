@@ -8,17 +8,16 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static io.vertx.core.CompositeFuture.all;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
 import static server.service.DatabaseService.*;
 import static server.util.CommonUtils.*;
 import static server.util.StringUtils.*;
+import static server.util.StringUtils.formToDBDate;
 
 /**
  * Database service implementation.
@@ -34,10 +33,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             "JOIN Settings ON Users.Username = Settings.Username";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
 
-    private static final String SQL_INSERT_DEMO_VIEWS =
-            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_VIEW =
+            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Title, Start, WasFirst, WasCinema, Image " +
+            "SELECT MovieId, Title, Start, WasFirst, WasCinema, Image, Comment " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
@@ -61,7 +61,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
     public static final String SQL_GET_WISHLIST =
-            "SELECT Title, Time, Image FROM Wishlist " +
+            "SELECT Title, Time, Image, MovieId FROM Wishlist " +
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username =  ? ORDER BY Time DESC";
 
@@ -90,11 +90,8 @@ public class DatabaseServiceImpl implements DatabaseService {
                     .add(hash(password, salt))
                     .add(salt), ar -> {
                 if (ar.succeeded()) {
-                    Future<JsonObject> f1 = insertDemoViews(username, 157336, 1, 0);
-                    Future<JsonObject> f2 = insertDemoViews(username, 334541, 1, 1);
-                    Future<JsonObject> f3 = insertDemoViews(username, 334543, 0, 1);
                     Future<JsonObject> f4 = insert(Table.SETTINGS, createDataMap(username));
-                    all(f1, f2, f3, f4).setHandler(result -> {
+                    f4.setHandler(result -> {
                         if (result.succeeded()) {
                             fut.complete(ar.result().toJson());
                         } else {
@@ -113,15 +110,22 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Inserts a view into views table.
      */
     @Override
-    public Future<JsonObject> insertDemoViews(String username, int movieId, int wasFirst, int wasCinema) {
+    public Future<JsonObject> insertView(String user, String param) {
+        JsonObject json = new JsonObject(param);
+        System.out.println("-------------------------------------");
+        System.out.println(json.encodePrettily());
+        System.out.println("-------------------------------------");
+
+        String movieId = json.getString("movieId");
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_DEMO_VIEWS, new JsonArray()
-                        .add(username)
+                conn -> conn.updateWithParams(SQL_INSERT_VIEW, new JsonArray()
+                        .add(user)
                         .add(movieId)
-                        .add(LocalDateTime.now().toString())
-                        .add(LocalDateTime.now().plusHours(2).toString())
-                        .add(wasFirst)
-                        .add(wasCinema), updateHandler(conn, fut)))));
+                        .add(movieDateToDBDate(json.getString("start")))
+                        .add(movieDateToDBDate(json.getString("end")))
+                        .add(json.getBoolean("wasFirst"))
+                        .add(json.getBoolean("wasCinema"))
+                        .add(json.getString("comment")), updateHandler(conn, fut)))));
     }
 
     /**
