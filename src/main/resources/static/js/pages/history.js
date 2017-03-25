@@ -47,7 +47,6 @@ fallback.ready(['jQuery', 'EventBus'], function () {
 });
 
 function searchHistory(eventbus, lang, start, end) {
-    $("#load-more").show();
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -107,6 +106,7 @@ function searchHistory(eventbus, lang, start, end) {
                 });
 
             } else {
+                $("#load-more").hide();
                 $("#table").empty();
                 $("#viewsTitle").empty().append(
                     '<div class="card z-depth-0">' +
