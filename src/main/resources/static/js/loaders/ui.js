@@ -80,7 +80,6 @@ function getCookie(name) {
 }
 
 function getMonth(start, lang) {
-    console.log(start);
     var startArray = start.split(' ');
     var month = startArray[1];
     return startArray[0] + lang[month.toUpperCase()] + ' ' + startArray[2];

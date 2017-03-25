@@ -1,84 +1,122 @@
 fallback.ready(['jQuery', 'EventBus'], function () {
     var eventbus = new EventBus("/eventbus");
+    var startDateField =  $("#startingDay");
+    var endDateField = $("#endDay");
     eventbus.onopen = function () {
         var lang;
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
             console.log(lang);
             $("#Search").click(function () {
-                $("#load-more").show();
-                eventbus.send("database_get_history",
-                    {
-                        'is-first': $("#seenFirst").is(':checked'),
-                        'is-cinema': $("#wasCinema").is(':checked'),
-                        'start': $("#startingDay").pickadate('picker').get(),
-                        'end': $("#endDay").pickadate('picker').get(),
-                        'page': 0
-                    }, function (error, reply) {
-                        console.log(reply);
-                        var data = reply.body['rows'];
-                        console.log(data.length);
-                        if (data.length > 0) {
-                            $("#viewsTitle").empty();
-                            $("#table").empty();
-
-                            addHistory(data, lang);
-
-                            if (data.length == 10) {
-                                $("#load-more-holder").empty().append(
-                                    $.parseHTML(
-                                        '<tr tabindex="8" class="load-more" id="load-more">' +
-                                        '<td></td>' +
-                                        '<td>' + lang['HISTORY_LOAD_MORE'] + '</td>' +
-                                        '</tr>'
-                                    )
-                                ).show();
-                            } else {
-                                $("#load-more-holder").empty();
-                            }
-
-                            var i = 0;
-
-                            $("#load-more").keyup(function (e) {
-                                if (e.keyCode == 13) {
-                                    $("#load-more").click();
-                                }
-                            });
-
-                            $("#load-more").click(function () {
-                                eventbus.send("database_get_history",
-                                    {
-                                        'is-first': $("#seenFirst").is(':checked'),
-                                        'is-cinema': $("#wasCinema").is(':checked'),
-                                        'start': $("#startingDay").pickadate('picker').get(),
-                                        'end': $("#endDay").pickadate('picker').get(),
-                                        'page': ++i
-                                    }, function (error, reply) {
-                                        var addData = reply.body['rows'];
-                                        console.log(addData.length);
-                                        if (addData.length < 10) {
-                                            $("#load-more-holder").hide();
-                                        }
-                                        addHistory(addData, lang);
-                                        $(document).scrollTop($(document).height());
-                                    });
-                            });
-
-                        } else {
-                            $("#table").empty();
-                            $("#viewsTitle").empty().append(
-                                '<div class="card z-depth-0">' +
-                                '<div class="card-title">' +
-                                '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
-                                '</div>' +
-                                '</div>'
-                            );
-                        }
-                    });
+                searchHistory(eventbus, lang,
+                    startDateField.pickadate('picker').get(),
+                    endDateField.pickadate('picker').get())
+            });
+            $("#today").click(function () {
+                startDateField.pickadate('picker').set('select', new Date());
+                endDateField.pickadate('picker').set('select', new Date());
+                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            });
+            $("#this-week").click(function () {
+                var current = new Date();
+                var first = current.getDate() - current.getDay();
+                var last = first + 6;
+                startDateField.pickadate('picker').set('select', new Date(current.setDate(first)));
+                endDateField.pickadate('picker').set('select', new Date(current.setDate(last)));
+                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            });
+            $("#this-month").click(function () {
+                var date = new Date();
+                var first = new Date(date.getFullYear(), date.getMonth(), 1);
+                var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                startDateField.pickadate('picker').set('select', first);
+                endDateField.pickadate('picker').set('select', last);
+                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            });
+            $("#this-year").click(function () {
+                var date = new Date();
+                console.log(date.getFullYear());
+                var first = new Date(date.getFullYear(), 0, 1);
+                var last = new Date(date.getFullYear(), 11, 31);
+                startDateField.pickadate('picker').set('select', first);
+                endDateField.pickadate('picker').set('select', last);
+                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
             });
         });
     };
 });
+
+function searchHistory(eventbus, lang, start, end) {
+    $("#load-more").show();
+    eventbus.send("database_get_history",
+        {
+            'is-first': $("#seenFirst").is(':checked'),
+            'is-cinema': $("#wasCinema").is(':checked'),
+            'start': start,
+            'end': end,
+            'page': 0
+        }, function (error, reply) {
+            console.log(reply);
+            var data = reply.body['rows'];
+            console.log(data.length);
+            if (data.length > 0) {
+                $("#viewsTitle").empty();
+                $("#table").empty();
+
+                addHistory(data, lang);
+
+                if (data.length == 10) {
+                    $("#load-more-holder").empty().append(
+                        $.parseHTML(
+                            '<tr tabindex="8" class="load-more" id="load-more">' +
+                            '<td></td>' +
+                            '<td>' + lang['HISTORY_LOAD_MORE'] + '</td>' +
+                            '</tr>'
+                        )
+                    ).show();
+                } else {
+                    $("#load-more-holder").empty();
+                }
+
+                var i = 0;
+
+                $("#load-more").keyup(function (e) {
+                    if (e.keyCode == 13) {
+                        $("#load-more").click();
+                    }
+                });
+
+                $("#load-more").click(function () {
+                    eventbus.send("database_get_history",
+                        {
+                            'is-first': $("#seenFirst").is(':checked'),
+                            'is-cinema': $("#wasCinema").is(':checked'),
+                            'start': start,
+                            'end': end,
+                            'page': ++i
+                        }, function (error, reply) {
+                            var addData = reply.body['rows'];
+                            console.log(addData.length);
+                            if (addData.length < 10) {
+                                $("#load-more-holder").hide();
+                            }
+                            addHistory(addData, lang);
+                            $(document).scrollTop($(document).height());
+                        });
+                });
+
+            } else {
+                $("#table").empty();
+                $("#viewsTitle").empty().append(
+                    '<div class="card z-depth-0">' +
+                    '<div class="card-title">' +
+                    '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
+                    '</div>' +
+                    '</div>'
+                );
+            }
+        });
+}
 
 function addHistory(data, lang) {
     $.each(data, function (i) {
