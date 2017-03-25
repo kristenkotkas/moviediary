@@ -17,8 +17,12 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         var commentFiled = $("#watchComment");
 
-        var addToWatchBtn = $("#add-watch-btn");
+        var addToWatchBtn = $("#add-watch");
         var addButton = $('#add-btn');
+
+        addToWatchBtn.click(function () {
+            $('#modal1').modal('open');
+        });
 
         startNow.click(function (e) {
             startNowPress(startDate, startTime, e);
@@ -58,15 +62,10 @@ var searchMovie = function (eventbus, movieId, lang) {
                     Materialize.toast(data['original_title'] + ' added to views.', 2500);
                     console.log('hello');
                     console.log('reply ' + JSON.stringify(reply.body));
+                    $('#modal1').modal('close');
+                    getMovieViews(eventbus, movieId, lang);
                 });
-                addButton.off('click').off('keyup');
-                $('#modal1').modal('close');
-                //Fixme: parandada topelt lisamine
             }
-
-            setTimeout(function () {
-                getMovieViews(eventbus, movieId, lang);
-            }, 750);
         });
 
         endCalculate.click(function () {
@@ -365,6 +364,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
             });
 
             $("#search-button").click(function () {
+                $('#add-btn').off('click').off('keyup');
                 $("#search-result").empty();
                 $('#basic-info-box').removeClass('scale-in').addClass('scale-out');
                 $('#seen-times').removeClass('scale-in').addClass('scale-out');
