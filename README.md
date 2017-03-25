@@ -15,3 +15,4 @@ Viited:
 Etapid:
 - [Etapp 1](https://github.com/kristenkotkas/moviediary/wiki/Etapp-1)
 - [Etapp 2](https://github.com/kristenkotkas/moviediary/wiki/Etapp-2)
+- [Etapp 3](https://github.com/kristenkotkas/moviediary/wiki/Etapp-3)
