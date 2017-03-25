@@ -7,6 +7,31 @@ fallback.ready(['jQuery', 'EventBus'], function () {
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
             console.log(lang);
+            $("#search").keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $("#search").click();
+                }
+            });
+            $("#today").keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $("#today").click();
+                }
+            });
+            $("#this-week").keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $("#this-week").click();
+                }
+            });
+            $("#this-month").keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $("#this-month").click();
+                }
+            });
+            $("#this-year").keyup(function (e) {
+                if (e.keyCode === 13) {
+                    $("#this-year").click();
+                }
+            });
             $("#search").click(function () {
                 searchHistory(eventbus, lang,
                     startDateField.pickadate('picker').get(),
