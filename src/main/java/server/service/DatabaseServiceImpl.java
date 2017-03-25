@@ -254,8 +254,6 @@ public class DatabaseServiceImpl implements DatabaseService {
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         System.out.println(json.encodePrettily());
-        //"WHERE Username = ? AND Start >= ? AND End <= ? AND " + "WasFirst = ? AND WasCinema = ?"
-        // AND ? AND ?
         String SQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS;
         if (json.getBoolean("is-first")) {
             SQL_QUERY_VIEWS_TEMP += " AND WasFirst";

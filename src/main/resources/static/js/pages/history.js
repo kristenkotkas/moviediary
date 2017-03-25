@@ -7,7 +7,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
             console.log(lang);
-            $("#Search").click(function () {
+            $("#search").click(function () {
                 searchHistory(eventbus, lang,
                     startDateField.pickadate('picker').get(),
                     endDateField.pickadate('picker').get())
@@ -62,6 +62,7 @@ function searchHistory(eventbus, lang, start, end) {
             if (data.length > 0) {
                 $("#viewsTitle").empty();
                 $("#table").empty();
+                //addTableHead(data.length);
 
                 addHistory(data, lang);
 
@@ -116,6 +117,16 @@ function searchHistory(eventbus, lang, start, end) {
                 );
             }
         });
+}
+
+function addTableHead(data) {
+    $("#viewsTitle").empty().append(
+        '<div class="card z-depth-0">' +
+        '<div class="card-title">' +
+        '<a class="light grey-text text-lighten-1 not-found">' +  'Found ' + data + ' views</a>' +
+        '</div>' +
+        '</div>'
+    );
 }
 
 function addHistory(data, lang) {
