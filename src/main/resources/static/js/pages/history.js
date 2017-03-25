@@ -71,7 +71,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
     };
 });
 
-function searchHistory(eventbus, lang, start, end) {
+var searchHistory = function(eventbus, lang, start, end) {
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -167,7 +167,7 @@ function addHistory(data, lang) {
                 '<li class="z-depth-0">' +
                     '<div class="collapsible-header history-object content-key grey-text">' +
                         data[i]['Title'] +
-                        '<span class="badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
+                        '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
                     '</div>' +
                     '<div class="collapsible-body white">' +

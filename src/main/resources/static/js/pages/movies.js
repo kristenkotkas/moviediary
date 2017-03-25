@@ -20,10 +20,6 @@ var searchMovie = function (eventbus, movieId, lang) {
         var addToWatchBtn = $("#add-watch");
         var addButton = $('#add-btn');
 
-        addToWatchBtn.click(function () {
-            $('#modal1').modal('open');
-        });
-
         startNow.click(function (e) {
             startNowPress(startDate, startTime, e);
         });
@@ -34,6 +30,7 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         addToWatchBtn.click(function () {
             console.log('click');
+            $('#modal1').modal('open');
             startDate.val('');
             startTime.val('');
             endDate.val('');
