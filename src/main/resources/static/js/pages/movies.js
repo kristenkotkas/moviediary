@@ -47,18 +47,18 @@ var searchMovie = function (eventbus, movieId, lang) {
             var end = endDate.val() + ' ' + endTime.val();
 
             if (start != ' ' && end != ' ') {
-                eventbus.send("database_insert_view",
-                    {
-                        'movieId': movieId.toString(),
-                        'start': start,
-                        'end': end,
-                        'wasFirst': seenFirst.is(':checked'),
-                        'wasCinema': wasCinema.is(':checked'),
-                        'comment': commentFiled.val()
-                    }, function (error, reply) {
-                        console.log('hello');
-                        console.log('reply ' + reply);
-                    });
+                eventbus.send("database_insert_view", {
+                    'movieId': movieId.toString(),
+                    'start': start,
+                    'end': end,
+                    'wasFirst': seenFirst.is(':checked'),
+                    'wasCinema': wasCinema.is(':checked'),
+                    'comment': commentFiled.val()
+                }, function (error, reply) {
+                    Materialize.toast(data['original_title'] + ' added to views.', 2500);
+                    console.log('hello');
+                    console.log('reply ' + JSON.stringify(reply.body));
+                });
                 addButton.off('click').off('keyup');
                 $('#modal1').modal('close');
                 //Fixme: parandada topelt lisamine

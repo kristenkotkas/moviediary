@@ -66,8 +66,8 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, parseInt(param)));
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param)),
                 (user, json) -> json));
-        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), getDatabaseWishlist()));
-        listen(DATABASE_INSERT_VIEW, database::insertView);
+        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), (user, json) -> json));
+        listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
     }
 
     @Override
@@ -75,10 +75,6 @@ public class DatabaseRouter extends EventBusRoutable {
         router.get(API_USERS_ALL).handler(this::handleUsersAll);
         router.get(API_VIEWS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
-    }
-
-    private BiFunction<String, JsonObject, Object> getDatabaseWishlist() {
-        return (String user, JsonObject json) -> json;
     }
 
     /**

@@ -229,24 +229,17 @@ public interface DatabaseService {
         };
     }
 
-    static Handler<AsyncResult<ResultSet>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                future.complete(ar.result().toJson());
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        };
-    }
-
     /**
-     * Convenience method for handling sql update commands result.
+     * Convenience method for handling sql commands result.
      */
-    static Handler<AsyncResult<UpdateResult>> updateHandler(SQLConnection conn, Future future) {
+    static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
         return ar -> {
             if (ar.succeeded()) {
-                future.complete();
+                if (ar.result() instanceof ResultSet) {
+                    future.complete(((ResultSet) ar.result()).toJson());
+                } else {
+                    future.complete(((UpdateResult) ar.result()).toJson());
+                }
             } else {
                 future.fail(ar.cause());
             }

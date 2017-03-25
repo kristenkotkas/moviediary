@@ -22,9 +22,11 @@ fallback.load({
         '//localhost:8081/static/js/custom/materialize.js'
     ],
     ClockPicker_css: [
+        //'//movies.kyngas.eu/static/css/clockpicker.css',
         '//localhost:8081/static/css/clockpicker.css'
     ],
     ClockPicker: [
+        //'//movies.kyngas.eu/static/js/custom/clockpicker.js'
         '//localhost:8081/static/js/custom/clockpicker.js'
     ]
 }, {

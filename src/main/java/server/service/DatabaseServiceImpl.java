@@ -17,7 +17,6 @@ import static server.service.DatabaseService.SQLCommand.UPDATE;
 import static server.service.DatabaseService.*;
 import static server.util.CommonUtils.*;
 import static server.util.StringUtils.*;
-import static server.util.StringUtils.formToDBDate;
 
 /**
  * Database service implementation.
@@ -125,7 +124,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .add(movieDateToDBDate(json.getString("end")))
                         .add(json.getBoolean("wasFirst"))
                         .add(json.getBoolean("wasCinema"))
-                        .add(json.getString("comment")), updateHandler(conn, fut)))));
+                        .add(json.getString("comment")), resultHandler(conn, fut)))));
     }
 
     /**
@@ -138,7 +137,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .add(id)
                         .add(movieTitle)
                         .add(year)
-                        .add(posterPath), updateHandler(conn, fut)))));
+                        .add(posterPath), resultHandler(conn, fut)))));
     }
 
     /**
@@ -150,7 +149,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
                         .add(username)
                         .add(movieId)
-                        .add(System.currentTimeMillis()), updateHandler(conn, fut)))));
+                        .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
     }
 
     @Override
@@ -167,7 +166,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         System.out.println("USERNAME: " + username);
         return future(fut -> client.getConnection(DatabaseService.connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username),
-                        DatabaseService.resultHandler(conn, fut)))));
+                        resultHandler(conn, fut)))));
     }
 
     /**
@@ -201,7 +200,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             List<Column> columns = getSortedColumns(data);
             client.getConnection(connHandler(fut,
                     conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
-                            updateHandler(conn, fut))));
+                            resultHandler(conn, fut))));
         });
     }
 
@@ -222,7 +221,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             List<Column> columns = getSortedColumns(data);
             client.getConnection(connHandler(fut,
                     conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
-                            updateHandler(conn, fut))));
+                            resultHandler(conn, fut))));
         });
     }
 
