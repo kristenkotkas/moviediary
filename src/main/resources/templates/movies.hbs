@@ -109,40 +109,41 @@
                      tabindex="8" id="add-watch">
                     <div class="card-content">
                         <a class="grey-text content-key">
-                            Add to watch</a>
+                            {{i18n "MOVIES_ADD_TO_WATCH" locale=lang}}</a>
                     </div>
                 </div>
 
                 <!-- Modal Structure -->
                 <div id="modal1" class="modal modal-fixed-footer">
                     <div class="modal-content">
-                        <h5>Add Avatar to watch</h5>
+                        <h5>{{i18n "MOVIES_ADD_TO_WATCH" locale=lang}}</h5>
                         <hr>
                         <div class="row">
                             <div class="col s12 m10 offset-m1 l10 offset-l1">
                                 <!-- Start -->
                                 <div class="row">
                                     <div class="col s12 m12 l12">
-                                        <h5 class="grey-text">Start of the viewing</h5>
+                                        <h5 class="grey-text">{{i18n "START_OF_VIEWING" locale=lang}}</h5>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col s12 m6 l5">
                                         <div class="input-field">
                                             <input id="watchStartDay" type="text" class="datepicker">
-                                            <label for="watchStartDay">Date</label>
+                                            <label for="watchStartDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
                                         </div>
                                     </div>
                                     <div class="col s12 m6 l5">
                                         <div class="input-field">
-                                            <label for="watchStartTime">Time</label>
+                                            <label for="watchStartTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
                                             <input id="watchStartTime" type="time" class="timepicker">
                                         </div>
                                     </div>
                                     <div class="col s6 m6 l2">
                                         <div class="input-field">
                                             <button id="watchStartNow" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0">Now
+                                                    class="btn waves-effect waves-light z-depth-0">
+                                                {{i18n "MOVIES_NOW" locale=lang}}
                                             </button>
                                         </div>
                                     </div>
@@ -151,7 +152,8 @@
                                             <button id="watchStartCalculate" type="submit"
                                                     class="btn waves-effect waves-light z-depth-0 tooltipped"
                                                     data-position="right"
-                                                    data-tooltip="Arvuta algusaeg lõppemise põhjal">Calculate
+                                                    data-tooltip="{{i18n "CALCULATE_START_TOOLTIP" locale=lang}}">
+                                                {{i18n "MOVIES_CALCULATE" locale=lang}}
                                             </button>
                                         </div>
                                     </div>
@@ -163,26 +165,27 @@
                                 <!-- End -->
                                 <div class="row">
                                     <div class="col s12 m12 l12">
-                                        <h5 class="grey-text">End of the viewing</h5>
+                                        <h5 class="grey-text">{{i18n "END_OF_VIEWING" locale=lang}}</h5>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col s12 m6 l5">
                                         <div class="input-field">
                                             <input id="watchEndDay" type="text" class="datepicker">
-                                            <label for="watchEndDay">Date</label>
+                                            <label for="watchEndDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
                                         </div>
                                     </div>
                                     <div class="col s12 m6 l5">
                                         <div class="input-field">
-                                            <label for="watchEndTime">Time</label>
+                                            <label for="watchEndTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
                                             <input id="watchEndTime" type="time" class="timepicker">
                                         </div>
                                     </div>
                                     <div class="col s6 m6 l2">
                                         <div class="input-field">
                                             <button id="watchEndNow" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0">Now
+                                                    class="btn waves-effect waves-light z-depth-0">
+                                                {{i18n "MOVIES_NOW" locale=lang}}
                                             </button>
                                         </div>
                                     </div>
@@ -191,7 +194,8 @@
                                             <button id="watchEndCalculate" type="submit"
                                                     class="btn waves-effect waves-light z-depth-0 tooltipped"
                                                     data-position="right"
-                                                    data-tooltip="Arvuta lõpuaeg alguse põhjal">Calculate
+                                                    data-tooltip="{{i18n "CALCULATE_END_TOOLTIP" locale=lang}}">
+                                                {{i18n "MOVIES_CALCULATE" locale=lang}}
                                             </button>
                                         </div>
                                     </div>
@@ -205,7 +209,7 @@
                                         <input id="watchSeenFirst" type="checkbox">
                                         <label for="watchSeenFirst" class="tooltipped"
                                                data-position="right"
-                                               data-tooltip="Kas see oli filmi esimene vaatamine?">
+                                               data-tooltip="{{i18n "MOVIES_WAS_FIRST_TOOLTIP" locale=lang}}">
                                             {{i18n "HISTORY_WAS_FIRST" locale=lang}}
                                         </label>
                                     </div>
@@ -215,7 +219,7 @@
                                         <input id="watchWasCinema" type="checkbox">
                                         <label for="watchWasCinema" class="tooltipped"
                                                data-position="right"
-                                               data-tooltip="Kas sa vaatasid seda kinos?">
+                                               data-tooltip="{{i18n "MOVIES_WAS_CINEMA_TOOLTIP" locale=lang}}">
                                             {{i18n "HISTORY_WAS_CINEMA" locale=lang}}
                                         </label>
                                     </div>
@@ -225,13 +229,13 @@
                         <div class="row">
                             <div class="input-field col s12 m10 offset-m1 l10 offset-l1">
                                 <textarea id="watchComment" class="materialize-textarea" data-length="500"></textarea>
-                                <label for="watchComment">Kirjuta midagi vaatamisest</label>
+                                <label for="watchComment">{{i18n "MOVIES_COMMENT" locale=lang}}</label>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a class="modal-action waves-effect waves-green btn-flat" id="add-btn">Add</a>
-                        <a class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                        <a class="modal-action waves-effect waves-green btn-flat" id="add-btn">{{i18n "MOVIES_ADD" locale=lang}}</a>
+                        <a class="modal-action modal-close waves-effect waves-green btn-flat">{{i18n "MOVIES_CANCEL" locale=lang}}</a>
                     </div>
                 </div>
                 <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist"
