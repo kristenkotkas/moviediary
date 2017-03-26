@@ -5,12 +5,12 @@ fallback.load({
         '//localhost:8081/static/css/font-awesome-4.7.0/css/font-awesome.min.css'
     ],
     materialize_css: [
-        //'//movies.kyngas.eu/static/css/custom/materialize.css',
-        '//localhost:8081/static/css/custom/materialize.css'
+        '//movies.kyngas.eu/static/css/custom/materialize.css'
+        //'//localhost:8081/static/css/custom/materialize.css'
     ],
     base_css: [
-        //'//movies.kyngas.eu/static/css/custom/base.css',
-        '//localhost:8081/static/css/custom/base.css'
+        '//movies.kyngas.eu/static/css/custom/base.css'
+        //'//localhost:8081/static/css/custom/base.css'
     ],
     jQuery: [
         '//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js',
@@ -18,16 +18,16 @@ fallback.load({
         '//localhost:8081/static/js/jquery.min.js'
     ],
     Materialize: [
-        //'//movies.kyngas.eu/static/js/custom/materialize.js',
-        '//localhost:8081/static/js/custom/materialize.js'
+        '//movies.kyngas.eu/static/js/custom/materialize.js'
+        //'//localhost:8081/static/js/custom/materialize.js'
     ],
     ClockPicker_css: [
-        //'//movies.kyngas.eu/static/css/clockpicker.css',
-        '//localhost:8081/static/css/clockpicker.css'
+        '//movies.kyngas.eu/static/css/clockpicker.css'
+        //'//localhost:8081/static/css/clockpicker.css'
     ],
     ClockPicker: [
-        //'//movies.kyngas.eu/static/js/custom/clockpicker.js'
-        '//localhost:8081/static/js/custom/clockpicker.js'
+        '//movies.kyngas.eu/static/js/custom/clockpicker.js'
+        //'//localhost:8081/static/js/custom/clockpicker.js'
     ]
 }, {
     shim: {
