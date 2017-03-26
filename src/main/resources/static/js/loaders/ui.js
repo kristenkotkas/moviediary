@@ -44,7 +44,8 @@ fallback.ready(function () {
     $(".datepicker").pickadate({ //calendar initialization
         //http://amsul.ca/pickadate.js/date/#options
         selectMonths: true,
-        selectYears: 10
+        selectYears: 10,
+        firstDay: 1
     });
     $('.tooltipped').tooltip({ //tooltips initialization
         delay: 150,
