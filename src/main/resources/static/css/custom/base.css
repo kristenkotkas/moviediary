@@ -141,6 +141,13 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.custom-truncate {
+    display: block;
+    white-space: pre-wrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .load-more {
     font-weight: bold;
 }

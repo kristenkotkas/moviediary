@@ -165,7 +165,7 @@ function addHistory(data, lang) {
         $("#table").append(
             $.parseHTML(
                 '<li class="z-depth-0">' +
-                    '<div class="collapsible-header history-object content-key grey-text">' +
+                    '<div class="collapsible-header history-object content-key grey-text truncate">' +
                         data[i]['Title'] +
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
@@ -192,7 +192,7 @@ function addHistory(data, lang) {
                             '<div class="row"></div>' +
                             '<div class="row">' +
                                 '<div class="col s12 m12 l12">' +
-                                '<div>' +
+                                '<div class="custom-truncate">' +
                                 safe_tags_replace(data[i]['Comment'])+
                                 '</div>' +
                                 '</div>'+
