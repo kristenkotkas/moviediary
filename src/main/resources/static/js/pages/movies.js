@@ -47,7 +47,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             var start = startDate.val() + ' ' + startTime.val();
             var end = endDate.val() + ' ' + endTime.val();
 
-            if (start != ' ' && end != ' ') {
+            if (start != ' ' && end != ' ' && commentFiled.val().length <= 500) {
                 eventbus.send("database_insert_view", {
                     'movieId': movieId.toString(),
                     'start': start,
