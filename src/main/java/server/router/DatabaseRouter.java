@@ -48,6 +48,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
     public static final String DATABASE_GET_WISHLIST = "database_get_wishlist";
     public static final String DATABASE_INSERT_VIEW = "database_insert_view";
+    public static final String DATABASE_GET_YEARS_DIST = "database_get_years_dist";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -68,6 +69,7 @@ public class DatabaseRouter extends EventBusRoutable {
                 (user, json) -> json));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), (user, json) -> json));
         listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
+        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (username, json) -> json));
     }
 
     @Override

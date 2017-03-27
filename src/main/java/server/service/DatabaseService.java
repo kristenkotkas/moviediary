@@ -119,6 +119,8 @@ public interface DatabaseService {
 
     Future<String> getUsersCount();
 
+    Future<JsonObject> getYearsDist(String username, String param);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

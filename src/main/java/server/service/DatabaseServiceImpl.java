@@ -64,6 +64,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username =  ? ORDER BY Time DESC";
 
+    public static final String SQL_GET_YEARS_DIST =
+            "SELECT Year, COUNT(*) AS 'Count' from Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? " +
+                    "GROUP BY Year ORDER BY Year DESC";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -272,6 +278,13 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .add(json.getString("end"))
                         .add(page * 10)
                         .add(10), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getYearsDist(String username, String param) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_YEARS_DIST, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
     }
 
     /**
