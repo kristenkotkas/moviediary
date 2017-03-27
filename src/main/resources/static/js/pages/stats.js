@@ -27,9 +27,10 @@ eventbus.onopen = function () {
 
     function fillData(data, years, distr) {
         var smallestYear = data[data.length - 1]['Year'];
+        var greatestYear = data[0]['Year'];
 
         var i = 0;
-        for (var year = 2017; year >= smallestYear; year--) {
+        for (var year = greatestYear; year >= smallestYear; year--) {
             var yearData = data[i]['Year'];
             //console.log(yearData);
             if (yearData == year) {
