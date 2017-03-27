@@ -14,12 +14,14 @@ eventbus.onopen = function () {
             function (error, reply) {
                 console.log(reply);
                 var data = reply.body['rows'];
-                var years = [];
-                var distr = [];
+                if (data.length > 0) {
+                    var years = [];
+                    var distr = [];
 
-                fillData(data, years, distr);
-                makeChart(chart, 'bar', years, distr);
-                makeChart(chartSmall, 'horizontalBar', years, distr);
+                    fillData(data, years, distr);
+                    makeChart(chart, 'bar', years, distr);
+                    makeChart(chartSmall, 'horizontalBar', years, distr);
+                }
             });
     }
 
@@ -29,7 +31,7 @@ eventbus.onopen = function () {
         var i = 0;
         for (var year = 2017; year >= smallestYear; year--) {
             var yearData = data[i]['Year'];
-            console.log(yearData);
+            //console.log(yearData);
             if (yearData == year) {
                 years.push(data[i]['Year']);
                 distr.push(data[i]['Count']);
@@ -42,7 +44,7 @@ eventbus.onopen = function () {
     }
 
     function makeChart(chart, type, years, distr) {
-        chart.show();
+        $('#year-card').show();
 
         new Chart(chart, {
             type: type,
