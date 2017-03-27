@@ -7,50 +7,57 @@ fallback.ready(['jQuery', 'EventBus'], function () {
         eventbus.send("translations", getCookie("lang"), function (error, reply) {
             lang = reply.body;
             console.log(lang);
-            $("#search").keyup(function (e) {
+            var search = $("#search");
+            var today = $("#today");
+            var thisWeek = $("#this-week");
+            var thisMonth = $("#this-month");
+            var thisYear = $("#this-year");
+
+            search.keyup(function (e) {
                 if (e.keyCode === 13) {
-                    $("#search").click();
+                    search.click();
                 }
             });
-            $("#today").keyup(function (e) {
+            today.keyup(function (e) {
                 if (e.keyCode === 13) {
-                    $("#today").click();
+                    today.click();
                 }
             });
-            $("#this-week").keyup(function (e) {
+            thisWeek.keyup(function (e) {
                 if (e.keyCode === 13) {
-                    $("#this-week").click();
+                    thisWeek.click();
                 }
             });
-            $("#this-month").keyup(function (e) {
+            thisMonth.keyup(function (e) {
                 if (e.keyCode === 13) {
-                    $("#this-month").click();
+                    thisMonth.click();
                 }
             });
-            $("#this-year").keyup(function (e) {
+            thisYear.keyup(function (e) {
                 if (e.keyCode === 13) {
-                    $("#this-year").click();
+                    thisYear.click();
                 }
             });
-            $("#search").click(function () {
+            search.click(function () {
                 searchHistory(eventbus, lang,
                     startDateField.pickadate('picker').get(),
                     endDateField.pickadate('picker').get())
             });
-            $("#today").click(function () {
+            today.click(function () {
                 startDateField.pickadate('picker').set('select', new Date());
                 endDateField.pickadate('picker').set('select', new Date());
                 searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
             });
-            $("#this-week").click(function () {
+            thisWeek.click(function () {
                 var current = new Date();
-                var first = current.getDate() - current.getDay();
+                var isMonday = (current.getDay() + 6) % 7;
+                var first = current.getDate() - isMonday;
                 var last = first + 6;
                 startDateField.pickadate('picker').set('select', new Date(current.setDate(first)));
                 endDateField.pickadate('picker').set('select', new Date(current.setDate(last)));
                 searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
             });
-            $("#this-month").click(function () {
+            thisMonth.click(function () {
                 var date = new Date();
                 var first = new Date(date.getFullYear(), date.getMonth(), 1);
                 var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -58,7 +65,7 @@ fallback.ready(['jQuery', 'EventBus'], function () {
                 endDateField.pickadate('picker').set('select', last);
                 searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
             });
-            $("#this-year").click(function () {
+            thisYear.click(function () {
                 var date = new Date();
                 console.log(date.getFullYear());
                 var first = new Date(date.getFullYear(), 0, 1);
