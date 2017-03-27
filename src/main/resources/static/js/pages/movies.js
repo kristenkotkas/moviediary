@@ -1,3 +1,102 @@
+$('.timepicker').pickatime({
+    autoclose: true,
+    twelvehour: false,
+    default: 'now'
+});
+var eventbus = new EventBus("/eventbus");
+eventbus.onopen = function () {
+
+    var lang;
+    eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        lang = reply.body;
+        enableParameterMovieLoading(eventbus, lang);
+
+        $("#search").keyup(function (e) {
+            if (e.keyCode === 13) {
+                $("#search-button").click();
+            }
+        });
+
+        $("#search-button").click(function () {
+            $('#add-btn').off('click').off('keyup');
+            $("#search-result").empty();
+            $('#basic-info-box').removeClass('scale-in').addClass('scale-out');
+            $('#seen-times').removeClass('scale-in').addClass('scale-out');
+            $('#add-info-box').removeClass('scale-in').addClass('scale-out');
+            $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
+            $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
+            $('#add-watch').removeClass('scale-in').addClass('scale-out');
+            setTimeout(
+                function () {
+                    eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
+                        var data = reply.body['results'];
+                        console.log(data.length);
+                        if (data.length > 0) {
+                            $.each(data, function (i) {
+                                var movie = data[i];
+                                var posterPath = "";
+                                if (movie['poster_path'] !== null) {
+                                    posterPath = 'https://image.tmdb.org/t/p/w92/' + movie['poster_path'];
+                                } else {
+                                    posterPath = '/static/img/nanPosterSmall.jpg'
+                                }
+                                var arrayOfNodes = $.parseHTML(
+                                    '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
+                                    '<div class="row">' +
+                                    '<img src="' + posterPath + '" alt="Poster for movie: '
+                                    + movie['original_title'] + '" class="search-image" width="10%">' +
+                                    '<span class="title search-object-text">' +
+                                    movie['original_title'] +
+                                    '</span>' +
+                                    '</div>' +
+                                    '</li>'
+                                );
+                                arrayOfNodes[0].onclick = function () {
+                                    searchMovie(eventbus, movie.id, lang);
+                                };
+
+                                arrayOfNodes[0].addEventListener("keyup", function (e) {
+                                    if (e.keyCode === 13) {
+                                        searchMovie(eventbus, movie.id, lang);
+                                    }
+                                });
+
+                                $("#search-result").append(arrayOfNodes).show();
+                                if (i === 9) {
+                                    return false;
+                                }
+                            });
+                        } else {
+                            $("#search-result").append(
+                                $.parseHTML(
+                                    '<li class="collection-item">' +
+                                    '<div class="row">' +
+                                    '<h5>' + lang['MOVIES_JS_NO_MOVIES'] + '</h5>' +
+                                    '</div>' +
+                                    '</li>'
+                                )
+                            ).show();
+                        }
+                        $("#movie-poster-card").empty();
+                    });
+                }, 405);
+        });
+    });
+};
+
+var enableParameterMovieLoading = function (eventbus, lang) {
+    var loadMovie = function (eventbus, lang) {
+        var query = getUrlParam("id");
+        if (query !== null && isNormalInteger(query)) {
+            searchMovie(eventbus, query, lang);
+        }
+    };
+    window.onpopstate = function () { //try to load movie on back/forward page movement
+        loadMovie(eventbus, lang);
+    };
+    loadMovie(eventbus, lang); //load movie if url has param
+};
+
 var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
     console.log(movieId);
@@ -344,100 +443,3 @@ function replaceUrlParameter(param, value) {
         window.history.pushState('', '', url);
     }
 }
-
-fallback.ready(['jQuery', 'EventBus'], function () {
-    var eventbus = new EventBus("/eventbus");
-    eventbus.onopen = function () {
-
-        var lang;
-        eventbus.send("translations", getCookie("lang"), function (error, reply) {
-            lang = reply.body;
-            enableParameterMovieLoading(eventbus, lang);
-
-            $("#search").keyup(function (e) {
-                if (e.keyCode === 13) {
-                    $("#search-button").click();
-                }
-            });
-
-            $("#search-button").click(function () {
-                $('#add-btn').off('click').off('keyup');
-                $("#search-result").empty();
-                $('#basic-info-box').removeClass('scale-in').addClass('scale-out');
-                $('#seen-times').removeClass('scale-in').addClass('scale-out');
-                $('#add-info-box').removeClass('scale-in').addClass('scale-out');
-                $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
-                $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
-                $('#add-watch').removeClass('scale-in').addClass('scale-out');
-                setTimeout(
-                    function () {
-                        eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
-                            var data = reply.body['results'];
-                            console.log(data.length);
-                            if (data.length > 0) {
-                                $.each(data, function (i) {
-                                    var movie = data[i];
-                                    var posterPath = "";
-                                    if (movie['poster_path'] !== null) {
-                                        posterPath = 'https://image.tmdb.org/t/p/w92/' + movie['poster_path'];
-                                    } else {
-                                        posterPath = '/static/img/nanPosterSmall.jpg'
-                                    }
-                                    var arrayOfNodes = $.parseHTML(
-                                        '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
-                                        '<div class="row">' +
-                                        '<img src="' + posterPath + '" alt="Poster for movie: '
-                                        + movie['original_title'] + '" class="search-image" width="10%">' +
-                                        '<span class="title search-object-text">' +
-                                        movie['original_title'] +
-                                        '</span>' +
-                                        '</div>' +
-                                        '</li>'
-                                    );
-                                    arrayOfNodes[0].onclick = function () {
-                                        searchMovie(eventbus, movie.id, lang);
-                                    };
-
-                                    arrayOfNodes[0].addEventListener("keyup", function (e) {
-                                        if (e.keyCode === 13) {
-                                            searchMovie(eventbus, movie.id, lang);
-                                        }
-                                    });
-
-                                    $("#search-result").append(arrayOfNodes).show();
-                                    if (i === 9) {
-                                        return false;
-                                    }
-                                });
-                            } else {
-                                $("#search-result").append(
-                                    $.parseHTML(
-                                        '<li class="collection-item">' +
-                                        '<div class="row">' +
-                                        '<h5>' + lang['MOVIES_JS_NO_MOVIES'] + '</h5>' +
-                                        '</div>' +
-                                        '</li>'
-                                    )
-                                ).show();
-                            }
-                            $("#movie-poster-card").empty();
-                        });
-                    }, 405);
-
-            });
-        });
-    };
-
-    var enableParameterMovieLoading = function (eventbus, lang) {
-        var loadMovie = function (eventbus, lang) {
-            var query = getUrlParam("id");
-            if (query !== null && isNormalInteger(query)) {
-                searchMovie(eventbus, query, lang);
-            }
-        };
-        window.onpopstate = function () { //try to load movie on back/forward page movement
-            loadMovie(eventbus, lang);
-        };
-        loadMovie(eventbus, lang); //load movie if url has param
-    };
-});

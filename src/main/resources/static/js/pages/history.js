@@ -1,82 +1,80 @@
-fallback.ready(['jQuery', 'EventBus'], function () {
-    var eventbus = new EventBus("/eventbus");
-    var startDateField =  $("#startingDay");
-    var endDateField = $("#endDay");
-    eventbus.onopen = function () {
-        var lang;
-        eventbus.send("translations", getCookie("lang"), function (error, reply) {
-            lang = reply.body;
-            console.log(lang);
-            var search = $("#search");
-            var today = $("#today");
-            var thisWeek = $("#this-week");
-            var thisMonth = $("#this-month");
-            var thisYear = $("#this-year");
+var eventbus = new EventBus("/eventbus");
+var startDateField =  $("#startingDay");
+var endDateField = $("#endDay");
+eventbus.onopen = function () {
+    var lang;
+    eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        lang = reply.body;
+        console.log(lang);
+        var search = $("#search");
+        var today = $("#today");
+        var thisWeek = $("#this-week");
+        var thisMonth = $("#this-month");
+        var thisYear = $("#this-year");
 
-            search.keyup(function (e) {
-                if (e.keyCode === 13) {
-                    search.click();
-                }
-            });
-            today.keyup(function (e) {
-                if (e.keyCode === 13) {
-                    today.click();
-                }
-            });
-            thisWeek.keyup(function (e) {
-                if (e.keyCode === 13) {
-                    thisWeek.click();
-                }
-            });
-            thisMonth.keyup(function (e) {
-                if (e.keyCode === 13) {
-                    thisMonth.click();
-                }
-            });
-            thisYear.keyup(function (e) {
-                if (e.keyCode === 13) {
-                    thisYear.click();
-                }
-            });
-            search.click(function () {
-                searchHistory(eventbus, lang,
-                    startDateField.pickadate('picker').get(),
-                    endDateField.pickadate('picker').get())
-            });
-            today.click(function () {
-                startDateField.pickadate('picker').set('select', new Date());
-                endDateField.pickadate('picker').set('select', new Date());
-                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
-            });
-            thisWeek.click(function () {
-                var current = new Date();
-                var isMonday = (current.getDay() + 6) % 7;
-                var first = current.getDate() - isMonday;
-                var last = first + 6;
-                startDateField.pickadate('picker').set('select', new Date(current.setDate(first)));
-                endDateField.pickadate('picker').set('select', new Date(current.setDate(last)));
-                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
-            });
-            thisMonth.click(function () {
-                var date = new Date();
-                var first = new Date(date.getFullYear(), date.getMonth(), 1);
-                var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-                startDateField.pickadate('picker').set('select', first);
-                endDateField.pickadate('picker').set('select', last);
-                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
-            });
-            thisYear.click(function () {
-                var date = new Date();
-                console.log(date.getFullYear());
-                var first = new Date(date.getFullYear(), 0, 1);
-                var last = new Date(date.getFullYear(), 11, 31);
-                startDateField.pickadate('picker').set('select', first);
-                endDateField.pickadate('picker').set('select', last);
-                searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
-            });
+        search.keyup(function (e) {
+            if (e.keyCode === 13) {
+                search.click();
+            }
         });
-    };
-});
+        today.keyup(function (e) {
+            if (e.keyCode === 13) {
+                today.click();
+            }
+        });
+        thisWeek.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisWeek.click();
+            }
+        });
+        thisMonth.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisMonth.click();
+            }
+        });
+        thisYear.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisYear.click();
+            }
+        });
+        search.click(function () {
+            searchHistory(eventbus, lang,
+                startDateField.pickadate('picker').get(),
+                endDateField.pickadate('picker').get())
+        });
+        today.click(function () {
+            startDateField.pickadate('picker').set('select', new Date());
+            endDateField.pickadate('picker').set('select', new Date());
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisWeek.click(function () {
+            var current = new Date();
+            var isMonday = (current.getDay() + 6) % 7;
+            var first = current.getDate() - isMonday;
+            var last = first + 6;
+            startDateField.pickadate('picker').set('select', new Date(current.setDate(first)));
+            endDateField.pickadate('picker').set('select', new Date(current.setDate(last)));
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisMonth.click(function () {
+            var date = new Date();
+            var first = new Date(date.getFullYear(), date.getMonth(), 1);
+            var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            startDateField.pickadate('picker').set('select', first);
+            endDateField.pickadate('picker').set('select', last);
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisYear.click(function () {
+            var date = new Date();
+            console.log(date.getFullYear());
+            var first = new Date(date.getFullYear(), 0, 1);
+            var last = new Date(date.getFullYear(), 11, 31);
+            startDateField.pickadate('picker').set('select', first);
+            endDateField.pickadate('picker').set('select', last);
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+    });
+};
 
 var searchHistory = function(eventbus, lang, start, end) {
     eventbus.send("database_get_history",
@@ -149,7 +147,7 @@ var searchHistory = function(eventbus, lang, start, end) {
                 );
             }
         });
-}
+};
 
 function addTableHead(data) {
     $("#viewsTitle").empty().append(

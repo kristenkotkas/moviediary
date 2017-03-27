@@ -1,31 +1,29 @@
-fallback.ready(['jQuery', 'EventBus'], function () {
-    var eventbus = new EventBus("/eventbus");
-    eventbus.onopen = function () {
-        var lang;
-        eventbus.send("translations", getCookie("lang"), function (error, reply) {
-            lang = reply.body;
-            console.log(lang);
-            eventbus.send("database_get_wishlist", {}, function (error, reply) {
-                var data = reply.body['rows'];
-                if (typeof Storage !== 'undefined') {
-                    localStorage.setItem("wishlist_data", JSON.stringify(data));
-                }
-                console.log(data);
-                //addTableHead(lang);
-                addTableData(data);
-            });
-        });
-    };
-    eventbus.onclose = function (json) {
-        if (json.wasClean === false) { //connection lost
+var eventbus = new EventBus("/eventbus");
+eventbus.onopen = function () {
+    var lang;
+    eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        lang = reply.body;
+        console.log(lang);
+        eventbus.send("database_get_wishlist", {}, function (error, reply) {
+            var data = reply.body['rows'];
             if (typeof Storage !== 'undefined') {
-                var data = JSON.parse(localStorage.getItem("wishlist_data"));
-                $("#wishlist-result").empty();
-                addTableData(data);
+                localStorage.setItem("wishlist_data", JSON.stringify(data));
             }
+            console.log(data);
+            //addTableHead(lang);
+            addTableData(data);
+        });
+    });
+};
+eventbus.onclose = function (json) {
+    if (json.wasClean === false) { //connection lost
+        if (typeof Storage !== 'undefined') {
+            var data = JSON.parse(localStorage.getItem("wishlist_data"));
+            $("#wishlist-result").empty();
+            addTableData(data);
         }
-    };
-});
+    }
+};
 
 function addTableHead(lang) {
     $("#wishlist-table").empty().append(
