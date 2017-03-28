@@ -170,7 +170,7 @@ function addHistory(data, lang) {
         $("#table").append(
             $.parseHTML(
                 '<li class="z-depth-0">' +
-                    '<div class="collapsible-header history-object content-key grey-text">' +
+                    '<div class="collapsible-header collapsible-header-history history-object content-key grey-text">' +
                         data[i]['Title'] +
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +

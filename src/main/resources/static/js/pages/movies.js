@@ -25,7 +25,9 @@ eventbus.onopen = function () {
             $('#add-info-box').removeClass('scale-in').addClass('scale-out');
             $('#movie-poster-card').removeClass('scale-in').addClass('scale-out');
             $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
+            $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
+            $('.collapsible').collapsible('close', 0);
             setTimeout(
                 function () {
                     eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
@@ -225,6 +227,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-info-box').removeClass('scale-out').addClass('scale-in');
         $('#movie-poster-card').removeClass('scale-out').addClass('scale-in');
         $('#add-watch').removeClass('scale-out').addClass('scale-in');
+        $('#plot').removeClass('scale-out').addClass('scale-in');
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
 
         inWishlist(eventbus, movieId, lang);
@@ -238,6 +241,10 @@ var searchMovie = function (eventbus, movieId, lang) {
                 $("#add-wishlist").click();
             }
         });
+
+        if (data['overview'].length > 0) {
+            $('#plot-text').empty().append(data['overview']);
+        }
 
         replaceUrlParameter("id", movieId);
     });

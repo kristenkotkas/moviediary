@@ -40,8 +40,48 @@ body {
     margin-left: -10px !important;
 }
 
+.plot-title {
+    margin-top: 25px;
+}
+
 .page-heading {
     margin: 3% 0 1% 4%;
+}
+
+.collapsible {
+    border: none;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.collapsible-header {
+    display: block;
+    cursor: pointer;
+    min-height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    background-color: #fff;
+    border-bottom: none;
+}
+
+.collapsible-header i {
+    width: 2rem;
+    font-size: 1.6rem;
+    line-height: 3rem;
+    display: block;
+    float: left;
+    text-align: center;
+    margin-right: 1rem;
+}
+
+.collapsible-header-history {
+    border-bottom: 1px solid #ddd;
+}
+
+.collapsible-body {
+    display: none;
+    border-bottom: none;
+    box-sizing: border-box;
+    padding: 2rem;
 }
 
 .movies-heading {
