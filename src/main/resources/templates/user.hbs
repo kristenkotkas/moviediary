@@ -51,10 +51,9 @@
             </form>
         </a>
     </div>
-
 </div>
 <div class="row">
-    <div class="col s12 m6">
+    <div class="col s12 m6 l6">
         <div class="card white small z-depth-0">
             <div class="card-content grey-text">
                 <span class="card-title">{{i18n "HOME_MESSENGER" locale=lang}}</span>
@@ -68,7 +67,20 @@
             </div>
         </div>
     </div>
+    <div class="col s12 m6 l6">
+        <div class="card white small z-depth-0">
+            <div class="card-content">
+                <span class="card-title grey-text">{{i18n "HOME_LOCATION" locale=lang}}</span>
+                <div id="map" class="card-image card-map" ></div>
+            </div>
+        </div>
+    </div>
 </div>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEUBsfzjpfNyRUIn40cvvHxSpFevlflPk&callback=initMap"></script>
+<script type="text/javascript" src="/static/js/fallback.min.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/ui.js"></script>
+<script async type="text/javascript" src="/static/js/loaders/eventbus.js"></script>
+<script async type="text/javascript" src="/static/js/pages/user.js"></script>
 <script type="text/javascript" src="/static/js/jquery.min.js"></script>
 <script type="text/javascript" src="/static/js/custom/materialize.js"></script>
 <script type="text/javascript" src="/static/js/sockjs.min.js"></script>

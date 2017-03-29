@@ -131,6 +131,11 @@ span.badge.new:after {
     height: 100%;
 }
 
+.card .card-map {
+    width:100%;
+    height:220px;
+}
+
 .not-found {
     margin: 15px;
     font-size: xx-large;
@@ -267,6 +272,7 @@ span.badge.new:after {
     left: 10px;
     top: 20px;
 }
+
 
 header .brand-logo:hover {
     background-color: transparent;

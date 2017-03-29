@@ -16,6 +16,23 @@ eventbus.onopen = function () {
     $("#SendMessage").click(function () {
         sendMessage();
     });
+
+    var initMap = function() {
+        var liivi2 = {lat: 58.378367, lng: 26.714695};
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 18,
+            center: liivi2
+        });
+        var marker = new google.maps.Marker({
+            position: liivi2,
+            map: map
+        });
+    }
+
+    //$("#map"). = initMap();
+    $(document).ready(function () {
+        initMap();
+    })
 };
 
 $.ajax({
@@ -29,3 +46,6 @@ $.ajax({
         console.log(e.message())
     }
 });
+
+
+
