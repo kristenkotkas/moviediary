@@ -70,6 +70,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ? " +
                     "GROUP BY Year ORDER BY Year DESC";
 
+    public static final String SQL_GET_WEEKDAYS_DIST =
+            "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
+                    "FROM Views " +
+                    "WHERE Username = ? " +
+                    "GROUP BY Day ORDER BY Day";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -284,6 +290,13 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> getYearsDist(String username, String param) {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_YEARS_DIST, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getWeekdaysDist(String username, String param) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_WEEKDAYS_DIST, new JsonArray()
                         .add(username), resultHandler(conn, fut)))));
     }
 

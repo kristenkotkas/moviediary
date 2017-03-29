@@ -49,6 +49,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_WISHLIST = "database_get_wishlist";
     public static final String DATABASE_INSERT_VIEW = "database_insert_view";
     public static final String DATABASE_GET_YEARS_DIST = "database_get_years_dist";
+    public static final String DATABASE_GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -70,6 +71,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), (user, json) -> json));
         listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
         listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (username, json) -> json));
+        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist, (username, json) -> json));
     }
 
     @Override
