@@ -1,3 +1,7 @@
+$(document).ready(function () {
+    //todo mis init vaja
+});
+
 var eventbus = new EventBus("/eventbus");
 eventbus.onopen = function () {
     eventbus.registerHandler("messenger", function (err, msg) {

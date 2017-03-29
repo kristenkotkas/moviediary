@@ -1,3 +1,8 @@
+$(document).ready(function () {
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
+    $('body').addClass('loaded'); //remove loader
+});
+
 var tagsToReplace = {
     '&': '&amp;',
     '<': '&lt;',

@@ -1,8 +1,23 @@
-$('.timepicker').pickatime({
-    autoclose: true,
-    twelvehour: false,
-    default: 'now'
+$(document).ready(function () {
+    $(".datepicker").pickadate({ //calendar initialization
+        //http://amsul.ca/pickadate.js/date/#options
+        selectMonths: true,
+        selectYears: 10,
+        firstDay: 1
+    });
+    $('.tooltipped').tooltip({ //tooltips initialization
+        delay: 150,
+        position: 'top',
+        html: true
+    });
+    $('.timepicker').pickatime({
+        autoclose: true,
+        twelvehour: false,
+        default: 'now'
+    });
+    $('.modal').modal(); //movies modal initialization
 });
+
 var eventbus = new EventBus("/eventbus");
 eventbus.onopen = function () {
 
