@@ -116,6 +116,7 @@ var enableParameterMovieLoading = function (eventbus, lang) {
 
 var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
+    $('#add-btn').off('click').off('keyup');
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
         var startDate = $("#watchStartDay");
@@ -235,7 +236,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#budget').empty().append(toNormalRevenue(nullCheck(data['budget'], lang), lang));
         $('#revenue').empty().append(toNormalRevenue(nullCheck(data['revenue'], lang), lang));
         $('#country').empty().append(getStringFormArray(nullCheck(data['production_countries'], lang), lang));
-        $('#rating').empty().append(getRating(nullCheck(data['vote_average'], lang), lang));
+        $('#rating').empty().append(getRating(nullCheck(data['vote_average'], lang), lang) + ' <i>(' + data['vote_count'] + ')</i>');
 
         $('#basic-info-box').removeClass('scale-out').addClass('scale-in');
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
