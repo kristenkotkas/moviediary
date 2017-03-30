@@ -17,7 +17,7 @@ js/pages/movies.js
 js/pages/stats.js
 js/pages/user.js
 js/pages/wishlist.js
-js/Chart.min.js
+js/chart.min.js
 js/jquery.min.js
 js/sockjs.min.js
 
