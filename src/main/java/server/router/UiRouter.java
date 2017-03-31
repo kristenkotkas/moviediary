@@ -68,8 +68,8 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
-    private static final String TEMPL_DONATE_SUCCESS = "templates/donatesuccess.hbs";
-    private static final String TEMPL_DONATE_FAILURE = "templates/donatefailure.hbs";
+    private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
+    private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -98,12 +98,13 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
-        router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
-        router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
+        router.route(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
+        router.route(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
         router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
+                .setMaxAgeSeconds(DAYS.toSeconds(7))
                 .setIncludeHidden(false)
                 .setDirectoryListing(true));
         router.get().last().handler(this::handleNotFound);

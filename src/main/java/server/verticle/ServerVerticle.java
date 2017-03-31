@@ -62,7 +62,9 @@ public class ServerVerticle extends AbstractVerticle {
                 new UiRouter(vertx, securityConfig))
                 .forEach(routable -> routable.route(router));
         EventBusRoutable.startEventbus(router, vertx);
-        vertx.createHttpServer(new HttpServerOptions().setCompressionSupported(true))
+        vertx.createHttpServer(new HttpServerOptions()
+                .setCompressionSupported(true)
+                .setCompressionLevel(3))
                 .requestHandler(router::accept)
                 .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
                         config().getString(HTTP_HOST, DEFAULT_HOST), futureHandler(future));
