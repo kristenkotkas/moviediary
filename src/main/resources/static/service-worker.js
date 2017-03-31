@@ -6,9 +6,11 @@ var filesToCache = [
     '/',
     'css/custom/loader.min.css',
     'css/font-awesome/css/font-awesome.min.css',
-    'css/font-awesome/fonts/',
+    'css/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0',
     'css/custom/materialize.min.css',
-    'css/fonts/roboto/',
+    'css/fonts/roboto/Roboto-Regular.woff2',
+    'css/fonts/roboto/Roboto-Medium.woff2',
+    'css/fonts/roboto/Roboto-Light.woff2',
     'css/custom/base.css',
     'css/custom/page-center.css',
     'css/clockpicker.css',
@@ -29,56 +31,49 @@ var filesToCache = [
     'js/chart.min.js',
     'js/common.js',
     'js/jquery.min.js',
-    'js/load-worker.js',
-    'js/loaded.js',
+    'js/loader.js',
     'js/sockjs.min.js'
 ];
 
 self.addEventListener('install', function (event) {
     log('[ServiceWorker] Installing...');
-    event.waitUntil(caches
-        .open(cache)
-        .then(function (cache) {
-            log('[ServiceWorker] Caching files');
-            return cache.addAll(filesToCache);
-        }));
+    event.waitUntil(caches.open(cache).then(function (cache) {
+        log('[ServiceWorker] Caching files');
+        return cache.addAll(filesToCache);
+    }));
 });
 
 self.addEventListener('fetch', function () {
-    event.respondWith(caches
-        .match(event.request)
-        .then(function (response) {
-            if (response) {
-                log("Fulfilling " + event.request.url + " from cache.");
+    event.respondWith(caches.match(event.request).then(function (response) {
+        if (response) {
+            log("Fulfilling " + event.request.url + " from cache.");
+            return response;
+        }
+        log(event.request.url + " not found in cache fetching from network.");
+        var fetchRequest = event.request.clone();
+        return fetch(fetchRequest).then(function (response) {
+            if (!response || response.status !== 200 || response.type !== 'basic') {
                 return response;
             }
-            log(event.request.url + " not found in cache fetching from network.");
-            var fetchRequest = event.request.clone();
-            return fetch(fetchRequest).then(function (response) {
-                if (!response || response.status !== 200 || response.type !== 'basic') {
-                    return response;
-                }
-                var responseToCache = response.clone();
-                caches.open(cacheName).then(function (cache) {
-                    cache.put(event.request, responseToCache);
-                });
-                return response;
+            var responseToCache = response.clone();
+            caches.open(cacheName).then(function (cache) {
+                cache.put(event.request, responseToCache);
             });
-        }));
+            return response;
+        });
+    }));
 });
 
 self.addEventListener('activate', function (event) {
     log('[ServiceWorker] Activate');
-    event.waitUntil(caches.keys()
-        .then(function (keyList) {
-            return Promise.all(keyList.map(function (key) {
-                if (key !== cacheName) {
-                    log('[ServiceWorker] Removing old cache ', key);
-                    return caches.delete(key);
-                }
-            }));
-        })
-        .then(function () {
-            self.clients.claim();
+    event.waitUntil(caches.keys().then(function (keyList) {
+        return Promise.all(keyList.map(function (key) {
+            if (key !== cacheName) {
+                log('[ServiceWorker] Removing old cache ', key);
+                return caches.delete(key);
+            }
         }));
+    }).then(function () {
+        self.clients.claim();
+    }));
 });

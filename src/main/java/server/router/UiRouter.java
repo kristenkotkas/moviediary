@@ -98,15 +98,14 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
-        router.route(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
-        router.route(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
+        router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
+        router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
-        router.route(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
+        router.get(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
                 STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
                 .setCachingEnabled(true)
                 .setMaxAgeSeconds(DAYS.toSeconds(7))
-                .setIncludeHidden(false)
-                .setDirectoryListing(true));
+                .setIncludeHidden(false));
         router.get().last().handler(this::handleNotFound);
     }
 
@@ -126,7 +125,7 @@ public class UiRouter extends EventBusRoutable {
                 .setVK_RETURN(vk_return)
                 .setVK_CANCEL(vk_cancel)
                 .setVK_ENCODING(vk_encoding)
-                .setVK_MAC(BankLinkRouter.createMac())
+                .setVK_MAC(createMac())
                 .setVK_DATETIME(vk_datetime), endHandler(ctx));
     }
 
