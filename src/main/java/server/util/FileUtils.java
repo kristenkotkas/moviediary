@@ -19,6 +19,15 @@ public class FileUtils {
      *
      * @return server.json config
      */
+    public static JsonObject getConfig() {
+        return getConfig(null);
+    }
+
+    /**
+     * Loads config from classpath.
+     *
+     * @return server.json config
+     */
     public static JsonObject getConfig(String[] args) {
         JsonObject config = new JsonObj();
         try {

@@ -161,13 +161,13 @@ public class DatabaseRouter extends EventBusRoutable {
                 all(f1, f2).setHandler(resultHandler(ctx, ar -> {
                     if (isServer(config)) {
                         mail.sendVerificationEmail(ctx, username);
-                        redirect(ctx, UI_LOGIN + verifyEmail());
+                        redirect(ctx, verifyEmail());
                     } else {
-                        redirect(ctx, UI_LOGIN + userVerified());
+                        redirect(ctx, userVerified());
                     }
                 }));
             } else {
-                redirect(ctx, UI_FORM_REGISTER + userExists());
+                redirect(ctx, userExists());
             }
         }));
     }
@@ -180,10 +180,10 @@ public class DatabaseRouter extends EventBusRoutable {
     }
 
     private String userExists() {
-        return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_EXISTS";
+        return UI_FORM_REGISTER + "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_EXISTS";
     }
 
     private String verifyEmail() {
-        return "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_VERIFY_EMAIL";
+        return UI_LOGIN + "?" + DISPLAY_MESSAGE + "=" + "FORM_REGISTER_VERIFY_EMAIL";
     }
 }
