@@ -23,9 +23,6 @@ import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
 import static server.util.NetworkUtils.HTTP_PORT;
 
-/**
- * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
- */
 @RunWith(VertxUnitRunner.class)
 public class UiLoginPageTest {
     private static final int PORT = 8082;
@@ -83,19 +80,19 @@ public class UiLoginPageTest {
     }
 
     @Test
-    public void testLoginPageLanguages() throws Exception {
-        checkLoginPageLanguage("en");
-        checkLoginPageLanguage("et");
-        checkLoginPageLanguage("de");
-        checkLoginPageVerifyEmailLangugage("en");
-        checkLoginPageVerifyEmailLangugage("et");
-        checkLoginPageVerifyEmailLangugage("de");
-        checkLoginPageUnauthorizedLanguage("en");
-        checkLoginPageUnauthorizedLanguage("et");
-        checkLoginPageUnauthorizedLanguage("de");
+    public void testLoginPageTranslations() throws Exception {
+        checkLoginPageTranslations("en");
+        checkLoginPageTranslations("et");
+        checkLoginPageTranslations("de");
+        checkLoginPageVerifyEmailTranslation("en");
+        checkLoginPageVerifyEmailTranslation("et");
+        checkLoginPageVerifyEmailTranslation("de");
+        checkLoginPageUnauthorizedTranslation("en");
+        checkLoginPageUnauthorizedTranslation("et");
+        checkLoginPageUnauthorizedTranslation("de");
     }
 
-    private void checkLoginPageLanguage(String lang) {
+    private void checkLoginPageTranslations(String lang) {
         String url = URI + "/login?lang=" + lang + "&message=LOGIN_VERIFIED";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
@@ -110,7 +107,7 @@ public class UiLoginPageTest {
         assertEquals(getString("LOGIN_IDCARD", lang), loginButtons.get(3).getText());
     }
 
-    private void checkLoginPageVerifyEmailLangugage(String lang) {
+    private void checkLoginPageVerifyEmailTranslation(String lang) {
         String url = URI + "/login?lang=" + lang + "&message=FORM_REGISTER_VERIFY_EMAIL";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
@@ -118,7 +115,7 @@ public class UiLoginPageTest {
                 driver.findElements(tagName("h5")).get(1).getText());
     }
 
-    private void checkLoginPageUnauthorizedLanguage(String lang) {
+    private void checkLoginPageUnauthorizedTranslation(String lang) {
         String url = URI + "/login?lang=" + lang + "&message=AUTHORIZER_UNAUTHORIZED";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());

@@ -24,6 +24,4 @@ public interface BaseTemplate extends TypeSafeTemplate {
     void setUserName(String name);
 
     void setUserFirstName(String name);
-
-    void setDonatePage(String name);
 }

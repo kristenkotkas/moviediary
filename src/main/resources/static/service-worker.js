@@ -12,6 +12,7 @@ var filesToCache = [
     'css/fonts/roboto/Roboto-Medium.woff2',
     'css/fonts/roboto/Roboto-Light.woff2',
     'css/custom/base.css',
+    'js/custom/loader.js',
     'css/custom/page-center.css',
     'css/clockpicker.css',
     'img/eng.svg',
@@ -23,15 +24,15 @@ var filesToCache = [
     'js/custom/materialize.min.js',
     'js/custom/vertx-eventbus.js',
     'js/pages/history.js',
+    'js/pages/home.js',
     'js/pages/login.js',
     'js/pages/movies.js',
     'js/pages/stats.js',
     'js/pages/user.js',
     'js/pages/wishlist.js',
     'js/chart.min.js',
-    'js/common.js',
     'js/jquery.min.js',
-    'js/loader.js',
+    'js/jquery-matchHeight.min.js',
     'js/sockjs.min.js'
 ];
 
