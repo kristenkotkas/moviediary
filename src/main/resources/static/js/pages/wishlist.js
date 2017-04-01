@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    //todo mis init vaja
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");
@@ -24,7 +24,7 @@ eventbus.onclose = function (json) {
         if (typeof Storage !== 'undefined') {
             var data = JSON.parse(localStorage.getItem("wishlist_data"));
             $("#wishlist-result").empty();
-            addTableData(data);
+            addTableData2(data);
         }
     }
 };
@@ -35,6 +35,35 @@ function addTableHead(lang) {
         '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
         '<th class="center">' + lang['HISTORY_DATE'] + '</th>' +
         '</tr>');
+}
+
+function addTableData2(data) {
+    var timeout = 0;
+    $.each(data, function (i) {
+        var posterPath = "";
+        var movie = data[i];
+        if (movie['Image'] !== "") {
+            posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
+        } else {
+            posterPath = '/static/img/nanPosterBig.jpg'
+        }
+
+        $("#wishlist-result").append(
+            $.parseHTML(
+                '<div class="col s6 m4 l2 megatest">' +
+                '<img class="responsive-img" ' + 'src="' + posterPath + '" ' + movie['Title'] + '">' +
+                '</div>'
+            )
+        );
+    });
+    $('.megatest').matchHeight({
+        byRow: true,
+        property: 'height',
+        target: $('.responsive-img'),
+        remove: false
+    });
+    //todo mingi trigger et esimesele reale ei paneks aind
+    //todo varasem kraam tagasi
 }
 
 function addTableData(data) {
@@ -52,14 +81,14 @@ function addTableData(data) {
             $("#wishlist-result").append(
                 $.parseHTML(
                     '<div class="col s6 m4 l2">' +
-                        '<div class="card z-depth-2 wishlist-object">' +
-                            '<div class="card-image wishlist-object">' +
-                                '<a class="wishlist-object" href="movies/?id=' + movie['MovieId']  + '">' +
-                                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
-                                    movie['Title'] + '">' +
-                                '</a>' +
-                            '</div>' +
-                        '</div>' +
+                    '<div class="card z-depth-2 wishlist-object">' +
+                    '<div class="card-image wishlist-object">' +
+                    '<a class="wishlist-object" href="movies/?id=' + movie['MovieId'] + '">' +
+                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
+                    movie['Title'] + '">' +
+                    '</a>' +
+                    '</div>' +
+                    '</div>' +
                     '</div>'
                 )
             );

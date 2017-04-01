@@ -1,12 +1,12 @@
 $(document).ready(function () {
-    //todo mis init vaja
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");
 eventbus.onopen = function () {
     eventbus.registerHandler("messenger", function (err, msg) {
         console.log(msg);
-        Materialize.toast(msg.headers.name + ": " +  msg.body, 2500);
+        Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
     });
     var sendMessage = function () {
         var input = $("#MessageInput").val();
@@ -21,7 +21,7 @@ eventbus.onopen = function () {
         sendMessage();
     });
 
-    var initMap = function() {
+    var initMap = function () {
         var liivi2 = {lat: 58.378367, lng: 26.714695};
         var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 18,

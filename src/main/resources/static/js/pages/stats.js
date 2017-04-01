@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    //todo mis init vaja
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");

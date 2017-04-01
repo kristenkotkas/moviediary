@@ -10,6 +10,7 @@ $(document).ready(function () {
         position: 'top',
         html: true
     });
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");

@@ -16,6 +16,7 @@ $(document).ready(function () {
         default: 'now'
     });
     $('.modal').modal(); //movies modal initialization
+    $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");

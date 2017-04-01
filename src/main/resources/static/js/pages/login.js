@@ -1,5 +1,2 @@
-$(document).ready(function () {
-    $('body').addClass('loaded'); //remove loader
-});
-
 document.cookie = "javascript=enabled";
+asyncLoadCSS('/static/css/custom/page-center.css');
