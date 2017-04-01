@@ -18,6 +18,8 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
@@ -29,6 +31,7 @@ public class UiLoginPageTest {
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
+    private JsonObject auth;
     private WebDriver driver;
 
     @Before
@@ -36,6 +39,8 @@ public class UiLoginPageTest {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
         JsonObject config = getConfig().put(HTTP_PORT, PORT);
+        config.getJsonObject("oauth").put("localCallback", URI + "/callback");
+        auth = config.getJsonObject("unit_test");
         vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
     }
 
@@ -69,6 +74,21 @@ public class UiLoginPageTest {
                 escapeHtml4(loginButtons.get(6).getAttribute("href")));
     }
 
+    @Test
+    public void testFacebookLogin() throws Exception {
+        driver.manage().deleteAllCookies();
+        JsonObject fbAuth = auth.getJsonObject("facebook_user");
+        String url = URI + "/login";
+        driver.get(url);
+        assertEquals(url, driver.getCurrentUrl());
+        driver.findElements(tagName("a")).get(1).click();
+        assertTrue(driver.getCurrentUrl().contains("facebook"));
+        driver.findElement(id("email")).sendKeys(fbAuth.getString("username"));
+        driver.findElement(id("pass")).sendKeys(fbAuth.getString("password"));
+        driver.findElement(id("loginbutton")).click();
+        assertEquals(URI + "/private/home?client_name=FacebookClient", driver.getCurrentUrl());
+        driver.manage().deleteAllCookies();
+    }
 
     @Test
     public void testFromLoginPageCanGetToFormLoginPage() throws Exception {

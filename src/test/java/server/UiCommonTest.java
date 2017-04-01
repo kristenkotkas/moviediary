@@ -29,7 +29,7 @@ public class UiCommonTest {
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
-    private JsonObject auth;
+    private JsonObject config;
     private WebDriver driver;
 
     @SuppressWarnings("Duplicates")
@@ -37,11 +37,10 @@ public class UiCommonTest {
     public void setUp(TestContext ctx) throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
-        JsonObject config = getConfig().put(HTTP_PORT, PORT);
+        config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        auth = config.getJsonObject("unit_test_user");
         vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
-        formLogin(driver, URI, auth.getString("username"), auth.getString("password"));
+        formLogin(driver, URI, config);
     }
 
     @Test
@@ -50,7 +49,7 @@ public class UiCommonTest {
         String url = URI + "/private/movies";
         driver.get(url);
         assertEquals(URI + "/login", driver.getCurrentUrl());
-        formLogin(driver, URI, auth.getString("username"), auth.getString("password"));
+        formLogin(driver, URI, config);
         assertEquals(url, driver.getCurrentUrl());
     }
 
@@ -98,7 +97,8 @@ public class UiCommonTest {
 
     @Test
     public void testNavBarTranslations() throws Exception {
-        assertEquals(auth.getString("firstname") + " " + auth.getString("lastname"),
+        JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
+        assertEquals(formAuth.getString("firstname") + " " + formAuth.getString("lastname"),
                 driver.findElements(tagName("a")).get(6).getText());
         checkNavBarTranslations("en");
         checkNavBarTranslations("et");

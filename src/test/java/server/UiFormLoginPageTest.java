@@ -30,29 +30,30 @@ public class UiFormLoginPageTest {
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
-    private JsonObject auth;
+    private JsonObject config;
     private WebDriver driver;
 
     @Before
     public void setUp(TestContext ctx) throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
-        JsonObject config = getConfig().put(HTTP_PORT, PORT);
+        config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        auth = config.getJsonObject("unit_test_user");
         vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
     }
 
     @Test
     public void testLoginUnauthorized() throws Exception {
-        formLogin(driver, URI, "megalamp", "ultrateam3000");
+        driver.manage().deleteAllCookies();
+        formLogin(driver, URI, new JsonObject().put("unit_test", new JsonObject().put("form_user",
+                new JsonObject().put("username", "megalamp").put("password", "ultrateam3000"))));
         assertEquals(URI + "/login?message=AUTHORIZER_UNAUTHORIZED", driver.getCurrentUrl());
     }
 
     @Test
     public void testLoginAuthorizedToHomePage() throws Exception {
-
-        formLogin(driver, URI, auth.getString("username"), auth.getString("password"));
+        driver.manage().deleteAllCookies();
+        formLogin(driver, URI, config);
         assertEquals(URI + "/private/home", driver.getCurrentUrl());
     }
 
@@ -76,7 +77,7 @@ public class UiFormLoginPageTest {
     }
 
     private void checkFormLoginPageTranslations(String lang) {
-        String url = URI + "/formlogin?";
+        String url = URI + "/formlogin";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
         assertEquals(getString("FORM_LOGIN_TITLE", lang), driver.getTitle());

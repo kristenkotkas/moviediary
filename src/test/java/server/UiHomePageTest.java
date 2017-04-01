@@ -26,7 +26,7 @@ public class UiHomePageTest {
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
-    private JsonObject auth;
+    private JsonObject config;
     private WebDriver driver;
 
     @SuppressWarnings("Duplicates")
@@ -34,11 +34,10 @@ public class UiHomePageTest {
     public void setUp(TestContext ctx) throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
-        JsonObject config = getConfig().put(HTTP_PORT, PORT);
+        config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        auth = config.getJsonObject("unit_test_user");
         vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
-        formLogin(driver, URI, auth.getString("username"), auth.getString("password"));
+        formLogin(driver, URI, config);
     }
 
     @Test
@@ -49,16 +48,16 @@ public class UiHomePageTest {
     }
 
     private void checkHomePageTranslations(String lang) {
+        JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
         String url = URI + "/login?lang=" + lang;
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
         url = URI + "/private/home";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
-        assertEquals(getString("HOME_HELLO", lang) + " " + auth.getString("firstname"),
+        assertEquals(getString("HOME_HELLO", lang) + " " + formAuth.getString("firstname"),
                 driver.findElement(tagName("h3")).getText());
     }
-
 
     @After
     public void tearDown(TestContext ctx) throws Exception {
