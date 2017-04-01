@@ -180,6 +180,10 @@ span.badge.new:after {
     filter: alpha(opacity=90)
 }
 
+.history-date {
+    margin-bottom: 3px;
+}
+
 .load-more:hover,
 .load-more:focus,
 .search-button:hover {

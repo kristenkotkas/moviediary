@@ -123,6 +123,10 @@ public interface DatabaseService {
 
     Future<JsonObject> getWeekdaysDist(String username, String param);
 
+    Future<JsonObject> getAllTimeMeta(String username);
+
+    Future<JsonObject> getViewsMeta(String username, String param);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

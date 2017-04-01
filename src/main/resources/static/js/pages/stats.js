@@ -1,36 +1,152 @@
 $(document).ready(function () {
+    $(".datepicker").pickadate({ //calendar initialization
+        //http://amsul.ca/pickadate.js/date/#options
+        selectMonths: true,
+        selectYears: 10,
+        firstDay: 1
+    });
+    $('.tooltipped').tooltip({ //tooltips initialization
+        delay: 150,
+        position: 'top',
+        html: true
+    });
     $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
 
 var eventbus = new EventBus("/eventbus");
+var startDateField = $("#startingDay-stat");
+var endDateField = $("#endDay-stat");
 eventbus.onopen = function () {
-    var yearsChart = $('#yearsChart');
-    var yearsChartSmall = $('#yearsChartSmall');
-    var daysChart = $('#daysChart');
-    var daysChartSmall = $('#daysChartSmall');
-    var click_me = $('#click-me');
+    var lang;
+    eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        lang = reply.body;
+        console.log(lang);
 
-    click_me.click(function () {
-        console.log('click');
-        getData(eventbus);
+        var search = $("#search-stat");
+        var today = $("#today-stat");
+        var thisWeek = $("#this-week-stat");
+        var thisMonth = $("#this-month-stat");
+        var thisYear = $("#this-year-stat");
+        var allTime = $("#all-time-stat");
+
+        search.keyup(function (e) {
+            if (e.keyCode === 13) {
+                search.click();
+            }
+        });
+        today.keyup(function (e) {
+            if (e.keyCode === 13) {
+                today.click();
+            }
+        });
+        thisWeek.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisWeek.click();
+            }
+        });
+        thisMonth.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisMonth.click();
+            }
+        });
+        thisYear.keyup(function (e) {
+            if (e.keyCode === 13) {
+                thisYear.click();
+            }
+        });
+        allTime.keyup(function (e) {
+            if (e.keyCode === 13) {
+                allTime.click();
+            }
+        });
+        search.click(function () {
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        today.click(function () {
+            startDateField.pickadate('picker').set('select', new Date());
+            endDateField.pickadate('picker').set('select', new Date());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisWeek.click(function () {
+            var dates = getThisWeek();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisMonth.click(function () {
+            var dates = getThisMonth();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        thisYear.click(function () {
+            var dates = getThisYear();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        allTime.click(function () {
+            makeAllTime(eventbus);
+        });
     });
 
-    function getData(eventbus) {
-        eventbus.send("database_get_years_dist", {},
-            function (error, reply) {
+    var makeHistory = function (eventbus, lang, start, end) {
+        eventbus.send("database_get_history_meta",
+            {
+                'is-first': $("#seenFirst-stat").is(':checked'),
+                'is-cinema': $("#wasCinema-stat").is(':checked'),
+                'start': start,
+                'end': end
+            }
+            , function (error, reply) {
+                var data = reply.body['rows'];
+                getData(eventbus, lang, start, end);
+            });
+    };
+
+    var makeAllTime = function (eventbus, lang) {
+        eventbus.send("database_get_all_time_meta", {}, function (error, reply) {
+            var data = reply.body['rows'];
+            startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
+            endDateField.pickadate('picker').set('select', new Date());
+            getData(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+    };
+
+    function getData(eventbus, lang, start, end) {
+        eventbus.send("database_get_years_dist",
+            {
+                'is-first': $("#seenFirst-stat").is(':checked'),
+                'is-cinema': $("#wasCinema-stat").is(':checked'),
+                'start': start,
+                'end': end
+            }
+            , function (error, reply) {
                 console.log(reply);
                 var data = reply.body['rows'];
                 if (data.length > 0) {
                     makeYearsChart(data);
+                } else {
+                    $('#year-chart-container').empty();
+                    $('#year-chart-small-container').empty();
                 }
             });
 
-        eventbus.send("database_get_weekdays_dist", {},
-            function (error, reply) {
+        eventbus.send("database_get_weekdays_dist",
+            {
+                'is-first': $("#seenFirst-stat").is(':checked'),
+                'is-cinema': $("#wasCinema-stat").is(':checked'),
+                'start': start,
+                'end': end
+            }
+            , function (error, reply) {
                 console.log(reply);
                 var data = reply.body['rows'];
                 if (data.length > 0) {
                     makeDaysChart(data);
+                } else {
+                    $('#days-chart-container').empty();
+                    $('#days-chart-small-container').empty();
                 }
             });
     }
@@ -46,8 +162,16 @@ eventbus.onopen = function () {
             distrArray.push(distr[i]);
         }
 
-        makeDChart(daysChart, 'bar', distrArray);
-        makeDChart(daysChartSmall, 'horizontalBar', distrArray);
+        $('#days-chart-container').empty().append($.parseHTML(
+            '<canvas class="hide-on-small-only" id="daysChart" height="250%"></canvas>'
+        ));
+
+        $('#days-chart-small-container').empty().append($.parseHTML(
+            '<canvas class="hide-on-med-and-up" id="daysChartSmall" height="250%"></canvas>'
+        ));
+
+        makeDChart($('#daysChart'), 'bar', distrArray);
+        makeDChart($('#daysChartSmall'), 'horizontalBar', distrArray);
 
     }
 
@@ -56,8 +180,17 @@ eventbus.onopen = function () {
         var distr = [];
 
         fillYearsData(data, years, distr);
-        makeYChart(yearsChart, 'bar', years, distr);
-        makeYChart(yearsChartSmall, 'horizontalBar', years, distr);
+
+        $('#year-chart-container').empty().append($.parseHTML(
+            '<canvas class="hide-on-small-only" id="yearsChart" height="100%"></canvas>'
+        ));
+
+        $('#year-chart-small-container').empty().append($.parseHTML(
+            '<canvas class="hide-on-med-and-up" id="yearsChartSmall" height="750%"></canvas>'
+        ));
+
+        makeYChart($('#yearsChart'), 'bar', years, distr);
+        makeYChart($('#yearsChartSmall'), 'horizontalBar', years, distr);
     }
 
     function fillDaysData(data, distr) {
