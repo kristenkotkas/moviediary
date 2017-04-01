@@ -14,7 +14,7 @@ $(document).ready(function () {
 });
 
 var eventbus = new EventBus("/eventbus");
-var startDateField =  $("#startingDay");
+var startDateField = $("#startingDay");
 var endDateField = $("#endDay");
 eventbus.onopen = function () {
     var lang;
@@ -105,15 +105,20 @@ var makeHistory = function (eventbus, lang, start, end) {
 };
 
 var makeAllTime = function (eventbus, lang) {
-    eventbus.send("database_get_all_time_meta", {}, function (error, reply) {
-        var data = reply.body['rows'];
-        startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
-        endDateField.pickadate('picker').set('select', new Date());
-        searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
-    });
+    eventbus.send("database_get_all_time_meta",
+        {
+            'is-first': $("#seenFirst").is(':checked'),
+            'is-cinema': $("#wasCinema").is(':checked')
+        }
+        , function (error, reply) {
+            var data = reply.body['rows'];
+            startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
+            endDateField.pickadate('picker').set('select', new Date());
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
+        });
 };
 
-var searchHistory = function(eventbus, lang, start, end, count) {
+var searchHistory = function (eventbus, lang, start, end, count) {
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -176,25 +181,52 @@ var searchHistory = function(eventbus, lang, start, end, count) {
             } else {
                 $("#load-more").hide();
                 $("#table").empty();
-                $("#viewsTitle").empty().append(
-                    '<div class="card z-depth-0">' +
-                    '<div class="card-title">' +
-                    '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
-                    '</div>' +
-                    '</div>'
-                );
+                addNotFound(lang);
             }
         });
 };
 
-function addTableHead(data) {
+function addTableHead(data, lang) {
+    if (data > 0) {
+        $("#viewsTitle").empty().append(
+            '<div class="card z-depth-0">' +
+            '<div class="card-title">' +
+            '<a class="light grey-text text-lighten-1 not-found">' + data + ' views</a>' +
+            '</div>' +
+            '</div>'
+        );
+    } else {
+        addNotFound(lang);
+    }
+}
+
+function addNotFound(lang) {
     $("#viewsTitle").empty().append(
         '<div class="card z-depth-0">' +
         '<div class="card-title">' +
-        '<a class="light grey-text text-lighten-1 not-found">' + data + ' views</a>' +
+        '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
         '</div>' +
         '</div>'
     );
+}
+
+function removeView(movieId, lang) {
+    console.log(movieId);
+    eventbus.send("database_remove_view", movieId, function (error, reply) {
+        console.log(movieId + ' removed');
+        document.getElementById('history-' + movieId).remove();
+        eventbus.send("database_get_history_meta",
+            {
+                'is-first': $("#seenFirst").is(':checked'),
+                'is-cinema': $("#wasCinema").is(':checked'),
+                'start': $("#startingDay").val(),
+                'end': $("#endDay").val()
+            }
+            , function (error, reply) {
+                var data = reply.body['rows'];
+                addTableHead(data[0]['Count'], lang);
+            });
+    });
 }
 
 function addHistory(data, lang) {
@@ -207,7 +239,7 @@ function addHistory(data, lang) {
         }
         $("#table").append(
             $.parseHTML(
-                '<li class="z-depth-0">' +
+                '<li class="z-depth-0" id="history-' + data[i]['Id'] + '">' +
                     '<div class="collapsible-header collapsible-header-history history-object content-key grey-text">' +
                         data[i]['Title'] +
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
@@ -215,38 +247,58 @@ function addHistory(data, lang) {
                     '</div>' +
                     //body starts here
                     '<div class="collapsible-body white">' +
-                        '<div class="row search-image">' +
+                        '<div class="row">' +
                             '<div class="col m4 l3 search-image hide-on-small-only">' +
-                                '<a class="wishlist-object" href="movies/?id=' + data[i]['MovieId']  + '">' +
-                                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
-                                    data[i]['Title'] + '" width="80%">' +
-                                '</a>' +
-                            '</div>'+
+                                '<div class="row">' +
+                                    '<a class="wishlist-object" href="movies/?id=' + data[i]['MovieId'] + '">' +
+                                        '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
+                                        data[i]['Title'] + '" width="80%">' +
+                                    '</a>' +
+                                '</div>' +
+                                '<div class="row">' +
+                                    '<a class="waves-effect waves-light btn red z-depth-0" id="' + data[i]['Id'] +'">' + 'remove' + '</a>' +
+                                '</div>' +
+                            '</div>' +
                             '<div class="col m8 l9">' +
                                 '<ul>' +
                                     '<li>' +
-                                    '<div>' +
-                                        getMonth(data[i]['Start'], lang) +
-                                        '<span class="content-key grey-text badge">' + data[i]['Time'] + '</span>' +
-                                        '<span class="content-key grey-text badge">' + lang[data[i]['DayOfWeek']] + '</span>' +
-                                    '</div></li>' +
-                                    '<li><i class="grey-text ' + data[i]['WasFirst'] + '" aria-hidden="true"></i></li>' +
-                                    '<li><i class="grey-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></li>' +
+                                        '<table>' +
+                                            '<tbody>' +
+                                                '<tr>' +
+                                                    '<td class="col s12 m10 l10">' +
+                                                    '<span class="grey-text history-date">' + getMonth(data[i]['Start'], lang) + '</span><br>' +
+                                                    '<span class="content-key grey-text">' + data[i]['Time'] + '</span>' +
+                                                    '</td>' +
+                                                    '<td class="col s12 m2 l2"><span class="content-key grey-text">' + lang[data[i]['DayOfWeek']] + '</span></td>' +
+                                                '</tr>' +
+                                                '<tr>' +
+                                                    '<td class="col">' +
+                                                        '<i class="fa-lg grey-text ' + data[i]['WasFirst'] + '" aria-hidden="true"></i>' +
+                                                        '&nbsp&nbsp' +
+                                                        '<i class="fa-lg grey-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i>' +
+                                                    '</td>' +
+                                                '</tr>' +
+                                            '</tbody>' +
+                                        '</table>' +
+                                    '</li>' +
+                                    '<br>' +
                                     '<li>' +
-                                        '<div class="custom-truncate">' +
-                                        safe_tags_replace(data[i]['Comment'])+
+                                        '<div>' +
+                                            '<span class="custom-truncate">' +
+                                                safe_tags_replace(data[i]['Comment']) +
+                                            '</span>' +
                                         '</div>' +
                                     '</li>' +
                                 '</ul>' +
-                            '</div>' +
-                            '<div class="row">' +
-                                '<div class="col s12 m12 l12">' +
-                                '</div>'+
                             '</div>' +
                         '</div>' +
                     '</div>' +
                 '</li>'
             )
         );
+        var button = document.getElementById(data[i]['Id']);
+        button.onclick = function () {
+            removeView(data[i]['Id'], lang);
+        };
     });
 }

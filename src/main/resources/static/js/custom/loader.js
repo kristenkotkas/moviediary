@@ -86,9 +86,9 @@ function isNormalInteger(str) {
 function getThisWeek() {
     var result = {};
     var curr = new Date(); // get current date
-    var first = curr.getDate() - curr.getDay() + 1; // First day is the day of the month - the day of the week
-    let firstday = new Date(curr.setDate(first));
-    let lastday = new Date(curr.setDate(curr.getDate() + 6));
+    var first = curr.getDate() - ((curr.getDay() + 6) % 7); // First day is the day of the month - the day of the week
+    var firstday = new Date(curr.setDate(first));
+    var lastday = new Date(curr.setDate(curr.getDate() + 6));
     result['start'] = firstday;
     result['end'] = lastday;
     return result;

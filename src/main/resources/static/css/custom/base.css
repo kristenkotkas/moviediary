@@ -184,6 +184,16 @@ span.badge.new:after {
     margin-bottom: 3px;
 }
 
+.history-date {
+    font-size: x-large;
+}
+
+.fa-lg {
+    font-size: 1.15em;
+    line-height: 0.75em;
+    vertical-align: -15%;
+}
+
 .load-more:hover,
 .load-more:focus,
 .search-button:hover {

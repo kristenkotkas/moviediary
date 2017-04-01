@@ -97,20 +97,23 @@ eventbus.onopen = function () {
                 'is-cinema': $("#wasCinema-stat").is(':checked'),
                 'start': start,
                 'end': end
-            }
-            , function (error, reply) {
+            }, function (error, reply) {
                 var data = reply.body['rows'];
                 getData(eventbus, lang, start, end);
             });
     };
 
     var makeAllTime = function (eventbus, lang) {
-        eventbus.send("database_get_all_time_meta", {}, function (error, reply) {
-            var data = reply.body['rows'];
-            startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
-            endDateField.pickadate('picker').set('select', new Date());
-            getData(eventbus, lang, startDateField.val(), endDateField.val());
-        });
+        eventbus.send("database_get_all_time_meta",
+            {
+                'is-first': $("#seenFirst").is(':checked'),
+                'is-cinema': $("#wasCinema").is(':checked')
+            }, function (error, reply) {
+                var data = reply.body['rows'];
+                startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
+                endDateField.pickadate('picker').set('select', new Date());
+                getData(eventbus, lang, startDateField.val(), endDateField.val());
+            });
     };
 
     function getData(eventbus, lang, start, end) {

@@ -36,7 +36,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_QUERY_VIEWS =
-            "SELECT MovieId, Title, Start, WasFirst, WasCinema, Image, Comment " +
+            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
@@ -83,6 +83,9 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
+
+    private static final String SQL_REMOVE_VIEW =
+            "DELETE FROM Views WHERE Username = ? AND Id = ?";
 
     private final JDBCClient client;
 
@@ -351,11 +354,20 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getAllTimeMeta(String username) {
-        //fixme arvestada linnukestega
-        System.out.println(username);
+    public Future<JsonObject> getAllTimeMeta(String username, String param) {
+        JsonObject json = new JsonObject(param);
+
+        String SQL_GET_ALL_TIME_META_TEMP = SQL_GET_ALL_TIME_META;
+        if (json.getBoolean("is-first")) {
+            SQL_GET_ALL_TIME_META_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_GET_ALL_TIME_META_TEMP += " AND WasCinema";
+        }
+
+        String SQL_GET_ALL_TIME_META_TEMP_FINAL = SQL_GET_ALL_TIME_META_TEMP;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_ALL_TIME_META, new JsonArray()
+                conn -> conn.queryWithParams(SQL_GET_ALL_TIME_META_TEMP_FINAL, new JsonArray()
                         .add(username), resultHandler(conn, fut)))));
     }
 
@@ -377,8 +389,16 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
                         .add(username)
                         .add(json.getString("start"))
-                        .add(json.getString("end"))
-                        , resultHandler(conn, fut)))));
+                        .add(json.getString("end")),
+                        resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> removeView(String username, String param) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_REMOVE_VIEW, new JsonArray()
+                        .add(username)
+                        .add(param), resultHandler(conn, fut)))));
     }
 
     /**
