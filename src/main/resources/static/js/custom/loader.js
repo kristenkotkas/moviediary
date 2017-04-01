@@ -80,3 +80,36 @@ function isNormalInteger(str) {
     var n = Math.floor(Number(str));
     return String(n) === str && n >= 0;
 }
+
+//History time interval
+
+function getThisWeek() {
+    var result = {};
+    var curr = new Date(); // get current date
+    var first = curr.getDate() - curr.getDay() + 1; // First day is the day of the month - the day of the week
+    let firstday = new Date(curr.setDate(first));
+    let lastday = new Date(curr.setDate(curr.getDate() + 6));
+    result['start'] = firstday;
+    result['end'] = lastday;
+    return result;
+}
+
+function getThisMonth() {
+    var result = {};
+    var date = new Date();
+    var firstday = new Date(date.getFullYear(), date.getMonth(), 1);
+    var lastday = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    result['start'] = firstday;
+    result['end'] = lastday;
+    return result;
+}
+
+function getThisYear() {
+    var result = {};
+    var date = new Date();
+    var firstday = new Date(date.getFullYear(), 0, 1);
+    var lastday = new Date(date.getFullYear(), 11, 31);
+    result['start'] = firstday;
+    result['end'] = lastday;
+    return result;
+}

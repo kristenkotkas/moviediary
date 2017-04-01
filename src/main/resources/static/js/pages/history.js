@@ -26,6 +26,7 @@ eventbus.onopen = function () {
         var thisWeek = $("#this-week");
         var thisMonth = $("#this-month");
         var thisYear = $("#this-year");
+        var allTime = $("#all-time");
 
         search.keyup(function (e) {
             if (e.keyCode === 13) {
@@ -52,46 +53,67 @@ eventbus.onopen = function () {
                 thisYear.click();
             }
         });
+        allTime.keyup(function (e) {
+            if (e.keyCode === 13) {
+                allTime.click();
+            }
+        });
         search.click(function () {
-            searchHistory(eventbus, lang,
-                startDateField.pickadate('picker').get(),
-                endDateField.pickadate('picker').get())
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
         thisWeek.click(function () {
-            var current = new Date();
-            var isMonday = (current.getDay() + 6) % 7;
-            var first = current.getDate() - isMonday;
-            var last = first + 6;
-            startDateField.pickadate('picker').set('select', new Date(current.setDate(first)));
-            endDateField.pickadate('picker').set('select', new Date(current.setDate(last)));
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            var dates = getThisWeek();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
         thisMonth.click(function () {
-            var date = new Date();
-            var first = new Date(date.getFullYear(), date.getMonth(), 1);
-            var last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-            startDateField.pickadate('picker').set('select', first);
-            endDateField.pickadate('picker').set('select', last);
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            var dates = getThisMonth();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
         thisYear.click(function () {
-            var date = new Date();
-            console.log(date.getFullYear());
-            var first = new Date(date.getFullYear(), 0, 1);
-            var last = new Date(date.getFullYear(), 11, 31);
-            startDateField.pickadate('picker').set('select', first);
-            endDateField.pickadate('picker').set('select', last);
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            var dates = getThisYear();
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+        });
+        allTime.click(function () {
+            makeAllTime(eventbus, lang);
         });
     });
 };
 
-var searchHistory = function(eventbus, lang, start, end) {
+var makeHistory = function (eventbus, lang, start, end) {
+    eventbus.send("database_get_history_meta",
+        {
+            'is-first': $("#seenFirst").is(':checked'),
+            'is-cinema': $("#wasCinema").is(':checked'),
+            'start': start,
+            'end': end
+        }
+        , function (error, reply) {
+            var data = reply.body['rows'];
+            searchHistory(eventbus, lang, start, end, data[0]['Count']);
+        });
+};
+
+var makeAllTime = function (eventbus, lang) {
+    eventbus.send("database_get_all_time_meta", {}, function (error, reply) {
+        var data = reply.body['rows'];
+        startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
+        endDateField.pickadate('picker').set('select', new Date());
+        searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
+    });
+};
+
+var searchHistory = function(eventbus, lang, start, end, count) {
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -105,6 +127,7 @@ var searchHistory = function(eventbus, lang, start, end) {
             console.log(data.length);
             if (data.length > 0) {
                 $("#viewsTitle").empty();
+                addTableHead(count);
                 $("#table").empty();
                 //addTableHead(data.length);
 
@@ -168,7 +191,7 @@ function addTableHead(data) {
     $("#viewsTitle").empty().append(
         '<div class="card z-depth-0">' +
         '<div class="card-title">' +
-        '<a class="light grey-text text-lighten-1 not-found">' +  'Found ' + data + ' views</a>' +
+        '<a class="light grey-text text-lighten-1 not-found">' + data + ' views</a>' +
         '</div>' +
         '</div>'
     );
@@ -190,6 +213,7 @@ function addHistory(data, lang) {
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
                     '</div>' +
+                    //body starts here
                     '<div class="collapsible-body white">' +
                         '<div class="row search-image">' +
                             '<div class="col m4 l3 search-image hide-on-small-only">' +
@@ -198,23 +222,25 @@ function addHistory(data, lang) {
                                     data[i]['Title'] + '" width="80%">' +
                                 '</a>' +
                             '</div>'+
-                            '<div class="col">' +
+                            '<div class="col m8 l9">' +
                                 '<ul>' +
                                     '<li>' +
-                                    '<h4 class="grey-text">' + getMonth(data[i]['Start'], lang) + '</h4></li>' +
-                                    '<li><i class="fa fa-clock-o left grey-text" aria-hidden="true"></i>' +
-                                    '<span class="content-key grey-text">' + data[i]['Time'] + '</span></li>' +
-                                    '<li><span class="content-key grey-text">' + lang[data[i]['DayOfWeek']] + '</span></li>' +
+                                    '<div>' +
+                                        getMonth(data[i]['Start'], lang) +
+                                        '<span class="content-key grey-text badge">' + data[i]['Time'] + '</span>' +
+                                        '<span class="content-key grey-text badge">' + lang[data[i]['DayOfWeek']] + '</span>' +
+                                    '</div></li>' +
                                     '<li><i class="grey-text ' + data[i]['WasFirst'] + '" aria-hidden="true"></i></li>' +
                                     '<li><i class="grey-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></li>' +
+                                    '<li>' +
+                                        '<div class="custom-truncate">' +
+                                        safe_tags_replace(data[i]['Comment'])+
+                                        '</div>' +
+                                    '</li>' +
                                 '</ul>' +
                             '</div>' +
-                            '<div class="row"></div>' +
                             '<div class="row">' +
                                 '<div class="col s12 m12 l12">' +
-                                '<div class="custom-truncate">' +
-                                safe_tags_replace(data[i]['Comment'])+
-                                '</div>' +
                                 '</div>'+
                             '</div>' +
                         '</div>' +

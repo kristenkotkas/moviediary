@@ -50,6 +50,8 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_INSERT_VIEW = "database_insert_view";
     public static final String DATABASE_GET_YEARS_DIST = "database_get_years_dist";
     public static final String DATABASE_GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
+    public static final String DATABASE_GET_ALL_TIME_META = "database_get_all_time_meta";
+    public static final String DATABASE_GET_HISTORY_META = "database_get_history_meta";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -70,8 +72,10 @@ public class DatabaseRouter extends EventBusRoutable {
                 (user, json) -> json));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), (user, json) -> json));
         listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
-        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (username, json) -> json));
-        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist, (username, json) -> json));
+        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (user, json) -> json));
+        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist, (user, json) -> json));
+        listen(DATABASE_GET_ALL_TIME_META, reply((user, param) -> database.getAllTimeMeta(user), (user, json) -> json));
+        listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta, (user, json) -> json));
     }
 
     @Override

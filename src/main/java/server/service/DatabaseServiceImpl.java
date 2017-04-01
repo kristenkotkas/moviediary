@@ -65,16 +65,24 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username =  ? ORDER BY Time DESC";
 
     public static final String SQL_GET_YEARS_DIST =
-            "SELECT Year, COUNT(*) AS 'Count' from Views " +
+            "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
-                    "WHERE Username = ? " +
-                    "GROUP BY Year ORDER BY Year DESC";
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
 
     public static final String SQL_GET_WEEKDAYS_DIST =
             "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
                     "FROM Views " +
-                    "WHERE Username = ? " +
-                    "GROUP BY Day ORDER BY Day";
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
+
+    public static final String SQL_GET_ALL_TIME_META =
+            "Select Min(Start) AS Start, COUNT(*) AS Count FROM Views " +
+                    "WHERE Username = ?";
+
+    private static final String SQL_QUERY_VIEWS_META =
+            "SELECT Count(*) AS Count " +
+                    "FROM Views " +
+                    "JOIN Movies ON Views.MovieId = Movies.Id " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
 
     private final JDBCClient client;
 
@@ -288,16 +296,47 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getYearsDist(String username, String param) {
+        //GROUP BY Year ORDER BY Year DESC
+        JsonObject json = new JsonObject(param);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        String SQL_QUERY_VIEWS_TEMP = SQL_GET_YEARS_DIST;
+        if (json.getBoolean("is-first")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
+        }
+
+        SQL_QUERY_VIEWS_TEMP += " GROUP BY Year ORDER BY Year DESC";
+        String SQL_QUERY_VIEWS_TEMP_FINAL = SQL_QUERY_VIEWS_TEMP;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_YEARS_DIST, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+                conn -> conn.queryWithParams(SQL_QUERY_VIEWS_TEMP_FINAL, new JsonArray()
+                        .add(username)
+                        .add(json.getString("start"))
+                        .add(json.getString("end")), resultHandler(conn, fut)))));
     }
 
     @Override
     public Future<JsonObject> getWeekdaysDist(String username, String param) {
+        //"GROUP BY Day ORDER BY Day"
+        JsonObject json = new JsonObject(param);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        String SQL_QUERY_VIEWS_TEMP = SQL_GET_WEEKDAYS_DIST;
+        if (json.getBoolean("is-first")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
+        }
+        SQL_QUERY_VIEWS_TEMP += " GROUP BY Day ORDER BY Day";
+        String SQL_QUERY_VIEWS_TEMP_FINAL = SQL_QUERY_VIEWS_TEMP;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_WEEKDAYS_DIST, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+                conn -> conn.queryWithParams(SQL_QUERY_VIEWS_TEMP_FINAL, new JsonArray()
+                        .add(username)
+                        .add(json.getString("start"))
+                        .add(json.getString("end")), resultHandler(conn, fut)))));
     }
 
     /**
@@ -309,6 +348,37 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
                         .add(username)
                         .add(param), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getAllTimeMeta(String username) {
+        //fixme arvestada linnukestega
+        System.out.println(username);
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_ALL_TIME_META, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getViewsMeta(String username, String param) {
+        JsonObject json = new JsonObject(param);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        String SQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_META;
+        if (json.getBoolean("is-first")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
+        }
+
+        String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
+                        .add(username)
+                        .add(json.getString("start"))
+                        .add(json.getString("end"))
+                        , resultHandler(conn, fut)))));
     }
 
     /**
