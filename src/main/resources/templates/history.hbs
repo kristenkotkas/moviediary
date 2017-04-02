@@ -86,11 +86,15 @@
                                 <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_MONTH" locale=lang}}
                             </button>
                         </div>
-                        <div class="input-field row">
-                            <button id="this-year" type="submit"
-                                    class="btn waves-effect waves-light col s12 z-depth-0">
+                        <div class="row">
+                            <!-- Dropdown Trigger -->
+                            <a class="dropdown-button btn waves-effect waves-light col s12 z-depth-0" data-activates="history-year-drop">
                                 <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_YEAR" locale=lang}}
-                            </button>
+                            </a>
+
+                            <!-- Dropdown Structure -->
+                            <ul id="history-year-drop" class="dropdown-content">
+                            </ul>
                         </div>
                         <div class="input-field row">
                             <button id="all-time" type="submit"

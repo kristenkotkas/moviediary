@@ -16,6 +16,7 @@ $(document).ready(function () {
 var eventbus = new EventBus("/eventbus");
 var startDateField = $("#startingDay");
 var endDateField = $("#endDay");
+var yearDropdown = $("#history-year-drop");
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -25,9 +26,8 @@ eventbus.onopen = function () {
         var today = $("#today");
         var thisWeek = $("#this-week");
         var thisMonth = $("#this-month");
-        var thisYear = $("#this-year");
         var allTime = $("#all-time");
-
+        fillDropDown(lang);
         search.keyup(function (e) {
             if (e.keyCode === 13) {
                 search.click();
@@ -46,11 +46,6 @@ eventbus.onopen = function () {
         thisMonth.keyup(function (e) {
             if (e.keyCode === 13) {
                 thisMonth.click();
-            }
-        });
-        thisYear.keyup(function (e) {
-            if (e.keyCode === 13) {
-                thisYear.click();
             }
         });
         allTime.keyup(function (e) {
@@ -78,16 +73,23 @@ eventbus.onopen = function () {
             endDateField.pickadate('picker').set('select', dates['end']);
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
-        thisYear.click(function () {
-            var dates = getThisYear();
-            startDateField.pickadate('picker').set('select', dates['start']);
-            endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
-        });
         allTime.click(function () {
             makeAllTime(eventbus, lang);
         });
     });
+};
+
+var fillDropDown = function (lang) {
+    eventbus.send("database_get_all_time_meta",
+        {
+            'is-first': $("#seenFirst").is(':checked'),
+            'is-cinema': $("#wasCinema").is(':checked')
+        }
+        , function (error, reply) {
+            var data = reply.body['rows'];
+            var start = new Date(data[0]['Start']).getFullYear();
+            makeDropList(start, lang, 'history', startDateField, endDateField);
+        });
 };
 
 var makeHistory = function (eventbus, lang, start, end) {
@@ -299,6 +301,7 @@ function addHistory(data, lang) {
                 '</li>'
             )
         );
+
         var button = document.getElementById(data[i]['Id']);
         button.onclick = function () {
             removeView(data[i]['Id'], lang);

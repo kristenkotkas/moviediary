@@ -114,6 +114,43 @@ function getThisYear() {
     return result;
 }
 
+function getYear(year) {
+    var result = {};
+    var firstday = new Date(year, 0, 1);
+    var lastday = new Date(year, 11, 31);
+    result['start'] = firstday;
+    result['end'] = lastday;
+    return result;
+}
+
+function searchYear(year, lang, startDateField, endDateField) {
+    var dates = getYear(year);
+    console.log(dates);
+    startDateField.pickadate('picker').set('select', dates['start']);
+    endDateField.pickadate('picker').set('select', dates['end']);
+    makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+}
+
+function makeDropList(start, lang, type, startDateField, endDateField) {
+    var array = [];
+    for (var year = start; year <= new Date().getFullYear(); year++) {
+        array.push(year);
+    }
+
+    $.each(array, function (i) {
+        yearDropdown.append(
+            $.parseHTML(
+                '<li id="' + type + '-drop-' + array[i] + '"><a>' + array[i] + '</a></li>'
+            )
+        );
+
+        var yearButton = document.getElementById(type + '-drop-' + array[i]);
+        yearButton.onclick = function () {
+            searchYear(array[i], lang, startDateField, endDateField);
+        }
+    });
+}
+
 function minutesToString(minutes) {
     var seconds = minutes * 60;
     var daysString = 'day';
