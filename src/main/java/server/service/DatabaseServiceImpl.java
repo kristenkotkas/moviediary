@@ -36,7 +36,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment " +
+            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";

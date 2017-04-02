@@ -113,3 +113,44 @@ function getThisYear() {
     result['end'] = lastday;
     return result;
 }
+
+function minutesToString(minutes) {
+    var seconds = minutes * 60;
+    var daysString = 'day';
+    var hoursString = 'h';
+    var minString = 'min';
+    var daysStringPlur = 'days';
+    var hoursStringPlur = 'h';
+    var minStringPlur = 'min';
+    var result = '';
+
+    var numdays = Math.floor(seconds / 86400);
+    var numhours = Math.floor((seconds % 86400) / 3600);
+    var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
+
+    if (numdays > 0) {
+        if (numdays > 1) {
+            result += numdays + ' ' + daysStringPlur + ' ';
+        } else {
+            result += numdays + ' ' + daysString + ' ';
+        }
+    }
+
+    if (numhours > 0) {
+        if (numhours > 1) {
+            result += numhours + ' ' + hoursStringPlur + ' ';
+        } else {
+            result += numhours + ' ' + hoursString + ' ';
+        }
+    }
+
+    if (numminutes > 0) {
+        if (numminutes > 1) {
+            result += numminutes + ' ' + minStringPlur + ' ';
+        } else {
+            result += numminutes + ' ' + minString + ' ';
+        }
+    }
+
+    return result;
+}
