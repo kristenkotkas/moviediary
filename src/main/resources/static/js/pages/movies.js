@@ -54,7 +54,7 @@ eventbus.onopen = function () {
                                 var movie = data[i];
                                 var posterPath = "";
                                 if (movie['poster_path'] !== null) {
-                                    posterPath = 'https://image.tmdb.org/t/p/w92/' + movie['poster_path'];
+                                    posterPath = 'https://image.tmdb.org/t/p/w92' + movie['poster_path'];
                                 } else {
                                     posterPath = '/static/img/nanPosterSmall.jpg'
                                 }
@@ -202,7 +202,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         if (data['poster_path'] === null) {
             posterPath = '/static/img/nanPosterBig.jpg'
         } else {
-            posterPath = 'https://image.tmdb.org/t/p/w500/' + data['poster_path'];
+            posterPath = 'https://image.tmdb.org/t/p/w500' + data['poster_path'];
         }
 
         document.title = lang['NAVBAR_MOVIES'] + ' - ' + data.title;

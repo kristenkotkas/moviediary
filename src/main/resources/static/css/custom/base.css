@@ -4,8 +4,8 @@
 }
 
 body {
-    background-attachment: fixed;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .bc-image {
@@ -139,6 +139,11 @@ span.badge.new:after {
 .not-found {
     margin: 15px;
     font-size: xx-large;
+}
+
+.not-found-info {
+    margin: 15px;
+    font-size: large;
 }
 
 .poster-image {

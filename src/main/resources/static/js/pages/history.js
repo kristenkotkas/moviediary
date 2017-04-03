@@ -193,7 +193,8 @@ function addTableHead(data, lang) {
         $("#viewsTitle").empty().append(
             '<div class="card z-depth-0">' +
             '<div class="card-title">' +
-            '<a class="light grey-text text-lighten-1 not-found">' + data + ' views</a>' +
+            '<span class="light grey-text text-lighten-1 not-found">' + data + ' views</span><br>' +
+            '<span class="grey-text not-found-info">' + startDateField.val() + '  -  ' + endDateField.val() + '</span>' +
             '</div>' +
             '</div>'
         );
@@ -206,7 +207,9 @@ function addNotFound(lang) {
     $("#viewsTitle").empty().append(
         '<div class="card z-depth-0">' +
         '<div class="card-title">' +
-        '<a class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</a>' +
+        '<span class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</span><br>' +
+        '<span class="grey-text not-found-info">' + startDateField.val() + '  -  ' + endDateField.val() + '</span>' +
+        '</span>' +
         '</div>' +
         '</div>'
     );
