@@ -54,24 +54,24 @@ eventbus.onopen = function () {
             }
         });
         search.click(function () {
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'search');
         });
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'today');
         });
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'week');
         });
         thisMonth.click(function () {
             var dates = getThisMonth();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'month');
         });
         allTime.click(function () {
             makeAllTime(eventbus, lang);
@@ -92,7 +92,7 @@ var fillDropDown = function (lang) {
         });
 };
 
-var makeHistory = function (eventbus, lang, start, end) {
+var makeHistory = function (eventbus, lang, start, end, type) {
     eventbus.send("database_get_history_meta",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -102,7 +102,7 @@ var makeHistory = function (eventbus, lang, start, end) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
-            searchHistory(eventbus, lang, start, end, data[0]['Count']);
+            searchHistory(eventbus, lang, start, end, data[0]['Count'], type);
         });
 };
 
@@ -116,11 +116,11 @@ var makeAllTime = function (eventbus, lang) {
             var data = reply.body['rows'];
             startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
             endDateField.pickadate('picker').set('select', new Date());
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count'], 'all_time');
         });
 };
 
-var searchHistory = function (eventbus, lang, start, end, count) {
+var searchHistory = function (eventbus, lang, start, end, count, type) {
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -134,7 +134,7 @@ var searchHistory = function (eventbus, lang, start, end, count) {
             console.log(data.length);
             if (data.length > 0) {
                 $("#viewsTitle").empty();
-                addTableHead(count);
+                addTableHead(count, lang, type);
                 $("#table").empty();
                 //addTableHead(data.length);
 
@@ -188,13 +188,22 @@ var searchHistory = function (eventbus, lang, start, end, count) {
         });
 };
 
-function addTableHead(data, lang) {
+function addTableHead(data, lang, type) {
+    /*
+     search
+     today
+     week
+     month
+     <year>
+     all_time
+     */
     if (data > 0) {
         $("#viewsTitle").empty().append(
             '<div class="card z-depth-0">' +
             '<div class="card-title">' +
             '<span class="light grey-text text-lighten-1 not-found">' + data + ' views</span><br>' +
             '<span class="grey-text not-found-info">' + startDateField.val() + '  -  ' + endDateField.val() + '</span>' +
+            '<span class="grey-text not-found-info">' + type + '</span>' +
             '</div>' +
             '</div>'
         );

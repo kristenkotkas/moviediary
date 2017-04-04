@@ -123,12 +123,12 @@ function getYear(year) {
     return result;
 }
 
-function searchYear(year, lang, startDateField, endDateField) {
+function searchYear(year, lang, startDateField, endDateField, type) {
     var dates = getYear(year);
     console.log(dates);
     startDateField.pickadate('picker').set('select', dates['start']);
     endDateField.pickadate('picker').set('select', dates['end']);
-    makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+    makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), type);
 }
 
 function makeDropList(start, lang, type, startDateField, endDateField) {
@@ -146,7 +146,7 @@ function makeDropList(start, lang, type, startDateField, endDateField) {
 
         var yearButton = document.getElementById(type + '-drop-' + array[i]);
         yearButton.onclick = function () {
-            searchYear(array[i], lang, startDateField, endDateField);
+            searchYear(array[i], lang, startDateField, endDateField, array[i]);
         }
     });
 }

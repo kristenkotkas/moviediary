@@ -230,7 +230,7 @@ function makeDChart(chart, type, distr) {
     new Chart(chart, {
         type: type,
         data: {
-            labels: ['Mon.', 'Tue.', 'Wed', 'Thu.', 'Fri.', 'Sun.', 'Sat.'],
+            labels: ['Mon.', 'Tue.', 'Wed', 'Thu.', 'Fri.', 'Sat.', 'Sun.'],
             datasets: [{
                 label: '# of Views',
                 data: distr,
