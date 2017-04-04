@@ -17,9 +17,49 @@ var eventbus = new EventBus("/eventbus");
 var startDateField = $("#startingDay-stat");
 var endDateField = $("#endDay-stat");
 var yearDropdown = $("#stat-year-drop");
+var daysChartCtx = $("#daysChart");
+var daysChart = new Chart(daysChartCtx, {
+    type : 'bar',
+    data: {
+        labels: ['Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.', 'Sun.'],
+        datasets: [
+            {
+                data: [],
+                backgroundColor: [
+                    'rgb(56, 164, 221)',
+                    'rgb(139, 194, 73)',
+                    'rgb(254, 234, 57)',
+                    'rgb(241, 89, 43)',
+                    'rgb(248, 152, 29)',
+                    'rgb(205, 220, 55)',
+                    'rgb(243, 127, 128)'
+                ]
+            }
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                },
+                gridLines: {
+                    display: false
+                }
+            }],
+            xAxes: [{
+                gridLines: {
+                    display: false
+                }
+            }]
+        }
+    }
+});
+
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
+
         lang = reply.body;
         console.log(lang);
         var search = $("#search-stat");
@@ -168,16 +208,16 @@ function makeDaysChart(data) {
         distrArray.push(distr[i]);
     }
 
-    $('#days-chart-container').empty().append($.parseHTML(
+    /*$('#days-chart-container').empty().append($.parseHTML(
         '<canvas class="hide-on-small-only" id="daysChart" height="250%"></canvas>'
     ));
 
     $('#days-chart-small-container').empty().append($.parseHTML(
         '<canvas class="hide-on-med-and-up" id="daysChartSmall" height="250%"></canvas>'
-    ));
+    ));*/
 
     makeDChart($('#daysChart'), 'bar', distrArray);
-    makeDChart($('#daysChartSmall'), 'horizontalBar', distrArray);
+    //makeDChart($('#daysChartSmall'), 'horizontalBar', distrArray);
 
 }
 
@@ -226,43 +266,9 @@ function fillYearsData(data, years, distr) {
 
 function makeDChart(chart, type, distr) {
     $('#week-card').show();
-
-    new Chart(chart, {
-        type: type,
-        data: {
-            labels: ['Mon.', 'Tue.', 'Wed', 'Thu.', 'Fri.', 'Sat.', 'Sun.'],
-            datasets: [{
-                label: '# of Views',
-                data: distr,
-                backgroundColor: [
-                    'rgb(56, 164, 221)',
-                    'rgb(139, 194, 73)',
-                    'rgb(254, 234, 57)',
-                    'rgb(241, 89, 43)',
-                    'rgb(248, 152, 29)',
-                    'rgb(205, 220, 55)',
-                    'rgb(243, 127, 128)'
-                ]
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    },
-                    gridLines: {
-                        display: false
-                    }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display: false
-                    }
-                }]
-            }
-        }
-    });
+    var data = [23, 10, 21, 6, 8, 6];
+    daysChart['data']['datasets'][0]['data'] = distr;
+    daysChart.update();
 
 }
 

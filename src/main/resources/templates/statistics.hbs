@@ -89,7 +89,8 @@
                         </div>
                         <div class="row">
                             <!-- Dropdown Trigger -->
-                            <a class="dropdown-button btn blue lighten-2 waves-effect waves-light col s12 z-depth-0" data-activates="stat-year-drop">
+                            <a class="dropdown-button btn blue lighten-2 waves-effect waves-light col s12 z-depth-0"
+                               data-activates="stat-year-drop">
                                 <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_YEAR" locale=lang}}
                             </a>
 
@@ -108,10 +109,11 @@
             </div>
         </div>
         <div class="col s12 m4 l4">
-            <div class="card z-depth-0" id="week-card" hidden>
+            <div class="card z-depth-0" id="week-card">
                 <div class="card-content">
                     <div class="card-title">Distribution of weekdays</div>
                     <div id="days-chart-container"></div>
+                        <canvas class="hide-on-small-only" id="daysChart" height="250%"></canvas>
                     <div id="days-chart-small-container"></div>
                 </div>
             </div>
