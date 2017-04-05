@@ -15,6 +15,8 @@ import server.service.TmdbService;
 
 import java.util.Arrays;
 
+import static server.router.EventBusRoutable.closeEventbus;
+import static server.router.EventBusRoutable.startEventbus;
 import static server.util.HandlerUtils.futureHandler;
 import static server.util.NetworkUtils.*;
 
@@ -59,9 +61,8 @@ public class ServerVerticle extends AbstractVerticle {
                 new BankLinkRouter(vertx, bankLink),
                 new DatabaseRouter(vertx, config(), database, mail),
                 new MailRouter(vertx, mail),
-                new UiRouter(vertx, securityConfig))
-                .forEach(routable -> routable.route(router));
-        EventBusRoutable.startEventbus(router, vertx);
+                new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));
+        startEventbus(router, vertx);
         vertx.createHttpServer(new HttpServerOptions()
                 .setCompressionSupported(true)
                 .setCompressionLevel(3))
@@ -72,6 +73,6 @@ public class ServerVerticle extends AbstractVerticle {
 
     @Override
     public void stop() throws Exception {
-        EventBusRoutable.closeEventbus();
+        closeEventbus();
     }
 }
