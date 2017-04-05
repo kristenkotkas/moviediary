@@ -23,7 +23,7 @@
 
 <div class="row">
     <div class="row">
-        <div class="col s12 m10 offset-m1 l10 offset-l1">
+        <div class="col s12 m12 l10 offset-l1">
             <div class="col s12 m4 l4">
                 <div class="card z-depth-0">
                     <div class="card-content">
@@ -40,7 +40,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row last-row">
                                 <div class="input-field login-text">
                                     <input id="wasCinema-stat" type="checkbox">
                                     <label for="wasCinema-stat" class="tooltipped"
@@ -60,22 +60,22 @@
                     <div class="card-content">
                         <span class="card-title">Search</span>
                         <div class="row"></div>
-                        <div class="row">
+                        <div class="col s12 m12 l6">
                             <div class="input-field login-text">
                                 <input id="startingDay-stat" type="text" class="datepicker">
                                 <label for="startingDay-stat">{{i18n "HISTORY_START_DAY" locale=lang}}</label>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="col s12 m12 l6">
                             <div class="input-field login-text">
                                 <input id="endDay-stat" type="text" class="datepicker">
                                 <label for="endDay-stat">{{i18n "HISTORY_END_DAY" locale=lang}}</label>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row last-row">
                             <div class="input-field">
                                 <button id="search-stat" type="submit"
-                                        class="btn blue waves-effect waves-light col s12 z-depth-0">
+                                        class="btn blue waves-effect waves-light col s12 m12 l6 offset-l3 z-depth-0 white-text">
                                     <i class="fa fa-search left"></i>{{i18n "HISTORY_SEARCH" locale=lang}}
                                 </button>
                             </div>
@@ -90,37 +90,32 @@
                         <div class="row"></div>
                         <div class="row">
                             <a id="today-stat"
-                                    class="waves-effect waves-light grey-text">
-                                <i class="fa fa-search left"></i>{{i18n "HISTORY_TODAY" locale=lang}}
+                               class="col s12 m12 l5 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                {{i18n "HISTORY_TODAY" locale=lang}}
                             </a>
-                        </div>
-                        <div class="row">
                             <a id="this-week-stat"
-                                    class="waves-effect waves-light grey-text">
-                                <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_WEEK" locale=lang}}
+                               class="col s12 m12 l5 offset-l2 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                {{i18n "HISTORY_THIS_WEEK" locale=lang}}
                             </a>
                         </div>
                         <div class="row">
                             <a id="this-month-stat"
-                                    class="waves-effect waves-light grey-text">
-                                <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_MONTH" locale=lang}}
+                               class="col s12 m12 l5 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                {{i18n "HISTORY_THIS_MONTH" locale=lang}}
                             </a>
-                        </div>
-                        <div class="row">
                             <!-- Dropdown Trigger -->
-                            <a class="dropdown-button waves-light waves-effect grey-text"
-                               data-activates="stat-year-drop">
-                                <i class="fa fa-search left"></i>{{i18n "HISTORY_THIS_YEAR" locale=lang}}
+                            <a class="col s12 m12 l5 offset-l2 btn blue dropdown-button waves-light waves-effect z-depth-0 white-text"
+                               data-activates="stat-year-drop">{{i18n "HISTORY_THIS_YEAR" locale=lang}}
                             </a>
 
                             <!-- Dropdown Structure -->
                             <ul id="stat-year-drop" class="dropdown-content">
                             </ul>
                         </div>
-                        <div class="row">
+                        <div class="row last-row">
                             <a id="all-time-stat"
-                                    class="waves-effect waves-light grey-text">
-                                <i class="fa fa-search left"></i>{{i18n "HISTORY_ALL_TIME" locale=lang}}
+                               class="col s12 m12 l6 offset-l3 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                {{i18n "HISTORY_ALL_TIME" locale=lang}}
                             </a>
                         </div>
                     </div>
@@ -129,7 +124,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col s12 m10 offset-m1 l10 offset-l1">
+        <div class="col s12 m12 l10 offset-l1">
             <div class="row">
                 <div class="col s12 m12 l10 offset-l1">
                     <div class="col s12 m6 l6">

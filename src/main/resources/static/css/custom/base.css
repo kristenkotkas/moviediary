@@ -161,6 +161,10 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.last-row {
+    margin-bottom: 0;
+}
+
 .movie-in-wishlist {
     background: #21ff6e;
 }
