@@ -123,6 +123,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getWeekdaysDist(String username, String param);
 
+    Future<JsonObject> getTimeDist(String username, String param);
+
     Future<JsonObject> getAllTimeMeta(String username, String param);
 
     Future<JsonObject> getViewsMeta(String username, String param);

@@ -50,6 +50,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_INSERT_VIEW = "database_insert_view";
     public static final String DATABASE_GET_YEARS_DIST = "database_get_years_dist";
     public static final String DATABASE_GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
+    public static final String DATABASE_GET_TIME_DIST = "database_get_time_dist";
     public static final String DATABASE_GET_ALL_TIME_META = "database_get_all_time_meta";
     public static final String DATABASE_GET_HISTORY_META = "database_get_history_meta";
     public static final String DATABASE_REMOVE_VIEW = "database_remove_view";
@@ -75,6 +76,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
         listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (user, json) -> json));
         listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist, (user, json) -> json));
+        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDist, (user, json) -> json));
         listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta, (user, json) -> json));
         listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta, (user, json) -> json));
         listen(DATABASE_REMOVE_VIEW, reply(database::removeView, (user, json) -> json));

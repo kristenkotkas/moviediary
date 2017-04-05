@@ -74,6 +74,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
 
+    public static final String SQL_GET_TIME_DIST =
+            "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ? ";
+
     public static final String SQL_GET_ALL_TIME_META =
             "Select Min(Start) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
@@ -337,6 +341,28 @@ public class DatabaseServiceImpl implements DatabaseService {
         String SQL_QUERY_VIEWS_TEMP_FINAL = SQL_QUERY_VIEWS_TEMP;
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_QUERY_VIEWS_TEMP_FINAL, new JsonArray()
+                        .add(username)
+                        .add(json.getString("start"))
+                        .add(json.getString("end")), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getTimeDist(String username, String param) {
+        //"GROUP BY Hour";
+        JsonObject json = new JsonObject(param);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        String SQL_GET_TIME_DIST_TEMP = SQL_GET_TIME_DIST;
+        if (json.getBoolean("is-first")) {
+            SQL_GET_TIME_DIST_TEMP += " AND WasFirst";
+        }
+        if (json.getBoolean("is-cinema")) {
+            SQL_GET_TIME_DIST_TEMP += " AND WasCinema";
+        }
+        SQL_GET_TIME_DIST_TEMP += " GROUP BY Hour";
+        String SQL_GET_TIME_DIST_TEMP_FINAL = SQL_GET_TIME_DIST_TEMP;
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_TIME_DIST_TEMP_FINAL, new JsonArray()
                         .add(username)
                         .add(json.getString("start"))
                         .add(json.getString("end")), resultHandler(conn, fut)))));
