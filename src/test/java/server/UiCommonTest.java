@@ -46,10 +46,9 @@ public class UiCommonTest {
                 formLogin(driver, URI, config);
                 async.complete();
             } else {
-                // TODO: 06/04/2017 fail
+                ctx.fail("Failed to setup server.");
             }
         });
-
     }
 
     @Test
