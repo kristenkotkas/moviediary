@@ -317,6 +317,10 @@ header .brand-logo:hover {
     .movies-search-bar {
         width: 100%;
     }
+
+    .quick-button {
+        margin-top: 20px;
+    }
 }
 
 /* Tablet mode */
@@ -325,6 +329,10 @@ header .brand-logo:hover {
     /* Left side nav bar height */
     ul.side-nav.leftside-navigation {
         top: 64px !important;
+    }
+
+    .quick-button {
+        margin-top: 20px;
     }
 
     /* h3 {
