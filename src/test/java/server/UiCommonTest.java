@@ -3,6 +3,7 @@ package server;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.After;
@@ -39,8 +40,16 @@ public class UiCommonTest {
         vertx = Vertx.vertx();
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
-        formLogin(driver, URI, config);
+        Async async = ctx.async();
+        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar -> {
+            if (ar.succeeded()) {
+                formLogin(driver, URI, config);
+                async.complete();
+            } else {
+                // TODO: 06/04/2017 fail
+            }
+        });
+
     }
 
     @Test
