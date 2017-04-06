@@ -24,7 +24,7 @@ eventbus.onclose = function (json) {
         if (typeof Storage !== 'undefined') {
             var data = JSON.parse(localStorage.getItem("wishlist_data"));
             $("#wishlist-result").empty();
-            addTableData2(data);
+            addTableData(data);
         }
     }
 };
@@ -80,11 +80,11 @@ function addTableData(data) {
 
             $("#wishlist-result").append(
                 $.parseHTML(
-                    '<div class="col s6 m4 l2">' +
+                    '<div class="col s6 m4 l2 megatest">' +
                     '<div class="card z-depth-2 wishlist-object">' +
                     '<div class="card-image wishlist-object">' +
                     '<a class="wishlist-object" href="movies/?id=' + movie['MovieId'] + '">' +
-                    '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
+                    '<img class="wishlist-object responsive-img" src="' + posterPath + '" alt="Poster for movie: ' +
                     movie['Title'] + '">' +
                     '</a>' +
                     '</div>' +
@@ -93,5 +93,11 @@ function addTableData(data) {
                 )
             );
         }, timeout += 25);
+    });
+    $('.megatest').matchHeight({
+        byRow: true,
+        property: 'height',
+        target: $('.responsive-img'),
+        remove: false
     });
 }

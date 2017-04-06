@@ -22,146 +22,134 @@
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_STATISTICS" locale=lang}}</h3>
 
 <div class="row">
-    <div class="row">
-        <div class="col s12 m12 l10 offset-l1">
-            <div class="col s12 m4 l4">
-                <div class="card z-depth-0">
-                    <div class="card-content">
+    <div class="col s12 m12 l10 offset-l1">
+        <div class="col s12 m4 l3">
+            <div class="card z-depth-0">
+                <div class="card-content">
+                    <div class="row">
                         <span class="card-title">{{i18n "HISTORY_FILTERS" locale=lang}}</span>
                         <div class="row">
-                            <div class="row">
-                                <div class="input-field login-text">
-                                    <input id="seenFirst-stat" type="checkbox">
-                                    <label for="seenFirst-stat" class="tooltipped"
-                                           data-position="right"
-                                           data-tooltip="{{i18n "HISTORY_WAS_FIRST_TOOLTIP" locale=lang}}">
-                                        <i class="fa-lg fa fa-eye" aria-hidden="true">
-                                        </i>&ensp; {{i18n "HISTORY_WAS_FIRST" locale=lang}}
-                                    </label>
-                                </div>
+                            <div class="input-field login-text">
+                                <input id="seenFirst-stat" type="checkbox">
+                                <label for="seenFirst-stat" class="tooltipped"
+                                       data-position="right"
+                                       data-tooltip="{{i18n "HISTORY_WAS_FIRST_TOOLTIP" locale=lang}}">
+                                    {{i18n "HISTORY_WAS_FIRST" locale=lang}}
+                                </label>
                             </div>
-                            <div class="row last-row">
-                                <div class="input-field login-text">
-                                    <input id="wasCinema-stat" type="checkbox">
-                                    <label for="wasCinema-stat" class="tooltipped"
-                                           data-position="right"
-                                           data-tooltip="{{i18n "HISTORY_WAS_CINEMA_TOOLTIP" locale=lang}}">
-                                        <i class="fa-lg fa fa-ticket" aria-hidden="true">
-                                        </i>&ensp; {{i18n "HISTORY_WAS_CINEMA" locale=lang}}
-                                    </label>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field login-text">
+                                <input id="wasCinema-stat" type="checkbox">
+                                <label for="wasCinema-stat" class="tooltipped"
+                                       data-position="right"
+                                       data-tooltip="{{i18n "HISTORY_WAS_CINEMA_TOOLTIP" locale=lang}}">
+                                    {{i18n "HISTORY_WAS_CINEMA" locale=lang}}
+                                </label>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col s12 m4 l4">
-                <div class="card z-depth-0">
-                    <div class="card-content">
+                    <div class="divider"></div>
+                    <div class="row"></div>
+                    <div class="row">
                         <span class="card-title">Search</span>
                         <div class="row"></div>
-                        <div class="col s12 m12 l6">
+                        <div class="row">
                             <div class="input-field login-text">
                                 <input id="startingDay-stat" type="text" class="datepicker">
                                 <label for="startingDay-stat">{{i18n "HISTORY_START_DAY" locale=lang}}</label>
                             </div>
                         </div>
-                        <div class="col s12 m12 l6">
+                        <div class="row">
                             <div class="input-field login-text">
                                 <input id="endDay-stat" type="text" class="datepicker">
                                 <label for="endDay-stat">{{i18n "HISTORY_END_DAY" locale=lang}}</label>
                             </div>
                         </div>
-                        <div class="row last-row">
+                        <div class="row">
                             <div class="input-field">
                                 <button id="search-stat" type="submit"
-                                        class="btn blue waves-effect waves-light col s12 m12 l6 offset-l3 z-depth-0 white-text">
+                                        class="btn blue waves-effect waves-light z-depth-0 white-text">
                                     <i class="fa fa-search left"></i>{{i18n "HISTORY_SEARCH" locale=lang}}
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col s12 m4 l4">
-                <div class="card z-depth-0">
-                    <div class="card-content">
-                        <span class="card-title">Quick search</span>
-                        <div class="row"></div>
-                        <div class="row">
-                            <a id="today-stat"
-                               class="col s12 m12 l5 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
-                                {{i18n "HISTORY_TODAY" locale=lang}}
-                            </a>
-                            <a id="this-week-stat"
-                               class="col s12 m12 l5 offset-l2 btn blue waves-effect waves-light grey-text z-depth-0 white-text quick-button">
-                                {{i18n "HISTORY_THIS_WEEK" locale=lang}}
-                            </a>
-                        </div>
-                        <div class="row">
-                            <a id="this-month-stat"
-                               class="col s12 m12 l5 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
-                                {{i18n "HISTORY_THIS_MONTH" locale=lang}}
-                            </a>
-                            <!-- Dropdown Trigger -->
-                            <a class="col s12 m12 l5 offset-l2 btn blue dropdown-button waves-light waves-effect z-depth-0 white-text quick-button"
-                               data-activates="stat-year-drop">{{i18n "HISTORY_THIS_YEAR" locale=lang}}
-                            </a>
+                    <div class="divider"></div>
 
-                            <!-- Dropdown Structure -->
-                            <ul id="stat-year-drop" class="dropdown-content">
-                            </ul>
-                        </div>
-                        <div class="row last-row">
-                            <a id="all-time-stat"
-                               class="col s12 m12 l6 offset-l3 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
-                                {{i18n "HISTORY_ALL_TIME" locale=lang}}
-                            </a>
+                    <div class="row"></div>
+                    <div class="row">
+                        <span class="card-title">Quick search</span>
+                        <div class="row">
+                            <div class="row">
+                                <a id="today-stat"
+                                   class="col s12 m12 l12 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                    {{i18n "HISTORY_TODAY" locale=lang}}
+                                </a>
+                            </div>
+                            <div class="row">
+                                <a id="this-week-stat"
+                                   class="col s12 m12 l12 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                    {{i18n "HISTORY_THIS_WEEK" locale=lang}}
+                                </a>
+                            </div>
+                            <div class="row">
+                                <a id="this-month-stat"
+                                   class="col s12 m12 l12 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                    {{i18n "HISTORY_THIS_MONTH" locale=lang}}
+                                </a>
+                            </div>
+                            <div class="row">
+                                <!-- Dropdown Trigger -->
+                                <a class="col s12 m12 l12 btn blue dropdown-button waves-light waves-effect z-depth-0 white-text"
+                                   data-activates="stat-year-drop">{{i18n "HISTORY_THIS_YEAR" locale=lang}}
+                                </a>
+                                <!-- Dropdown Structure -->
+                                <ul id="stat-year-drop" class="dropdown-content"></ul>
+                            </div>
+                            <div class="row last-row">
+                                <a id="all-time-stat"
+                                   class="col s12 m12 l12 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
+                                    {{i18n "HISTORY_ALL_TIME" locale=lang}}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col s12 m12 l10 offset-l1">
-            <div class="row">
-                <div class="col s12 m12 l10 offset-l1">
-                    <div class="col s12 m6 l6">
-                        <div class="card z-depth-0" id="week-card">
-                            <div class="card-content">
-                                <div class="card-title">Distribution of weekdays</div>
-                                <canvas class="hide-on-small-only" id="daysChart" height="250%"></canvas>
-                                <canvas class="hide-on-med-and-up" id="daysChartSmall" height="300%"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col s12 m6 l6">
-                        <div class="card z-depth-0" id="time-card">
-                            <div class="card-content">
-                                <div class="card-title">Distribution of time</div>
-                                <canvas class="hide-on-small-only" id="timeChart" height="250%"></canvas>
-                                <canvas class="hide-on-med-and-up" id="timeChartSmall" height="550%"></canvas>
-                            </div>
-                        </div>
+        <div class="col s12 m8 l9">
+            <div class="col s12 m12 l6">
+                <div class="card z-depth-0" id="week-card">
+                    <div class="card-content">
+                        <div class="card-title">Distribution of weekdays</div>
+                        <canvas class="hide-on-small-only" id="daysChart" height="250%"></canvas>
+                        <canvas class="hide-on-med-and-up" id="daysChartSmall" height="300%"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col s12 m12 l12">
-                    <div class="card z-depth-0" id="year-card">
-                        <div class="card-content">
-                            <div class="card-title">Distribution of years</div>
-                            <canvas class="hide-on-small-only" id="yearsChart" height="100%"></canvas>
-                            <canvas class="hide-on-med-and-up" id="yearsChartSmall" height="900%"></canvas>
-                        </div>
+            <div class="col s12 m12 l6">
+                <div class="card z-depth-0" id="time-card">
+                    <div class="card-content">
+                        <div class="card-title">Distribution of time</div>
+                        <canvas class="hide-on-small-only" id="timeChart" height="250%"></canvas>
+                        <canvas class="hide-on-med-and-up" id="timeChartSmall" height="550%"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m12 l12">
+                <div class="card z-depth-0" id="year-card">
+                    <div class="card-content">
+                        <div class="card-title">Distribution of years</div>
+                        <canvas class="hide-on-med-and-down" id="yearsChart" height="100%"></canvas>
+                        <canvas class="hide-on-large-only" id="yearsChartSmall" height="900%"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
 <script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
 <script defer type="text/javascript" src="/static/js/custom/materialize.min.js"></script>
