@@ -1,6 +1,13 @@
 var log = console.log.bind(console);
 var loadingCounter = 0;
-
+var types = {
+    today: 1,
+    week: 2,
+    month: 3,
+    year: 4,
+    all: 5,
+    search: 6
+};
 function removeLoader() {
     document.getElementsByTagName('body')[0].className += " loaded";
 }
@@ -149,6 +156,27 @@ function makeDropList(start, lang, type, startDateField, endDateField) {
             searchYear(array[i], lang, startDateField, endDateField, array[i]);
         }
     });
+}
+
+function getHistoryPeriodString(type, lang) {
+    switch (type) {
+        case types.today:
+            return lang['HISTORY_TODAY'];
+        case types.week:
+            //do sth
+            return lang['HISTORY_THIS_WEEK'];
+        case types.month:
+            //do sth
+            return lang['HISTORY_THIS_MONTH'];
+        case types.all:
+            //do sth
+            return lang['HISTORY_ALL_VIEWS'];
+        case types.search:
+            return startDateField.val() + ' - ' + endDateField.val();
+            break;
+        default:
+            return lang['MOVIES_YEAR'] + ': ' + type;
+    }
 }
 
 function minutesToString(minutes) {

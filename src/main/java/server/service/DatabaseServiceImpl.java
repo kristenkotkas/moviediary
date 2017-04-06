@@ -79,7 +79,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
 
     public static final String SQL_GET_ALL_TIME_META =
-            "Select Min(Start) AS Start, COUNT(*) AS Count FROM Views " +
+            "Select DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
 
     private static final String SQL_QUERY_VIEWS_META =

@@ -388,7 +388,7 @@ var getDualTime = function (digit) {
     return digit;
 };
 
-var getNormalDate = function (date, lang) {
+function getNormalDate (date, lang) {
     if (date === lang['MOVIES_JS_UNKNOWN']) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else {

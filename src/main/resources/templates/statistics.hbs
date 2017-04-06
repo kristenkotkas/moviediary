@@ -24,10 +24,12 @@
 <div class="row">
     <div class="col s12 m12 l10 offset-l1">
         <div class="col s12 m4 l3">
-            <div class="card z-depth-0">
-                <div class="card-content">
-                    <div class="row">
+            <ul class="collapsible z-depth-0" data-collapsible="accordion" id="search-coll-filters">
+                <li>
+                    <div class="collapsible-header collapsible-header-history">
                         <span class="card-title">{{i18n "HISTORY_FILTERS" locale=lang}}</span>
+                    </div>
+                    <div class="collapsible-body white">
                         <div class="row">
                             <div class="input-field login-text">
                                 <input id="seenFirst-stat" type="checkbox">
@@ -38,7 +40,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row last-row">
                             <div class="input-field login-text">
                                 <input id="wasCinema-stat" type="checkbox">
                                 <label for="wasCinema-stat" class="tooltipped"
@@ -49,11 +51,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="divider"></div>
-                    <div class="row"></div>
-                    <div class="row">
-                        <span class="card-title">Search</span>
-                        <div class="row"></div>
+                </li>
+            </ul>
+            <ul class="collapsible z-depth-0" data-collapsible="accordion" id="search-coll-search">
+                <li>
+                    <div class="collapsible-header collapsible-header-history">
+                        <span class="card-title">{{i18n "HISTORY_SEARCH" locale=lang}}</span>
+                    </div>
+                    <div class="collapsible-body white">
                         <div class="row">
                             <div class="input-field login-text">
                                 <input id="startingDay-stat" type="text" class="datepicker">
@@ -66,21 +71,24 @@
                                 <label for="endDay-stat">{{i18n "HISTORY_END_DAY" locale=lang}}</label>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row last-row">
                             <div class="input-field">
-                                <button id="search-stat" type="submit"
-                                        class="btn blue waves-effect waves-light z-depth-0 white-text">
+                                <a id="search-stat" type="submit"
+                                        class="col s12 m12 l12 btn blue waves-effect waves-light z-depth-0 white-text">
                                     <i class="fa fa-search left"></i>{{i18n "HISTORY_SEARCH" locale=lang}}
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
-                    <div class="divider"></div>
-
-                    <div class="row"></div>
-                    <div class="row">
-                        <span class="card-title">Quick search</span>
-                        <div class="row">
+                </li>
+            </ul>
+            <ul class="collapsible z-depth-0" data-collapsible="accordion" id="search-coll-qk-search">
+                <li>
+                    <div class="collapsible-header collapsible-header-history">
+                        <span class="card-title">{{i18n "HISTORY_QUICK_SEARCH" locale=lang}}</span>
+                    </div>
+                    <div class="collapsible-body white">
+                        <div class="row ">
                             <div class="row">
                                 <a id="today-stat"
                                    class="col s12 m12 l12 btn blue waves-effect waves-light grey-text z-depth-0 white-text">
@@ -115,8 +123,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </li>
+            </ul>
         </div>
         <div class="col s12 m8 l9">
             <div class="col s12 m12 l6">

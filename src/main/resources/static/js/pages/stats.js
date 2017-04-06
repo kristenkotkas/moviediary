@@ -23,6 +23,9 @@ var yearsChartCtx = $("#yearsChart");
 var yearsChartSmallCtx = $("#yearsChartSmall");
 var timeChartCtx = $("#timeChart");
 var timeChartSmallCtx = $("#timeChartSmall");
+var collSearch = $("#search-coll-search");
+var collFilters = $("#search-coll-filters");
+var collQkSearch = $("#search-coll-qk-search");
 var options = {
     scales: {
         yAxes: [{
@@ -151,6 +154,10 @@ eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
 
+        if ($( window ).width() > 600) {
+            openCollapsible();
+        }
+
         lang = reply.body;
         console.log(lang);
         var search = $("#search-stat");
@@ -158,6 +165,8 @@ eventbus.onopen = function () {
         var thisWeek = $("#this-week-stat");
         var thisMonth = $("#this-month-stat");
         var allTime = $("#all-time-stat");
+
+
         fillDropDown(lang);
 
         search.keyup(function (e) {
@@ -208,7 +217,15 @@ eventbus.onopen = function () {
         allTime.click(function () {
             makeAllTime(eventbus);
         });
+
+        allTime.click();
     });
+};
+
+var openCollapsible = function () {
+    collFilters.collapsible('open', 0);
+    collSearch.collapsible('open', 0);
+    collQkSearch.collapsible('open', 0);
 };
 
 var fillDropDown = function (lang) {

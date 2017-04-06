@@ -17,9 +17,17 @@ var eventbus = new EventBus("/eventbus");
 var startDateField = $("#startingDay");
 var endDateField = $("#endDay");
 var yearDropdown = $("#history-year-drop");
+var collSearch = $("#history-coll-search");
+var collFilters = $("#history-coll-filters");
+var collQkSearch = $("#history-coll-qk-search");
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
+
+        if ($( window ).width() > 600) {
+            openCollapsible();
+        }
+
         lang = reply.body;
         console.log(lang);
         var search = $("#search");
@@ -54,29 +62,37 @@ eventbus.onopen = function () {
             }
         });
         search.click(function () {
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'search');
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.search);
         });
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'today');
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.today);
         });
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'week');
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.week);
         });
         thisMonth.click(function () {
             var dates = getThisMonth();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 'month');
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month);
         });
         allTime.click(function () {
             makeAllTime(eventbus, lang);
         });
+        //array[i], lang, startDateField, endDateField, array[i]
+        searchYear(new Date().getFullYear(), lang, startDateField, endDateField, new Date().getFullYear());
     });
+};
+
+var openCollapsible = function () {
+    collFilters.collapsible('open', 0);
+    collSearch.collapsible('open', 0);
+    collQkSearch.collapsible('open', 0);
 };
 
 var fillDropDown = function (lang) {
@@ -114,9 +130,11 @@ var makeAllTime = function (eventbus, lang) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
+            console.log(data);
+            console.log(new Date(data[0]['Start']));
             startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
             endDateField.pickadate('picker').set('select', new Date());
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count'], 'all_time');
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count'], types.all);
         });
 };
 
@@ -138,7 +156,7 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
                 $("#table").empty();
                 //addTableHead(data.length);
 
-                addHistory(data, lang);
+                addHistory(data, lang, type);
 
                 if (data.length == 10) {
                     $("#load-more-holder").empty().append(
@@ -175,7 +193,7 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
                             if (addData.length < 10) {
                                 $("#load-more-holder").hide();
                             }
-                            addHistory(addData, lang);
+                            addHistory(addData, lang, type);
                             $(document).scrollTop($(document).height());
                         });
                 });
@@ -183,48 +201,47 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
             } else {
                 $("#load-more").hide();
                 $("#table").empty();
-                addNotFound(lang);
+                addNotFound(lang, type);
             }
         });
 };
 
 function addTableHead(data, lang, type) {
-    /*
-     search
-     today
-     week
-     month
-     <year>
-     all_time
-     */
+    var date = getHistoryPeriodString(type, lang);
+    var views = '';
     if (data > 0) {
+        if (data === 1) {
+            views = lang['HISTORY_VIEW'];
+        } else {
+            views = lang['HISTORY_VIEWS'];
+        }
         $("#viewsTitle").empty().append(
             '<div class="card z-depth-0">' +
             '<div class="card-title">' +
-            '<span class="light grey-text text-lighten-1 not-found">' + data + ' views</span><br>' +
-            '<span class="grey-text not-found-info">' + startDateField.val() + '  -  ' + endDateField.val() + '</span>' +
-            '<span class="grey-text not-found-info">' + type + '</span>' +
+            '<span class="light grey-text text-lighten-1 not-found">' + data + ' ' + views + '</span><br>' +
+            '<span class="grey-text not-found-info">' + date + '</span>' +
             '</div>' +
             '</div>'
         );
     } else {
-        addNotFound(lang);
+        addNotFound(lang, type);
     }
 }
 
-function addNotFound(lang) {
+function addNotFound(lang, type) {
+    var date = getHistoryPeriodString(type, lang);
     $("#viewsTitle").empty().append(
         '<div class="card z-depth-0">' +
         '<div class="card-title">' +
         '<span class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</span><br>' +
-        '<span class="grey-text not-found-info">' + startDateField.val() + '  -  ' + endDateField.val() + '</span>' +
+        '<span class="grey-text not-found-info">' + date + '</span>' +
         '</span>' +
         '</div>' +
         '</div>'
     );
 }
 
-function removeView(movieId, lang) {
+function removeView(movieId, lang, type) {
     console.log(movieId);
     eventbus.send("database_remove_view", movieId, function (error, reply) {
         console.log(movieId + ' removed');
@@ -238,12 +255,12 @@ function removeView(movieId, lang) {
             }
             , function (error, reply) {
                 var data = reply.body['rows'];
-                addTableHead(data[0]['Count'], lang);
+                addTableHead(data[0]['Count'], lang, type);
             });
     });
 }
 
-function addHistory(data, lang) {
+function addHistory(data, lang, type) {
     $.each(data, function (i) {
         var posterPath = "";
         if (data[i]['Image'] != "") {
@@ -316,7 +333,7 @@ function addHistory(data, lang) {
 
         var button = document.getElementById(data[i]['Id']);
         button.onclick = function () {
-            removeView(data[i]['Id'], lang);
+            removeView(data[i]['Id'], lang, type);
         };
     });
 }
