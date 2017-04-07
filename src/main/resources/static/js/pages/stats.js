@@ -46,7 +46,7 @@ var options = {
 var daysChart = new Chart(daysChartCtx, {
     type : 'bar',
     data: {
-        labels: ['Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.', 'Sun.'],
+        labels: [],
         datasets: [
             {
                 data: [],
@@ -68,7 +68,7 @@ var daysChart = new Chart(daysChartCtx, {
 var daysChartSmall = new Chart(daysChartSmallCtx, {
     type : 'horizontalBar',
     data: {
-        labels: ['Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.', 'Sun.'],
+        labels: [],
         datasets: [
             {
                 data: [],
@@ -160,6 +160,15 @@ eventbus.onopen = function () {
 
         lang = reply.body;
         console.log(lang);
+        var labels = [
+            lang['STATISTICS_MON'],
+            lang['STATISTICS_TUE'],
+            lang['STATISTICS_WED'],
+            lang['STATISTICS_THU'],
+            lang['STATISTICS_FRI'],
+            lang['STATISTICS_SAT'],
+            lang['STATISTICS_SUN']
+        ];
         var search = $("#search-stat");
         var today = $("#today-stat");
         var thisWeek = $("#this-week-stat");
@@ -218,6 +227,8 @@ eventbus.onopen = function () {
             makeAllTime(eventbus);
         });
 
+        daysChart['data']['labels'] = labels;
+        daysChartSmall['data']['labels'] = labels;
         allTime.click();
     });
 };
