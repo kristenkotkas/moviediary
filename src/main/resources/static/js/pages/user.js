@@ -56,21 +56,29 @@ $.ajax({
     contentType: 'application/xml',
     success: function (data) {
         var $xml = $($.parseXML(data));
-        var card = $("#my-info");
-        card.append('<p>ID: ' + $xml.find('id').text() + '</p>');
-        card.append('<p>Firstname: ' + $xml.find('firstname').text() + '</p>');
-        card.append('<p>Lastname: ' + $xml.find('lastname').text() + '</p>');
-        card.append('<p>Username: ' + $xml.find('username').text() + '</p>');
-        card.append('<p>Hash: ' + $xml.find('hash').text() + '</p>');
-        card.append('<p>Salt: ' + $xml.find('salt').text() + '</p>');
-        card.append('<p>RuntimeType: ' + $xml.find('runtimeType').text() + '</p>');
-        card.append('<p>Verified: ' + $xml.find('verified').text() + '</p>');
+        addUserInfo('ID', $xml.find('id').text());
+        addUserInfo('Firstname', $xml.find('firstname').text());
+        addUserInfo('Lastname', $xml.find('lastname').text());
+        addUserInfo('Username', $xml.find('username').text());
+        addUserInfo('Hash', $xml.find('hash').text());
+        addUserInfo('Salt', $xml.find('salt').text());
+        addUserInfo('RuntimeType', $xml.find('runtimeType').text());
+        addUserInfo('Verified', $xml.find('verified').text());
     },
     error: function (e) {
         console.log(e.message());
         Materialize.toast("Failed to query user data.", 2000);
     }
 });
+
+function addUserInfo(key, value) {
+    $("#my-info").append(
+        '<tr>' +
+        '<td class="grey-text">' + key + '</td>' +
+        '<td class="content-key grey-text truncate">' + value + '</td>' +
+        '</tr>'
+    );
+}
 
 
 
