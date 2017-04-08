@@ -50,5 +50,27 @@ $.ajax({
     }
 });
 
+$.ajax({
+    url: '/private/api/v1/user',
+    type: 'GET',
+    contentType: 'application/xml',
+    success: function (data) {
+        var $xml = $($.parseXML(data));
+        var card = $("#my-info");
+        card.append('<p>ID: ' + $xml.find('id').text() + '</p>');
+        card.append('<p>Firstname: ' + $xml.find('firstname').text() + '</p>');
+        card.append('<p>Lastname: ' + $xml.find('lastname').text() + '</p>');
+        card.append('<p>Username: ' + $xml.find('username').text() + '</p>');
+        card.append('<p>Hash: ' + $xml.find('hash').text() + '</p>');
+        card.append('<p>Salt: ' + $xml.find('salt').text() + '</p>');
+        card.append('<p>RuntimeType: ' + $xml.find('runtimeType').text() + '</p>');
+        card.append('<p>Verified: ' + $xml.find('verified').text() + '</p>');
+    },
+    error: function (e) {
+        console.log(e.message());
+        Materialize.toast("Failed to query user data.", 2000);
+    }
+});
+
 
 

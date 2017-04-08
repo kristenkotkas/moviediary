@@ -8,6 +8,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import server.entity.User;
 import server.service.DatabaseService;
 import server.service.DatabaseService.*;
 import server.service.MailService;
@@ -25,7 +26,7 @@ import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
 import static server.service.DatabaseService.*;
 import static server.util.CommonUtils.contains;
-import static server.util.HandlerUtils.jsonResponse;
+import static server.util.CommonUtils.getProfile;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
 import static server.util.StringUtils.*;
@@ -36,7 +37,7 @@ import static server.util.StringUtils.*;
 public class DatabaseRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
-    public static final String API_USERS_ALL = "/private/api/v1/users/all";
+    public static final String API_USER_INFO = "/private/api/v1/user";
     public static final String API_VIEWS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
 
@@ -84,7 +85,7 @@ public class DatabaseRouter extends EventBusRoutable {
 
     @Override
     public void route(Router router) {
-        router.get(API_USERS_ALL).handler(this::handleUsersAll);
+        router.get(API_USER_INFO).handler(this::handleUserInfo);
         router.get(API_VIEWS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
     }
@@ -179,8 +180,21 @@ public class DatabaseRouter extends EventBusRoutable {
     /**
      * Returns all users in database as JSON response.
      */
-    private void handleUsersAll(RoutingContext ctx) {
-        database.getAllUsers().setHandler(resultHandler(ctx, jsonResponse(ctx)));
+    private void handleUserInfo(RoutingContext ctx) {
+        database.getUser(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, json -> {
+            User user = new User();
+            JsonObject userObj = getRows(json).getJsonObject(0);
+            System.out.println(userObj.encodePrettily());
+            user.setId(userObj.getInteger("Id"));
+            user.setFirstname(userObj.getString("Firstname"));
+            user.setLastname(userObj.getString("Lastname"));
+            user.setUsername(userObj.getString("Username"));
+            user.setHash(userObj.getString("Password"));
+            user.setSalt(userObj.getString("Salt"));
+            user.setRuntimeType(userObj.getString("RuntimeType"));
+            user.setVerified(userObj.getString("Verified").equals("1"));
+            ctx.response().setStatusCode(200).end(toXml(user));
+        }));
     }
 
     private String userExists() {

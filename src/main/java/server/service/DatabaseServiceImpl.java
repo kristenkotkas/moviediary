@@ -30,7 +30,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username";
-    private static final String SQL_QUERY_USER = "SELECT * FROM Users WHERE Username = ?";
+    private static final String SQL_QUERY_USER = "SELECT * FROM Users " +
+            "JOIN Settings ON Users.Username = Settings.Username " +
+            "WHERE Users.Username = ?";
 
     private static final String SQL_INSERT_VIEW =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -415,8 +417,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
                         .add(username)
                         .add(json.getString("start"))
-                        .add(json.getString("end")),
-                        resultHandler(conn, fut)))));
+                        .add(json.getString("end")), resultHandler(conn, fut)))));
     }
 
     @Override
