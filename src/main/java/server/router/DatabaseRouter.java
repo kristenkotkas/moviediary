@@ -38,7 +38,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USER_INFO = "/private/api/v1/user";
-    public static final String API_VIEWS_COUNT = "/private/api/v1/views/count";
+    public static final String API_USERS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
 
     public static final String DATABASE_USERS = "database_users";
@@ -86,7 +86,7 @@ public class DatabaseRouter extends EventBusRoutable {
     @Override
     public void route(Router router) {
         router.get(API_USER_INFO).handler(this::handleUserInfo);
-        router.get(API_VIEWS_COUNT).handler(this::handleUsersCount);
+        router.get(API_USERS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
     }
 
