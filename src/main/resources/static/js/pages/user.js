@@ -2,7 +2,6 @@ $(document).ready(function () {
     $(".sidebar-collapse").sideNav(); //sidebar initialization
     initMap();
 });
-
 var eventbus = new EventBus("/eventbus");
 eventbus.onopen = function () {
     eventbus.registerHandler("messenger", function (err, msg) {
@@ -20,6 +19,29 @@ eventbus.onopen = function () {
     });
     $("#SendMessage").click(function () {
         sendMessage();
+    });
+    eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        lang = reply.body;
+
+        var lang;
+        $.ajax({
+            url: '/private/api/v1/user',
+            type: 'GET',
+            contentType: 'application/xml',
+            success: function (data) {
+                var $xml = $($.parseXML(data));
+                addUserInfo('ID', $xml.find('id').text());
+                addUserInfo(lang['USER_FIRSTNAME'], $xml.find('firstname').text());
+                addUserInfo(lang['USER_LASTNAME'], $xml.find('lastname').text());
+                addUserInfo(lang['USER_USERNAME'], $xml.find('username').text());
+                addUserInfo(lang['USER_RUNTIME_TYPE'], $xml.find('runtimeType').text());
+                addUserInfo(lang['USER_VERIFIED'], $xml.find('verified').text());
+            },
+            error: function (e) {
+                console.log(e.message());
+                Materialize.toast("Failed to query user data.", 2000);
+            }
+        });
     });
 };
 
@@ -50,27 +72,6 @@ $.ajax({
     }
 });
 
-$.ajax({
-    url: '/private/api/v1/user',
-    type: 'GET',
-    contentType: 'application/xml',
-    success: function (data) {
-        var $xml = $($.parseXML(data));
-        addUserInfo('ID', $xml.find('id').text());
-        addUserInfo('Firstname', $xml.find('firstname').text());
-        addUserInfo('Lastname', $xml.find('lastname').text());
-        addUserInfo('Username', $xml.find('username').text());
-        addUserInfo('Hash', $xml.find('hash').text());
-        addUserInfo('Salt', $xml.find('salt').text());
-        addUserInfo('RuntimeType', $xml.find('runtimeType').text());
-        addUserInfo('Verified', $xml.find('verified').text());
-    },
-    error: function (e) {
-        console.log(e.message());
-        Materialize.toast("Failed to query user data.", 2000);
-    }
-});
-
 function addUserInfo(key, value) {
     $("#my-info").append(
         '<tr>' +
@@ -79,6 +80,5 @@ function addUserInfo(key, value) {
         '</tr>'
     );
 }
-
 
 
