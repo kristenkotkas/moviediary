@@ -229,6 +229,8 @@ eventbus.onopen = function () {
 
         daysChart['data']['labels'] = labels;
         daysChartSmall['data']['labels'] = labels;
+        daysChart.update();
+        daysChartSmall.update();
         allTime.click();
     });
 };
