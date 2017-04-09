@@ -182,18 +182,14 @@ public class DatabaseRouter extends EventBusRoutable {
      */
     private void handleUserInfo(RoutingContext ctx) {
         database.getUser(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, json -> {
-            User user = new User();
-            JsonObject userObj = getRows(json).getJsonObject(0);
-            System.out.println(userObj.encodePrettily());
-            user.setId(userObj.getInteger("Id"));
-            user.setFirstname(userObj.getString("Firstname"));
-            user.setLastname(userObj.getString("Lastname"));
-            user.setUsername(userObj.getString("Username"));
-            user.setHash(userObj.getString("Password"));
-            user.setSalt(userObj.getString("Salt"));
-            user.setRuntimeType(userObj.getString("RuntimeType"));
-            user.setVerified(userObj.getString("Verified").equals("1"));
-            ctx.response().setStatusCode(200).end(toXml(user));
+            JsonObject user = getRows(json).getJsonObject(0);
+            ctx.response().setStatusCode(200).end(toXml(new User(
+                    user.getInteger("Id"),
+                    user.getString("Firstname"),
+                    user.getString("Lastname"),
+                    user.getString("Username"),
+                    user.getString("RuntimeType"),
+                    user.getString("Verified").equals("1"))));
         }));
     }
 
