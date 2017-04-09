@@ -37,7 +37,7 @@ import static server.util.StringUtils.*;
 public class DatabaseRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
-    public static final String API_USER_INFO = "/private/api/v1/user";
+    public static final String API_USER_INFO = "/private/api/v1/user/info";
     public static final String API_USERS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
 

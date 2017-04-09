@@ -25,7 +25,7 @@ eventbus.onopen = function () {
 
         var lang;
         $.ajax({
-            url: '/private/api/v1/user',
+            url: '/private/api/v1/user/info',
             type: 'GET',
             contentType: 'application/xml',
             success: function (data) {
