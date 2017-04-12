@@ -2,7 +2,6 @@ package server;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.After;
@@ -23,23 +22,20 @@ import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
 import static server.util.NetworkUtils.HTTP_PORT;
 
-@SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
 public class UiFormRegisterPageTest {
     private static final int PORT = 8082;
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
-    private JsonObject config;
     private WebDriver driver;
 
     @Before
     public void setUp(TestContext ctx) throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
-        config = getConfig().put(HTTP_PORT, PORT);
-        config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
+        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig().put(HTTP_PORT, PORT)),
+                ctx.asyncAssertSuccess());
     }
 
     @Test
