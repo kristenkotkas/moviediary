@@ -21,12 +21,11 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
-import static server.util.LoginUtils.formLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
 
 @SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
-public class UiFormLoginPageTest {
+public class UiFormRegisterPageTest {
     private static final int PORT = 8082;
     private static final String URI = "http://localhost:" + PORT;
 
@@ -44,50 +43,38 @@ public class UiFormLoginPageTest {
     }
 
     @Test
-    public void testLoginUnauthorized() throws Exception {
-        driver.manage().deleteAllCookies();
-        formLogin(driver, URI, new JsonObject().put("unit_test", new JsonObject().put("form_user",
-                new JsonObject().put("username", "megalamp").put("password", "ultrateam3000"))));
-        assertEquals(URI + "/login?message=AUTHORIZER_UNAUTHORIZED", driver.getCurrentUrl());
-    }
-
-    @Test
-    public void testLoginAuthorizedToHomePage() throws Exception {
-        driver.manage().deleteAllCookies();
-        formLogin(driver, URI, config);
-        assertEquals(URI + "/private/home", driver.getCurrentUrl());
-    }
-
-    @Test
-    public void testFormLoginPageLinks() throws Exception {
-        String url = URI + "/formlogin";
+    public void testFormRegisterPageLinks() throws Exception {
+        String url = URI + "/formregister";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
-        assertEquals(URI + "/callback?client_name=FormClient",
+        assertEquals("/public/api/v1/users/form/insert",
                 escapeHtml4(driver.findElement(tagName("form")).getAttribute("action")));
-        assertEquals(URI + "/formregister", driver.findElement(tagName("a")).getAttribute("href"));
     }
 
     @Test
-    public void testFormLoginPageTranslations() throws Exception {
-        checkFormLoginPageTranslations("en");
-        checkFormLoginPageTranslations("et");
-        checkFormLoginPageTranslations("de");
+    public void testFormRegisterPageTranslations() throws Exception {
+        checkFormRegisterPageTranslations("en");
+        checkFormRegisterPageTranslations("et");
+        checkFormRegisterPageTranslations("de");
     }
 
-    private void checkFormLoginPageTranslations(String lang) {
+    private void checkFormRegisterPageTranslations(String lang) {
         String url = URI + "/login?lang=" + lang;
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
-        url = URI + "/formlogin";
+        url = URI + "/formregister?message=FORM_REGISTER_EXISTS";
         driver.get(url);
         assertEquals(url, driver.getCurrentUrl());
-        assertEquals(getString("FORM_LOGIN_TITLE", lang), driver.getTitle());
-        assertEquals(getString("LOGIN_TITLE", lang), driver.findElement(tagName("h5")).getText());
+        assertEquals(getString("FORM_REGISTER_TITLE", lang), driver.getTitle());
+        List<WebElement> headers = driver.findElements(tagName("h5"));
+        assertEquals(getString("FORM_REGISTER_SIGNUP", lang), headers.get(0).getText());
+        assertEquals(getString("FORM_REGISTER_EXISTS", lang), headers.get(1).getText());
         List<WebElement> textFields = driver.findElements(tagName("label"));
-        assertEquals(getString("FORM_LOGIN_EMAIL", lang), textFields.get(0).getText());
-        assertEquals(getString("FORM_LOGIN_PASSWORD", lang), textFields.get(1).getText());
-        assertEquals(getString("FORM_LOGIN_REGISTER", lang), driver.findElement(tagName("a")).getText());
+        assertEquals(getString("FORM_REGISTER_FIRSTNAME", lang), textFields.get(0).getText());
+        assertEquals(getString("FORM_REGISTER_LASTNAME", lang), textFields.get(1).getText());
+        assertEquals(getString("FORM_LOGIN_EMAIL", lang), textFields.get(2).getText());
+        assertEquals(getString("FORM_LOGIN_PASSWORD", lang), textFields.get(3).getText());
+        assertEquals(getString("FORM_LOGIN_REGISTER", lang), driver.findElement(tagName("button")).getText());
     }
 
     @After
