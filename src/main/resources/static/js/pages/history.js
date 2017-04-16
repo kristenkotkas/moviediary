@@ -20,6 +20,14 @@ var yearDropdown = $("#history-year-drop");
 var collSearch = $("#history-coll-search");
 var collFilters = $("#history-coll-filters");
 var collQkSearch = $("#history-coll-qk-search");
+var search = $("#search");
+var today = $("#today");
+var thisWeek = $("#this-week");
+var thisMonth = $("#this-month");
+var allTime = $("#all-time");
+var monthBack = $("#month-back-history");
+var monthNext = $("#month-next-history");
+var monthIndex = 0;
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -30,61 +38,79 @@ eventbus.onopen = function () {
 
         lang = reply.body;
         console.log(lang);
-        var search = $("#search");
-        var today = $("#today");
-        var thisWeek = $("#this-week");
-        var thisMonth = $("#this-month");
-        var allTime = $("#all-time");
         fillDropDown(lang);
         search.keyup(function (e) {
             if (e.keyCode === 13) {
                 search.click();
             }
         });
+
         today.keyup(function (e) {
             if (e.keyCode === 13) {
                 today.click();
             }
         });
+
         thisWeek.keyup(function (e) {
             if (e.keyCode === 13) {
                 thisWeek.click();
             }
         });
+
         thisMonth.keyup(function (e) {
             if (e.keyCode === 13) {
                 thisMonth.click();
             }
         });
+
         allTime.keyup(function (e) {
             if (e.keyCode === 13) {
                 allTime.click();
             }
         });
+
         search.click(function () {
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.search);
         });
+
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.today);
         });
+
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.week);
         });
+
         thisMonth.click(function () {
-            var dates = getThisMonth();
+            var dates = getThisMonth(0);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month);
         });
+
         allTime.click(function () {
             makeAllTime(eventbus, lang);
         });
-        //array[i], lang, startDateField, endDateField, array[i]
+
+        monthBack.click(function () {
+            var dates = getThisMonth(--monthIndex);
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month, monthIndex);
+        });
+
+        monthNext.click(function () {
+            var dates = getThisMonth(++monthIndex);
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month, monthIndex);
+        });
+
         searchYear(new Date().getFullYear(), lang, startDateField, endDateField, new Date().getFullYear());
     });
 };

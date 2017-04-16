@@ -16,4 +16,8 @@ public interface TmdbService extends CachingService<JsonObject> {
     Future<JsonObject> getMovieByName(String name);
 
     Future<JsonObject> getMovieById(String id);
+
+    Future<JsonObject> getTVByName(String name);
+
+    Future<JsonObject> getTVById(String id, int page);
 }

@@ -1,0 +1,2 @@
+https://api.themoviedb.org/3/search/tv?query=modern&api_key=fbe0eec213cc4dd1dbb4a8c222273a3e
+https://api.themoviedb.org/3/tv/1421?api_key=fbe0eec213cc4dd1dbb4a8c222273a3e&append_to_response=season/1,season/2

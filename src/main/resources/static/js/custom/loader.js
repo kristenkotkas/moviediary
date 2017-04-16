@@ -101,11 +101,11 @@ function getThisWeek() {
     return result;
 }
 
-function getThisMonth() {
+function getThisMonth(index) {
     var result = {};
     var date = new Date();
-    var firstday = new Date(date.getFullYear(), date.getMonth(), 1);
-    var lastday = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    var firstday = new Date(date.getFullYear(), date.getMonth() + index, 1);
+    var lastday = new Date(date.getFullYear(), date.getMonth() + 1 + index, 0);
     result['start'] = firstday;
     result['end'] = lastday;
     return result;
@@ -132,10 +132,11 @@ function getYear(year) {
 
 function searchYear(year, lang, startDateField, endDateField, type) {
     var dates = getYear(year);
+    var monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
     console.log(dates);
     startDateField.pickadate('picker').set('select', dates['start']);
     endDateField.pickadate('picker').set('select', dates['end']);
-    makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), type);
+    makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
 }
 
 function makeDropList(start, lang, type, startDateField, endDateField) {
