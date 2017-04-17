@@ -1,13 +1,11 @@
 package server.util;
 
-import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
-
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -53,9 +51,43 @@ public class CommonUtils {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     }
 
-    public static <T> Future<T> future(Consumer<Future<T>> consumer) {
-        Future<T> future = Future.future();
-        consumer.accept(future);
-        return future;
+    public static <T> boolean ifPresent(T input, Consumer<T> consumer) {
+        if (input != null) {
+            consumer.accept(input);
+            return true;
+        }
+        return false;
+    }
+
+    public static <T> boolean ifMissing(T input, Runnable runnable) {
+        if (input == null) {
+            runnable.run();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean ifTrue(boolean check, Runnable runnable) {
+        if (check) {
+            runnable.run();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean ifFalse(boolean check, Runnable runnable) {
+        if (!check) {
+            runnable.run();
+            return false;
+        }
+        return true;
+    }
+
+    public static void check(boolean check, Runnable ifTrue, Runnable ifFalse) {
+        if (check) {
+            ifTrue.run();
+        } else {
+            ifFalse.run();
+        }
     }
 }

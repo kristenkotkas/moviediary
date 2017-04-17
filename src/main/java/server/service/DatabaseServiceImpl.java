@@ -11,6 +11,7 @@ import io.vertx.ext.jdbc.JDBCClient;
 import java.util.List;
 import java.util.Map;
 
+import static io.vertx.core.Future.future;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -22,74 +23,56 @@ import static server.util.StringUtils.*;
  * Database service implementation.
  */
 public class DatabaseServiceImpl implements DatabaseService {
+    public static final String SQL_INSERT_WISHLIST =
+            "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
+    public static final String SQL_INSERT_EPISODE =
+            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
+    public static final String SQL_IS_IN_WISHLIST =
+            "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
+    public static final String SQL_GET_WISHLIST =
+            "SELECT Title, Time, Image, MovieId FROM Wishlist " +
+                    "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
+                    "WHERE Username =  ? ORDER BY Time DESC";
+    public static final String SQL_GET_YEARS_DIST =
+            "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
+    public static final String SQL_GET_WEEKDAYS_DIST =
+            "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
+                    "FROM Views " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
+    public static final String SQL_GET_TIME_DIST =
+            "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ? ";
+    public static final String SQL_GET_ALL_TIME_META =
+            "Select DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
+                    "WHERE Username = ?";
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String MYSQL = "mysql";
-
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username";
     private static final String SQL_QUERY_USER = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username " +
             "WHERE Users.Username = ?";
-
     private static final String SQL_INSERT_VIEW =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
     private static final String SQL_QUERY_VIEWS =
             "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-
     private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
-
     private static final String SQL_INSERT_SERIES =
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
-
     private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
-
     private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Start, WasCinema From Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
-
-    public static final String SQL_INSERT_WISHLIST =
-            "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
-
-    public static final String SQL_INSERT_EPISODE =
-            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
-
-    public static final String SQL_IS_IN_WISHLIST =
-            "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
-
-    public static final String SQL_GET_WISHLIST =
-            "SELECT Title, Time, Image, MovieId FROM Wishlist " +
-                    "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
-                    "WHERE Username =  ? ORDER BY Time DESC";
-
-    public static final String SQL_GET_YEARS_DIST =
-            "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
-                    "JOIN Movies ON Movies.Id = Views.MovieId " +
-                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
-
-    public static final String SQL_GET_WEEKDAYS_DIST =
-            "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
-                    "FROM Views " +
-                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
-
-    public static final String SQL_GET_TIME_DIST =
-            "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
-                    "WHERE Username = ? AND Start >= ? AND Start <= ? ";
-
-    public static final String SQL_GET_ALL_TIME_META =
-            "Select DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
-                    "WHERE Username = ?";
-
     private static final String SQL_QUERY_VIEWS_META =
             "SELECT Count(*) AS Count " +
                     "FROM Views " +
@@ -112,7 +95,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     /**
      * Inserts a Facebook, Google or IdCard user into database.
-     * Also inserts 3 movie views for demonstration purposes.
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
@@ -128,18 +110,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     .add(lastname)
                     .add(hash(password, salt))
                     .add(salt), ar -> {
-                if (ar.succeeded()) {
-                    Future<JsonObject> f4 = insert(Table.SETTINGS, createDataMap(username));
-                    f4.setHandler(result -> {
-                        if (result.succeeded()) {
-                            fut.complete(ar.result().toJson());
-                        } else {
-                            fut.fail(result.cause());
-                        }
-                    });
-                } else {
-                    fut.fail(ar.cause());
-                }
+                check(ar.succeeded(),
+                        () -> insert(Table.SETTINGS, createDataMap(username)).setHandler(result ->
+                                check(result.succeeded(),
+                                        () -> fut.complete(ar.result().toJson()),
+                                        () -> fut.fail(result.cause()))),
+                        () -> fut.fail(ar.cause()));
                 conn.close();
             })));
         });
@@ -204,7 +180,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> insertEpisodeView(String username, String param) {
         JsonObject json = new JsonObject(param);
-
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.updateWithParams(SQL_INSERT_EPISODE, new JsonArray()
                         .add(username)
@@ -235,7 +210,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getWishlist(String username) {
         System.out.println("USERNAME: " + username);
-        return future(fut -> client.getConnection(DatabaseService.connHandler(fut,
+        return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username),
                         resultHandler(conn, fut)))));
     }
@@ -476,11 +451,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<String> getUsersCount() {
         return future(fut -> client.getConnection(connHandler(fut, conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
-            if (ar.succeeded()) {
-                fut.complete(ar.result().getRows().get(0).getLong("Count").toString());
-            } else {
-                fut.fail(ar.cause());
-            }
+            check(ar.succeeded(),
+                    () -> fut.complete(ar.result().getRows().get(0).getLong("Count").toString()),
+                    () -> fut.fail(ar.cause()));
             conn.close();
         }))));
     }

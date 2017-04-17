@@ -2,10 +2,8 @@ package server.router;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import server.entity.User;
@@ -13,13 +11,13 @@ import server.service.DatabaseService;
 import server.service.DatabaseService.*;
 import server.service.MailService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 import static io.vertx.core.CompositeFuture.all;
+import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.toList;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.MailRouter.userVerified;
@@ -27,8 +25,7 @@ import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
 import static server.service.DatabaseService.*;
-import static server.util.CommonUtils.contains;
-import static server.util.CommonUtils.getProfile;
+import static server.util.CommonUtils.*;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
 import static server.util.StringUtils.*;
@@ -37,12 +34,10 @@ import static server.util.StringUtils.*;
  * Contains routes that interact with database.
  */
 public class DatabaseRouter extends EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseRouter.class);
     public static final String DISPLAY_MESSAGE = "message";
     public static final String API_USER_INFO = "/private/api/v1/user/info";
     public static final String API_USERS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
-
     public static final String DATABASE_USERS = "database_users";
     public static final String DATABASE_USERS_SIZE = "database_users_size";
     public static final String DATABASE_GET_HISTORY = "database_get_history";
@@ -59,7 +54,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_REMOVE_VIEW = "database_remove_view";
     public static final String DATABASE_INSERT_EPISODE = "database_insert_episode";
     public static final String DATABASE_GET_SEEN_EPISODES = "database_get_seen_episodes";
-
+    private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
     private final MailService mail;
@@ -75,20 +70,18 @@ public class DatabaseRouter extends EventBusRoutable {
                 new JsonObject(param).getInteger("page")), getDatabaseHistory()));
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
         listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, parseInt(param)));
-        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param)),
-                (user, json) -> json));
-        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user), (user, json) -> json));
-        listen(DATABASE_INSERT_VIEW, reply(database::insertView, (user, json) -> json));
-        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist, (user, json) -> json));
-        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist, (user, json) -> json));
-        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDist, (user, json) -> json));
-        listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta, (user, json) -> json));
-        listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta, (user, json) -> json));
-        listen(DATABASE_REMOVE_VIEW, reply(database::removeView, (user, json) -> json));
-        listen(DATABASE_INSERT_EPISODE, reply(database::insertEpisodeView, (user, json) -> json));
-        listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) ->
-                //database.getSeenEpisodes(user, parseInt(param)), (user, json) -> json.getJsonArray("results")));
-                database.getSeenEpisodes(user, parseInt(param)), getSeenEpisodes()));
+        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
+        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
+        listen(DATABASE_INSERT_VIEW, reply(database::insertView));
+        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist));
+        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist));
+        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDist));
+        listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta));
+        listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta));
+        listen(DATABASE_REMOVE_VIEW, reply(database::removeView));
+        listen(DATABASE_INSERT_EPISODE, reply(database::insertEpisodeView));
+        listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)),
+                getSeenEpisodes()));
     }
 
     @Override
@@ -99,15 +92,11 @@ public class DatabaseRouter extends EventBusRoutable {
     }
 
     private BiFunction<String, JsonObject, Object> getSeenEpisodes() {
-        return (user, json) -> {
-            JsonObject resultJson = new JsonObject();
-            List<Integer> list = new ArrayList<>();
-            json.getJsonArray("rows").stream()
-                    .forEach(elem -> list.add(((JsonObject) elem).getInteger("EpisodeId")));
-
-            resultJson.put("episodes", list);
-            return resultJson;
-        };
+        return (String user, JsonObject json) -> new JsonObject()
+                .put("episodes", json.getJsonArray("rows").stream()
+                        .map(obj -> (JsonObject) obj)
+                        .map(j -> j.getInteger("EpisodeId"))
+                        .collect(toList()));
     }
 
     /**
@@ -116,15 +105,14 @@ public class DatabaseRouter extends EventBusRoutable {
     private BiFunction<String, JsonObject, Object> getDatabaseHistory() {
         return (user, json) -> {
             json.remove("results");
-            JsonArray array = json.getJsonArray("rows");
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject jsonObject = array.getJsonObject(i);
-                jsonObject.put("WasFirst", getFirstSeen(jsonObject.getBoolean("WasFirst")));
-                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
-                jsonObject.put("DayOfWeek", getWeekdayFromDB(jsonObject.getString("Start")));
-                jsonObject.put("Time", toNormalTime(jsonObject.getString("Start")));
-                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
-            }
+            json.getJsonArray("rows").stream()
+                    .map(obj -> (JsonObject) obj)
+                    .forEach(jsonObj -> jsonObj
+                            .put("WasFirst", getFirstSeen(jsonObj.getBoolean("WasFirst")))
+                            .put("WasCinema", getCinema(jsonObj.getBoolean("WasCinema")))
+                            .put("DayOfWeek", getWeekdayFromDB(jsonObj.getString("Start")))
+                            .put("Time", toNormalTime(jsonObj.getString("Start")))
+                            .put("Start", getNormalDTFromDB(jsonObj.getString("Start"), LONG_DATE)));
             return json;
         };
     }
@@ -135,12 +123,11 @@ public class DatabaseRouter extends EventBusRoutable {
     private BiFunction<String, JsonObject, Object> getDatabaseMovieHistory() {
         return (user, json) -> {
             json.remove("results");
-            JsonArray array = json.getJsonArray("rows");
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject jsonObject = array.getJsonObject(i);
-                jsonObject.put("WasCinema", getCinema(jsonObject.getBoolean("WasCinema")));
-                jsonObject.put("Start", getNormalDTFromDB(jsonObject.getString("Start"), LONG_DATE));
-            }
+            json.getJsonArray("rows").stream()
+                    .map(obj -> (JsonObject) obj)
+                    .forEach(jsonObj -> jsonObj
+                            .put("WasCinema", getCinema(jsonObj.getBoolean("WasCinema")))
+                            .put("Start", getNormalDTFromDB(jsonObj.getString("Start"), LONG_DATE)));
             return json;
         };
     }
@@ -168,49 +155,32 @@ public class DatabaseRouter extends EventBusRoutable {
             serviceUnavailable(ctx, new Throwable("All fields must be filled!"));
             return;
         }
-        database.getUser(username).setHandler(resultHandler(ctx, result -> {
-            boolean exists = getRows(result).stream()
-                    .map(obj -> (JsonObject) obj)
-                    .anyMatch(json -> json.getString(DB_USERNAME).equals(username));
-            if (!exists) {
-                Map<Column, String> userMap = createDataMap(username);
-                Map<Column, String> settingsMap = createDataMap(username);
-                String salt = genString();
-                userMap.put(Column.FIRSTNAME, firstname);
-                userMap.put(Column.LASTNAME, lastname);
-                userMap.put(Column.PASSWORD, hash(password, salt));
-                userMap.put(Column.SALT, salt);
-                settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
-                Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
-                Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
-                all(f1, f2).setHandler(resultHandler(ctx, ar -> {
-                    if (isServer(config)) {
-                        mail.sendVerificationEmail(ctx, username);
-                        redirect(ctx, verifyEmail());
-                    } else {
-                        redirect(ctx, userVerified());
-                    }
-                }));
-            } else {
-                redirect(ctx, userExists());
-            }
-        }));
+        database.getUser(username).setHandler(resultHandler(ctx, result -> check(getRows(result).stream()
+                .map(obj -> (JsonObject) obj)
+                .noneMatch(json -> json.getString(DB_USERNAME).equals(username)), () -> {
+            Map<Column, String> userMap = createDataMap(username);
+            Map<Column, String> settingsMap = createDataMap(username);
+            String salt = genString();
+            userMap.put(Column.FIRSTNAME, firstname);
+            userMap.put(Column.LASTNAME, lastname);
+            userMap.put(Column.PASSWORD, hash(password, salt));
+            userMap.put(Column.SALT, salt);
+            settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
+            Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
+            Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
+            all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
+                mail.sendVerificationEmail(ctx, username);
+                redirect(ctx, verifyEmail());
+            }, () -> redirect(ctx, userVerified()))));
+        }, () -> redirect(ctx, userExists()))));
     }
 
     /**
      * Returns all users in database as JSON response.
      */
     private void handleUserInfo(RoutingContext ctx) {
-        database.getUser(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx, json -> {
-            JsonObject user = getRows(json).getJsonObject(0);
-            ctx.response().setStatusCode(200).end(toXml(new User(
-                    user.getInteger("Id"),
-                    user.getString("Firstname"),
-                    user.getString("Lastname"),
-                    user.getString("Username"),
-                    user.getString("RuntimeType"),
-                    user.getString("Verified").equals("1"))));
-        }));
+        database.getUser(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx,
+                json -> ctx.response().setStatusCode(200).end(toXml(new User(getRows(json).getJsonObject(0))))));
     }
 
     private String userExists() {

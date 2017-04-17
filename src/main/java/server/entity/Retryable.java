@@ -3,6 +3,7 @@ package server.entity;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Objects.requireNonNull;
+import static server.util.CommonUtils.check;
 
 /**
  * Retries asynchronous actions as long as there are retries left.
@@ -42,11 +43,7 @@ public class Retryable {
     public Retryable retry(Runnable again, Runnable failure) {
         requireNonNull(again);
         requireNonNull(failure);
-        if (decrement() > 0) {
-            again.run();
-        } else {
-            failure.run();
-        }
+        check(decrement() > 0, again, failure);
         return this;
     }
 }

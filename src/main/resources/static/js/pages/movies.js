@@ -44,8 +44,7 @@ eventbus.onopen = function () {
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
-            setTimeout(
-                function () {
+            setTimeout(function () {
                     eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
                         var data = reply.body['results'];
                         console.log(data.length);

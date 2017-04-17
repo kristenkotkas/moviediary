@@ -7,12 +7,10 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
 
 import java.util.HashMap;
@@ -22,23 +20,56 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
+import static java.lang.String.valueOf;
+import static server.util.CommonUtils.*;
 
 /**
  * Generic class that contains routes.
  */
 public abstract class EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(EventBusRoutable.class);
-    protected final Vertx vertx;
-
     public static final String EVENTBUS_ALL = "/eventbus/*";
-    public static final String EVENTBUS = "/eventbus";
-
     protected static final Map<String, MessageConsumer> consumers = new HashMap<>();
     protected static final Map<String, MessageConsumer> gateways = new HashMap<>();
+    private static final Logger LOG = getLogger(EventBusRoutable.class);
+    protected final Vertx vertx;
 
     public EventBusRoutable(Vertx vertx) {
         this.vertx = vertx;
+    }
+
+    /**
+     * Permits messages to move on eventbus that have been specified in listeners and gateways.
+     * Enables eventbus.
+     * Adds current users username and firstname to message headers.
+     */
+    public static void startEventbus(Router router, Vertx vertx) {
+        BridgeOptions options = new BridgeOptions();
+        consumers.keySet().stream()
+                .map(key -> new PermittedOptions().setAddress(key))
+                .forEach(options::addInboundPermitted);
+        gateways.keySet().stream()
+                .map(key -> new PermittedOptions().setAddress(key))
+                .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
+        router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
+            ifTrue(event.getRawMessage() != null && event.type() != RECEIVE, () ->
+                    ifPresent(((Pac4jUser) event.socket().webUser())
+                            .pac4jUserProfiles().values().stream()
+                            .findAny()
+                            .orElse(null), profile -> event.setRawMessage(event.getRawMessage()
+                            .put("headers", event.getRawMessage().getJsonObject("headers", new JsonObject())
+                                    .put("user", profile.getEmail())
+                                    .put("name", profile.getFirstName())))));
+            event.complete(true);
+        }));
+    }
+
+    public static void closeEventbus() throws Exception {
+        Stream.of(consumers, gateways)
+                .flatMap(map -> map.values().stream())
+                .filter(Objects::nonNull)
+                .forEach(MessageConsumer::unregister);
     }
 
     public abstract void route(Router router);
@@ -72,9 +103,9 @@ public abstract class EventBusRoutable {
      *
      * @param address to listen on
      */
-    protected  <T> void listen(String address, BiFunction<String, String, Future<T>> processor) {
+    protected <T> void listen(String address, BiFunction<String, String, Future<T>> processor) {
         consumers.put(address, vertx.eventBus().consumer(address,
-                msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body()))));
+                msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))));
     }
 
     /**
@@ -84,15 +115,19 @@ public abstract class EventBusRoutable {
      * @param compiler  to transform service data into usable form
      * @return replyHandler
      */
-    protected  <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
-                                          BiFunction<String, T, Object> compiler) {
-        return msg -> processor.apply(msg.headers().get("user"), String.valueOf(msg.body())).setHandler(ar -> {
-            if (ar.succeeded()) {
-                msg.reply(compiler.apply(msg.headers().get("user"), ar.result()));
-            } else {
-                msg.reply("Failure: " + ar.cause().getMessage());
-            }
-        });
+    protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
+                                            BiFunction<String, T, Object> compiler) {
+        return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
+                check(ar.succeeded(),
+                        () -> msg.reply(compiler.apply(msg.headers().get("user"), ar.result())),
+                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
+    }
+
+    protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor) {
+        return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
+                check(ar.succeeded(),
+                        () -> msg.reply(ar.result()),
+                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
     }
 
     /**
@@ -102,13 +137,10 @@ public abstract class EventBusRoutable {
      * @return replyHandler
      */
     protected <T> Handler<Message<T>> reply(Function<String, Future<T>> processor) {
-        return msg -> processor.apply(String.valueOf(msg.body())).setHandler(ar -> {
-            if (ar.succeeded()) {
-                msg.reply(ar.result());
-            } else {
-                msg.reply("Failure: " + ar.cause().getMessage());
-            }
-        });
+        return msg -> processor.apply(valueOf(msg.body())).setHandler(ar ->
+                check(ar.succeeded(),
+                        () -> msg.reply(ar.result()),
+                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
     }
 
     protected <T> Handler<Message<T>> log() {
@@ -119,40 +151,5 @@ public abstract class EventBusRoutable {
         return "Msg{address='" + msg.address() + '\'' +
                 ", replyAddress='" + msg.replyAddress() + '\'' +
                 ", body=" + msg.body() + '}';
-    }
-
-    /**
-     * Permits messages to move on eventbus that have been specified in listeners and gateways.
-     * Enables eventbus.
-     * Adds current users username and firstname to message headers.
-     */
-    public static void startEventbus(Router router, Vertx vertx) {
-        BridgeOptions options = new BridgeOptions();
-        consumers.keySet().stream()
-                .map(key -> new PermittedOptions().setAddress(key))
-                .forEach(options::addInboundPermitted);
-        gateways.keySet().stream()
-                .map(key -> new PermittedOptions().setAddress(key))
-                .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
-        router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
-            if (event.getRawMessage() != null && event.type() != RECEIVE) {
-                CommonProfile profile = ((Pac4jUser) event.socket().webUser())
-                        .pac4jUserProfiles().values().stream()
-                        .findAny()
-                        .orElse(null);
-                event.setRawMessage(event.getRawMessage()
-                        .put("headers", event.getRawMessage().getJsonObject("headers", new JsonObject())
-                                .put("user", profile.getEmail())
-                                .put("name", profile.getFirstName())));
-            }
-            event.complete(true);
-        }));
-    }
-
-    public static void closeEventbus() throws Exception {
-        Stream.of(consumers, gateways)
-                .flatMap(map -> map.values().stream())
-                .filter(Objects::nonNull)
-                .forEach(MessageConsumer::unregister);
     }
 }

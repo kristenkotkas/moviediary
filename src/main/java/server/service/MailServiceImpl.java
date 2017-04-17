@@ -13,10 +13,11 @@ import server.service.DatabaseService.*;
 
 import java.util.Map;
 
+import static io.vertx.core.Future.future;
 import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
 import static server.service.DatabaseService.*;
-import static server.util.CommonUtils.future;
+import static server.util.CommonUtils.check;
 import static server.util.StringUtils.genString;
 
 /**
@@ -47,19 +48,11 @@ public class MailServiceImpl implements MailService {
                 .setHtml(createContent(ctx, userEmail, unique));
         Map<Column, String> data = createDataMap(userEmail);
         data.put(Column.VERIFIED, unique);
-        return future(fut -> database.update(Table.SETTINGS, data).setHandler(ar -> {
-            if (ar.succeeded()) {
-                client.sendMail(email, result -> {
-                    if (result.succeeded()) {
-                        fut.complete(result.result().toJson());
-                    } else {
-                        fut.fail("Failed to send email to user: " + result.cause());
-                    }
-                });
-            } else {
-                fut.fail("Could not set unique verification string in DB: " + ar.cause());
-            }
-        }));
+        return future(fut -> database.update(Table.SETTINGS, data).setHandler(ar -> check(ar.succeeded(),
+                () -> client.sendMail(email, result -> check(result.succeeded(),
+                        () -> fut.complete(result.result().toJson()),
+                        () -> fut.fail("Failed to send email to user: " + result.cause()))),
+                () -> fut.fail("Could not set unique verification string DB: " + ar.cause()))));
     }
 
     /**
@@ -67,25 +60,15 @@ public class MailServiceImpl implements MailService {
      */
     @Override
     public Future<JsonObject> verifyEmail(String email, String unique) {
-        return future(fut -> database.getSettings(email).setHandler(ar -> {
-            if (ar.succeeded()) {
-                if (getRows(ar.result()).getJsonObject(0).getString(DB_VERIFIED).equals(unique)) {
+        return future(fut -> database.getSettings(email).setHandler(ar -> check(ar.succeeded(),
+                () -> check(getRows(ar.result()).getJsonObject(0).getString(DB_VERIFIED).equals(unique), () -> {
                     Map<Column, String> map = createDataMap(email);
                     map.put(Column.VERIFIED, "1");
-                    database.update(Table.SETTINGS, map).setHandler(result -> {
-                        if (result.succeeded()) {
-                            fut.complete(result.result());
-                        } else {
-                            fut.fail("Failed to update user unique string in DB: " + result.cause());
-                        }
-                    });
-                } else {
-                    fut.fail("User presented unique string does not match DB.");
-                }
-            } else {
-                fut.fail("Failed to get user settings from DB: " + ar.cause());
-            }
-        }));
+                    database.update(Table.SETTINGS, map).setHandler(result -> check(result.succeeded(),
+                            () -> fut.complete(result.result()),
+                            () -> fut.fail("Failed to update user unique string DB: " + result.cause())));
+                }, () -> fut.fail("User presented unique string does not match DB.")),
+                () -> fut.fail("Failed to get user settings from DB: " + ar.cause()))));
     }
 
     /**
@@ -95,7 +78,8 @@ public class MailServiceImpl implements MailService {
         return "<p>" + getString("MAIL_REGISTER_TEXT", ctx) + "</p>" +
                 "<a href=\"https://movies.kyngas.eu" + API_MAIL_VERIFY +
                 "?" + EMAIL + "=" + userEmail +
-                "&" + UNIQUE + "=" + unique +
-                "\">" + getString("MAIL_REGISTER_CLICK_ME", ctx) + "</a>";
+                "&" + UNIQUE + "=" + unique + "\">" +
+                getString("MAIL_REGISTER_CLICK_ME", ctx) +
+                "</a>";
     }
 }

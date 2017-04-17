@@ -17,6 +17,7 @@ import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
+import static server.util.CommonUtils.check;
 
 /**
  * Service which interacts with database.
@@ -89,6 +90,26 @@ public interface DatabaseService {
      */
     static Integer getNumRows(JsonObject json) {
         return json.getInteger(ROWS_NUMS);
+    }
+
+    static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
+        return conn -> check(conn.succeeded(),
+                () -> handler.handle(conn.result()),
+                () -> future.fail(conn.cause()));
+    }
+
+    /**
+     * Convenience method for handling sql commands result.
+     */
+    static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
+        return ar -> {
+            check(ar.succeeded(),
+                    () -> check(ar.result() instanceof ResultSet,
+                            () -> future.complete(((ResultSet) ar.result()).toJson()),
+                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
+                    () -> future.fail(ar.cause()));
+            conn.close();
+        };
     }
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
@@ -235,33 +256,5 @@ public interface DatabaseService {
         public String getName() {
             return columnName;
         }
-    }
-
-    static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> {
-            if (conn.succeeded()) {
-                handler.handle(conn.result());
-            } else {
-                future.fail(conn.cause());
-            }
-        };
-    }
-
-    /**
-     * Convenience method for handling sql commands result.
-     */
-    static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                if (ar.result() instanceof ResultSet) {
-                    future.complete(((ResultSet) ar.result()).toJson());
-                } else {
-                    future.complete(((UpdateResult) ar.result()).toJson());
-                }
-            } else {
-                future.fail(ar.cause());
-            }
-            conn.close();
-        };
     }
 }

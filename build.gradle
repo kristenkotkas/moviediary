@@ -19,6 +19,7 @@ dependencies {
     compile group: 'com.github.jknack', name: 'handlebars', version: '4.0.6'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.4.1'
     compile group: 'io.vertx', name: 'vertx-web', version: '3.4.1'
+    //compile group: 'io.vertx', name: 'vertx-rx-java', version: '3.4.1'
     compile group: 'io.vertx', name: 'vertx-mail-client', version: '3.4.1'
     compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.4.1'
     compile group: 'io.vertx', name: 'vertx-web-client', version: '3.4.1'

@@ -29,11 +29,9 @@ public abstract class CachingServiceImpl<T> implements CachingService<T> {
      * @param future    to complete
      */
     protected boolean tryCachedResult(boolean useCache, CacheItem<T> cacheItem, Future<T> future) {
-        if (useCache) {
-            if (cacheItem.isUpToDate()) {
-                future.complete(cacheItem.get());
-                return true;
-            }
+        if (useCache && cacheItem.isUpToDate()) {
+            future.complete(cacheItem.get());
+            return true;
         }
         return false;
     }

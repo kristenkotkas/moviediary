@@ -13,10 +13,10 @@ import server.entity.Retryable;
 
 import java.util.concurrent.TimeUnit;
 
+import static io.vertx.core.Future.future;
 import static server.entity.Status.OK;
 import static server.entity.Status.RATE_LIMIT;
 import static server.service.TmdbServiceImpl.Cache.*;
-import static server.util.CommonUtils.future;
 
 /**
  * TheMovieDatabase service implementation.
@@ -53,7 +53,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieByName(String name) { //pärib tmdb-st otsingu
-        return get(MOVIE_NAME + name.replaceAll(" ", "-") + APIKEY_PREFIX1, getCached(SEARCH.get(name)), "");
+        return get(MOVIE_NAME + name.replaceAll(" ", "-") + APIKEY_PREFIX1,
+                getCached(SEARCH.get(name)), "");
     }
 
     @Override
@@ -64,7 +65,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                 fut.complete(json);
                 if (!json.getString("release_date").equals("")) {
                     database.insertMovie(json.getInteger("id"), json.getString("title"),
-                            Integer.parseInt(json.getString("release_date").split("-")[0]),
+                            Integer.parseInt(json.getString("release_date").split("-")[0]), // TODO: 18.04.2017 release date null check
                             json.getString("poster_path") == null ? "" : json.getString("poster_path"));
                 }
             } else {
@@ -91,9 +92,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                                 json.getString("poster_path") == null ? "" : json.getString("poster_path"));
                     }
                 }));
-            }/* else {
-                //LOG.error("TMDB getMovieByID failed, could not add movie to DB: " + ar.cause());
-            }*/
+            }
         }));
     }
 

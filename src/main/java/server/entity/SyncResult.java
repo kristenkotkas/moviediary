@@ -2,6 +2,7 @@ package server.entity;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import server.util.CommonUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -46,9 +47,7 @@ public class SyncResult<T> {
     }
 
     public SyncResult<T> ifPresent(Consumer<? super T> consumer) {
-        if (value != null) {
-            consumer.accept(value);
-        }
+        CommonUtils.ifPresent(value, consumer::accept);
         return this;
     }
 

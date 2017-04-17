@@ -13,6 +13,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.function.Consumer;
 
 import static server.entity.Status.serviceUnavailable;
+import static server.util.CommonUtils.check;
 
 public class HandlerUtils {
     private static final Logger LOG = LoggerFactory.getLogger(HandlerUtils.class);
@@ -35,14 +36,16 @@ public class HandlerUtils {
      * A result handler that will call consumer of success and send service unavailable response on failure.
      */
     public static <T> Handler<AsyncResult<T>> resultHandler(RoutingContext ctx, Consumer<T> success) {
-        return ar -> {
-            if (ar.succeeded()) {
-                success.accept(ar.result());
-            } else {
-                LOG.error(ar.cause());
-                serviceUnavailable(ctx, ar.cause());
-            }
-        };
+        return ar -> check(ar.succeeded(), () -> success.accept(ar.result()), () -> {
+            LOG.error(ar.cause());
+            serviceUnavailable(ctx, ar.cause());
+        });
+    }
+
+    public static <T> Handler<AsyncResult<T>> resultHandler(Consumer<T> success, Consumer<AsyncResult<T>> failure) {
+        return ar -> check(ar.succeeded(),
+                () -> success.accept(ar.result()),
+                () -> failure.accept(ar));
     }
 
     /**
@@ -52,13 +55,7 @@ public class HandlerUtils {
      * @return this handler
      */
     public static <T> Handler<AsyncResult<T>> futureHandler(Future<Void> future) {
-        return ar -> {
-            if (ar.succeeded()) {
-                future.complete();
-            } else {
-                future.fail(ar.cause());
-            }
-        };
+        return ar -> check(ar.succeeded(), future::complete, () -> future.fail(ar.cause()));
     }
 
     /**
@@ -68,12 +65,8 @@ public class HandlerUtils {
      * @return this handler
      */
     public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
-        return ar -> {
-            if (ar.succeeded()) {
-                ctx.response().end(ar.result());
-            } else {
-                ctx.fail(ar.cause());
-            }
-        };
+        return ar -> check(ar.succeeded(),
+                () -> ctx.response().end(ar.result()),
+                () -> ctx.fail(ar.cause()));
     }
 }
