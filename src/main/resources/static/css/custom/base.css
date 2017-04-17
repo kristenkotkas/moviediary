@@ -8,6 +8,10 @@ body {
     background-attachment: fixed;
 }
 
+.episode-card:hover {
+    opacity: 0.85;
+}
+
 .bc-image {
     background-position: center;
     width: 100%;
@@ -53,6 +57,11 @@ body {
     margin: 0.5rem 0 1rem 0;
 }
 
+.cursor:hover {
+    cursor: pointer;
+}
+
+
 .collapsible-header {
     display: block;
     cursor: pointer;
@@ -76,6 +85,16 @@ body {
 .collapsible-header-history {
     border-bottom: 1px solid #ddd;
 }
+
+.collapsible-header-tv {
+    line-height: 1.7rem;
+    padding: 1rem;
+}
+
+.smaller {
+    font-size: smaller;
+}
+
 
 .collapsible-body {
     display: none;

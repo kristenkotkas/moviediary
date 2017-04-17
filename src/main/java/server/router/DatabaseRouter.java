@@ -13,6 +13,8 @@ import server.service.DatabaseService;
 import server.service.DatabaseService.*;
 import server.service.MailService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -55,6 +57,8 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_ALL_TIME_META = "database_get_all_time_meta";
     public static final String DATABASE_GET_HISTORY_META = "database_get_history_meta";
     public static final String DATABASE_REMOVE_VIEW = "database_remove_view";
+    public static final String DATABASE_INSERT_EPISODE = "database_insert_episode";
+    public static final String DATABASE_GET_SEEN_EPISODES = "database_get_seen_episodes";
 
     private final JsonObject config;
     private final DatabaseService database;
@@ -81,6 +85,10 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta, (user, json) -> json));
         listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta, (user, json) -> json));
         listen(DATABASE_REMOVE_VIEW, reply(database::removeView, (user, json) -> json));
+        listen(DATABASE_INSERT_EPISODE, reply(database::insertEpisodeView, (user, json) -> json));
+        listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) ->
+                //database.getSeenEpisodes(user, parseInt(param)), (user, json) -> json.getJsonArray("results")));
+                database.getSeenEpisodes(user, parseInt(param)), getSeenEpisodes()));
     }
 
     @Override
@@ -88,6 +96,18 @@ public class DatabaseRouter extends EventBusRoutable {
         router.get(API_USER_INFO).handler(this::handleUserInfo);
         router.get(API_USERS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
+    }
+
+    private BiFunction<String, JsonObject, Object> getSeenEpisodes() {
+        return (user, json) -> {
+            JsonObject resultJson = new JsonObject();
+            List<Integer> list = new ArrayList<>();
+            json.getJsonArray("rows").stream()
+                    .forEach(elem -> list.add(((JsonObject) elem).getInteger("EpisodeId")));
+
+            resultJson.put("episodes", list);
+            return resultJson;
+        };
     }
 
     /**

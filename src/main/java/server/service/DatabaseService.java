@@ -131,6 +131,12 @@ public interface DatabaseService {
 
     Future<JsonObject> removeView(String username, String param);
 
+    Future<JsonObject> insertEpisodeView(String username, String param);
+
+    Future<JsonObject> getSeenEpisodes(String username, int seriesId);
+
+    Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

@@ -48,6 +48,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
 
+    private static final String SQL_INSERT_SERIES =
+            "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
+
     private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
 
     private static final String SQL_GET_MOVIE_VIEWS =
@@ -57,6 +60,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     public static final String SQL_INSERT_WISHLIST =
             "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
+
+    public static final String SQL_INSERT_EPISODE =
+            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
 
     public static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
@@ -92,6 +98,11 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     private static final String SQL_REMOVE_VIEW =
             "DELETE FROM Views WHERE Username = ? AND Id = ?";
+
+    private static final String SQL_GET_SEEN_EPISODES =
+            "SELECT EpisodeId FROM Series " +
+                    "WHERE Username = ? " +
+                    "AND SeriesId = ?";
 
     private final JDBCClient client;
 
@@ -169,6 +180,15 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .add(posterPath), resultHandler(conn, fut)))));
     }
 
+    @Override
+    public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_INSERT_SERIES, new JsonArray()
+                        .add(id)
+                        .add(seriesTitle)
+                        .add(posterPath), resultHandler(conn, fut)))));
+    }
+
     /**
      * Inserts an entry to wishlist table.
      */
@@ -179,6 +199,28 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .add(username)
                         .add(movieId)
                         .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> insertEpisodeView(String username, String param) {
+        JsonObject json = new JsonObject(param);
+
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_INSERT_EPISODE, new JsonArray()
+                        .add(username)
+                        .add(json.getInteger("seriesId"))
+                        .add(json.getInteger("episodeId"))
+                        .add(json.getString("seasonId"))
+                        .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
+
+    }
+
+    @Override
+    public Future<JsonObject> getSeenEpisodes(String username, int seriesId) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_SEEN_EPISODES, new JsonArray()
+                        .add(username)
+                        .add(seriesId), resultHandler(conn, fut)))));
     }
 
     @Override

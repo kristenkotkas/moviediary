@@ -26,6 +26,14 @@ var timeChartSmallCtx = $("#timeChartSmall");
 var collSearch = $("#search-coll-search");
 var collFilters = $("#search-coll-filters");
 var collQkSearch = $("#search-coll-qk-search");
+var monthBack = $("#month-back-stat");
+var monthNext = $("#month-next-stat");
+var search = $("#search-stat");
+var today = $("#today-stat");
+var thisWeek = $("#this-week-stat");
+var thisMonth = $("#this-month-stat");
+var allTime = $("#all-time-stat");
+var monthIndex = 0;
 var options = {
     scales: {
         yAxes: [{
@@ -169,67 +177,83 @@ eventbus.onopen = function () {
             lang['STATISTICS_SAT'],
             lang['STATISTICS_SUN']
         ];
-        var search = $("#search-stat");
-        var today = $("#today-stat");
-        var thisWeek = $("#this-week-stat");
-        var thisMonth = $("#this-month-stat");
-        var allTime = $("#all-time-stat");
-
 
         fillDropDown(lang);
-
         search.keyup(function (e) {
             if (e.keyCode === 13) {
                 search.click();
             }
         });
+
         today.keyup(function (e) {
             if (e.keyCode === 13) {
                 today.click();
             }
         });
+
         thisWeek.keyup(function (e) {
             if (e.keyCode === 13) {
                 thisWeek.click();
             }
         });
+
         thisMonth.keyup(function (e) {
             if (e.keyCode === 13) {
                 thisMonth.click();
             }
         });
+
         allTime.keyup(function (e) {
             if (e.keyCode === 13) {
                 allTime.click();
             }
         });
+
         search.click(function () {
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex, types.search);
         });
+
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.today);
         });
+
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.week);
         });
+
         thisMonth.click(function () {
-            var dates = getThisMonth();
+            var dates = getThisMonth(0);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.month);
         });
+
         allTime.click(function () {
             makeAllTime(eventbus);
         });
 
+        monthBack.click(function () {
+            var dates = getThisMonth(--monthIndex);
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
+        });
+
+        monthNext.click(function () {
+            var dates = getThisMonth(++monthIndex);
+            startDateField.pickadate('picker').set('select', dates['start']);
+            endDateField.pickadate('picker').set('select', dates['end']);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
+        });
+
         daysChart['data']['labels'] = labels;
-        daysChartSmall['data']['labels'] = labels;
         daysChart.update();
+        daysChartSmall['data']['labels'] = labels;
         daysChartSmall.update();
         allTime.click();
     });
@@ -254,7 +278,8 @@ var fillDropDown = function (lang) {
         });
 };
 
-var makeHistory = function (eventbus, lang, start, end) {
+var makeHistory = function (eventbus, lang, start, end, monthInd, type) {
+    monthIndex = monthInd;
     getData(eventbus, lang, start, end);
 };
 
@@ -265,8 +290,16 @@ var makeAllTime = function (eventbus, lang) {
             'is-cinema': $("#wasCinema").is(':checked')
         }, function (error, reply) {
             var data = reply.body['rows'];
-            startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
-            endDateField.pickadate('picker').set('select', new Date());
+            var start;
+            if (data[0]['Start'] === null) {
+                start = new Date();
+            } else {
+                start = new Date(data[0]['Start']);
+            }
+            var now = new Date();
+            monthIndex = -1 * ((now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
+            startDateField.pickadate('picker').set('select', start);
+            endDateField.pickadate('picker').set('select', now);
             getData(eventbus, lang, startDateField.val(), endDateField.val());
         });
 };
