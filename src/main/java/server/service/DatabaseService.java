@@ -1,23 +1,19 @@
 package server.service;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
-import static server.util.CommonUtils.check;
 
 /**
  * Service which interacts with database.
@@ -90,26 +86,6 @@ public interface DatabaseService {
      */
     static Integer getNumRows(JsonObject json) {
         return json.getInteger(ROWS_NUMS);
-    }
-
-    static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> check(conn.succeeded(),
-                () -> handler.handle(conn.result()),
-                () -> future.fail(conn.cause()));
-    }
-
-    /**
-     * Convenience method for handling sql commands result.
-     */
-    static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            check(ar.succeeded(),
-                    () -> check(ar.result() instanceof ResultSet,
-                            () -> future.complete(((ResultSet) ar.result()).toJson()),
-                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
-                    () -> future.fail(ar.cause()));
-            conn.close();
-        };
     }
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
@@ -245,6 +221,10 @@ public interface DatabaseService {
                     .collect(toList());
             columns.add(USERNAME);
             return columns;
+        }
+
+        public static void getSortedColumns(Map<Column, String> data, Consumer<List<Column>> consumer) {
+            consumer.accept(getSortedColumns(data));
         }
 
         public static JsonArray getSortedValues(List<Column> columns, Map<Column, String> data) {

@@ -9,7 +9,6 @@ import io.vertx.core.logging.LoggerFactory;
 import java.io.IOException;
 
 import static io.vertx.rxjava.core.Vertx.vertx;
-import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.setLoggingToSLF4J;
 import static server.util.FileUtils.getConfig;
 
@@ -25,9 +24,8 @@ public class Launcher {
         vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
                 .addServer("8.8.8.8")
                 .addServer("8.8.4.4")))
-                .deployVerticle("server.verticle.ServerVerticle", new DeploymentOptions()
-                        .setConfig(getConfig(args)), ar -> check(ar.succeeded(),
-                        () -> LOG.info("Server up!"),
-                        () -> LOG.error(ar.cause())));
+                .rxDeployVerticle("server.verticle.ServerVerticle", new DeploymentOptions()
+                        .setConfig(getConfig(args)))
+                .subscribe(ar -> LOG.info("Server up!"), LOG::error);
     }
 }

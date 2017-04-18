@@ -1,11 +1,11 @@
 package server.verticle;
 
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.Router;
+import io.vertx.rxjava.core.AbstractVerticle;
+import io.vertx.rxjava.ext.web.Router;
 import server.router.*;
 import server.security.SecurityConfig;
 import server.service.BankLinkService;
@@ -17,7 +17,6 @@ import java.util.Arrays;
 
 import static server.router.EventBusRoutable.closeEventbus;
 import static server.router.EventBusRoutable.startEventbus;
-import static server.util.HandlerUtils.futureHandler;
 import static server.util.NetworkUtils.*;
 
 /**
@@ -67,8 +66,8 @@ public class ServerVerticle extends AbstractVerticle {
                 .setCompressionSupported(true)
                 .setCompressionLevel(3))
                 .requestHandler(router::accept)
-                .listen(config().getInteger(HTTP_PORT, DEFAULT_PORT),
-                        config().getString(HTTP_HOST, DEFAULT_HOST), futureHandler(future));
+                .rxListen(config().getInteger(HTTP_PORT, DEFAULT_PORT), config().getString(HTTP_HOST, DEFAULT_HOST))
+                .subscribe(res -> future.complete(), future::fail);
     }
 
     @Override
