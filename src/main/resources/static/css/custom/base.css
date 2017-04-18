@@ -255,6 +255,19 @@ span.badge.new:after {
     transition: transform .8s ease-in-out;
 }
 
+.description {
+    font-weight: 300;
+}
+
+.tv-season-title {
+    font-weight: 900;
+    font-size: x-large;
+}
+
+.season-add-info {
+    margin-left: 1em;
+}
+
 .flag:hover {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);

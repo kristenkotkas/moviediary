@@ -116,8 +116,12 @@ function fillTVTable(tvId) {
                             '<img src="' + getImageUrl(seasonData) + '" width="100%">' +
                             '</div>' +
                             '<div class="col s9 m10 l10">' +
-                            '<span class="content-key">' + seasonData['name'] + '</span>' +
-                            '<span class="badge new ">' + seasonData['episodes'].length + ' episodes' + '</span><br>' +
+                            '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +
+                            '<span class="season-add-info grey-text text-darken-2">' +
+                            seasonData['air_date'].split('-')[0]  +
+                                ' | ' +
+                            seasonData['episodes'].length + ' episodes' +
+                            '</span><br>' +
                             '<span class="description hide-on-med-and-down">' + seasonData['overview'] + '</span>' +
                             '</div>' +
                             '</div>' +
