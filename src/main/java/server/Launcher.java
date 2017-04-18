@@ -5,11 +5,10 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import server.verticle.ServerVerticle;
 
 import java.io.IOException;
 
-import static io.vertx.core.Vertx.vertx;
+import static io.vertx.rxjava.core.Vertx.vertx;
 import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.setLoggingToSLF4J;
 import static server.util.FileUtils.getConfig;
@@ -26,9 +25,9 @@ public class Launcher {
         vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
                 .addServer("8.8.8.8")
                 .addServer("8.8.4.4")))
-                .deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig(args)), ar ->
-                        check(ar.succeeded(),
-                                () -> LOG.info("Server up!"),
-                                () -> LOG.error(ar.cause())));
+                .deployVerticle("server.verticle.ServerVerticle", new DeploymentOptions()
+                        .setConfig(getConfig(args)), ar -> check(ar.succeeded(),
+                        () -> LOG.info("Server up!"),
+                        () -> LOG.error(ar.cause())));
     }
 }
