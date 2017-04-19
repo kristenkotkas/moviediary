@@ -1,11 +1,11 @@
 package server.service;
 
-import io.vertx.core.Future;
+import io.vertx.rxjava.core.Future;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
-import static io.vertx.core.Future.future;
+import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
 import static server.util.CommonUtils.check;
 

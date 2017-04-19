@@ -1,16 +1,16 @@
 package server.router;
 
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.Message;
-import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
-import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.core.eventbus.Message;
+import io.vertx.rxjava.core.eventbus.MessageConsumer;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler;
 import org.pac4j.vertx.auth.Pac4jUser;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public abstract class EventBusRoutable {
                 .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
         router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
             ifTrue(event.getRawMessage() != null && event.type() != RECEIVE, () ->
-                    ifPresent(((Pac4jUser) event.socket().webUser())
+                    ifPresent(((Pac4jUser) event.socket().webUser().getDelegate())
                             .pac4jUserProfiles().values().stream()
                             .findAny()
                             .orElse(null), profile -> event.setRawMessage(event.getRawMessage()

@@ -1,11 +1,10 @@
 package server.entity;
 
-import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.Cookie;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.ext.web.Cookie;
+import io.vertx.rxjava.ext.web.RoutingContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +16,9 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
+import static io.vertx.core.logging.LoggerFactory.getLogger;
+import static io.vertx.rxjava.core.Future.succeededFuture;
+
 /**
  * Handles getting strings from ResourceBundles.
  */
@@ -25,7 +27,7 @@ public enum Language {
     ESTONIAN(new Locale.Builder().setLanguage("et").setScript("Latn").setRegion("EE").build()),
     GERMAN(new Locale.Builder().setLanguage("de").setScript("Latn").setRegion("GR").build());
 
-    private static final Logger LOG = LoggerFactory.getLogger(Language.class);
+    private static final Logger LOG = getLogger(Language.class);
     public static final String LANGUAGE = "lang";
     private final Locale locale;
     private final ResourceBundle bundle;
@@ -54,7 +56,7 @@ public enum Language {
                 .findAny()
                 .orElse(ENGLISH)
                 .getBundle();
-        return Future.succeededFuture(bundle.keySet().stream()
+        return succeededFuture(bundle.keySet().stream()
                 .collect(JsonObject::new, (json, key) -> json.put(key, bundle.getString(key)), JsonObject::mergeIn));
     }
 

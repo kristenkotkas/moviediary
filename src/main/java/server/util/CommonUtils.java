@@ -2,7 +2,7 @@ package server.util;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
@@ -36,7 +36,7 @@ public class CommonUtils {
     }
 
     public static CommonProfile getProfile(RoutingContext ctx) {
-        return new VertxProfileManager(new VertxWebContext(ctx)).get(true).orElse(null);
+        return new VertxProfileManager(new VertxWebContext(ctx.getDelegate())).get(true).orElse(null);
     }
 
     public static RSAPrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {

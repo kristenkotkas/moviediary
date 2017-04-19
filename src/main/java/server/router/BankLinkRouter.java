@@ -1,11 +1,11 @@
 package server.router;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import server.service.BankLinkService;
 
 import java.nio.charset.StandardCharsets;
@@ -52,7 +52,8 @@ public class BankLinkRouter extends EventBusRoutable {
     public BankLinkRouter(Vertx vertx, BankLinkService bankLink) {
         super(vertx);
         this.bankLink = bankLink;
-        vertx.fileSystem().readFile("banklink_private_key.der", result -> privKey = result.result().getBytes());
+        vertx.fileSystem().readFile("banklink_private_key.der",
+                result -> privKey = result.result().getDelegate().getBytes());
     }
 
     @Override

@@ -1,14 +1,13 @@
 package server.util;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import org.apache.http.HttpHeaders;
 
 import java.util.function.Consumer;
 
@@ -49,16 +48,6 @@ public class HandlerUtils {
     }
 
     /**
-     * Completes or fails future based on result.
-     *
-     * @param future to use
-     * @return this handler
-     */
-    public static <T> Handler<AsyncResult<T>> futureHandler(Future<Void> future) {
-        return ar -> check(ar.succeeded(), future::complete, () -> future.fail(ar.cause()));
-    }
-
-    /**
      * Ends the response and sends client the result.
      *
      * @param ctx to use
@@ -66,7 +55,7 @@ public class HandlerUtils {
      */
     public static Handler<AsyncResult<Buffer>> endHandler(RoutingContext ctx) {
         return ar -> check(ar.succeeded(),
-                () -> ctx.response().end(ar.result()),
-                () -> ctx.fail(ar.cause()));
+                () -> ctx.getDelegate().response().end(ar.result()),
+                () -> ctx.getDelegate().fail(ar.cause()));
     }
 }

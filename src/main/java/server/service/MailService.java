@@ -1,9 +1,9 @@
 package server.service;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.RoutingContext;
 
 /**
  * Service which interacts with a mail server.

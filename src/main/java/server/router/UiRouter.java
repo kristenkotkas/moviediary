@@ -1,12 +1,13 @@
 package server.router;
 
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
-import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Cookie;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.handler.StaticHandler;
 import org.pac4j.core.profile.CommonProfile;
 import server.security.FormClient;
 import server.security.IdCardClient;
@@ -16,7 +17,6 @@ import server.template.ui.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static io.vertx.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.*;
@@ -134,8 +134,8 @@ public class UiRouter extends EventBusRoutable {
      * Redirects user to some other page if session contains specified url.
      */
     private void handleHome(RoutingContext ctx) {
-        if (ctx.session().data().containsKey(REDIRECT_URL)) {
-            redirect(ctx, (String) ctx.session().data().remove(REDIRECT_URL));
+        if (ctx.session().getDelegate().data().containsKey(REDIRECT_URL)) {
+            redirect(ctx, (String) ctx.session().getDelegate().data().remove(REDIRECT_URL));
             return;
         }
         engine.render(getSafe(ctx, TEMPL_HOME, HomeTemplate.class), endHandler(ctx));
@@ -169,7 +169,7 @@ public class UiRouter extends EventBusRoutable {
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
             ctx.removeCookie(LANGUAGE);
-            ctx.addCookie(cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
+            ctx.addCookie(Cookie.cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
             template.setLang(lang);
         }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
@@ -231,7 +231,7 @@ public class UiRouter extends EventBusRoutable {
      * @return template of specified type
      */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
-        S baseTemplate = engine.getSafeTemplate(ctx, fileName, type);
+        S baseTemplate = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
         baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
                 ENGLISH.getLocale().getLanguage());
         baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));

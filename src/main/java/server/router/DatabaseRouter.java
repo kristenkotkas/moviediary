@@ -1,11 +1,12 @@
 package server.router;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.CompositeFuture;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import server.entity.User;
 import server.service.DatabaseService;
 import server.service.DatabaseService.*;
@@ -14,7 +15,6 @@ import server.service.MailService;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static io.vertx.core.CompositeFuture.all;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
@@ -136,7 +136,10 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns current users count in database as String response.
      */
     private void handleUsersCount(RoutingContext ctx) {
-        database.getUsersCount().setHandler(resultHandler(ctx, count -> ctx.response().end(count)));
+        database.getUsersCount()
+                .rxSetHandler()
+                .doOnError(err -> serviceUnavailable(ctx, err))
+                .subscribe(count -> ctx.response().end(count));
     }
 
     /**
@@ -168,7 +171,7 @@ public class DatabaseRouter extends EventBusRoutable {
             settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
             Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
             Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
-            all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
+            CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
                 mail.sendVerificationEmail(ctx, username);
                 redirect(ctx, verifyEmail());
             }, () -> redirect(ctx, userVerified()))));
