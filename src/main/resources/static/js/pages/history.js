@@ -86,6 +86,7 @@ eventbus.onopen = function () {
             makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.week);
         });
 
+
         thisMonth.click(function () {
             var dates = getThisMonth(0);
             startDateField.pickadate('picker').set('select', dates['start']);

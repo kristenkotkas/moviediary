@@ -195,7 +195,7 @@ function addEpisode(card, element, data, seriesData, seasonData) {
     if (element.children().length === 0) {
         addEpisodeToView(data, seriesData, seasonData, card, element);
     } else {
-        changeToInActive(card, element, data);
+        removeEpisode(card, element, data);
     }
 }
 
@@ -236,6 +236,19 @@ function addEpisodeToView(episodeData, seriesData, seasonData, card, element) {
                 changeToActive(card, element, episodeData);
             }
     });
+}
+
+function removeEpisode(card, element, episodeData) {
+    var episodeId = episodeData['id'];
+    eventbus.send("database_remove_episode",
+        episodeId
+        , function (error, reply) {
+            console.log('reply', reply);
+            if (reply['body']['updated'] != null) {
+                console.log('episode removed');
+                changeToInActive(card, element, episodeData);
+            }
+        });
 }
 
 function getImageUrl(data) {

@@ -152,11 +152,15 @@ public interface DatabaseService {
 
     Future<JsonObject> removeView(String username, String param);
 
+    Future<JsonObject> removeEpisode(String username, String param);
+
     Future<JsonObject> insertEpisodeView(String username, String param);
 
     Future<JsonObject> getSeenEpisodes(String username, int seriesId);
 
     Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath);
+
+    Future<JsonObject> getWatchingSeries(String username);
 
     /**
      * Creates a SQL command string from given Table and list of Columns.

@@ -47,6 +47,7 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_USER = "/private/user";
     public static final String UI_HOME = "/private/home";
     public static final String UI_MOVIES = "/private/movies";
+    public static final String UI_SERIES = "/private/series";
     public static final String UI_HISTORY = "/private/history";
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
@@ -60,6 +61,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
     private static final String TEMPL_MOVIES = "templates/movies.hbs";
+    private static final String TEMPL_SERIES = "templates/series.hbs";
     private static final String TEMPL_HISTORY = "templates/history.hbs";
     private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
     private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
@@ -95,6 +97,7 @@ public class UiRouter extends EventBusRoutable {
 
         router.get(UI_USER).handler(this::handleUser);
         router.get(UI_MOVIES).handler(this::handleMovies);
+        router.get(UI_SERIES).handler(this::handleSeries);
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
@@ -144,6 +147,11 @@ public class UiRouter extends EventBusRoutable {
     private void handleMovies(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_MOVIES, MoviesTemplate.class), endHandler(ctx));
     }
+
+    private void handleSeries(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_SERIES, SeriesTemplate.class), endHandler(ctx));
+    }
+
 
     private void handleHistory(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HISTORY, HistoryTemplate.class), endHandler(ctx));
@@ -239,6 +247,7 @@ public class UiRouter extends EventBusRoutable {
         baseTemplate.setUserPage(UI_USER);
         baseTemplate.setHomePage(UI_HOME);
         baseTemplate.setMoviesPage(UI_MOVIES);
+        baseTemplate.setSeriesPage(UI_SERIES);
         baseTemplate.setHistoryPage(UI_HISTORY);
         baseTemplate.setStatisticsPage(UI_STATISTICS);
         baseTemplate.setWishlistPage(UI_WISHLIST);

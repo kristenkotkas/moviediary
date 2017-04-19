@@ -4,38 +4,58 @@
             <ul class="hide-nav-bar">
                 <li>
                     <a href="{{userPage}}" tabindex="1"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-user left grey-text"></i>{{i18n "NAVBAR_ME" locale=lang}}
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_ME" locale=lang}}">
+                        <i class="fa fa-user white-text fa-2x"></i>
                     </a>
                 </li>
                 <li>
                     <a href="{{homePage}}" tabindex="2"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-home left grey-text"></i>{{i18n "NAVBAR_HOME" locale=lang}}
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_HOME" locale=lang}}">
+                        <i class="fa fa-home white-text fa-2x"></i>
                     </a>
                 </li>
                 <li>
                     <a href="{{moviesPage}}" tabindex="3"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-film left grey-text"></i>{{i18n "NAVBAR_MOVIES" locale=lang}}
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_MOVIES" locale=lang}}">
+                        <i class="fa fa-film white-text fa-2x"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="{{historyPage}}" tabindex="4"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-calendar left grey-text"></i>{{i18n "NAVBAR_HISTORY" locale=lang}}
+                    <a href="{{seriesPage}}" tabindex="4"
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_SERIES" locale=lang}}">
+                        <i class="fa fa-tv white-text fa-2x"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="{{statisticsPage}}" tabindex="5"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-bar-chart left grey-text"></i>{{i18n "NAVBAR_STATISTICS" locale=lang}}
+                    <a href="{{historyPage}}" tabindex="5"
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_HISTORY" locale=lang}}">
+                        <i class="fa fa-calendar white-text fa-2x"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="{{wishlistPage}}" tabindex="6"
-                       class="opacity-object-full waves-effect waves-cyan white grey-text btn z-depth-0">
-                        <i class="fa fa-list-ol left grey-text"></i>{{i18n "NAVBAR_WISHLIST" locale=lang}}
+                    <a href="{{statisticsPage}}" tabindex="6"
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_STATISTICS" locale=lang}}">
+                        <i class="fa fa-bar-chart white-text fa-2x"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{wishlistPage}}" tabindex="7"
+                       class="opacity-object-full btn-large cyan z-depth-0 tooltipped"
+                       data-position="bottom"
+                       data-tooltip="{{i18n "NAVBAR_WISHLIST" locale=lang}}">
+                        <i class="fa fa-list-ol white-text fa-2x"></i>
                     </a>
                 </li>
             </ul>
@@ -59,18 +79,23 @@
                 <i class="fa fa-film left grey-text darken-3"></i>{{i18n "NAVBAR_MOVIES" locale=lang}}
             </a>
         </li>
+        <li>
+            <a href="{{seriesPage}}" tabindex="4" class="waves-effect waves-cyan grey-text darken-3">
+                <i class="fa fa-tv left grey-text darken-3"></i>{{i18n "NAVBAR_SERIES" locale=lang}}
+            </a>
+        </li>
         <li class="bold">
-            <a href="{{historyPage}}" tabindex="4" class="waves-effect waves-cyan grey-text darken-3">
+            <a href="{{historyPage}}" tabindex="5" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-calendar left grey-text darken-3"></i>{{i18n "NAVBAR_HISTORY" locale=lang}}
             </a>
         </li>
         <li class="bold">
-            <a href="{{statisticsPage}}" tabindex="5" class="waves-effect waves-cyan grey-text darken-3">
+            <a href="{{statisticsPage}}" tabindex="6" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-bar-chart left grey-text darken-3"></i>{{i18n "NAVBAR_STATISTICS" locale=lang}}
             </a>
         </li>
         <li class="bold">
-            <a href="{{wishlistPage}}" tabindex="6" class="waves-effect waves-cyan grey-text darken-3">
+            <a href="{{wishlistPage}}" tabindex="7" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-list-ol left grey-text darken-3"></i>{{i18n "NAVBAR_WISHLIST" locale=lang}}
             </a>
         </li>

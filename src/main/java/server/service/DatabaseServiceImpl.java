@@ -82,10 +82,19 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_REMOVE_VIEW =
             "DELETE FROM Views WHERE Username = ? AND Id = ?";
 
+    private static final String SQL_REMOVE_EPISODE =
+            "DELETE FROM Series WHERE Username = ? AND EpisodeId = ?";
+
     private static final String SQL_GET_SEEN_EPISODES =
             "SELECT EpisodeId FROM Series " +
                     "WHERE Username = ? " +
                     "AND SeriesId = ?";
+
+    private static final String SQL_GET_WATCHING_SERIES =
+            "SELECT Title, Image, SeriesId FROM Series " +
+                    "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
+                    "WHERE Username = ? " +
+                    "GROUP BY Title, Image, SeriesId;";
 
     private final JDBCClient client;
 
@@ -443,6 +452,21 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.updateWithParams(SQL_REMOVE_VIEW, new JsonArray()
                         .add(username)
                         .add(param), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> removeEpisode(String username, String param) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_REMOVE_EPISODE, new JsonArray()
+                        .add(username)
+                        .add(param), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getWatchingSeries(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_WATCHING_SERIES, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
     }
 
     /**

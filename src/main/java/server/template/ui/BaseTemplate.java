@@ -15,6 +15,8 @@ public interface BaseTemplate extends TypeSafeTemplate {
 
     void setMoviesPage(String moviesPage);
 
+    void setSeriesPage(String moviesPage);
+
     void setHistoryPage(String historyPage);
 
     void setStatisticsPage(String statisticsPage);

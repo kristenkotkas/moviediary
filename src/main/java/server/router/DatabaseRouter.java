@@ -54,6 +54,8 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_REMOVE_VIEW = "database_remove_view";
     public static final String DATABASE_INSERT_EPISODE = "database_insert_episode";
     public static final String DATABASE_GET_SEEN_EPISODES = "database_get_seen_episodes";
+    public static final String DATABASE_REMOVE_EPISODE = "database_remove_episode";
+    public static final String DATABASE_GET_WATCHING_SERIES = "database_get_watching_series";
     private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
@@ -80,8 +82,10 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta));
         listen(DATABASE_REMOVE_VIEW, reply(database::removeView));
         listen(DATABASE_INSERT_EPISODE, reply(database::insertEpisodeView));
+        listen(DATABASE_REMOVE_EPISODE, reply(database::removeEpisode));
         listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)),
                 getSeenEpisodes()));
+        listen(DATABASE_GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
     }
 
     @Override
