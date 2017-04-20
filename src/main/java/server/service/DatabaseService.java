@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
 
@@ -19,19 +20,6 @@ import static server.service.DatabaseService.Column.USERNAME;
  * Service which interacts with database.
  */
 public interface DatabaseService {
-    String DB_USERNAME = "Username";
-    String DB_FIRSTNAME = "Firstname";
-    String DB_LASTNAME = "Lastname";
-    String DB_PASSWORD = "Password";
-    String DB_SALT = "Salt";
-    String DB_RUNTIME_TYPE = "RuntimeType";
-    String DB_VERIFIED = "Verified";
-
-    String COLUMNS = "columnNames";
-    String ROWS = "rows";
-    String RESULTS = "results";
-    String COLUMN_NUMS = "numColumns";
-    String ROWS_NUMS = "numRows";
 
     static EnumMap<Column, String> createDataMap(String username) {
         EnumMap<Column, String> map = new EnumMap<>(Column.class);
@@ -49,7 +37,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getColumns(JsonObject json) {
-        return json.getJsonArray(COLUMNS);
+        return json.getJsonArray("columnNames");
     }
 
     /**
@@ -58,7 +46,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getRows(JsonObject json) {
-        return json.getJsonArray(ROWS);
+        return json.getJsonArray("rows");
     }
 
     /**
@@ -67,7 +55,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getResults(JsonObject json) {
-        return json.getJsonArray(RESULTS);
+        return json.getJsonArray("results");
     }
 
     /**
@@ -76,7 +64,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static Integer getNumColumns(JsonObject json) {
-        return json.getInteger(COLUMN_NUMS);
+        return json.getInteger("numColumns");
     }
 
     /**
@@ -85,7 +73,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static Integer getNumRows(JsonObject json) {
-        return json.getInteger(ROWS_NUMS);
+        return json.getInteger("numRows");
     }
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
@@ -209,6 +197,7 @@ public interface DatabaseService {
         RUNTIMETYPE("RuntimeType"),
         VERIFIED("Verified");
 
+        private static boolean isTesting = false;
         private final String columnName;
 
         Column(String columnName) {
@@ -234,7 +223,11 @@ public interface DatabaseService {
         }
 
         public String getName() {
-            return columnName;
+            return isTesting ? columnName.toUpperCase(ENGLISH) : columnName;
+        }
+
+        public static void setTesting() {
+            Column.isTesting = true;
         }
     }
 }

@@ -6,6 +6,7 @@
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://kyngas.eu:3366/MovieDiary?characterEncoding=UTF-8&amp;verifyServerCertificate=false&amp;useSSL=true&amp;requireSSL=true</jdbc-url>
+      <default-dialect>MySQL</default-dialect>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />
@@ -14,6 +15,12 @@
         <property name="characterSetResults" value="utf8" />
         <property name="yearIsDateType" value="false" />
       </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="test" uuid="31d4037a-488f-48bc-8c91-65536f16f456">
+      <driver-ref>hsqldb.local</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.hsqldb.jdbc.JDBCDriver</jdbc-driver>
+      <jdbc-url>jdbc:hsqldb:mem:test</jdbc-url>
     </data-source>
   </component>
 </project>

@@ -1,10 +1,10 @@
-package server;
+package server.ui;
 
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.TestContext;
+import io.vertx.core.logging.Logger;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.rxjava.core.Vertx;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,35 +12,50 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import server.util.LocalDatabase;
 import server.verticle.ServerVerticle;
 
 import java.util.List;
 
+import static io.vertx.core.logging.LoggerFactory.getLogger;
+import static io.vertx.rxjava.core.RxHelper.deployVerticle;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
+import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.LoginUtils.formLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
 
 @SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
 public class UiFormLoginPageTest {
+    private static final Logger LOG = getLogger(UiFormLoginPageTest.class);
     private static final int PORT = 8082;
     private static final String URI = "http://localhost:" + PORT;
 
     private Vertx vertx;
     private JsonObject config;
     private WebDriver driver;
+    private LocalDatabase database;
 
     @Before
-    public void setUp(TestContext ctx) throws Exception {
+    public void setUp() throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ctx.asyncAssertSuccess());
+        initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
+                .doOnSuccess(db -> database = db)
+                .doOnError(err -> fail(err.getMessage()))
+                .toCompletable()
+                .andThen(deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions().setConfig(config)))
+                .test()
+                .awaitTerminalEvent(5, SECONDS)
+                .assertCompleted();
     }
 
     @Test
@@ -91,8 +106,11 @@ public class UiFormLoginPageTest {
     }
 
     @After
-    public void tearDown(TestContext ctx) throws Exception {
+    public void tearDown() throws Exception {
         driver.quit();
-        vertx.close(ctx.asyncAssertSuccess());
+        vertx.rxClose()
+                .test()
+                .awaitTerminalEvent(5, SECONDS)
+                .assertCompleted();
     }
 }

@@ -12,7 +12,8 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.mail.MailClient;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import rx.Observable;
-import server.service.DatabaseService.*;
+import server.service.DatabaseService.Column;
+import server.service.DatabaseService.Table;
 
 import java.util.Map;
 
@@ -20,7 +21,8 @@ import static io.vertx.rxjava.core.Future.future;
 import static rx.Statement.ifThen;
 import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.createDataMap;
+import static server.service.DatabaseService.getRows;
 import static server.util.StringUtils.genString;
 
 /**
@@ -70,7 +72,7 @@ public class MailServiceImpl implements MailService {
         return future(fut -> database.getSettings(email)
                 .rxSetHandler()
                 .doOnError(err -> fut.fail("Failed to get user settings from DB: " + err))
-                .map(json -> getRows(json).getJsonObject(0).getString(DB_VERIFIED).equals(unique))
+                .map(json -> getRows(json).getJsonObject(0).getString(Column.VERIFIED.getName()).equals(unique))
                 .toObservable()
                 .flatMap(bool -> ifThen(() -> bool, database.update(Table.SETTINGS, ImmutableMap
                                 .<Column, String>builder()

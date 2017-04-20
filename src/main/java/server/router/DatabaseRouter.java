@@ -9,7 +9,8 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import server.entity.User;
 import server.service.DatabaseService;
-import server.service.DatabaseService.*;
+import server.service.DatabaseService.Column;
+import server.service.DatabaseService.Table;
 import server.service.MailService;
 
 import java.util.Map;
@@ -24,7 +25,8 @@ import static server.router.MailRouter.userVerified;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.createDataMap;
+import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.*;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
@@ -160,7 +162,7 @@ public class DatabaseRouter extends EventBusRoutable {
         }
         database.getUser(username).setHandler(resultHandler(ctx, result -> check(getRows(result).stream()
                 .map(obj -> (JsonObject) obj)
-                .noneMatch(json -> json.getString(DB_USERNAME).equals(username)), () -> {
+                .noneMatch(json -> json.getString(Column.USERNAME.getName()).equals(username)), () -> {
             Map<Column, String> userMap = createDataMap(username);
             Map<Column, String> settingsMap = createDataMap(username);
             String salt = genString();

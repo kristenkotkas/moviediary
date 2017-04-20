@@ -1,5 +1,6 @@
 package server.service;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -11,6 +12,9 @@ import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import rx.Observable;
 import rx.Single;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
@@ -51,7 +55,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     private static final String SQL_GET_ALL_TIME_META =
-            "Select DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
+            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
     private static final String MYSQL = "mysql";
     private static final String SQL_INSERT_USER =
@@ -62,9 +66,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             "JOIN Settings ON Users.Username = Settings.Username " +
             "WHERE Users.Username = ?";
     private static final String SQL_INSERT_VIEW =
-            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_VIEWS =
-            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
+            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, " +
+                    "TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
@@ -75,7 +81,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
     private static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
     private static final String SQL_GET_MOVIE_VIEWS =
-            "SELECT Start, WasCinema From Views" +
+            "SELECT Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
     private static final String SQL_QUERY_VIEWS_META =
@@ -96,6 +102,33 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
+    }
+
+    @SuppressWarnings("unused")
+    private void test() throws SQLException {
+        DataSource dataSource = new MysqlDataSource();
+        Connection conn = dataSource.getConnection();
+        conn.prepareStatement(SQL_INSERT_WISHLIST);
+        conn.prepareStatement(SQL_INSERT_EPISODE);
+        conn.prepareStatement(SQL_IS_IN_WISHLIST);
+        conn.prepareStatement(SQL_GET_WISHLIST);
+        conn.prepareStatement(SQL_GET_YEARS_DIST);
+        conn.prepareStatement(SQL_GET_WEEKDAYS_DIST);
+        conn.prepareStatement(SQL_GET_TIME_DIST);
+        conn.prepareStatement(SQL_GET_ALL_TIME_META);
+        conn.prepareStatement(SQL_INSERT_USER);
+        conn.prepareStatement(SQL_QUERY_USER);
+        conn.prepareStatement(SQL_QUERY_USERS);
+        conn.prepareStatement(SQL_INSERT_VIEW);
+        conn.prepareStatement(SQL_QUERY_VIEWS);
+        conn.prepareStatement(SQL_QUERY_SETTINGS);
+        conn.prepareStatement(SQL_INSERT_MOVIE);
+        conn.prepareStatement(SQL_INSERT_SERIES);
+        conn.prepareStatement(SQL_USERS_COUNT);
+        conn.prepareStatement(SQL_GET_MOVIE_VIEWS);
+        conn.prepareStatement(SQL_QUERY_VIEWS_META);
+        conn.prepareStatement(SQL_REMOVE_VIEW);
+        conn.prepareStatement(SQL_GET_SEEN_EPISODES);
     }
 
     /**

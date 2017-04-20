@@ -1,4 +1,4 @@
-package server;
+package server.ui;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
