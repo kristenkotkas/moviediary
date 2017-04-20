@@ -372,6 +372,20 @@ header .brand-logo:hover {
     .quick-button {
         margin-top: 20px;
     }
+
+    .episodes-count {
+        font-weight: 900;
+        opacity: 0.6;
+        font-size: 1em;
+    }
+
+    .episodes-seen {
+        margin-left: 0.5em;
+    }
+
+    .collapsible-body-tv {
+        padding: 2em 0;
+    }
 }
 
 /* Tablet mode */

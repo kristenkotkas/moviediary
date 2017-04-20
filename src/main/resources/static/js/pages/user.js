@@ -127,7 +127,7 @@ function fillTVTable(tvId) {
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="collapsible-body grey lighten-4">' +
+                            '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                             '<div class="row">' +
                             '<div class="col s12 m12 l12" id="episode_container_' + i + '">' +
                             '</div>' +

@@ -55,22 +55,22 @@ function fillSeenSeries(seriesData) {
        var imgCard = $(document.getElementById(cardId));
        var titleCard = $(document.getElementById(cardIdTitle));
        var episodesCard = $(document.getElementById(cardIdEpisodes));
-       changeToActive(imgCard, titleCard, episodesCard, info['Image'], info['Title'], info['Count']);
+       decorateSeriesCard(imgCard, titleCard, episodesCard, info);
     });
     seenSeriesColl.collapsible('open', 0);
 }
 
-function changeToActive(card, titleCard, episodeCard, image, title, count) {
-    if (image !== '') {
-        var path = 'https://image.tmdb.org/t/p/w300' + image;
+function decorateSeriesCard(card, titleCard, episodeCard, info) {
+    if (info['Image'] !== '') {
+        var path = 'https://image.tmdb.org/t/p/w300' + info['Image'];
         card.attr('src', path);
     } else {
         card.attr('src', '/static/img/nanPosterBig.jpg')
     }
-    titleCard.append(title);
+    titleCard.append(info['Title']);
     episodeCard.append(
         $.parseHTML(
-            '<span class="episodes-count">' + count + '</span>' + '<span class="episodes-seen">' + 'episodes seen' + '</span>'
+            '<span class="episodes-count">' +  info['Count'] + '</span>' + '<span class="episodes-seen">' + 'episodes seen' + '</span>'
         )
     );
 }
