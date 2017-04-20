@@ -27,29 +27,35 @@ eventbus.onopen = function () {
 function fillSeenSeries(seriesData) {
     seenSeriesContainer.empty();
     $.each(seriesData, function (i) {
-       console.log('series', seriesData[i]);
+       //console.log('series', seriesData[i]);
        var info = seriesData[i];
+       var cardId = 'card_' + info['SeriesId'];
        seenSeriesContainer.append(
            $.parseHTML(
                 '<div class="col s6 m4 l2">' +
-                    '<div class="card">' +
-                        '<div class="card-content">' +
-                            '<img src="' + getImageUrl(info['Image']) + '">' +
-                        '</div>' +
+                    '<div class="card" id="' + cardId + '">' +
+                        '<div class="card-content truncate content-key"></div>' +
                     '</div>' +
                 '</div>'
            )
        );
+       var card = $(document.getElementById(cardId));
+       changeToActive(card, info['Image'], info['Title']);
     });
     seenSeriesColl.collapsible('open', 0);
 }
 
-function getImageUrl(data) {
-    var posterPath;
-    if (data != "") {
-        posterPath = 'https://image.tmdb.org/t/p/w342' + data;
+function changeToActive(card, data, title) {
+    if (data !== '') {
+        var path = 'https://image.tmdb.org/t/p/w300' + data;
+        card
+            .css("background-image", "url(" + path + ")")
+            .css("background-size", "cover")
+            .css("background-position", "center");
+        card.addClass('white-text');
     } else {
-        posterPath = '/static/img/nanPosterBig.jpg'
+        card.addClass('green').addClass('lighten-2').addClass('white-text');
+        card.children(0).append(title);
     }
-    return posterPath;
+    card.css("height", "18em");
 }
