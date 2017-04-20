@@ -317,17 +317,18 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> update(Table table, Map<Column, String> data) {
-        return future(fut -> check(data.get(USERNAME) == null,
-                () -> fut.fail("Username required."),
-                () -> check(data.size() == 1,
-                        () -> fut.fail("No columns specified."),
-                        () -> getSortedColumns(data, columns -> client.rxGetConnection()
-                                .flatMap(conn -> conn
-                                        .rxUpdateWithParams(UPDATE
-                                                .create(table, columns), getSortedValues(columns, data))
-                                        .doAfterTerminate(conn::close))
-                                .map(UpdateResult::toJson)
-                                .subscribe(fut::complete, fut::fail)))));
+        return future(fut -> checkFail(data.get(USERNAME) == null).rxSetHandler()
+                // TODO: 20.04.2017 rakendada mujal ka
+                .doOnError(err -> fut.fail("Username required."))
+                .flatMap(bool -> checkFail(data.size() == 1).rxSetHandler())
+                .doOnError(err -> fut.fail("No columns specified."))
+                .map(bool -> getSortedColumns(data))
+                .flatMap(columns -> client.rxGetConnection()
+                        .flatMap(conn -> conn.rxUpdateWithParams(UPDATE
+                                .create(table, columns), getSortedValues(columns, data))
+                                .doAfterTerminate(conn::close)))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -339,14 +340,15 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insert(Table table, Map<Column, String> data) {
-        return future(fut -> check(data.get(USERNAME) == null,
-                () -> fut.fail("Username required."),
-                () -> getSortedColumns(data, columns -> client.rxGetConnection()
+        return future(fut -> checkFail(data.get(USERNAME) == null).rxSetHandler()
+                .doOnError(err -> fut.fail("Username required."))
+                .map(bool -> getSortedColumns(data))
+                .flatMap(columns -> client.rxGetConnection()
                         .flatMap(conn -> conn
                                 .rxUpdateWithParams(INSERT.create(table, columns), getSortedValues(columns, data))
-                                .doAfterTerminate(conn::close))
-                        .map(UpdateResult::toJson)
-                        .subscribe(fut::complete, fut::fail))));
+                                .doAfterTerminate(conn::close)))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**

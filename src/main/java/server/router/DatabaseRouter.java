@@ -13,7 +13,6 @@ import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
 import server.service.MailService;
 
-import java.util.Map;
 import java.util.function.BiFunction;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
@@ -163,16 +162,16 @@ public class DatabaseRouter extends EventBusRoutable {
         database.getUser(username).setHandler(resultHandler(ctx, result -> check(getRows(result).stream()
                 .map(obj -> (JsonObject) obj)
                 .noneMatch(json -> json.getString(Column.USERNAME.getName()).equals(username)), () -> {
-            Map<Column, String> userMap = createDataMap(username);
-            Map<Column, String> settingsMap = createDataMap(username);
             String salt = genString();
-            userMap.put(Column.FIRSTNAME, firstname);
-            userMap.put(Column.LASTNAME, lastname);
-            userMap.put(Column.PASSWORD, hash(password, salt));
-            userMap.put(Column.SALT, salt);
-            settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
-            Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
-            Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
+            Future<JsonObject> f1 = database.insert(Table.USERS, mapBuilder(createDataMap(username))
+                    .put(Column.FIRSTNAME, firstname)
+                    .put(Column.LASTNAME, lastname)
+                    .put(Column.PASSWORD, hash(password, salt))
+                    .put(Column.SALT, salt)
+                    .build());
+            Future<JsonObject> f2 = database.insert(Table.SETTINGS, mapBuilder(createDataMap(username))
+                    .put(Column.VERIFIED, isServer(config) ? "0" : "1")
+                    .build());
             CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
                 mail.sendVerificationEmail(ctx, username);
                 redirect(ctx, verifyEmail());

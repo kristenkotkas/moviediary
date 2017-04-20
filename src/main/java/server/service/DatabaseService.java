@@ -1,16 +1,14 @@
 package server.service;
 
-
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
+import server.util.CommonUtils;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toList;
@@ -21,10 +19,10 @@ import static server.service.DatabaseService.Column.USERNAME;
  */
 public interface DatabaseService {
 
-    static EnumMap<Column, String> createDataMap(String username) {
-        EnumMap<Column, String> map = new EnumMap<>(Column.class);
-        map.put(USERNAME, username);
-        return map;
+    static Map<Column, String> createDataMap(String username) {
+        return CommonUtils.<Column, String>mapBuilder()
+                .put(USERNAME, username)
+                .build();
     }
 
     static DatabaseService create(Vertx vertx, JsonObject config) {
@@ -128,28 +126,18 @@ public interface DatabaseService {
      */
     enum SQLCommand {
         UPDATE((table, columns) -> {
-            StringBuilder sb = new StringBuilder("UPDATE ")
-                    .append(table.getName())
-                    .append(" SET ");
+            StringBuilder sb = new StringBuilder("UPDATE ").append(table.getName()).append(" SET ");
             columns.stream()
                     .filter(column -> column != USERNAME)
                     .forEach(column -> sb
-                            .append(columns.indexOf(column) == 0 ? "" : ", ")
-                            .append(column.getName())
-                            .append(" = ?"));
+                            .append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()).append(" = ?"));
             return sb.append(" WHERE Username = ?").toString();
         }),
         INSERT((table, columns) -> {
-            StringBuilder sb = new StringBuilder("INSERT INTO ")
-                    .append(table.getName())
-                    .append(" (");
-            columns.forEach(column -> sb
-                    .append(columns.indexOf(column) == 0 ? "" : ", ")
-                    .append(column.getName()));
+            StringBuilder sb = new StringBuilder("INSERT INTO ").append(table.getName()).append(" (");
+            columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()));
             sb.append(") VALUES (");
-            columns.forEach(column -> sb
-                    .append(columns.indexOf(column) == 0 ? "" : ", ")
-                    .append("?"));
+            columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append("?"));
             return sb.append(")").toString();
         });
 
@@ -212,22 +200,18 @@ public interface DatabaseService {
             return columns;
         }
 
-        public static void getSortedColumns(Map<Column, String> data, Consumer<List<Column>> consumer) {
-            consumer.accept(getSortedColumns(data));
-        }
-
         public static JsonArray getSortedValues(List<Column> columns, Map<Column, String> data) {
             return columns.stream()
                     .map(data::get)
                     .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
         }
 
-        public String getName() {
-            return isTesting ? columnName.toUpperCase(ENGLISH) : columnName;
-        }
-
         public static void setTesting() {
             Column.isTesting = true;
+        }
+
+        public String getName() {
+            return isTesting ? columnName.toUpperCase(ENGLISH) : columnName;
         }
     }
 }
