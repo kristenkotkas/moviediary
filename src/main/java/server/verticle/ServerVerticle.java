@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import static server.router.EventBusRoutable.closeEventbus;
 import static server.router.EventBusRoutable.startEventbus;
+import static server.util.CommonUtils.createIfMissing;
 import static server.util.NetworkUtils.*;
 
 /**
@@ -27,7 +28,11 @@ import static server.util.NetworkUtils.*;
 public class ServerVerticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
 
-    // TODO: 02/03/2017 pass in services with constructor for testing
+    private DatabaseService database;
+    private TmdbService tmdb;
+    private BankLinkService bankLink;
+    private MailService mail;
+    private SecurityConfig securityConfig;
 
     /**
      * Creates service for interacting with database.
@@ -49,11 +54,11 @@ public class ServerVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx);
-        DatabaseService database = DatabaseService.create(vertx, config());
-        TmdbService tmdb = TmdbService.create(vertx, config(), database);
-        BankLinkService bankLink = BankLinkService.create(vertx, config());
-        MailService mail = MailService.create(vertx, database);
-        SecurityConfig securityConfig = new SecurityConfig(config(), database);
+        database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
+        tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
+        bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
+        mail = createIfMissing(mail, () -> MailService.create(vertx, database));
+        securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(config(), database));
         Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig),
                 new TmdbRouter(vertx, tmdb),
@@ -68,6 +73,31 @@ public class ServerVerticle extends AbstractVerticle {
                 .requestHandler(router::accept)
                 .rxListen(config().getInteger(HTTP_PORT, DEFAULT_PORT), config().getString(HTTP_HOST, DEFAULT_HOST))
                 .subscribe(res -> future.complete(), future::fail);
+    }
+
+    public ServerVerticle setDatabase(DatabaseService database) {
+        this.database = database;
+        return this;
+    }
+
+    public ServerVerticle setTmdb(TmdbService tmdb) {
+        this.tmdb = tmdb;
+        return this;
+    }
+
+    public ServerVerticle setBankLink(BankLinkService bankLink) {
+        this.bankLink = bankLink;
+        return this;
+    }
+
+    public ServerVerticle setMail(MailService mail) {
+        this.mail = mail;
+        return this;
+    }
+
+    public ServerVerticle setSecurityConfig(SecurityConfig securityConfig) {
+        this.securityConfig = securityConfig;
+        return this;
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 
 import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toList;
+import static server.entity.Language.isTesting;
 import static server.service.DatabaseService.Column.USERNAME;
 
 /**
@@ -185,7 +186,6 @@ public interface DatabaseService {
         RUNTIMETYPE("RuntimeType"),
         VERIFIED("Verified");
 
-        private static boolean isTesting = false;
         private final String columnName;
 
         Column(String columnName) {
@@ -206,12 +206,8 @@ public interface DatabaseService {
                     .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
         }
 
-        public static void setTesting() {
-            Column.isTesting = true;
-        }
-
         public String getName() {
-            return isTesting ? columnName.toUpperCase(ENGLISH) : columnName;
+            return isTesting() ? columnName.toUpperCase(ENGLISH) : columnName;
         }
     }
 }

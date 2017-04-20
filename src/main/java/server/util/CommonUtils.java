@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.failedFuture;
@@ -96,8 +97,12 @@ public class CommonUtils {
         }
     }
 
-    public static Future<Boolean> checkFail(boolean check) {
-        return check ? succeededFuture() : failedFuture("checkFail method returned false.");
+    public static Future<Boolean> check(boolean check) {
+        return check ? succeededFuture() : failedFuture("check method returned false");
+    }
+
+    public static <T> T createIfMissing(T input, Supplier<T> supplier) {
+        return input != null ? input : supplier.get();
     }
 
     public static <K, V> MapBuilder<K, V> mapBuilder() {

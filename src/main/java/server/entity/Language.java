@@ -28,6 +28,7 @@ public enum Language {
     GERMAN(new Locale.Builder().setLanguage("de").setScript("Latn").setRegion("GR").build());
 
     private static final Logger LOG = getLogger(Language.class);
+    private static boolean testing = false;
     public static final String LANGUAGE = "lang";
     private final Locale locale;
     private final ResourceBundle bundle;
@@ -35,6 +36,18 @@ public enum Language {
     Language(Locale locale) {
         this.locale = locale;
         this.bundle = ResourceBundle.getBundle("messages", locale, new UTF8Control());
+    }
+
+    public static boolean isTesting() {
+        return testing;
+    }
+
+    public static void setTesting() {
+        Language.testing = true;
+    }
+
+    public static String toTestString(String input) {
+        return testing ? input.toUpperCase(Locale.ENGLISH) : input;
     }
 
     public static String getString(String key, String lang) {

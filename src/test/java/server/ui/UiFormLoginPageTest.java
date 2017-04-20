@@ -3,6 +3,7 @@ package server.ui;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
+import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.rxjava.core.Vertx;
 import org.junit.After;
@@ -22,7 +23,6 @@ import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
 import static server.util.FileUtils.getConfig;
@@ -43,14 +43,14 @@ public class UiFormLoginPageTest {
     private LocalDatabase database;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp(TestContext ctx) throws Exception {
         driver = new HtmlUnitDriver();
         vertx = Vertx.vertx();
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
         initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
                 .doOnSuccess(db -> database = db)
-                .doOnError(err -> fail(err.getMessage()))
+                .doOnError(ctx::fail)
                 .toCompletable()
                 .andThen(deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions().setConfig(config)))
                 .test()
@@ -59,11 +59,11 @@ public class UiFormLoginPageTest {
     }
 
     @Test
-    public void testLoginUnauthorized() throws Exception {
+    public void testLoginUnauthorized(TestContext ctx) throws Exception {
         driver.manage().deleteAllCookies();
         formLogin(driver, URI, new JsonObject().put("unit_test", new JsonObject().put("form_user",
                 new JsonObject().put("username", "megalamp").put("password", "ultrateam3000"))));
-        assertEquals(URI + "/login?message=AUTHORIZER_UNAUTHORIZED", driver.getCurrentUrl());
+        ctx.assertEquals(URI + "/login?message=AUTHORIZER_UNAUTHORIZED", driver.getCurrentUrl());
     }
 
     @Test

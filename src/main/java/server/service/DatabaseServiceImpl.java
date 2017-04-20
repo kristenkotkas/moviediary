@@ -11,6 +11,7 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import rx.Observable;
 import rx.Single;
+import server.util.CommonUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -21,6 +22,7 @@ import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
 import static rx.Statement.ifThen;
+import static server.entity.Language.toTestString;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -33,67 +35,64 @@ import static server.util.StringUtils.*;
  */
 public class DatabaseServiceImpl implements DatabaseService {
     private static final Logger LOG = getLogger(DatabaseServiceImpl.class);
-    private static final String SQL_INSERT_WISHLIST =
+    public static final String SQL_INSERT_WISHLIST =
             "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
-    private static final String SQL_INSERT_EPISODE =
+    public static final String SQL_INSERT_EPISODE =
             "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_IS_IN_WISHLIST =
+    public static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
-    private static final String SQL_GET_WISHLIST =
+    public static final String SQL_GET_WISHLIST =
             "SELECT Title, Time, Image, MovieId FROM Wishlist " +
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username =  ? ORDER BY Time DESC";
-    private static final String SQL_GET_YEARS_DIST =
+    public static final String SQL_GET_YEARS_DIST =
             "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    private static final String SQL_GET_WEEKDAYS_DIST =
+    public static final String SQL_GET_WEEKDAYS_DIST =
             "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    private static final String SQL_GET_TIME_DIST =
+    public static final String SQL_GET_TIME_DIST =
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
-    private static final String SQL_GET_ALL_TIME_META =
+    public static final String SQL_GET_ALL_TIME_META =
             "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
-    private static final String MYSQL = "mysql";
-    private static final String SQL_INSERT_USER =
+    public static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
+    public static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username";
-    private static final String SQL_QUERY_USER = "SELECT * FROM Users " +
+    public static final String SQL_QUERY_USER = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username " +
             "WHERE Users.Username = ?";
-    private static final String SQL_INSERT_VIEW =
+    public static final String SQL_INSERT_VIEW =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_VIEWS =
+    public static final String SQL_QUERY_VIEWS =
             "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, " +
                     "TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-    private static final String SQL_INSERT_MOVIE =
+    public static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
+    public static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
-    private static final String SQL_INSERT_SERIES =
+    public static final String SQL_INSERT_SERIES =
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
-    private static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
-    private static final String SQL_GET_MOVIE_VIEWS =
+    public static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
+    public static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
-    private static final String SQL_QUERY_VIEWS_META =
+    public static final String SQL_QUERY_VIEWS_META =
             "SELECT Count(*) AS Count " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-
-    private static final String SQL_REMOVE_VIEW =
+    public static final String SQL_REMOVE_VIEW =
             "DELETE FROM Views WHERE Username = ? AND Id = ?";
-
-    private static final String SQL_GET_SEEN_EPISODES =
+    public static final String SQL_GET_SEEN_EPISODES =
             "SELECT EpisodeId FROM Series " +
                     "WHERE Username = ? " +
                     "AND SeriesId = ?";
@@ -101,9 +100,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
+        this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
     }
 
+    //for enabling intellij inspections on sql fragments
     @SuppressWarnings("unused")
     private void test() throws SQLException {
         DataSource dataSource = new MysqlDataSource();
@@ -317,10 +317,10 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> update(Table table, Map<Column, String> data) {
-        return future(fut -> checkFail(data.get(USERNAME) == null).rxSetHandler()
+        return future(fut -> CommonUtils.check(data.get(USERNAME) == null).rxSetHandler()
                 // TODO: 20.04.2017 rakendada mujal ka
                 .doOnError(err -> fut.fail("Username required."))
-                .flatMap(bool -> checkFail(data.size() == 1).rxSetHandler())
+                .flatMap(bool -> CommonUtils.check(data.size() == 1).rxSetHandler())
                 .doOnError(err -> fut.fail("No columns specified."))
                 .map(bool -> getSortedColumns(data))
                 .flatMap(columns -> client.rxGetConnection()
@@ -340,7 +340,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insert(Table table, Map<Column, String> data) {
-        return future(fut -> checkFail(data.get(USERNAME) == null).rxSetHandler()
+        return future(fut -> CommonUtils.check(data.get(USERNAME) == null).rxSetHandler()
                 .doOnError(err -> fut.fail("Username required."))
                 .map(bool -> getSortedColumns(data))
                 .flatMap(columns -> client.rxGetConnection()
@@ -522,13 +522,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                                 () -> sb.getValue().append(" AND WasFirst")))
                         .doOnEach(sb -> ifTrue(json.getBoolean("is-cinema"),
                                 () -> sb.getValue().append(" AND WasCinema")))
-                        .subscribe(sb -> client.rxGetConnection()
-                                .flatMap(conn -> conn
-                                        .rxQueryWithParams(sb.toString(), new JsonArray()
-                                                .add(username)
-                                                .add(json.getString("start"))
-                                                .add(json.getString("end")))
-                                        .doAfterTerminate(conn::close))
+                        .subscribe(sb -> client.rxGetConnection().flatMap(conn -> conn
+                                .rxQueryWithParams(sb.toString(), new JsonArray()
+                                        .add(username)
+                                        .add(json.getString("start"))
+                                        .add(json.getString("end")))
+                                .doAfterTerminate(conn::close))
                                 .map(ResultSet::toJson)
                                 .subscribe(fut::complete, fut::fail))));
 /*        JsonObject json = new JsonObject(param);
@@ -574,7 +573,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .flatMap(conn -> conn
                         .rxQuery(SQL_USERS_COUNT)
                         .doAfterTerminate(conn::close))
-                .map(resultSet -> resultSet.getRows().get(0).getLong("Count").toString())
+                .map(resultSet -> resultSet.getRows().get(0).getLong(toTestString("Count")).toString())
                 .subscribe(fut::complete, fut::fail));
     }
 }
