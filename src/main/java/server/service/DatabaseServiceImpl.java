@@ -8,6 +8,7 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
+import rx.Observable;
 import rx.Single;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
+import static rx.Statement.ifThen;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -101,7 +103,31 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
-        return future(fut -> check(!nonNull(username, password, firstname, lastname) ||
+        return future(fut -> ifThen(() -> !nonNull(username, password, firstname, lastname) ||
+                        contains("", username, firstname, lastname),
+                Observable.just(genString()),
+                Observable.error(new Throwable("Email, firstname and lastname must exist!")))
+                .toSingle()
+                .flatMap(salt -> client.rxGetConnection()
+                        .flatMap(conn -> conn
+                                .rxUpdateWithParams(SQL_INSERT_USER, new JsonArray()
+                                        .add(username)
+                                        .add(firstname)
+                                        .add(lastname)
+                                        .add(hash(password, salt))
+                                        .add(salt))
+                                .doAfterTerminate(conn::close)))
+                .map(UpdateResult::toJson)
+                .doOnError(fut::fail)
+                .subscribe(res -> insert(Table.SETTINGS, createDataMap(username))
+                        .rxSetHandler()
+                        .doOnError(fut::fail)
+                        .subscribe(result -> fut.complete(res))));
+
+
+
+
+ /*       return future(fut -> check(!nonNull(username, password, firstname, lastname) ||
                         contains("", username, firstname, lastname),
                 () -> fut.fail(new Throwable("Email, firstname and lastname must exist!")),
                 () -> ifPresent(genString(), salt -> client.rxGetConnection()
@@ -116,7 +142,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                         .map(UpdateResult::toJson)
                         .subscribe(res -> insert(Table.SETTINGS, createDataMap(username))
                                 .rxSetHandler()
-                                .subscribe(result -> fut.complete(res), fut::fail), fut::fail))));
+                                .subscribe(result -> fut.complete(res), fut::fail), fut::fail))));*/
     }
 
     /**
