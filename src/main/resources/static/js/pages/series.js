@@ -29,33 +29,48 @@ function fillSeenSeries(seriesData) {
     $.each(seriesData, function (i) {
        //console.log('series', seriesData[i]);
        var info = seriesData[i];
-       var cardId = 'card_' + info['SeriesId'];
+       var cardId = 'img_' + info['SeriesId'];
+       var cardIdTitle = 'title_' + info['SeriesId'];
+       var cardIdEpisodes = 'episodes_' + info['SeriesId'];
        seenSeriesContainer.append(
            $.parseHTML(
-                '<div class="col s6 m4 l2">' +
-                    '<div class="card" id="' + cardId + '">' +
-                        '<div class="card-content truncate content-key"></div>' +
+                '<div class="col s12 m6 l3">' +
+                    '<div class="card horizontal">' +
+                        '<div class="card-image">' +
+                            '<img id="' + cardId + '" class="series-poster">' +
+                        '</div>' +
+                        '<div class="card-stacked truncate">' +
+                            '<div class="card-content">' +
+                                '<span class="truncate content-key" id="' + cardIdTitle + '"></span>' +
+                                info['SeriesId'] +
+                            '</div>' +
+                            '<div class="card-action">' +
+                                '<span class="truncate" id="' + cardIdEpisodes + '"></span>' +
+                            '</div>' +
+                        '</div>' +
                     '</div>' +
                 '</div>'
            )
        );
-       var card = $(document.getElementById(cardId));
-       changeToActive(card, info['Image'], info['Title']);
+       var imgCard = $(document.getElementById(cardId));
+       var titleCard = $(document.getElementById(cardIdTitle));
+       var episodesCard = $(document.getElementById(cardIdEpisodes));
+       changeToActive(imgCard, titleCard, episodesCard, info['Image'], info['Title'], info['Count']);
     });
     seenSeriesColl.collapsible('open', 0);
 }
 
-function changeToActive(card, data, title) {
-    if (data !== '') {
-        var path = 'https://image.tmdb.org/t/p/w300' + data;
-        card
-            .css("background-image", "url(" + path + ")")
-            .css("background-size", "cover")
-            .css("background-position", "center");
-        card.addClass('white-text');
+function changeToActive(card, titleCard, episodeCard, image, title, count) {
+    if (image !== '') {
+        var path = 'https://image.tmdb.org/t/p/w300' + image;
+        card.attr('src', path);
     } else {
-        card.addClass('green').addClass('lighten-2').addClass('white-text');
-        card.children(0).append(title);
+        card.attr('src', '/static/img/nanPosterBig.jpg')
     }
-    card.css("height", "18em");
+    titleCard.append(title);
+    episodeCard.append(
+        $.parseHTML(
+            '<span class="episodes-count">' + count + '</span>' + '<span class="episodes-seen">' + 'episodes seen' + '</span>'
+        )
+    );
 }

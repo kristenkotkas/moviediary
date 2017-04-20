@@ -112,13 +112,13 @@ function fillTVTable(tvId) {
                             '<div class="collapsible-header collapsible-header-tv history-object grey-text">' +
                             '<div class="row"></div>' +
                             '<div class="row">' +
-                            '<div class="col s3 m2 l2">' +
+                            '<div class="col s3 m2 l1">' +
                             '<img src="' + getImageUrl(seasonData) + '" width="100%">' +
                             '</div>' +
                             '<div class="col s9 m10 l10">' +
                             '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +
                             '<span class="season-add-info grey-text text-darken-2">' +
-                            seasonData['air_date'].split('-')[0]  +
+                            getYear(seasonData['air_date'])  +
                                 ' | ' +
                             seasonData['episodes'].length + ' episodes' +
                             '</span><br>' +
@@ -141,6 +141,12 @@ function fillTVTable(tvId) {
             }
         });
     });
+}
+
+function getYear(airDate) {
+    if (airDate != null) {
+        return (airDate.split('-')[0]);
+    } else return '';
 }
 
 function getEpisodes(episodes, seasonNumber, seriesData) {

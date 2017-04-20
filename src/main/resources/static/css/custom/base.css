@@ -184,6 +184,10 @@ span.badge.new:after {
     margin-bottom: 0;
 }
 
+.description {
+    font-weight: 300;
+}
+
 .movie-in-wishlist {
     background: #21ff6e;
 }
@@ -214,6 +218,21 @@ span.badge.new:after {
 
 .history-date {
     font-size: x-large;
+}
+
+.series-poster {
+    max-height: 11em;
+    display: block;
+}
+
+.episodes-count {
+    font-weight: 900;
+    opacity: 0.6;
+    font-size: 2em;
+}
+
+.episodes-seen {
+    margin-left: 1em;
 }
 
 .fa-lg {

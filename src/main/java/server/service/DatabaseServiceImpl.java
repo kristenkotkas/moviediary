@@ -91,10 +91,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "AND SeriesId = ?";
 
     private static final String SQL_GET_WATCHING_SERIES =
-            "SELECT Title, Image, SeriesId FROM Series " +
+            "SELECT Title, Image, SeriesId, COUNT(SeriesId) AS Count FROM Series " +
                     "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
                     "WHERE Username = ? " +
-                    "GROUP BY Title, Image, SeriesId;";
+                    "GROUP BY Title, Image, SeriesId " +
+                    "ORDER BY Title";
 
     private final JDBCClient client;
 
