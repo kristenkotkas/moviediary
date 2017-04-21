@@ -406,6 +406,10 @@ header .brand-logo:hover {
          padding-left: 2%;
          width: 100%;
      }*/
+
+    .collapsible-body-tv {
+        padding: 2em 0;
+    }
 }
 
 /* Navbar fix */

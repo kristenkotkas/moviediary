@@ -105,6 +105,7 @@ function fillTVTable(tvId) {
                 //console.log(('season_' + i), data[('season/' + i)]);
                 if (data[('season/' + i)] != null) {
                     var seasonData = data[('season/' + i)];
+                    var seasonButtonId = 'season_btn_' + i;
                     console.log(seasonData);
                     tvTable.append(
                         $.parseHTML(
@@ -129,6 +130,7 @@ function fillTVTable(tvId) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                             '<div class="row">' +
+                            '<a class="btn waves-effect blue z-depth-0" id="' + seasonButtonId + '">Add season ' + seasonData['season_number'] + '</a><br>' +
                             '<div class="col s12 m12 l12" id="episode_container_' + i + '">' +
                             '</div>' +
                             '</div>' +
@@ -137,6 +139,9 @@ function fillTVTable(tvId) {
                         )
                     );
                     getEpisodes(seasonData['episodes'], i, data);
+                    $(document.getElementById(seasonButtonId)).click(function () {
+                        getSeasonData(data, i);
+                    })
                 }
             }
         });
@@ -244,6 +249,21 @@ function addEpisodeToView(episodeData, seriesData, seasonData, card, element) {
     });
 }
 
+function addEpisodeToViewWODecorating(episodeId, seriesId, seasonId) {
+    eventbus.send("database_insert_episode",
+        {
+            'seriesId': seriesId,
+            'episodeId': episodeId,
+            'seasonId': seasonId
+        }
+        , function (error, reply) {
+            console.log('reply', reply);
+            if (reply['body']['updated'] != null) {
+                console.log('episode added');
+            }
+        });
+}
+
 function removeEpisode(card, element, episodeData) {
     var episodeId = episodeData['id'];
     eventbus.send("database_remove_episode",
@@ -265,4 +285,12 @@ function getImageUrl(data) {
         posterPath = '/static/img/nanPosterBig.jpg'
     }
     return posterPath;
+}
+
+function getSeasonData(seriesInfo, seasonNr) {
+    var seasonInfo = seriesInfo[('season/' + seasonNr)];
+    var episodes = seasonInfo['episodes'];
+    $.each(episodes, function (i) {
+        addEpisodeToViewWODecorating(episodes[i]['id'], seriesInfo['id'], seasonInfo['_id']);
+    })
 }

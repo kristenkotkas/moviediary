@@ -34,15 +34,15 @@ function fillSeenSeries(seriesData) {
        var cardIdEpisodes = 'episodes_' + info['SeriesId'];
        seenSeriesContainer.append(
            $.parseHTML(
-                '<div class="col s12 m6 l3">' +
-                    '<div class="card horizontal">' +
+                '<div class="col s12 m6 l4">' +
+                    '<div class="card horizontal z-depth-0">' +
                         '<div class="card-image">' +
                             '<img id="' + cardId + '" class="series-poster">' +
                         '</div>' +
                         '<div class="card-stacked truncate">' +
                             '<div class="card-content">' +
                                 '<span class="truncate content-key" id="' + cardIdTitle + '"></span>' +
-                                info['SeriesId'] +
+                                //info['SeriesId'] +
                             '</div>' +
                             '<div class="card-action">' +
                                 '<span class="truncate" id="' + cardIdEpisodes + '"></span>' +
