@@ -57,12 +57,12 @@ public class CommonUtils {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     }
 
-    public static <T> boolean ifPresent(T input, Consumer<T> consumer) {
+    public static <T> T ifPresent(T input, Consumer<T> consumer) {
         if (input != null) {
             consumer.accept(input);
-            return true;
+            return input;
         }
-        return false;
+        return null;
     }
 
     public static <T> boolean ifMissing(T input, Runnable runnable) {

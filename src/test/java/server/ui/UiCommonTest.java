@@ -20,6 +20,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
+import static server.util.CommonUtils.check;
 import static server.util.FileUtils.getConfig;
 import static server.util.LoginUtils.formLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
@@ -41,14 +42,11 @@ public class UiCommonTest {
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
         Async async = ctx.async();
-        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar -> {
-            if (ar.succeeded()) {
-                formLogin(driver, URI, config);
-                async.complete();
-            } else {
-                ctx.fail("Failed to setup server.");
-            }
-        });
+        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar ->
+                check(ar.succeeded(), () -> {
+                    formLogin(driver, URI, config);
+                    async.complete();
+                }, () -> ctx.fail("Failed to setup server.")));
     }
 
     @Test
