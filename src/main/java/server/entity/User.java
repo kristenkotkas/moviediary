@@ -1,6 +1,9 @@
 package server.entity;
 
 import io.vertx.core.json.JsonObject;
+import server.service.DatabaseService.Column;
+
+import static server.entity.Language.toTestString;
 
 /**
  * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
@@ -14,12 +17,12 @@ public class User {
     private boolean verified;
 
     public User(JsonObject user) {
-        this.id = user.getInteger("Id");
-        this.firstname = user.getString("Firstname");
-        this.lastname = user.getString("Lastname");
-        this.username = user.getString("Username");
-        this.runtimeType = user.getString("RuntimeType");
-        this.verified = user.getString("Verified").equals("1");
+        this.id = user.getInteger(toTestString("Id"));
+        this.firstname = user.getString(Column.FIRSTNAME.getName());
+        this.lastname = user.getString(Column.LASTNAME.getName());
+        this.username = user.getString(Column.USERNAME.getName());
+        this.runtimeType = user.getString(Column.RUNTIMETYPE.getName());
+        this.verified = user.getString(Column.VERIFIED.getName()).equals("1");
     }
 
     public User(int id, String firstname, String lastname, String username, String runtimeType, boolean verified) {

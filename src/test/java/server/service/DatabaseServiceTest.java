@@ -20,7 +20,7 @@ import server.verticle.ServerVerticle;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;

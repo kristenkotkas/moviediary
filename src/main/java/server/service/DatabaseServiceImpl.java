@@ -136,6 +136,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
+        // TODO: 22.04.2017 doesnt work -> calls observable.error
         return future(fut -> ifThen(() -> !nonNull(username, password, firstname, lastname) ||
                         contains("", username, firstname, lastname),
                 Observable.just(genString()),

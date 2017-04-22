@@ -10,6 +10,7 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import rx.Single;
 import server.entity.Language;
+import server.service.DatabaseService;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -81,11 +82,12 @@ public class LocalDatabase {
                 .subscribe(res -> fut.complete(), fut::fail));
     }
 
-    public Future<JsonObject> query(String sql, JsonArray params) {
+    public Future<JsonArray> query(String sql, JsonArray params) {
         return future(fut -> client.rxGetConnection()
                 .flatMap(conn -> conn.rxQueryWithParams(sql, params)
                         .doAfterTerminate(conn::close))
                 .map(ResultSet::toJson)
+                .map(DatabaseService::getRows)
                 .subscribe(fut::complete, fut::fail));
     }
 
