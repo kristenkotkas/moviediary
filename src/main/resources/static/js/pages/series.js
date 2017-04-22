@@ -62,7 +62,7 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
     var loadSeries = function (eventbus, lang) {
         var query = getUrlParam("id");
         if (query !== null && isNormalInteger(query)) {
-            openSeries(query, 1);
+            openSeries(parseInt(query), 1);
         }
     };
     window.onpopstate = function () { //try to load series on back/forward page movement
