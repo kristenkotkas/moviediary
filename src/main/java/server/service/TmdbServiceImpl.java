@@ -80,26 +80,37 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     }
 
     @Override
-    public Future<JsonObject> getTVById(String id, int page) {
-        return future(fut -> get(TV_ID + id + APIKEY_PREFIX2, getCached(TV.get(id)),"").setHandler(ar -> {
+    public Future<JsonObject> getTVById(String param) {
+        JsonObject jsonParam = new JsonObject(param);
+        System.out.println("JSON");
+        System.out.println(jsonParam.encodePrettily());
+        String id = Integer.toString(jsonParam.getInteger("seriesId"));
+        int page = jsonParam.getInteger("page");
+        StringBuilder seasons = new StringBuilder(APPEND_TO_RESPONSE);
+        for (int i = ((page - 1) * 10); i < page * 10; i++) {
+            if (i != page * 10 - 1) {
+                seasons.append("season/").append(i).append(",");
+            } else {
+                seasons.append("season/").append(i);
+            }
+        }
+        System.out.println("PAGE: " + page);
+        System.out.println("QUERY: " + seasons);
+        return future(fut -> get(TV_ID + id + APIKEY_PREFIX2, getCached(TV.get(id + "_" + page)), seasons.toString()).setHandler(ar -> {
             if (ar.succeeded()) {
                 JsonObject json = ar.result();
-                future(fut2 -> getTVEpisodes(id, json.getInteger("number_of_seasons"), page).setHandler(ar2 -> {
-                    if (ar2.succeeded()) {
-                        JsonObject json2 = ar2.result();
-                        fut.complete(json2);
-                        database.insertSeries(json2.getInteger("id"), json2.getString("name"),
-                                json.getString("poster_path") == null ? "" : json.getString("poster_path"));
-                    }
-                }));
+                //System.out.println(json.encodePrettily());
+                fut.complete(json);
+                database.insertSeries(json.getInteger("id"), json.getString("name"),
+                        json.getString("poster_path") == null ? "" : json.getString("poster_path"));
             }
         }));
     }
 
-    private Future<JsonObject> getTVEpisodes(String id, int seasonCount, int page) {
+    private Future<JsonObject> getTVEpisodes(String id, int page) {
         StringBuilder seasons = new StringBuilder(APPEND_TO_RESPONSE);
-        for (int i = ((page - 1) * 10); i <= seasonCount && i <= page * 10; i++) {
-            if (i != seasonCount) {
+        for (int i = ((page - 1) * 10); i <= page * 10; i++) {
+            if (i != page * 10 - 1) {
                 seasons.append("season/").append(i).append(",");
             } else {
                 seasons.append("season/").append(i);

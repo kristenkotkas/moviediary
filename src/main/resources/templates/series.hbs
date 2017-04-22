@@ -18,7 +18,7 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navbar.hbs}}
-<h3 class="light grey-text text-lighten-1 page-heading truncate" id="movie-title">
+<h3 class="light grey-text text-lighten-1 page-heading truncate" id="series-title">
     {{i18n "NAVBAR_SERIES" locale=lang}}
 </h3>
 <div class="row">
@@ -33,23 +33,32 @@
                             <i class="fa fa-search left"></i></label>
                     </div>
                 </div>
-                <ul class="collapsible popout z-depth-0" data-collapsible="accordion" id="tv-table">
-                <!-- Siia tuleb otsingu sisu jqueryga -->
-                </ul>
             </div>
-
             <div class="col s12 m10 l10 offset-l1 offset-m1">
                 <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
                     <li class="z-depth-0">
-                        <div class="collapsible-header collapsible-header-tv history-object">
+                        <div class="collapsible-header collapsible-header-tv history-object" id="seen-series-header">
                             <span>Vaatamisel olevad sarjad</span>
                         </div>
                         <div class="collapsible-body collapsible-body-tv">
                             <div class="row" id="seen-series-container">
-
+                                <!-- Siia tuleb seen series sisu -->
                             </div>
                         </div>
                     </li>
+                </ul>
+            </div>
+            <div class="col s12 m10 l10 offset-l1 offset-m1">
+                <div id="tv-loader">
+                    <!-- Siia tuleb loader -->
+                </div>
+            </div>
+            <div class="col s12 m10 l10 offset-l1 offset-m1">
+                <div id="tv-search-result-container">
+                    <!-- Siia tuleb otsingu sisu jqueryga -->
+                </div>
+                <ul class="collapsible popout z-depth-0" data-collapsible="accordion" id="series-data-container">
+                    <!-- Siia tuleb sarja info sisu jqueryga -->
                 </ul>
             </div>
         </div>

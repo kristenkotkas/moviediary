@@ -35,7 +35,7 @@ public class TmdbRouter extends EventBusRoutable {
         listen(API_GET_SEARCH, reply(tmdb::getMovieByName));
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
         listen(API_GET_TV_SEARCH, reply(tmdb::getTVByName));
-        listen(API_GET_TV, reply((id) -> tmdb.getTVById(id, 1)));
+        listen(API_GET_TV, reply(tmdb::getTVById));
     }
 
     @Override
@@ -74,11 +74,11 @@ public class TmdbRouter extends EventBusRoutable {
     }
 
     private void handleApiGetTV(RoutingContext ctx) {
-        String id = ctx.request().getParam(parseParam(API_TMDB_GET_TV));
-        if (id == null) {
+        String param = ctx.request().getParam(parseParam(API_TMDB_GET_TV));
+        if (param == null) {
             badRequest(ctx);
             return;
         }
-        tmdb.getTVById(id, 1).setHandler(resultHandler(ctx, jsonResponse(ctx))); //fixme arvestama page count
+        tmdb.getTVById(param).setHandler(resultHandler(ctx, jsonResponse(ctx))); //fixme arvestama page count
     }
 }

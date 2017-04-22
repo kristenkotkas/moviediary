@@ -207,6 +207,13 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.search-object-series:hover,
+.search-object-series:focus {
+    opacity: 0.85;
+    cursor: pointer;
+}
+
+
 .wishlist-object:hover {
     opacity: 0.9;
     filter: alpha(opacity=90)
@@ -225,6 +232,10 @@ span.badge.new:after {
     display: block;
 }
 
+.series-search-title {
+    font-size: large;
+}
+
 .episodes-count {
     font-weight: 900;
     opacity: 0.6;
@@ -233,6 +244,11 @@ span.badge.new:after {
 
 .episodes-seen {
     margin-left: 1em;
+}
+
+.series-date {
+    margin-left: 0.5em;
+    font-size: smaller;
 }
 
 .fa-lg {
@@ -279,7 +295,7 @@ span.badge.new:after {
 }
 
 .tv-season-title {
-    font-weight: 900;
+    font-weight: 500;
     font-size: x-large;
 }
 
