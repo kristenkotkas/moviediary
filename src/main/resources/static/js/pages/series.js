@@ -113,6 +113,8 @@ function getSeriesSearch() {
 }
 
 function openSeries(seriesId, page) {
+    //seriesDataContainer.empty();
+    closeSeenSeries();
     console.log('opened series', seriesId);
     eventbus.send('api_get_tv',
         {

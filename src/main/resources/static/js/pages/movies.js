@@ -53,11 +53,11 @@ eventbus.onopen = function () {
                                 var movie = data[i];
                                 var posterPath = "";
                                 if (movie['poster_path'] !== null) {
-                                    posterPath = 'https://image.tmdb.org/t/p/w92' + movie['poster_path'];
+                                    posterPath = 'https://image.tmdb.org/t/p/w300' + movie['poster_path'];
                                 } else {
-                                    posterPath = '/static/img/nanPosterSmall.jpg'
+                                    posterPath = '/static/img/nanPosterBig.jpg'
                                 }
-                                var arrayOfNodes = $.parseHTML(
+                                /*var arrayOfNodes = $.parseHTML(
                                     '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
                                     '<div class="row">' +
                                     '<img src="' + posterPath + '" alt="Poster for movie: '
@@ -67,7 +67,25 @@ eventbus.onopen = function () {
                                     '</span>' +
                                     '</div>' +
                                     '</li>'
+                                );*/
+
+                                var arrayOfNodes = $.parseHTML(
+                                    '<div class="col s12 m6 l4">' +
+                                        '<div class="card horizontal z-depth-0 search-object-series" tabindex="' + (8 + i) + '">' +
+                                            '<div class="card-image">' +
+                                                '<img src="' + posterPath + '" alt="Poster for movie: '
+                                                    + movie['original_title'] + '" class="series-poster">' +
+                                            '</div>' +
+                                            '<div class="card-stacked truncate">' +
+                                                '<div class="card-content truncate">' +
+                                                    '<span class="truncate content-key">' +  movie['original_title'] + '</span>' +
+                                                    '<span class="truncate">' + getYear(movie['release_date']) + '</span>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>'
                                 );
+
                                 arrayOfNodes[0].onclick = function () {
                                     searchMovie(eventbus, movie.id, lang);
                                 };
@@ -79,9 +97,6 @@ eventbus.onopen = function () {
                                 });
 
                                 $("#search-result").append(arrayOfNodes).show();
-                                if (i === 9) {
-                                    return false;
-                                }
                             });
                         } else {
                             $("#search-result").append(
@@ -443,6 +458,12 @@ var getStringFormArray = function (jsonArray, lang) {
         return result.slice(0, -2);
     }
 };
+
+function getYear(airDate) {
+    if (airDate != null) {
+        return (airDate.split('-')[0]);
+    } else return '';
+}
 
 var toNormalRevenue = function (revenue, lang) {
     if (revenue === lang['MOVIES_JS_UNKNOWN']) {
