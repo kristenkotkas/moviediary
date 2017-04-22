@@ -24,6 +24,7 @@ eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
+        enableParameterSeriesLoading(eventbus, lang);
 
         eventbus.send("database_get_watching_series", {},  function (error, reply) {
             var seenSeries = reply.body['rows'];
@@ -56,6 +57,19 @@ function startLoading() {
 function endLoading() {
     loaderContainer.empty();
 }
+
+var enableParameterSeriesLoading = function (eventbus, lang) {
+    var loadSeries = function (eventbus, lang) {
+        var query = getUrlParam("id");
+        if (query !== null && isNormalInteger(query)) {
+            openSeries(query, 1);
+        }
+    };
+    window.onpopstate = function () { //try to load series on back/forward page movement
+        loadSeries(eventbus, lang);
+    };
+    loadSeries(eventbus, lang); //load series if url has param
+};
 
 function getSeriesSearch() {
     eventbus.send("api_get_tv_search", searchBar.val(), function (error, reply) {
@@ -114,7 +128,7 @@ function openSeries(seriesId, page) {
         console.log('seriesData', seriesData);
         changeDesign(seriesData);
         fillResultSeries(seriesData, page);
-
+            replaceUrlParameter("id", seriesId);
     });
     //page = 1;
 }

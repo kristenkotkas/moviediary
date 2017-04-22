@@ -449,20 +449,3 @@ var toNormalRevenue = function (revenue, lang) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else return revenue.toLocaleString() + ' $';
 };
-
-
-function replaceUrlParameter(param, value) {
-    var url = location.href;
-    var splitted = url.split('?');
-    var shouldPushHistory = true;
-    if (splitted.length > 1) {
-        url = splitted[0];
-        if (splitted[1].indexOf(value) !== -1) {
-            shouldPushHistory = false;
-        }
-    }
-    url = url + "?" + param + "=" + value;
-    if (shouldPushHistory) {
-        window.history.pushState('', '', url);
-    }
-}
