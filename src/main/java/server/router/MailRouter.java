@@ -7,12 +7,14 @@ import io.vertx.rxjava.ext.web.RoutingContext;
 import server.service.MailService;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
-import static server.entity.Status.*;
+import static server.entity.Status.badRequest;
+import static server.entity.Status.redirect;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.service.MailService.EMAIL;
 import static server.service.MailService.UNIQUE;
 import static server.util.CommonUtils.nonNull;
+import static server.util.HandlerUtils.resultHandler;
 
 /**
  * Contains routes that handle email services.
@@ -43,9 +45,10 @@ public class MailRouter extends EventBusRoutable {
             badRequest(ctx);
             return;
         }
-        mail.verifyEmail(email, unique)
+        mail.verifyEmail(email, unique).setHandler(resultHandler(ctx, json -> redirect(ctx, userVerified())));
+        /*mail.verifyEmail(email, unique)
                 .rxSetHandler()
-                .subscribe(r -> redirect(ctx, userVerified()), err -> serviceUnavailable(ctx, err));
+                .subscribe(r -> redirect(ctx, userVerified()), err -> serviceUnavailable(ctx, err));*/
     }
 
     public static String userVerified() {

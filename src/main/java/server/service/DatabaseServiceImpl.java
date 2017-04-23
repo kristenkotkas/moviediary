@@ -1,6 +1,8 @@
 package server.service;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -9,19 +11,16 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
-import rx.Observable;
-import rx.Single;
-import server.util.CommonUtils;
+import io.vertx.rxjava.ext.sql.SQLConnection;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.future;
-import static java.lang.System.currentTimeMillis;
-import static rx.Statement.ifThen;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -139,6 +138,26 @@ public class DatabaseServiceImpl implements DatabaseService {
         conn.prepareStatement(SQL_QUERY_VIEWS_META);
         conn.prepareStatement(SQL_REMOVE_VIEW);
         conn.prepareStatement(SQL_GET_SEEN_EPISODES);
+    }
+
+    private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
+        return conn -> check(conn.succeeded(),
+                () -> handler.handle(conn.result()),
+                () -> future.fail(conn.cause()));
+    }
+
+    /**
+     * Convenience method for handling sql commands result.
+     */
+    private static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
+        return ar -> {
+            check(ar.succeeded(),
+                    () -> check(ar.result() instanceof ResultSet,
+                            () -> future.complete(((ResultSet) ar.result()).toJson()),
+                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
+                    () -> future.fail(ar.cause()));
+            conn.close();
+        };
     }
 
     /**
@@ -513,7 +532,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<String> getUsersCount() {
-        return future(fut -> client.getConnection(connHandler(fut, conn -> conn.query(SQL_VIEWS_COUNT, ar -> {
+        return future(fut -> client.getConnection(connHandler(fut, conn -> conn.query(SQL_USERS_COUNT, ar -> {
             check(ar.succeeded(),
                     () -> fut.complete(ar.result().getRows().get(0).getLong("Count").toString()),
                     () -> fut.fail(ar.cause()));
