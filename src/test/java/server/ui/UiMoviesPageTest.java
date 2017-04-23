@@ -141,13 +141,16 @@ public class UiMoviesPageTest {
         driver.findElement(cssSelector("#add-watch > div.card-content")).click();
         driver.findElement(id("watchStartNow")).click();
         driver.findElement(id("watchEndCalculate")).click();
+        driver.executeScript("document.getElementById('watchStartTime').value = '12:00'");
+        driver.executeScript("document.getElementById('watchStartTime').setAttribute('data-submit', '12:00:00')");
+        driver.executeScript("document.getElementById('watchEndTime').value = '13:46'");
+        driver.executeScript("document.getElementById('watchEndTime').setAttribute('data-submit', '13:46:00')");
         driver.findElement(id("add-btn")).click();
-        // FIXME: 23.04.2017 https://puu.sh/vtDRD/130bb4aab7.png
-        /*await().atMost(5, SECONDS).until(() -> localDatabase
+        await().atMost(5, SECONDS).until(() -> localDatabase
                 .query("SELECT * FROM Views WHERE MovieId = ?", new JsonArray().add(315837))
                 .rxSetHandler()
                 .toBlocking()
-                .value().size() > 0);*/
+                .value().size() > 0);
         closeEventbus(driver);
         await().until(() -> isEventbus(CLOSED, driver));
     }
