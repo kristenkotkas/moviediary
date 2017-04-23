@@ -14,7 +14,6 @@ eventbus.onopen = function () {
                 localStorage.setItem("wishlist_data", JSON.stringify(data));
             }
             console.log(data);
-            //addTableHead(lang);
             addTableData(data, lang);
         });
     });
@@ -68,12 +67,6 @@ function addTableData(data, lang) {
                 )
             );
         }, timeout += 25);
-    });
-    $('.megatest').matchHeight({
-        byRow: true,
-        property: 'height',
-        target: $('.responsive-img'),
-        remove: false
     });
 }
 

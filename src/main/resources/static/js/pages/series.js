@@ -178,8 +178,8 @@ function fillResultSeries(seriesData, page, lang) {
                             '<div class="collapsible-header collapsible-header-tv history-object grey-text">' +
                                 '<div class="row last-row">' +
                                     '<div class="col s3 m2 l1">' +
-                                        '<img src="' + getPosterPath(seasonData['poster_path']) + '" width="100%" ' +
-                                        'alt="Poster for: ' + seasonData['name'] + '">' +
+                                        '<img src="' + getPosterPath(seasonData['poster_path']) + '"' +
+                                        ' alt="Poster for: ' + seasonData['name'] + '" class="img-100">' +
                                     '</div>' +
                                     '<div class="col s9 m10 l11">' +
                                         '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +

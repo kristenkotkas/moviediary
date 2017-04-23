@@ -309,8 +309,7 @@ function addHistory(data, lang, type) {
                             '<div class="col m4 l3 search-image hide-on-small-only">' +
                                 '<div class="row">' +
                                     '<a class="wishlist-object" href="movies/?id=' + data[i]['MovieId'] + '">' +
-                                        '<img class="wishlist-object" src="' + posterPath + '" alt="Poster for movie: ' +
-                                        data[i]['Title'] + '" width="80%">' +
+                                        '<img class="wishlist-object img-80" src="' + posterPath  + '" alt="Poster for movie: ' + data[i]['Title'] + '">' +
                                     '</a>' +
                                 '</div>' +
                                 '<div class="row">' +
@@ -331,6 +330,7 @@ function addHistory(data, lang, type) {
                                                 '</tr>' +
                                                 '<tr>' +
                                                     '<td class="col s12 m10 l10"><span class="content-key grey-text">' + minutesToString(data[i]['Runtime']) + '</span></td>' +
+                                                    '<td></td>' +
                                                 '</tr>' +
                                                 '<tr>' +
                                                     '<td class="col">' +
@@ -338,11 +338,11 @@ function addHistory(data, lang, type) {
                                                         '&nbsp&nbsp' +
                                                         '<i class="fa-lg grey-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i>' +
                                                     '</td>' +
+                                                    '<td></td>' +
                                                 '</tr>' +
                                             '</tbody>' +
                                         '</table>' +
                                     '</li>' +
-                                    '<br>' +
                                     '<li>' +
                                         '<div>' +
                                             '<span class="custom-truncate">' +
