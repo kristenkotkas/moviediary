@@ -1,52 +1,65 @@
 package server.ui;
 
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.junit.After;
-import org.junit.Before;
+import io.vertx.rxjava.core.Vertx;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import server.util.LocalDatabase;
 import server.verticle.ServerVerticle;
 
 import java.util.List;
 
+import static io.vertx.rxjava.core.RxHelper.deployVerticle;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
-import static server.util.CommonUtils.check;
 import static server.util.FileUtils.getConfig;
+import static server.util.LocalDatabase.initializeDatabase;
+import static server.util.LoginUtils.asyncFormLogin;
 import static server.util.LoginUtils.formLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
+import static server.util.Utils.assertGoToPage;
+import static server.util.Utils.createDriver;
 
+@SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UiCommonTest {
     private static final int PORT = 8082;
     private static final String URI = "http://localhost:" + PORT;
 
-    private Vertx vertx;
-    private JsonObject config;
-    private WebDriver driver;
+    private static io.vertx.rxjava.core.Vertx vertx;
+    private static JsonObject config;
+    private static HtmlUnitDriver driver;
+    private static LocalDatabase hsqldb;
 
-    @SuppressWarnings("Duplicates")
-    @Before
-    public void setUp(TestContext ctx) throws Exception {
-        driver = new HtmlUnitDriver();
+    @BeforeClass
+    public static void setUp(TestContext ctx) throws Exception {
+        driver = createDriver(true);
         vertx = Vertx.vertx();
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        Async async = ctx.async();
-        vertx.deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(config), ar ->
-                check(ar.succeeded(), () -> {
-                    formLogin(driver, URI, config);
-                    async.complete();
-                }, () -> ctx.fail("Failed to setup server.")));
+        initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
+                .doOnSuccess(db -> hsqldb = db)
+                .doOnError(ctx::fail)
+                .flatMap(db -> deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions()
+                        .setConfig(config))
+                        .toSingle())
+                .flatMap(s -> asyncFormLogin(driver, URI, config).rxSetHandler())
+                .doOnError(ctx::fail)
+                .test()
+                .awaitTerminalEvent(10, SECONDS)
+                .assertCompleted();
     }
 
     @Test
@@ -61,6 +74,7 @@ public class UiCommonTest {
 
     @Test
     public void testNavBarLinks() throws Exception {
+        assertGoToPage(driver, URI + "/private/home");
         List<WebElement> links = driver.findElements(tagName("a"));
         //top
         assertEquals(URI + "/private/user", links.get(0).getAttribute("href"));
@@ -80,6 +94,7 @@ public class UiCommonTest {
 
     @Test
     public void testNavBarLinksCanGetToPages() throws Exception {
+        assertGoToPage(driver, URI + "/private/home");
         //top
         checkCanGetToPage(driver.findElements(tagName("a")).get(0), URI + "/private/user");
         checkCanGetToPage(driver.findElements(tagName("a")).get(1), URI + "/private/home");
@@ -101,8 +116,10 @@ public class UiCommonTest {
         assertEquals(urlToCheck, driver.getCurrentUrl());
     }
 
+    // TODO: 23.04.2017 switch to tooltips
     @Test
     public void testNavBarTranslations() throws Exception {
+        assertGoToPage(driver, URI + "/private/home");
         JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
         assertEquals(formAuth.getString("firstname") + " " + formAuth.getString("lastname"),
                 driver.findElements(tagName("a")).get(6).getText());
@@ -112,12 +129,8 @@ public class UiCommonTest {
     }
 
     private void checkNavBarTranslations(String lang) {
-        String url = URI + "/login?lang=" + lang;
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
-        url = URI + "/private/home";
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
+        assertGoToPage(driver, URI + "/login?lang=" + lang);
+        assertGoToPage(driver, URI + "/private/home");
         List<WebElement> links = driver.findElements(tagName("a"));
         //top
         assertEquals(getString("NAVBAR_ME", lang), links.get(0).getText());
@@ -136,9 +149,7 @@ public class UiCommonTest {
 
     @Test
     public void testNotFoundPageLinks() throws Exception {
-        String url = URI + "/somethingRandom";
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
+        assertGoToPage(driver, URI + "/somethingRandom");
         assertEquals(URI + "/private/home", driver.findElement(tagName("a")).getAttribute("href"));
     }
 
@@ -150,20 +161,16 @@ public class UiCommonTest {
     }
 
     private void checkNotFoundPageTranslations(String lang) {
-        String url = URI + "/login?lang=" + lang;
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
-        url = URI + "/somethingRandom";
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
+        assertGoToPage(driver, URI + "/login?lang=" + lang);
+        assertGoToPage(driver, URI + "/somethingRandom");
         assertEquals(getString("NOTFOUND_TITLE", lang), driver.getTitle());
         assertEquals("404: " + getString("NOTFOUND_TITLE", lang),
                 driver.findElement(tagName("h3")).getText());
         assertEquals(getString("NOTFOUND_RETURN", lang), driver.findElement(tagName("a")).getText());
     }
 
-    @After
-    public void tearDown(TestContext ctx) throws Exception {
+    @AfterClass
+    public static void tearDown(TestContext ctx) throws Exception {
         driver.quit();
         vertx.close(ctx.asyncAssertSuccess());
     }

@@ -2,12 +2,13 @@ package server.util;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.lang.reflect.Field;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static server.util.CommonUtils.ifPresent;
+import static org.junit.Assert.assertEquals;
 
 public class Utils {
 
@@ -22,9 +23,8 @@ public class Utils {
         return null;
     }
 
-    public static HtmlUnitDriver createDriver() {
-        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.CHROME, true);
-        ifPresent(getWebClient(driver), c -> c.getOptions().setThrowExceptionOnScriptError(false));
+    public static HtmlUnitDriver createDriver(boolean enableJavascript) {
+        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.CHROME, enableJavascript);
         driver.manage().timeouts().pageLoadTimeout(10, SECONDS);
         return driver;
     }
@@ -49,5 +49,10 @@ public class Utils {
         public static void closeEventbus(HtmlUnitDriver driver) {
             driver.executeScript("eventbus.close();");
         }
+    }
+
+    public static void assertGoToPage(WebDriver driver, String page) {
+        driver.get(page);
+        assertEquals(page, driver.getCurrentUrl());
     }
 }

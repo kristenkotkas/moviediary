@@ -25,12 +25,13 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.tagName;
+import static server.util.CommonUtils.ifPresent;
 import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.LoginUtils.asyncFormLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
 import static server.util.Utils.Eventbus.*;
-import static server.util.Utils.createDriver;
+import static server.util.Utils.*;
 
 @SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
@@ -45,7 +46,8 @@ public class UiMePageTest {
 
     @BeforeClass
     public static void setUp(TestContext ctx) throws Exception {
-        driver = createDriver();
+        driver = createDriver(true);
+        ifPresent(getWebClient(driver), c -> c.getOptions().setThrowExceptionOnScriptError(false));
         vertx = Vertx.vertx();
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
@@ -65,7 +67,6 @@ public class UiMePageTest {
     @Test
     public void testMessageIsPushedToEverybody(TestContext ctx) throws Exception {
         String message = "Hello world!";
-        String url = URI + "/private/user";
         Async async = ctx.async();
         vertx.eventBus().consumer("messenger", msg -> {
             assertEquals(message, msg.body());
@@ -74,8 +75,7 @@ public class UiMePageTest {
             await().until(() -> isEventbus(CLOSED, driver));
             async.complete();
         });
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
+        assertGoToPage(driver, URI + "/private/user");
         await().until(() -> isEventbus(OPEN, driver));
         driver.findElement(By.id("MessageInput")).sendKeys(message);
         driver.findElement(By.id("SendMessage")).click();
@@ -89,9 +89,7 @@ public class UiMePageTest {
                 .add(config.getJsonObject("unit_test").getJsonObject("form_user").getString("username")))
                 .rxSetHandler().toBlocking()
                 .value().getJsonObject(0);
-        String url = URI + "/private/user";
-        driver.get(url);
-        assertEquals(url, driver.getCurrentUrl());
+        assertGoToPage(driver, URI + "/private/user");
         await().until(() -> isEventbus(OPEN, driver));
         await().until(() -> driver.findElements(tagName("td")).size() > 0);
         List<WebElement> data = driver.findElements(tagName("td"));
