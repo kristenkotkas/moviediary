@@ -29,7 +29,7 @@ eventbus.onopen = function () {
         eventbus.send("database_get_watching_series", {},  function (error, reply) {
             var seenSeries = reply.body['rows'];
             //console.log('seenSeries', data);
-            fillSeenSeries(seenSeries);
+            fillSeenSeries(seenSeries, lang);
             openSeenSeries();
 
             searchBar.keyup(function (e) {
@@ -38,12 +38,12 @@ eventbus.onopen = function () {
                 }
             });
             searchButton.click(function () {
-                getSeriesSearch();
+                getSeriesSearch(lang);
             });
 
             seenSeriesHeader.click(function () {
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
-                    fillSeenSeries(reply.body['rows']);
+                    fillSeenSeries(reply.body['rows'], lang);
                 });
             })
         });
@@ -62,7 +62,7 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
     var loadSeries = function (eventbus, lang) {
         var query = getUrlParam("id");
         if (query !== null && isNormalInteger(query)) {
-            openSeries(parseInt(query), 1);
+            openSeries(parseInt(query), 1, lang);
         }
     };
     window.onpopstate = function () { //try to load series on back/forward page movement
@@ -71,7 +71,7 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
     loadSeries(eventbus, lang); //load series if url has param
 };
 
-function getSeriesSearch() {
+function getSeriesSearch(lang) {
     eventbus.send("api_get_tv_search", searchBar.val(), function (error, reply) {
         seriesDataContainer.empty();
         closeSeenSeries();
@@ -86,7 +86,8 @@ function getSeriesSearch() {
                     '<div class="col s12 m6 l4">' +
                         '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
                             '<div class="card-image">' +
-                                '<img src="' + getPosterPath(searchedTvSeries['poster_path']) + '" class="series-poster">' +
+                                '<img src="' + getPosterPath(searchedTvSeries['poster_path']) + '" class="series-poster" ' +
+                                'alt="Poster for series: ' + searchedTvSeries['name'] + '">' +
                             '</div>' +
                             '<div class="card-stacked truncate">' +
                                 '<div class="card-content truncate">' +
@@ -105,14 +106,14 @@ function getSeriesSearch() {
 
             resultCard.click(function () {
                 console.log(resultCardId + ' clicked');
-                openSeries(searchedTvSeries['id'], 1);
+                openSeries(searchedTvSeries['id'], 1, lang);
                 startLoading();
             })
         })
     });
 }
 
-function openSeries(seriesId, page) {
+function openSeries(seriesId, page, lang) {
     //seriesDataContainer.empty();
     closeSeenSeries();
     console.log('opened series', seriesId);
@@ -129,13 +130,13 @@ function openSeries(seriesId, page) {
 
         console.log('seriesData', seriesData);
         changeDesign(seriesData);
-        fillResultSeries(seriesData, page);
+        fillResultSeries(seriesData, page, lang);
             replaceUrlParameter("id", seriesId);
     });
     //page = 1;
 }
 
-function fillResultSeries(seriesData, page) {
+function fillResultSeries(seriesData, page, lang) {
     endLoading();
     eventbus.send("database_get_seen_episodes", seriesData['id'], function (error, reply) {
         seriesDataContainer.empty();
@@ -152,7 +153,7 @@ function fillResultSeries(seriesData, page) {
                 );
 
                 $(document.getElementById(id)).click(function () {
-                    openSeries(seriesData['id'], pages + 1);
+                    openSeries(seriesData['id'], pages + 1, lang);
                     console.log('page', pages + 1);
                 })
             });
@@ -164,6 +165,12 @@ function fillResultSeries(seriesData, page) {
             var season = 'season/' + i;
             if (seriesData[season] != null) {
                 var seasonData = seriesData[season];
+                var episode = ' ';
+                if (seasonData['episodes'].length > 1) {
+                    episode += lang['SERIES_EPISODE_SINGULAR'];
+                } else {
+                    episode += lang['SERIES_EPISODE_PLURAL'];
+                }
                 console.log(seasonData);
                 seriesDataContainer.append(
                     $.parseHTML(
@@ -171,13 +178,14 @@ function fillResultSeries(seriesData, page) {
                             '<div class="collapsible-header collapsible-header-tv history-object grey-text">' +
                                 '<div class="row last-row">' +
                                     '<div class="col s3 m2 l1">' +
-                                        '<img src="' + getPosterPath(seasonData['poster_path']) + '" width="100%">' +
+                                        '<img src="' + getPosterPath(seasonData['poster_path']) + '" width="100%" ' +
+                                        'alt="Poster for: ' + seasonData['name'] + '">' +
                                     '</div>' +
                                     '<div class="col s9 m10 l11">' +
                                         '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +
                                         '<span class="season-add-info grey-text text-darken-2">' +
                                             getYear(seasonData['air_date'])  +
-                                            seasonData['episodes'].length + ' episodes' +
+                                            seasonData['episodes'].length + episode +
                                         '</span><br>' +
                                         '<span class="description hide-on-med-and-down grey-text text-darken-4" >' + seasonData['overview'] + '</span>' +
                                     '</div>' +
@@ -191,27 +199,28 @@ function fillResultSeries(seriesData, page) {
                         '</li>'
                     )
                 );
-                getEpisodes(seasonData['episodes'], i, seriesData);
+                getEpisodes(seasonData['episodes'], i, seriesData, lang);
             }
         }
     });
 }
 
 
-function getEpisodes(episodes, seasonNumber, seriesData) {
+function getEpisodes(episodes, seasonNumber, seriesData, lang) {
     var elem = $(document.getElementById('episode_container_' + seasonNumber));
     elem.empty();
     for (var episode = 1; episode <= episodes.length; episode++) {
         var id = 's' + seasonNumber + 'e' + episode;
         var episodeData = episodes[episode - 1];
         var seasonData = seriesData[('season/' + seasonNumber)];
+        var ep = lang['SERIES_EPISODE_SHORT'] + ': ';
         elem.append(
             '<div class="col s12 m6 l3 grey-text">' +
                 '<div class="card cursor episode-card" id="' + id + '">' +
                     '<div class="card-content">' +
                         '<div class="content-key truncate">' + episodeData['name'] + '</div>' +
                             '<span class="badge" id="' + (id + '_check') + '"></span>' +
-                        '<div class="">' + 'Ep: ' + episodeData['episode_number'] + '</div>' +
+                        '<div class="">' + ep + episodeData['episode_number'] + '</div>' +
                         '<div class="smaller">' + episodeData['air_date'] + '</div>' +
                     '</div>' +
                 '</div>' +
@@ -311,10 +320,10 @@ function changeDesign(seriesData) {
     body.attr("background", getBackdropPath(seriesData['backdrop_path']));
 }
 
-function fillSeenSeries(seriesData) {
+function fillSeenSeries(seriesData, lang) {
     seenSeriesContainer.empty();
     $.each(seriesData, function (i) {
-       //console.log('series', seriesData[i]);
+       console.log('series', seriesData[i]);
        var info = seriesData[i];
        var cardId = 'img_' + info['SeriesId'];
        var cardIdTitle = 'title_' + info['SeriesId'];
@@ -325,7 +334,7 @@ function fillSeenSeries(seriesData) {
                 '<div class="col s12 m6 l4">' +
                     '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
                         '<div class="card-image">' +
-                            '<img id="' + cardId + '" class="series-poster">' +
+                            '<img id="' + cardId + '" class="series-poster" alt="Poster for series: ' + seriesData[i]['Title'] + '">' +
                         '</div>' +
                         '<div class="card-stacked truncate">' +
                             '<div class="card-content">' +
@@ -346,11 +355,11 @@ function fillSeenSeries(seriesData) {
        var resultCard = $(document.getElementById(resultCardId));
 
         resultCard.click(function () {
-            openSeries(info['SeriesId'], 1);
+            openSeries(info['SeriesId'], 1, lang);
             startLoading();
         });
 
-       decorateSeriesCard(imgCard, titleCard, episodesCard, info);
+       decorateSeriesCard(imgCard, titleCard, episodesCard, info, lang);
     });
 }
 
@@ -392,7 +401,7 @@ function closeSeenSeries() {
     seenSeriesColl.collapsible('close', 0);
 }
 
-function decorateSeriesCard(card, titleCard, episodeCard, info) {
+function decorateSeriesCard(card, titleCard, episodeCard, info, lang) {
     if (info['Image'] !== '') {
         var path = 'https://image.tmdb.org/t/p/w300' + info['Image'];
         card.attr('src', path);
@@ -400,9 +409,15 @@ function decorateSeriesCard(card, titleCard, episodeCard, info) {
         card.attr('src', '/static/img/nanPosterBig.jpg')
     }
     titleCard.append(info['Title']);
+    var episodeSeen = '';
+    if (info['Count'] > 1) {
+        episodeSeen = lang['SERIES_EPISODE_SEEN_PLURAL'];
+    } else {
+        episodeSeen = lang['SERIES_EPISODE_SEEN_SINGULAR'];
+    }
     episodeCard.append(
         $.parseHTML(
-            '<span class="episodes-count">' +  info['Count'] + '</span>' + '<span class="episodes-seen">' + 'episodes seen' + '</span>'
+            '<span class="episodes-count">' +  info['Count'] + '</span>' + '<span class="episodes-seen">' + episodeSeen + '</span>'
         )
     );
 }

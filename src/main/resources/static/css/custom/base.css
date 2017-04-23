@@ -263,6 +263,30 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.statistics-chart-days {
+    height: 250%;
+}
+
+.statistics-chart-days-small {
+    height: 300%;
+}
+
+.statistics-chart-time {
+    height: 250%;
+}
+
+.statistics-chart-time-small {
+    height: 550%;
+}
+
+.statistics-chart-years {
+    height: 100%;
+}
+
+.statistics-chart-years-small {
+    height: 900%;
+}
+
 .custom-truncate {
     display: block;
     white-space: pre-wrap;

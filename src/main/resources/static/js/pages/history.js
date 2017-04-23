@@ -299,7 +299,7 @@ function addHistory(data, lang, type) {
             $.parseHTML(
                 '<li class="z-depth-0" id="history-' + data[i]['Id'] + '">' +
                     '<div class="collapsible-header collapsible-header-history history-object content-key grey-text">' +
-                        data[i]['Title'] +
+                        '<span>' + data[i]['Title'] + '</span>'+
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
                     '</div>' +
@@ -314,7 +314,7 @@ function addHistory(data, lang, type) {
                                     '</a>' +
                                 '</div>' +
                                 '<div class="row">' +
-                                    '<a class="waves-effect waves-light btn red z-depth-0" id="' + data[i]['Id'] +'">' + 'remove' + '</a>' +
+                                    '<a class="waves-effect waves-light btn red z-depth-0" id="' + data[i]['Id'] +'">' + lang['HISTORY_REMOVE'] + '</a>' +
                                 '</div>' +
                             '</div>' +
                             '<div class="col m8 l9">' +
