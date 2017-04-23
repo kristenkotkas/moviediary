@@ -1,8 +1,8 @@
 package server.util;
 
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
@@ -10,11 +10,18 @@ import org.pac4j.vertx.VertxWebContext;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import static io.vertx.core.logging.LoggerFactory.getLogger;
+import static io.vertx.rxjava.core.Future.failedFuture;
+import static io.vertx.rxjava.core.Future.succeededFuture;
 
 public class CommonUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(CommonUtils.class);
+    private static final Logger LOG = getLogger(CommonUtils.class);
 
     public static boolean nonNull(Object... objects) {
         for (Object obj : objects) {
@@ -36,12 +43,11 @@ public class CommonUtils {
     }
 
     public static CommonProfile getProfile(RoutingContext ctx) {
-        return new VertxProfileManager(new VertxWebContext(ctx)).get(true).orElse(null);
+        return new VertxProfileManager(new VertxWebContext(ctx.getDelegate())).get(true).orElse(null);
     }
 
     public static RSAPrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        return (RSAPrivateKey) KeyFactory.getInstance(algorithm).generatePrivate(spec);
+        return (RSAPrivateKey) KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
     }
 
     /**
@@ -51,12 +57,12 @@ public class CommonUtils {
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     }
 
-    public static <T> boolean ifPresent(T input, Consumer<T> consumer) {
+    public static <T> T ifPresent(T input, Consumer<T> consumer) {
         if (input != null) {
             consumer.accept(input);
-            return true;
+            return input;
         }
-        return false;
+        return null;
     }
 
     public static <T> boolean ifMissing(T input, Runnable runnable) {
@@ -88,6 +94,43 @@ public class CommonUtils {
             ifTrue.run();
         } else {
             ifFalse.run();
+        }
+    }
+
+    public static Future<Boolean> check(boolean check) {
+        return check ? succeededFuture() : failedFuture("check method returned false");
+    }
+
+    public static <T> T createIfMissing(T input, Supplier<T> supplier) {
+        return input != null ? input : supplier.get();
+    }
+
+    public static <K, V> MapBuilder<K, V> mapBuilder() {
+        return new MapBuilder<>();
+    }
+
+    public static <K, V> MapBuilder<K, V> mapBuilder(Map<K, V> map) {
+        return new MapBuilder<>(map);
+    }
+
+    public static class MapBuilder<K, V> {
+        private final Map<K, V> map;
+
+        private MapBuilder() {
+            this(new HashMap<>());
+        }
+
+        private MapBuilder(Map<K, V> map) {
+            this.map = map;
+        }
+
+        public MapBuilder<K, V> put(K key, V value) {
+            map.put(key, value);
+            return this;
+        }
+
+        public Map<K, V> build() {
+            return map;
         }
     }
 }

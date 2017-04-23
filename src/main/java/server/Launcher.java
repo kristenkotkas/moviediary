@@ -9,8 +9,8 @@ import server.verticle.ServerVerticle;
 
 import java.io.IOException;
 
-import static io.vertx.core.Vertx.vertx;
-import static server.util.CommonUtils.check;
+import static io.vertx.rxjava.core.RxHelper.deployVerticle;
+import static io.vertx.rxjava.core.Vertx.vertx;
 import static server.util.CommonUtils.setLoggingToSLF4J;
 import static server.util.FileUtils.getConfig;
 
@@ -23,12 +23,10 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
         setLoggingToSLF4J();
-        vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
+        deployVerticle(vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
                 .addServer("8.8.8.8")
-                .addServer("8.8.4.4")))
-                .deployVerticle(new ServerVerticle(), new DeploymentOptions().setConfig(getConfig(args)), ar ->
-                        check(ar.succeeded(),
-                                () -> LOG.info("Server up!"),
-                                () -> LOG.error(ar.cause())));
+                .addServer("8.8.4.4"))), new ServerVerticle(), new DeploymentOptions()
+                .setConfig(getConfig(args)))
+                .subscribe(ar -> LOG.info("Server up!"), LOG::error);
     }
 }

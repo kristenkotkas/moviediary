@@ -25,7 +25,8 @@ import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.router.UiRouter.UI_LOGIN;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.Column;
+import static server.service.DatabaseService.getRows;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
 
@@ -79,7 +80,8 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
         GOOGLE(Google2Profile.class, oAuth2Authorization()),
         IDCARD(IdCardProfile.class, (IdCardProfile profile, Stream<JsonObject> stream, DatabaseService database) -> {
-            boolean isAuthorized = stream.anyMatch(json -> profile.getSerial().equals(json.getString(DB_USERNAME)));
+            boolean isAuthorized = stream.anyMatch(json ->
+                    profile.getSerial().equals(json.getString(Column.USERNAME.getName())));
             if (isAuthorized) {
                 return true;
             }
@@ -93,9 +95,9 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         }),
 
         FORM(FormProfile.class, (FormProfile profile, Stream<JsonObject> stream, DatabaseService database) -> stream
-                .filter(json -> json.getString(DB_USERNAME).equals(profile.getEmail()))
-                .filter(json -> json.getString(DB_VERIFIED).equals("1"))
-                .anyMatch(json -> hash(profile.getPassword(), profile.getSalt()).equals(json.getString(DB_PASSWORD))));
+                .filter(json -> json.getString(Column.USERNAME.getName()).equals(profile.getEmail()))
+                .filter(json -> json.getString(Column.VERIFIED.getName()).equals("1"))
+                .anyMatch(json -> hash(profile.getPassword(), profile.getSalt()).equals(json.getString(Column.PASSWORD.getName()))));
 
         private final Class type;
         private final TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> checker;
@@ -130,7 +132,8 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
          */
         private static TriFunction<CommonProfile, Stream<JsonObject>, DatabaseService, Boolean> oAuth2Authorization() {
             return (profile, stream, database) -> {
-                boolean isAuthorized = stream.anyMatch(json -> json.getString(DB_USERNAME).equals(profile.getEmail()));
+                boolean isAuthorized = stream.anyMatch(
+                        json -> json.getString(Column.USERNAME.getName()).equals(profile.getEmail()));
                 if (isAuthorized) {
                     return true;
                 }

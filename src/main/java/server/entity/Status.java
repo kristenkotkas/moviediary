@@ -1,8 +1,8 @@
 package server.entity;
 
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.RoutingContext;
 
-import static io.vertx.core.http.HttpHeaders.LOCATION;
+import static org.apache.http.HttpHeaders.LOCATION;
 
 /**
  * Contains http status codes and convenience methods.

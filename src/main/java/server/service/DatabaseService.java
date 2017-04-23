@@ -1,46 +1,27 @@
 package server.service;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import server.util.CommonUtils;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
-import static server.util.CommonUtils.check;
 
 /**
  * Service which interacts with database.
  */
 public interface DatabaseService {
-    String DB_USERNAME = "Username";
-    String DB_FIRSTNAME = "Firstname";
-    String DB_LASTNAME = "Lastname";
-    String DB_PASSWORD = "Password";
-    String DB_SALT = "Salt";
-    String DB_RUNTIME_TYPE = "RuntimeType";
-    String DB_VERIFIED = "Verified";
 
-    String COLUMNS = "columnNames";
-    String ROWS = "rows";
-    String RESULTS = "results";
-    String COLUMN_NUMS = "numColumns";
-    String ROWS_NUMS = "numRows";
-
-    static EnumMap<Column, String> createDataMap(String username) {
-        EnumMap<Column, String> map = new EnumMap<>(Column.class);
-        map.put(USERNAME, username);
-        return map;
+    static Map<Column, String> createDataMap(String username) {
+        return CommonUtils.<Column, String>mapBuilder()
+                .put(USERNAME, username)
+                .build();
     }
 
     static DatabaseService create(Vertx vertx, JsonObject config) {
@@ -53,7 +34,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getColumns(JsonObject json) {
-        return json.getJsonArray(COLUMNS);
+        return json.getJsonArray("columnNames");
     }
 
     /**
@@ -62,7 +43,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getRows(JsonObject json) {
-        return json.getJsonArray(ROWS);
+        return json.getJsonArray("rows");
     }
 
     /**
@@ -71,7 +52,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static JsonArray getResults(JsonObject json) {
-        return json.getJsonArray(RESULTS);
+        return json.getJsonArray("results");
     }
 
     /**
@@ -80,7 +61,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static Integer getNumColumns(JsonObject json) {
-        return json.getInteger(COLUMN_NUMS);
+        return json.getInteger("numColumns");
     }
 
     /**
@@ -89,27 +70,7 @@ public interface DatabaseService {
      * @param json to use
      */
     static Integer getNumRows(JsonObject json) {
-        return json.getInteger(ROWS_NUMS);
-    }
-
-    static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> check(conn.succeeded(),
-                () -> handler.handle(conn.result()),
-                () -> future.fail(conn.cause()));
-    }
-
-    /**
-     * Convenience method for handling sql commands result.
-     */
-    static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            check(ar.succeeded(),
-                    () -> check(ar.result() instanceof ResultSet,
-                            () -> future.complete(((ResultSet) ar.result()).toJson()),
-                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
-                    () -> future.fail(ar.cause()));
-            conn.close();
-        };
+        return json.getInteger("numRows");
     }
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
@@ -168,28 +129,18 @@ public interface DatabaseService {
      */
     enum SQLCommand {
         UPDATE((table, columns) -> {
-            StringBuilder sb = new StringBuilder("UPDATE ")
-                    .append(table.getName())
-                    .append(" SET ");
+            StringBuilder sb = new StringBuilder("UPDATE ").append(table.getName()).append(" SET ");
             columns.stream()
                     .filter(column -> column != USERNAME)
                     .forEach(column -> sb
-                            .append(columns.indexOf(column) == 0 ? "" : ", ")
-                            .append(column.getName())
-                            .append(" = ?"));
+                            .append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()).append(" = ?"));
             return sb.append(" WHERE Username = ?").toString();
         }),
         INSERT((table, columns) -> {
-            StringBuilder sb = new StringBuilder("INSERT INTO ")
-                    .append(table.getName())
-                    .append(" (");
-            columns.forEach(column -> sb
-                    .append(columns.indexOf(column) == 0 ? "" : ", ")
-                    .append(column.getName()));
+            StringBuilder sb = new StringBuilder("INSERT INTO ").append(table.getName()).append(" (");
+            columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()));
             sb.append(") VALUES (");
-            columns.forEach(column -> sb
-                    .append(columns.indexOf(column) == 0 ? "" : ", ")
-                    .append("?"));
+            columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append("?"));
             return sb.append(")").toString();
         });
 

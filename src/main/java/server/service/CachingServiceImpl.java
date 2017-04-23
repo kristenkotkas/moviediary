@@ -1,7 +1,7 @@
 package server.service;
 
-import io.vertx.core.Future;
 import io.vertx.ext.web.impl.ConcurrentLRUCache;
+import io.vertx.rxjava.core.Future;
 
 /**
  * Caching implementation for services.

@@ -6,6 +6,7 @@
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://kyngas.eu:3366/MovieDiary?characterEncoding=UTF-8&amp;verifyServerCertificate=false&amp;useSSL=true&amp;requireSSL=true</jdbc-url>
+      <default-dialect>MySQL</default-dialect>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />
@@ -14,6 +15,12 @@
         <property name="characterSetResults" value="utf8" />
         <property name="yearIsDateType" value="false" />
       </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="h2-moviediary" uuid="6cb9f838-a669-4b26-8438-eefc2ee6ffc7">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:mem:test;DATABASE_TO_UPPER=false</jdbc-url>
     </data-source>
   </component>
 </project>

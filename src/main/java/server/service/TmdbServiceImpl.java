@@ -1,19 +1,19 @@
 package server.service;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.client.HttpResponse;
-import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
-import io.vertx.ext.web.codec.BodyCodec;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.client.HttpResponse;
+import io.vertx.rxjava.ext.web.client.WebClient;
+import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import server.entity.Retryable;
 
 import java.util.concurrent.TimeUnit;
 
-import static io.vertx.core.Future.future;
+import static io.vertx.rxjava.core.Future.future;
 import static server.entity.Status.OK;
 import static server.entity.Status.RATE_LIMIT;
 import static server.service.TmdbServiceImpl.Cache.*;

@@ -1,8 +1,8 @@
 package server.service;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
 
 /**
  * Service which interacts with TheMovieDatabase API.

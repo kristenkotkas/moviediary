@@ -1,20 +1,20 @@
 package server.router;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.rxjava.core.CompositeFuture;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import server.entity.User;
 import server.service.DatabaseService;
-import server.service.DatabaseService.*;
+import server.service.DatabaseService.Column;
+import server.service.DatabaseService.Table;
 import server.service.MailService;
 
-import java.util.Map;
 import java.util.function.BiFunction;
 
-import static io.vertx.core.CompositeFuture.all;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
@@ -24,7 +24,8 @@ import static server.router.MailRouter.userVerified;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.createDataMap;
+import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.*;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
@@ -140,7 +141,10 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns current users count in database as String response.
      */
     private void handleUsersCount(RoutingContext ctx) {
-        database.getUsersCount().setHandler(resultHandler(ctx, count -> ctx.response().end(count)));
+        database.getUsersCount()
+                .rxSetHandler()
+                .doOnError(err -> serviceUnavailable(ctx, err))
+                .subscribe(count -> ctx.response().end(count));
     }
 
     /**
@@ -161,18 +165,18 @@ public class DatabaseRouter extends EventBusRoutable {
         }
         database.getUser(username).setHandler(resultHandler(ctx, result -> check(getRows(result).stream()
                 .map(obj -> (JsonObject) obj)
-                .noneMatch(json -> json.getString(DB_USERNAME).equals(username)), () -> {
-            Map<Column, String> userMap = createDataMap(username);
-            Map<Column, String> settingsMap = createDataMap(username);
+                .noneMatch(json -> json.getString(Column.USERNAME.getName()).equals(username)), () -> {
             String salt = genString();
-            userMap.put(Column.FIRSTNAME, firstname);
-            userMap.put(Column.LASTNAME, lastname);
-            userMap.put(Column.PASSWORD, hash(password, salt));
-            userMap.put(Column.SALT, salt);
-            settingsMap.put(Column.VERIFIED, isServer(config) ? "0" : "1");
-            Future<JsonObject> f1 = database.insert(Table.USERS, userMap);
-            Future<JsonObject> f2 = database.insert(Table.SETTINGS, settingsMap);
-            all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
+            Future<JsonObject> f1 = database.insert(Table.USERS, mapBuilder(createDataMap(username))
+                    .put(Column.FIRSTNAME, firstname)
+                    .put(Column.LASTNAME, lastname)
+                    .put(Column.PASSWORD, hash(password, salt))
+                    .put(Column.SALT, salt)
+                    .build());
+            Future<JsonObject> f2 = database.insert(Table.SETTINGS, mapBuilder(createDataMap(username))
+                    .put(Column.VERIFIED, isServer(config) ? "0" : "1")
+                    .build());
+            CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
                 mail.sendVerificationEmail(ctx, username);
                 redirect(ctx, verifyEmail());
             }, () -> redirect(ctx, userVerified()))));

@@ -13,6 +13,7 @@ eventbus.onopen = function () {
             if (typeof Storage !== 'undefined') {
                 localStorage.setItem("wishlist_data", JSON.stringify(data));
             }
+            console.log("//////////////////arrrr");
             console.log(data);
             //addTableHead(lang);
             addTableData(data);

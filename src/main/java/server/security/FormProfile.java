@@ -6,7 +6,8 @@ import server.entity.SyncResult;
 import server.service.DatabaseService;
 
 import static server.security.SecurityConfig.*;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.Column;
+import static server.service.DatabaseService.getRows;
 
 /**
  * Profile for form client.
@@ -23,12 +24,12 @@ public class FormProfile extends CommonProfile {
         // TODO: 12/03/2017 timeout + retryable
         getRows(result.await().get()).stream()
                 .map(obj -> (JsonObject) obj)
-                .filter(json -> email.equals(json.getString(DB_USERNAME)))
+                .filter(json -> email.equals(json.getString(Column.USERNAME.getName())))
                 .findAny()
                 .ifPresent(json -> {
-                    addAttribute(PAC4J_FIRSTNAME, json.getString(DB_FIRSTNAME));
-                    addAttribute(PAC4J_LASTNAME, json.getString(DB_LASTNAME));
-                    addAttribute(PAC4J_SALT, json.getString(DB_SALT));
+                    addAttribute(PAC4J_FIRSTNAME, json.getString(Column.FIRSTNAME.getName()));
+                    addAttribute(PAC4J_LASTNAME, json.getString(Column.LASTNAME.getName()));
+                    addAttribute(PAC4J_SALT, json.getString(Column.SALT.getName()));
                 });
     }
 

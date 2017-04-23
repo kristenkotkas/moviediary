@@ -1,21 +1,31 @@
 package server.service;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.UpdateResult;
+import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.jdbc.JDBCClient;
+import rx.Observable;
+import rx.Single;
+import server.util.CommonUtils;
 
-import java.util.List;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
-import static io.vertx.core.Future.future;
+import static io.vertx.core.logging.LoggerFactory.getLogger;
+import static io.vertx.rxjava.core.Future.future;
+import static java.lang.System.currentTimeMillis;
+import static rx.Statement.ifThen;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
-import static server.service.DatabaseService.*;
+import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.*;
 import static server.util.StringUtils.*;
 
@@ -23,6 +33,7 @@ import static server.util.StringUtils.*;
  * Database service implementation.
  */
 public class DatabaseServiceImpl implements DatabaseService {
+    private static final Logger LOG = getLogger(DatabaseServiceImpl.class);
     public static final String SQL_INSERT_WISHLIST =
             "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
     public static final String SQL_INSERT_EPISODE =
@@ -45,47 +56,46 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     public static final String SQL_GET_ALL_TIME_META =
-            "Select DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
+            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseServiceImpl.class);
-    private static final String MYSQL = "mysql";
-    private static final String SQL_INSERT_USER =
+    public static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
+    public static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username";
-    private static final String SQL_QUERY_USER = "SELECT * FROM Users " +
+    public static final String SQL_QUERY_USER = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username " +
             "WHERE Users.Username = ?";
-    private static final String SQL_INSERT_VIEW =
-            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_QUERY_VIEWS =
-            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
+    public static final String SQL_INSERT_VIEW =
+            "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public static final String SQL_QUERY_VIEWS =
+            "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, " +
+                    "TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-    private static final String SQL_INSERT_MOVIE =
+    public static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
+    public static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
-    private static final String SQL_INSERT_SERIES =
+    public static final String SQL_INSERT_SERIES =
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
-    private static final String SQL_VIEWS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
-    private static final String SQL_GET_MOVIE_VIEWS =
-            "SELECT Start, WasCinema From Views" +
+    public static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
+    public static final String SQL_GET_MOVIE_VIEWS =
+            "SELECT Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
-    private static final String SQL_QUERY_VIEWS_META =
+    public static final String SQL_QUERY_VIEWS_META =
             "SELECT Count(*) AS Count " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-
-    private static final String SQL_REMOVE_VIEW =
+    public static final String SQL_REMOVE_VIEW =
             "DELETE FROM Views WHERE Username = ? AND Id = ?";
 
     private static final String SQL_REMOVE_EPISODE =
             "DELETE FROM Series WHERE Username = ? AND EpisodeId = ?";
 
-    private static final String SQL_GET_SEEN_EPISODES =
+    public static final String SQL_GET_SEEN_EPISODES =
             "SELECT EpisodeId FROM Series " +
                     "WHERE Username = ? " +
                     "AND SeriesId = ?";
@@ -100,7 +110,35 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        this.client = JDBCClient.createShared(vertx, config.getJsonObject(MYSQL));
+        this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
+    }
+
+    //for enabling intellij inspections on sql fragments
+    @SuppressWarnings("unused")
+    private void test() throws SQLException {
+        DataSource dataSource = new MysqlDataSource();
+        Connection conn = dataSource.getConnection();
+        conn.prepareStatement(SQL_INSERT_WISHLIST);
+        conn.prepareStatement(SQL_INSERT_EPISODE);
+        conn.prepareStatement(SQL_IS_IN_WISHLIST);
+        conn.prepareStatement(SQL_GET_WISHLIST);
+        conn.prepareStatement(SQL_GET_YEARS_DIST);
+        conn.prepareStatement(SQL_GET_WEEKDAYS_DIST);
+        conn.prepareStatement(SQL_GET_TIME_DIST);
+        conn.prepareStatement(SQL_GET_ALL_TIME_META);
+        conn.prepareStatement(SQL_INSERT_USER);
+        conn.prepareStatement(SQL_QUERY_USER);
+        conn.prepareStatement(SQL_QUERY_USERS);
+        conn.prepareStatement(SQL_INSERT_VIEW);
+        conn.prepareStatement(SQL_QUERY_VIEWS);
+        conn.prepareStatement(SQL_QUERY_SETTINGS);
+        conn.prepareStatement(SQL_INSERT_MOVIE);
+        conn.prepareStatement(SQL_INSERT_SERIES);
+        conn.prepareStatement(SQL_USERS_COUNT);
+        conn.prepareStatement(SQL_GET_MOVIE_VIEWS);
+        conn.prepareStatement(SQL_QUERY_VIEWS_META);
+        conn.prepareStatement(SQL_REMOVE_VIEW);
+        conn.prepareStatement(SQL_GET_SEEN_EPISODES);
     }
 
     /**
