@@ -34,6 +34,12 @@ var thisWeek = $("#this-week-stat");
 var thisMonth = $("#this-month-stat");
 var allTime = $("#all-time-stat");
 var monthIndex = 0;
+daysChartCtx.attr('height', '250%');
+daysChartSmallCtx.attr('height', '300%');
+timeChartCtx.attr('height', '250%');
+timeChartSmallCtx.attr('height', '500%');
+yearsChartCtx.attr('height', '100%');
+yearsChartSmallCtx.attr('height', '900%');
 var options = {
     scales: {
         yAxes: [{

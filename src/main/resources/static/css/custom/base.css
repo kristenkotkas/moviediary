@@ -23,6 +23,13 @@ body {
     background-size: cover;
 }
 
+.series-poster {
+    height: 11em;
+    max-height: 11em;
+    min-height: 11em;
+    display: block;
+}
+
 .opacity-object {
     opacity: 0.95;
 }
@@ -227,11 +234,6 @@ span.badge.new:after {
     font-size: x-large;
 }
 
-.series-poster {
-    max-height: 11em;
-    display: block;
-}
-
 .series-search-title {
     font-size: large;
 }
@@ -306,6 +308,10 @@ span.badge.new:after {
 .history-object:hover,
 .history-object:focus {
     background: #f2f5f0;
+}
+
+.movie-poster {
+    width: 100%;
 }
 
 .flag {

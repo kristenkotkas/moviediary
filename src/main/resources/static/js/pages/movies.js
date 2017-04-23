@@ -228,7 +228,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(
-                '<img src="' + posterPath + '" width="100%" alt="Poster for movie: ' + data.title + '">'
+                '<img src="' + posterPath + '" class="movie-poster" alt="Poster for movie: ' + data.title + '">'
             )
         );
 
