@@ -16,7 +16,7 @@ eventbus.onopen = function () {
             console.log("//////////////////arrrr");
             console.log(data);
             //addTableHead(lang);
-            addTableData(data);
+            addTableData(data, lang);
         });
     });
 };
@@ -30,44 +30,7 @@ eventbus.onclose = function (json) {
     }
 };
 
-function addTableHead(lang) {
-    $("#wishlist-table").empty().append(
-        '<tr>' +
-        '<th class="table-row">' + lang['HISTORY_TITLE'] + '</th>' +
-        '<th class="center">' + lang['HISTORY_DATE'] + '</th>' +
-        '</tr>');
-}
-
-function addTableData2(data) {
-    var timeout = 0;
-    $.each(data, function (i) {
-        var posterPath = "";
-        var movie = data[i];
-        if (movie['Image'] !== "") {
-            posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
-        } else {
-            posterPath = '/static/img/nanPosterBig.jpg'
-        }
-
-        $("#wishlist-result").append(
-            $.parseHTML(
-                '<div class="col s6 m4 l2 megatest">' +
-                '<img class="responsive-img" ' + 'src="' + posterPath + '" ' + movie['Title'] + '">' +
-                '</div>'
-            )
-        );
-    });
-    $('.megatest').matchHeight({
-        byRow: true,
-        property: 'height',
-        target: $('.responsive-img'),
-        remove: false
-    });
-    //todo mingi trigger et esimesele reale ei paneks aind
-    //todo varasem kraam tagasi
-}
-
-function addTableData(data) {
+function addTableData(data, lang) {
     var timeout = 0;
     $.each(data, function (i) {
         setTimeout(function () {
@@ -79,17 +42,29 @@ function addTableData(data) {
                 posterPath = '/static/img/nanPosterBig.jpg'
             }
 
+            var movieId = movie['MovieId'];
+            var cardId = 'card_' + movieId;
+
             $("#wishlist-result").append(
                 $.parseHTML(
-                    '<div class="col s6 m4 l2 megatest">' +
-                    '<div class="card z-depth-2 wishlist-object">' +
-                    '<div class="card-image wishlist-object">' +
-                    '<a class="wishlist-object" href="movies/?id=' + movie['MovieId'] + '">' +
-                    '<img class="wishlist-object responsive-img" src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '">' +
-                    '</a>' +
-                    '</div>' +
-                    '</div>' +
+                    '<div class="col s12 m6 l4" id="' + cardId+ '">' +
+                        '<div class="card horizontal z-depth-0">' +
+                            '<div class="card-image">' +
+                                '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
+                                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
+                            '</div>' +
+                            '<div class="card-stacked truncate">' +
+                                '<div class="card-content">' +
+                                    '<a class="truncate content-key search-object-series black-text" onclick="openMovie(' + movieId + ')">' +
+                                    movie['Title'] +
+                                    '</a>' +
+                                    '<span>' + movie['Year'] + '</span>' +
+                                '</div>' +
+                                '<div class="card-action">' +
+                                    '<a class="search-object-series red-text" onclick="removeFromWishlist(' + movieId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
                     '</div>'
                 )
             );
@@ -100,5 +75,20 @@ function addTableData(data) {
         property: 'height',
         target: $('.responsive-img'),
         remove: false
+    });
+}
+
+function openMovie(movieId) {
+    location.href = 'movies/?id=' + movieId;
+}
+
+function removeFromWishlist(movieId) {
+    console.log('removed', movieId);
+    eventbus.send("database_remove_wishlist", movieId, function (error, reply) {
+        if (reply['body']['updated'] != null) {
+            var id = 'card_' + movieId;
+            console.log('REMOVED', id);
+            $(document.getElementById(id)).remove();
+        }
     });
 }

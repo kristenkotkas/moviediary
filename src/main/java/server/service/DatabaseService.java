@@ -123,6 +123,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getWatchingSeries(String username);
 
+    Future<JsonObject> removeFromWishlist(String username, String param);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

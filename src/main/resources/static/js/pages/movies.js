@@ -57,17 +57,6 @@ eventbus.onopen = function () {
                                 } else {
                                     posterPath = '/static/img/nanPosterBig.jpg'
                                 }
-                                /*var arrayOfNodes = $.parseHTML(
-                                    '<li tabindex="' + (8 + i) + '" class="collection-item search-object">' +
-                                    '<div class="row">' +
-                                    '<img src="' + posterPath + '" alt="Poster for movie: '
-                                    + movie['original_title'] + '" class="search-image" width="10%">' +
-                                    '<span class="title search-object-text">' +
-                                    movie['original_title'] +
-                                    '</span>' +
-                                    '</div>' +
-                                    '</li>'
-                                );*/
 
                                 var arrayOfNodes = $.parseHTML(
                                     '<div class="col s12 m6 l4">' +

@@ -40,7 +40,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
     public static final String SQL_GET_WISHLIST =
-            "SELECT Title, Time, Image, MovieId FROM Wishlist " +
+            "SELECT Title, Time, Year, Image, MovieId FROM Wishlist " +
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username =  ? ORDER BY Time DESC";
     public static final String SQL_GET_YEARS_DIST =
@@ -106,6 +106,9 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "GROUP BY Title, Image, SeriesId " +
                     "ORDER BY Title";
 
+    public static final String SQL_REMOVE_WISHLIST =
+            "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
+
     private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
@@ -138,6 +141,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         conn.prepareStatement(SQL_QUERY_VIEWS_META);
         conn.prepareStatement(SQL_REMOVE_VIEW);
         conn.prepareStatement(SQL_GET_SEEN_EPISODES);
+        conn.prepareStatement(SQL_REMOVE_WISHLIST);
     }
 
     private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
@@ -525,6 +529,14 @@ public class DatabaseServiceImpl implements DatabaseService {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_WATCHING_SERIES, new JsonArray()
                         .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> removeFromWishlist(String username, String param) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.updateWithParams(SQL_REMOVE_WISHLIST, new JsonArray()
+                        .add(username)
+                        .add(param), resultHandler(conn, fut)))));
     }
 
     /**
