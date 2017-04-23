@@ -22,7 +22,6 @@ import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
 import static rx.Statement.ifThen;
-import static server.entity.Language.toTestString;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -285,9 +284,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
 
-    // TODO: 23.04.2017 when testing -> convert json keys to lowercase capitalized
-    // TODO: 23.04.2017 otherwise js fails
-    // TODO: 23.04.2017 then can refactor language testing stuff
     @Override
     public Future<JsonObject> getWishlist(String username) {
         return future(fut -> client.rxGetConnection()
@@ -578,7 +574,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .flatMap(conn -> conn
                         .rxQuery(SQL_USERS_COUNT)
                         .doAfterTerminate(conn::close))
-                .map(resultSet -> resultSet.getRows().get(0).getLong(toTestString("Count")).toString())
+                .map(resultSet -> resultSet.getRows().get(0).getLong("Count").toString())
                 .subscribe(fut::complete, fut::fail));
     }
 }

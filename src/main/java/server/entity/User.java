@@ -3,8 +3,6 @@ package server.entity;
 import io.vertx.core.json.JsonObject;
 import server.service.DatabaseService.Column;
 
-import static server.entity.Language.toTestString;
-
 /**
  * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
  */
@@ -17,7 +15,7 @@ public class User {
     private boolean verified;
 
     public User(JsonObject user) {
-        this.id = user.getInteger(toTestString("Id"));
+        this.id = user.getInteger("Id");
         this.firstname = user.getString(Column.FIRSTNAME.getName());
         this.lastname = user.getString(Column.LASTNAME.getName());
         this.username = user.getString(Column.USERNAME.getName());

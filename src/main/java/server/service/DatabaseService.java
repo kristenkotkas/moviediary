@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toList;
-import static server.entity.Language.isTesting;
 import static server.service.DatabaseService.Column.USERNAME;
 
 /**
@@ -207,7 +205,7 @@ public interface DatabaseService {
         }
 
         public String getName() {
-            return isTesting() ? columnName.toUpperCase(ENGLISH) : columnName;
+            return columnName;
         }
     }
 }

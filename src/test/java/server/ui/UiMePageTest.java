@@ -42,7 +42,7 @@ public class UiMePageTest {
     private static Vertx vertx;
     private static JsonObject config;
     private static HtmlUnitDriver driver;
-    private static LocalDatabase hsqldb;
+    private static LocalDatabase localDatabase;
 
     @BeforeClass
     public static void setUp(TestContext ctx) throws Exception {
@@ -52,7 +52,7 @@ public class UiMePageTest {
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
         initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
-                .doOnSuccess(db -> hsqldb = db)
+                .doOnSuccess(db -> localDatabase = db)
                 .doOnError(ctx::fail)
                 .flatMap(db -> deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions()
                         .setConfig(config))
@@ -83,7 +83,7 @@ public class UiMePageTest {
 
     @Test
     public void testMyDetailsAreCorrect() throws Exception {
-        JsonObject details = hsqldb.query("SELECT * FROM Users " +
+        JsonObject details = localDatabase.query("SELECT * FROM Users " +
                 "JOIN Settings ON Users.Username = Settings.Username " +
                 "WHERE Users.Username = ?", new JsonArray()
                 .add(config.getJsonObject("unit_test").getJsonObject("form_user").getString("username")))
@@ -93,19 +93,27 @@ public class UiMePageTest {
         await().until(() -> isEventbus(OPEN, driver));
         await().until(() -> driver.findElements(tagName("td")).size() > 0);
         List<WebElement> data = driver.findElements(tagName("td"));
-        assertTrue(data.get(1).getText().equals(String.valueOf(details.getInteger("ID"))));
-        assertTrue(data.get(3).getText().equals(details.getString("FIRSTNAME")));
-        assertTrue(data.get(5).getText().equals(details.getString("LASTNAME")));
-        assertTrue(data.get(7).getText().equals(details.getString("USERNAME")));
-        assertTrue(data.get(9).getText().equals(details.getString("RUNTIMETYPE")));
-        assertTrue(data.get(11).getText().equals(details.getString("VERIFIED").equals("1") ? "true" : "false"));
+        assertTrue(data.get(1).getText().equals(String.valueOf(details.getInteger("Id"))));
+        assertTrue(data.get(3).getText().equals(details.getString("Firstname")));
+        assertTrue(data.get(5).getText().equals(details.getString("Lastname")));
+        assertTrue(data.get(7).getText().equals(details.getString("Username")));
+        assertTrue(data.get(9).getText().equals(details.getString("RuntimeType")));
+        assertTrue(data.get(11).getText().equals(details.getString("Verified").equals("1") ? "true" : "false"));
         closeEventbus(driver);
         await().until(() -> isEventbus(CLOSED, driver));
     }
 
     @AfterClass
     public static void tearDown(TestContext ctx) throws Exception {
-        driver.quit();
-        vertx.close(ctx.asyncAssertSuccess());
+        Async async = ctx.async();
+        localDatabase.dropAll().setHandler(ar -> {
+            if (ar.succeeded()) {
+                driver.quit();
+                vertx.close(ctx.asyncAssertSuccess());
+                async.complete();
+            } else {
+                ctx.fail(ar.cause());
+            }
+        });
     }
 }

@@ -2,6 +2,7 @@ package server.ui;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.rxjava.core.Vertx;
@@ -41,7 +42,7 @@ public class UiCommonTest {
     private static io.vertx.rxjava.core.Vertx vertx;
     private static JsonObject config;
     private static HtmlUnitDriver driver;
-    private static LocalDatabase hsqldb;
+    private static LocalDatabase localDatabase;
 
     @BeforeClass
     public static void setUp(TestContext ctx) throws Exception {
@@ -50,7 +51,7 @@ public class UiCommonTest {
         config = getConfig().put(HTTP_PORT, PORT);
         config.getJsonObject("oauth").put("localCallback", URI + "/callback");
         initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
-                .doOnSuccess(db -> hsqldb = db)
+                .doOnSuccess(db -> localDatabase = db)
                 .doOnError(ctx::fail)
                 .flatMap(db -> deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions()
                         .setConfig(config))
@@ -60,6 +61,20 @@ public class UiCommonTest {
                 .test()
                 .awaitTerminalEvent(10, SECONDS)
                 .assertCompleted();
+    }
+
+    @AfterClass
+    public static void tearDown(TestContext ctx) throws Exception {
+        Async async = ctx.async();
+        localDatabase.dropAll().setHandler(ar -> {
+            if (ar.succeeded()) {
+                driver.quit();
+                vertx.close(ctx.asyncAssertSuccess());
+                async.complete();
+            } else {
+                ctx.fail(ar.cause());
+            }
+        });
     }
 
     @Test
@@ -167,11 +182,5 @@ public class UiCommonTest {
         assertEquals("404: " + getString("NOTFOUND_TITLE", lang),
                 driver.findElement(tagName("h3")).getText());
         assertEquals(getString("NOTFOUND_RETURN", lang), driver.findElement(tagName("a")).getText());
-    }
-
-    @AfterClass
-    public static void tearDown(TestContext ctx) throws Exception {
-        driver.quit();
-        vertx.close(ctx.asyncAssertSuccess());
     }
 }
