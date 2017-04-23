@@ -165,10 +165,10 @@ var searchMovie = function (eventbus, movieId, lang) {
         var posterPath = "";
 
         addButton.click(function () {
-            var start = startDate.val() + ' ' + startTime.val();
-            var end = endDate.val() + ' ' + endTime.val();
+            if (startDate.val() != '' &&  endDate.val() != '' && startTime.val() != '' && endTime.val() != '' && commentFiled.val().length <= 500) {
 
-            if (start != ' ' && end != ' ' && commentFiled.val().length <= 500) {
+                var start = startDate.val() + ' ' + startTime.val();
+                var end = endDate.val() + ' ' + endTime.val();
                 eventbus.send("database_insert_view", {
                     'movieId': movieId.toString(),
                     'start': start,
@@ -177,11 +177,14 @@ var searchMovie = function (eventbus, movieId, lang) {
                     'wasCinema': wasCinema.is(':checked'),
                     'comment': commentFiled.val()
                 }, function (error, reply) {
-                    Materialize.toast(data['original_title'] + ' added to views.', 2500);
-                    console.log('hello');
-                    console.log('reply ' + JSON.stringify(reply.body));
-                    $('#modal1').modal('close');
-                    getMovieViews(eventbus, movieId, lang);
+                    if (reply['body']['updated'] != null) {
+                        Materialize.toast(data['original_title'] + ' added to views.', 2500);
+                        console.log(reply);
+                        $('#modal1').modal('close');
+                        getMovieViews(eventbus, movieId, lang);
+                    } else {
+                        Materialize.toast('Adding failed', 2500);
+                    }
                 });
             }
         });
@@ -401,7 +404,7 @@ function getNormalDate (date, lang) {
         var month = dateFormat.toLocaleString(locale, {month: "long"});
         return startArray[2] + lang[month.toUpperCase()] + ' ' + startArray[0];
     }
-};
+}
 
 var nullCheck = function (data, lang) {
     console.log(data);

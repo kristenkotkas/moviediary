@@ -93,6 +93,8 @@ public class StringUtils {
     public static String movieDateToDBDate(String date) {
         //24 March, 2017 22:01 -> 2017-03-24 22:01:00
         String[] parts = date.split(" ");
+        System.out.println("DATE....");
+        System.out.println(date);
         return parts[2] + "-" + MONTHS.get(parts[1]) + "-" + parts[0] + " " +
                 parts[3].split(":")[0] + ":" + parts[3].split(":")[1] + ":00";
     }
