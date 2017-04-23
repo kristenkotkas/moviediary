@@ -284,6 +284,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .subscribe(fut::complete, fut::fail));
     }
 
+
+    // TODO: 23.04.2017 when testing -> convert json keys to lowercase capitalized
+    // TODO: 23.04.2017 otherwise js fails
+    // TODO: 23.04.2017 then can refactor language testing stuff
     @Override
     public Future<JsonObject> getWishlist(String username) {
         return future(fut -> client.rxGetConnection()
