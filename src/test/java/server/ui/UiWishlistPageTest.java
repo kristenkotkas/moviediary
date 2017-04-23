@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 import static server.util.FileUtils.getConfig;
+import static server.util.LocalDatabase.SQL_INSERT_MOVIES_HOBBIT;
 import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.LoginUtils.asyncFormLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
@@ -75,23 +76,27 @@ public class UiWishlistPageTest {
 
     @Test
     public void testWishlistMoviesAreLoaded() throws Exception {
+        localDatabase.resetCleanState().rxSetHandler().toBlocking().value();
+        localDatabase.updateOrInsert(SQL_INSERT_MOVIES_HOBBIT, null).rxSetHandler().toBlocking().value();
         assertGoToPage(driver, URI + "/private/wishlist");
         await().until(() -> isEventbus(OPEN, driver));
         new WebDriverWait(driver, 5)
-                .until(visibilityOfElementLocated(cssSelector("img.wishlist-object.responsive-img")));
+                .until(visibilityOfElementLocated(cssSelector("img.series-poster.search-object-series")));
         closeEventbus(driver);
         await().until(() -> isEventbus(CLOSED, driver));
     }
 
     @Test
     public void testClickingMovieRedirectsToMoviePage() throws Exception {
+        localDatabase.resetCleanState().rxSetHandler().toBlocking().value();
+        localDatabase.updateOrInsert(SQL_INSERT_MOVIES_HOBBIT, null).rxSetHandler().toBlocking().value();
         assertGoToPage(driver, URI + "/private/wishlist");
         await().until(() -> isEventbus(OPEN, driver));
         new WebDriverWait(driver, 5)
-                .until(visibilityOfElementLocated(cssSelector("img.wishlist-object.responsive-img")));
+                .until(visibilityOfElementLocated(cssSelector("img.series-poster.search-object-series")));
         closeEventbus(driver);
         await().until(() -> isEventbus(CLOSED, driver));
-        driver.findElement(cssSelector("img.wishlist-object.responsive-img")).click();
+        driver.findElement(cssSelector("img.series-poster.search-object-series")).click();
         assertEquals(URI + "/private/movies/?id=49051", driver.getCurrentUrl());
         await().until(() -> isEventbus(OPEN, driver));
         closeEventbus(driver);
