@@ -110,6 +110,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
     private final JDBCClient client;
+    private static boolean isTesting = false;
+
+    public static void setTesting() {
+        DatabaseServiceImpl.isTesting = true;
+    }
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
@@ -219,8 +224,9 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath) {
+        String cmd = isTesting ? SQL_INSERT_MOVIE.replaceAll("IGNORE ", "") : SQL_INSERT_MOVIE;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_MOVIE, new JsonArray()
+                conn -> conn.updateWithParams(cmd, new JsonArray()
                         .add(id)
                         .add(movieTitle)
                         .add(year)
@@ -229,8 +235,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
+        String cmd = isTesting ? SQL_INSERT_SERIES.replaceAll("IGNORE ", "") : SQL_INSERT_SERIES;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_SERIES, new JsonArray()
+                conn -> conn.updateWithParams(cmd, new JsonArray()
                         .add(id)
                         .add(seriesTitle)
                         .add(posterPath), resultHandler(conn, fut)))));
@@ -241,8 +248,9 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertWishlist(String username, int movieId) {
+        String cmd = isTesting ? SQL_INSERT_WISHLIST.replaceAll("IGNORE ", "") : SQL_INSERT_WISHLIST;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_WISHLIST, new JsonArray()
+                conn -> conn.updateWithParams(cmd, new JsonArray()
                         .add(username)
                         .add(movieId)
                         .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
@@ -251,8 +259,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> insertEpisodeView(String username, String param) {
         JsonObject json = new JsonObject(param);
+        String cmd = isTesting ? SQL_INSERT_EPISODE.replaceAll("IGNORE ", "") : SQL_INSERT_EPISODE;
         return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_EPISODE, new JsonArray()
+                conn -> conn.updateWithParams(cmd, new JsonArray()
                         .add(username)
                         .add(json.getInteger("seriesId"))
                         .add(json.getInteger("episodeId"))

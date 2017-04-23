@@ -55,7 +55,7 @@ public class DatabaseServiceTest {
 
     @Test
     public void testGetAllUsers(TestContext ctx) throws Exception {
-        JsonArray users = localDatabase.clearTables().rxSetHandler()
+        JsonArray users = localDatabase.resetCleanState().rxSetHandler()
                 .doOnError(ctx::fail)
                 .flatMap(v -> database.getAllUsers().rxSetHandler())
                 .doOnError(ctx::fail)
@@ -77,7 +77,7 @@ public class DatabaseServiceTest {
 
     @Test
     public void testGetUsersCount(TestContext ctx) throws Exception {
-        String count = localDatabase.clearTables().rxSetHandler()
+        String count = localDatabase.resetCleanState().rxSetHandler()
                 .doOnError(ctx::fail)
                 .flatMap(v -> database.getUsersCount().rxSetHandler())
                 .doOnError(ctx::fail)
