@@ -5,12 +5,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.rxjava.core.Vertx;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import rx.Observable;
 import server.service.DatabaseService.Column;
 import server.util.LocalDatabase;
@@ -20,12 +19,11 @@ import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static server.util.CommonUtils.check;
 import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.NetworkUtils.HTTP_PORT;
 
-@SuppressWarnings("Duplicates")
-@RunWith(VertxUnitRunner.class)
 public class DatabaseServiceTest {
     private static final int PORT = 8082;
 
@@ -53,11 +51,23 @@ public class DatabaseServiceTest {
                 .assertCompleted();
     }
 
+    @AfterClass
+    public static void tearDown(TestContext ctx) throws Exception {
+        Async async = ctx.async();
+        localDatabase.dropAll().setHandler(ar -> check(ar.succeeded(), () -> {
+            vertx.close(ctx.asyncAssertSuccess());
+            async.complete();
+        }, () -> ctx.fail(ar.cause())));
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        localDatabase.resetCleanStateBlocking();
+    }
+
     @Test
     public void testGetAllUsers(TestContext ctx) throws Exception {
-        JsonArray users = localDatabase.resetCleanState().rxSetHandler()
-                .doOnError(ctx::fail)
-                .flatMap(v -> database.getAllUsers().rxSetHandler())
+        JsonArray users = database.getAllUsers().rxSetHandler()
                 .doOnError(ctx::fail)
                 .map(DatabaseService::getRows)
                 .toBlocking()
@@ -77,25 +87,12 @@ public class DatabaseServiceTest {
 
     @Test
     public void testGetUsersCount(TestContext ctx) throws Exception {
-        String count = localDatabase.resetCleanState().rxSetHandler()
-                .doOnError(ctx::fail)
-                .flatMap(v -> database.getUsersCount().rxSetHandler())
+        String count = database.getUsersCount().rxSetHandler()
                 .doOnError(ctx::fail)
                 .toBlocking()
                 .value();
         assertThat(count, is("2"));
     }
 
-    @AfterClass
-    public static void tearDown(TestContext ctx) throws Exception {
-        Async async = ctx.async();
-        localDatabase.dropAll().setHandler(ar -> {
-            if (ar.succeeded()) {
-                vertx.close(ctx.asyncAssertSuccess());
-                async.complete();
-            } else {
-                ctx.fail(ar.cause());
-            }
-        });
-    }
+
 }

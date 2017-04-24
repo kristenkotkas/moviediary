@@ -130,6 +130,10 @@ public class LocalDatabase {
                 .subscribe(res -> fut.complete(), fut::fail));
     }
 
+    public void resetCleanStateBlocking() {
+        resetCleanState().rxSetHandler().toBlocking().value();
+    }
+
     public Future<Void> dropAll() {
         return future(fut -> client.rxGetConnection()
                 .flatMap(conn -> conn.rxExecute("DROP ALL OBJECTS").doAfterTerminate(conn::close))
@@ -145,12 +149,20 @@ public class LocalDatabase {
                 .subscribe(fut::complete, fut::fail));
     }
 
+    public JsonArray queryBlocking(String sql, JsonArray params) {
+        return query(sql, params).rxSetHandler().toBlocking().value();
+    }
+
     public Future<JsonObject> updateOrInsert(String sql, JsonArray params) {
         return future(fut -> client.rxGetConnection()
                 .flatMap(conn -> conn.rxUpdateWithParams(sql, params)
                         .doAfterTerminate(conn::close))
                 .map(UpdateResult::toJson)
                 .subscribe(fut::complete, fut::fail));
+    }
+
+    public JsonObject updateOrInsertBlocking(String sql, JsonArray params) {
+        return updateOrInsert(sql, params).rxSetHandler().toBlocking().value();
     }
 
     @SuppressWarnings("unused")

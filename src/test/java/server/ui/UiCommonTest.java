@@ -1,81 +1,26 @@
 package server.ui;
 
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.rxjava.core.Vertx;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import server.util.LocalDatabase;
-import server.verticle.ServerVerticle;
 
 import java.util.List;
 
-import static io.vertx.rxjava.core.RxHelper.deployVerticle;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
+import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 import static server.entity.Language.getString;
-import static server.util.FileUtils.getConfig;
-import static server.util.LocalDatabase.initializeDatabase;
-import static server.util.LoginUtils.asyncFormLogin;
 import static server.util.LoginUtils.formLogin;
-import static server.util.NetworkUtils.HTTP_PORT;
-import static server.util.Utils.assertGoToPage;
-import static server.util.Utils.createDriver;
+import static server.util.Utils.*;
 
-@SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UiCommonTest {
-    private static final int PORT = 8082;
-    private static final String URI = "http://localhost:" + PORT;
-
-    private static io.vertx.rxjava.core.Vertx vertx;
-    private static JsonObject config;
-    private static HtmlUnitDriver driver;
-    private static LocalDatabase localDatabase;
-
-    @BeforeClass
-    public static void setUp(TestContext ctx) throws Exception {
-        driver = createDriver(true);
-        vertx = Vertx.vertx();
-        config = getConfig().put(HTTP_PORT, PORT);
-        config.getJsonObject("oauth").put("localCallback", URI + "/callback");
-        initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
-                .doOnSuccess(db -> localDatabase = db)
-                .doOnError(ctx::fail)
-                .flatMap(db -> deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions()
-                        .setConfig(config))
-                        .toSingle())
-                .flatMap(s -> asyncFormLogin(driver, URI, config).rxSetHandler())
-                .doOnError(ctx::fail)
-                .test()
-                .awaitTerminalEvent(10, SECONDS)
-                .assertCompleted();
-    }
-
-    @AfterClass
-    public static void tearDown(TestContext ctx) throws Exception {
-        Async async = ctx.async();
-        localDatabase.dropAll().setHandler(ar -> {
-            if (ar.succeeded()) {
-                driver.quit();
-                vertx.close(ctx.asyncAssertSuccess());
-                async.complete();
-            } else {
-                ctx.fail(ar.cause());
-            }
-        });
-    }
+public class UiCommonTest extends UiTest {
 
     @Test
     public void testUnauthorizedIsRedirectedToLoginAndBackAfterLogin() throws Exception {
@@ -121,16 +66,27 @@ public class UiCommonTest {
         checkCanGetToPage(driver.findElements(tagName("a")).get(5), URI + "/private/statistics");
         checkCanGetToPage(driver.findElements(tagName("a")).get(6), URI + "/private/wishlist");
         //mobile
-        checkCanGetToPage(driver.findElements(tagName("a")).get(7), URI + "/private/user");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(8), URI + "/private/home");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(9), URI + "/private/movies");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(10), URI + "/private/series");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(11), URI + "/private/history");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(12), URI + "/private/statistics");
-        checkCanGetToPage(driver.findElements(tagName("a")).get(13), URI + "/private/wishlist");
+        driver.manage().window().setSize(getNexus5XScreenSize());
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(7), URI + "/private/user");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(8), URI + "/private/home");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(9), URI + "/private/movies");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(10), URI + "/private/series");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(11), URI + "/private/history");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(12), URI + "/private/statistics");
+        checkCanGetToMobilePage(driver.findElements(tagName("a")).get(13), URI + "/private/wishlist");
     }
 
     private void checkCanGetToPage(WebElement link, String urlToCheck) {
+        sleep(driver, 5, invisibilityOf(driver.findElementById("loader-wrapper")));
+        link.click();
+        assertEquals(urlToCheck, driver.getCurrentUrl());
+    }
+
+    private void checkCanGetToMobilePage(WebElement link, String urlToCheck) {
+        sleep(driver, 5, invisibilityOf(driver.findElementById("loader-wrapper")));
+        driver.findElementByCssSelector("i.fa.fa-bars").click();
+        sleep(driver, 5, visibilityOf(link));
+        await().until(() -> link.getLocation().getX() >= 0);
         link.click();
         assertEquals(urlToCheck, driver.getCurrentUrl());
     }
