@@ -175,7 +175,7 @@ function fillResultSeries(seriesData, page, lang) {
                 seriesDataContainer.append(
                     $.parseHTML(
                         '<li>' +
-                            '<div class="collapsible-header collapsible-header-tv history-object grey-text">' +
+                            '<div class="opacity-object collapsible-header collapsible-header-tv history-object grey-text">' +
                                 '<div class="row last-row">' +
                                     '<div class="col s3 m2 l1">' +
                                         '<img src="' + getPosterPath(seasonData['poster_path']) + '"' +
