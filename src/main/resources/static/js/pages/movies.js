@@ -350,7 +350,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
 
                 var deleteView = document.getElementById('remove_view_' + viewId);
                 deleteView.onclick = function () {
-                    removeView(movieId, viewId, lang);
+                    removeView(movieId, viewId, lang, data[i]['Start']);
                 };
             });
         } else {
@@ -360,11 +360,12 @@ var getMovieViews = function (eventbus, movieId, lang) {
     });
 };
 
-function removeView(movieId, viewId, lang) {
+function removeView(movieId, viewId, lang, date) {
     console.log('viewId', viewId);
     eventbus.send("database_remove_view", viewId, function (error, reply) {
         if (reply['body']['updated'] != null) {
             getMovieViews(eventbus, movieId, lang);
+            Materialize.toast('View at: ' + getMonth(date, lang) + ' removed', 2500);
         }
     });
 }
