@@ -23,6 +23,8 @@ public class LocalDatabase {
     public static final String SQL_TRUNCATE_TABLES = "TRUNCATE TABLE Users;" +
             "TRUNCATE TABLE Settings;" +
             "TRUNCATE TABLE Movies;" +
+            "TRUNCATE TABLE Series;" +
+            "TRUNCATE TABLE SeriesInfo;" +
             "TRUNCATE TABLE Views;" +
             "TRUNCATE TABLE Wishlist;";
     public static final String SQL_CREATE_USERS = "CREATE TABLE Users (" +
@@ -38,10 +40,24 @@ public class LocalDatabase {
             "  Username    VARCHAR(100)                   NOT NULL,\n" +
             "  Verified    VARCHAR(64) DEFAULT '0'        NOT NULL);";
     public static final String SQL_CREATE_MOVIES = "CREATE TABLE Movies (\n" +
-            "  Id    INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
+            "  Id    INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
             "  Title VARCHAR(100) NOT NULL,\n" +
-            "  Year  SMALLINT NOT NULL,\n" +
-            "  Image VARCHAR(64)  NOT NULL);";
+            "  Year  SMALLINT     NOT NULL,\n" +
+            "  Image VARCHAR(64)  NOT NULL\n" +
+            ");";
+    public static final String SQL_CREATE_SERIES = "CREATE TABLE Series (\n" +
+            "  Username  VARCHAR(100) NOT NULL,\n" +
+            "  SeriesId  INT          NOT NULL,\n" +
+            "  EpisodeId INT          NOT NULL,\n" +
+            "  SeasonId  VARCHAR(100) NOT NULL,\n" +
+            "  Time      BIGINT       NOT NULL,\n" +
+            "  PRIMARY KEY (Username, EpisodeId)\n" +
+            ");";
+    public static final String SQL_CREATE_SERIES_INFO = "CREATE TABLE SeriesInfo (\n" +
+            "  Id    INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
+            "  Title VARCHAR(100) NOT NULL,\n" +
+            "  Image VARCHAR(100) NOT NULL\n" +
+            ");";
     public static final String SQL_CREATE_VIEWS = "CREATE TABLE Views (\n" +
             "  Id        INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
             "  MovieId   INT                     NOT NULL,\n" +
@@ -72,6 +88,12 @@ public class LocalDatabase {
             "VALUES ('49051', 'The Hobbit: An Unexpected Journey', '2012', '/w29Guo6FX6fxzH86f8iAbEhQEFC.jpg')";
     public static final String SQL_INSERT_MOVIES_GHOST = "INSERT INTO Movies (Id, Title, Year, Image) " +
             "VALUES ('315837', 'Ghost in the Shell', '2017', '/si1ZyELNHdPUZw4pXR5KjMIIsBF.jpg')";
+    public static final String SQL_INSERT_SERIES_EPISODE = "INSERT INTO Series " +
+            "(Username, SeriesId, EpisodeId, SeasonId, Time) VALUES " +
+            "('unittest@kyngas.eu', '42009', '1188308', '571bb2e29251414e97005342', '" + currentTimeMillis() + "')";
+    public static final String SQL_INSERT_SERIES_INFO = "INSERT INTO SeriesInfo " +
+            "(Id, Title, Image) VALUES " +
+            "('42009', 'Black Mirror', '/djUxgzSIdfS5vNP2EHIBDIz9I8A.jpg')";
     public static final String SQL_INSERT_WISHLIST = "INSERT INTO Wishlist (Username, MovieId, Time) " +
             "VALUES ('unittest@kyngas.eu', '49051', '" + currentTimeMillis() + "')";
     public static final String SQL_INSERT_VIEW = "INSERT INTO Views " +
@@ -95,14 +117,12 @@ public class LocalDatabase {
                 .subscribe(r -> fut.complete(db), fut::fail)));
     }
 
-    public JDBCClient getClient() {
-        return client;
-    }
-
     private Single<UpdateResult> initTables() {
         return client.rxGetConnection().flatMap(conn -> conn.rxUpdate(SQL_CREATE_USERS)
                 .flatMap(res -> conn.rxUpdate(SQL_CREATE_SETTINGS))
                 .flatMap(res -> conn.rxUpdate(SQL_CREATE_MOVIES))
+                .flatMap(res -> conn.rxUpdate(SQL_CREATE_SERIES))
+                .flatMap(res -> conn.rxUpdate(SQL_CREATE_SERIES_INFO))
                 .flatMap(res -> conn.rxUpdate(SQL_CREATE_VIEWS))
                 .flatMap(res -> conn.rxUpdate(SQL_CREATE_WISHLIST))
                 .doAfterTerminate(conn::close));
@@ -169,5 +189,7 @@ public class LocalDatabase {
     private void test() throws SQLException {
         Connection conn = new MysqlDataSource().getConnection();
         conn.prepareStatement(SQL_CREATE_MOVIES);
+        conn.prepareStatement(SQL_CREATE_SERIES_INFO);
+        conn.prepareStatement(SQL_CREATE_SERIES);
     }
 }

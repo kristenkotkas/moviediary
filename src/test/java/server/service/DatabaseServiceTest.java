@@ -5,11 +5,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.rxjava.core.Vertx;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import rx.Observable;
 import server.service.DatabaseService.Column;
 import server.util.LocalDatabase;
@@ -24,6 +24,8 @@ import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.NetworkUtils.HTTP_PORT;
 
+@RunWith(VertxUnitRunner.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DatabaseServiceTest {
     private static final int PORT = 8082;
 

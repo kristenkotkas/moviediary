@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 import static server.util.Utils.Eventbus.OPEN;
 import static server.util.Utils.Eventbus.isEventbus;
@@ -63,6 +64,7 @@ public class UiMoviesPageTest extends UiTest {
         openDetailView();
         WebElement addToWishlistButton = driver.findElementById("wishlist-text");
         sleep(driver, 5, visibilityOf(addToWishlistButton));
+        sleep(driver, 5, elementToBeClickable(addToWishlistButton));
         addToWishlistButton.click();
         await().atMost(5, SECONDS).until(() -> localDatabase
                 .queryBlocking("SELECT * FROM Wishlist WHERE MovieId = ?", new JsonArray().add(315837))

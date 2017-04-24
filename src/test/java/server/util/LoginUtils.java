@@ -1,13 +1,11 @@
 package server.util;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava.core.Future;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-import static io.vertx.rxjava.core.Future.succeededFuture;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
@@ -23,10 +21,5 @@ public class LoginUtils {
         fields.get(0).sendKeys(user.getString("username"));
         fields.get(1).sendKeys(user.getString("password"));
         driver.findElement(tagName("button")).click();
-    }
-
-    public static Future<Void> asyncFormLogin(WebDriver driver, String uri, JsonObject config) {
-        formLogin(driver, uri, config);
-        return succeededFuture();
     }
 }

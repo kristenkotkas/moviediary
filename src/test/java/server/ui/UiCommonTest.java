@@ -12,8 +12,7 @@ import java.util.List;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
-import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static server.entity.Language.getString;
 import static server.util.LoginUtils.formLogin;
 import static server.util.Utils.*;
@@ -78,6 +77,7 @@ public class UiCommonTest extends UiTest {
 
     private void checkCanGetToPage(WebElement link, String urlToCheck) {
         sleep(driver, 5, invisibilityOf(driver.findElementById("loader-wrapper")));
+        sleep(driver, 5, elementToBeClickable(link));
         link.click();
         assertEquals(urlToCheck, driver.getCurrentUrl());
     }
