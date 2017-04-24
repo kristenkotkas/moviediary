@@ -274,13 +274,29 @@ var searchMovie = function (eventbus, movieId, lang) {
 };
 
 function addToWishlist(eventbus, movieId, lang) {
-    eventbus.send("database_insert_wishlist", movieId);
-    console.log(movieId + ' added to wishlist.');
-    decorateInWishlist(lang);
+    if (!$("#wishlist-text").hasClass('content-key')) {
+        removeFromWishlist(eventbus, movieId, lang);
+        console.log('REMOVE');
+    } else {
+        eventbus.send("database_insert_wishlist", movieId, function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                console.log(movieId + ' added to wishlist.');
+                decorateInWishlist(lang);
+            }
+        });
+    }
+}
+
+function removeFromWishlist(eventbus, movieId, lang) {
+    eventbus.send("database_remove_wishlist", movieId, function (error, reply) {
+        console.log('removeFromWishlist', reply);
+        if (reply['body']['updated'] != null) {
+            decorateNotInWIshlist(lang);
+        }
+    });
 }
 
 function decorateInWishlist(lang) {
-    $("#add-wishlist").removeClass('add-wishlist');
     $("#wishlist-text").empty().append(
         $.parseHTML(
             '<i class="fa fa-check left" aria-hidden="true"></i>' +

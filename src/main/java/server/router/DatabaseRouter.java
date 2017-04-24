@@ -73,7 +73,6 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_HISTORY, reply((username, param) -> database.getViews(username, param,
                 new JsonObject(param).getInteger("page")), getDatabaseHistory()));
         listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
-        listen(DATABASE_INSERT_WISHLIST, (user, param) -> database.insertWishlist(user, parseInt(param)));
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
         listen(DATABASE_INSERT_VIEW, reply(database::insertView));
@@ -88,6 +87,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)),
                 getSeenEpisodes()));
         listen(DATABASE_GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
+        listen(DATABASE_INSERT_WISHLIST, reply((user, param) ->database.insertWishlist(user, parseInt(param))));
         listen(DATABASE_REMOVE_WISHLIST, reply(database::removeFromWishlist));
     }
 
