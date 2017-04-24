@@ -355,6 +355,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
             });
         } else {
             $('#seen-header').empty().append(lang['MOVIES_JS_NOT_SEEN']);
+            $('#movie-views-table').empty();
         }
     });
 };
