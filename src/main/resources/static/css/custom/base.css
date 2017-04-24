@@ -76,6 +76,9 @@ body {
     cursor: pointer;
 }
 
+.opacity-object-hover:hover {
+    opacity: 0.95;
+}
 
 .collapsible-header {
     display: block;
