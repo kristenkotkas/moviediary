@@ -276,7 +276,6 @@ var searchMovie = function (eventbus, movieId, lang) {
 function addToWishlist(eventbus, movieId, lang) {
     if (!$("#wishlist-text").hasClass('content-key')) {
         removeFromWishlist(eventbus, movieId, lang);
-        console.log('REMOVE');
     } else {
         eventbus.send("database_insert_wishlist", movieId, function (error, reply) {
             if (reply['body']['updated'] != null) {
@@ -289,7 +288,7 @@ function addToWishlist(eventbus, movieId, lang) {
 
 function removeFromWishlist(eventbus, movieId, lang) {
     eventbus.send("database_remove_wishlist", movieId, function (error, reply) {
-        console.log('removeFromWishlist', reply);
+        console.log(movieId + ' remove from wishlist.');
         if (reply['body']['updated'] != null) {
             decorateNotInWIshlist(lang);
         }
