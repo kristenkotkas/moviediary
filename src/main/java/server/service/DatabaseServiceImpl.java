@@ -80,7 +80,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
     public static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
     public static final String SQL_GET_MOVIE_VIEWS =
-            "SELECT Start, WasCinema FROM Views" +
+            "SELECT Id, Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
     public static final String SQL_QUERY_VIEWS_META =

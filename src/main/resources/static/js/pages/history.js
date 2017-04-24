@@ -268,11 +268,11 @@ function addNotFound(lang, type) {
     );
 }
 
-function removeView(movieId, lang, type) {
-    console.log(movieId);
-    eventbus.send("database_remove_view", movieId, function (error, reply) {
-        console.log(movieId + ' removed');
-        document.getElementById('history-' + movieId).remove();
+function removeView(viewId, lang, type) {
+    console.log(viewId);
+    eventbus.send("database_remove_view", viewId, function (error, reply) {
+        console.log(viewId + ' removed');
+        document.getElementById('history-' + viewId).remove();
         eventbus.send("database_get_history_meta",
             {
                 'is-first': $("#seenFirst").is(':checked'),

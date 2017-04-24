@@ -166,7 +166,6 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         addButton.click(function () {
             if (startDate.val() != '' &&  endDate.val() != '' && startTime.val() != '' && endTime.val() != '' && commentFiled.val().length <= 500) {
-
                 var start = startDate.val() + ' ' + startTime.val();
                 var end = endDate.val() + ' ' + endTime.val();
                 eventbus.send("database_insert_view", {
@@ -334,20 +333,40 @@ var getMovieViews = function (eventbus, movieId, lang) {
             }
             $('#movie-views-table').empty();
             $.each(data, function (i) {
+                var viewId = data[i]['Id'];
                 $('#movie-views-table').append(
                     $.parseHTML(
                         '<tr>' +
                         '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
                         '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
+                        '<td>' +
+                            '<a class="grey-text cursor" id="' + ('remove_view_' + viewId) + '">' +
+                                '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                            '</a>' +
+                        '</td>' +
                         '</tr>'
                     )
                 );
+
+                var deleteView = document.getElementById('remove_view_' + viewId);
+                deleteView.onclick = function () {
+                    removeView(movieId, viewId, lang);
+                };
             });
         } else {
             $('#seen-header').empty().append(lang['MOVIES_JS_NOT_SEEN']);
         }
     });
 };
+
+function removeView(movieId, viewId, lang) {
+    console.log('viewId', viewId);
+    eventbus.send("database_remove_view", viewId, function (error, reply) {
+        if (reply['body']['updated'] != null) {
+            getMovieViews(eventbus, movieId, lang);
+        }
+    });
+}
 
 var startNowPress = function (startDate, startTime, e) {
     var date = new Date();
