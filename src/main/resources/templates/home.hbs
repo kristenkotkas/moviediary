@@ -22,52 +22,92 @@
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "HOME_HELLO" locale=lang}} {{userFirstName}}</h3>
 <div class="row"></div>
 <div class="row">
-    <div class="col s12 m12 l10 offset-l1">
-        <!-- Last 5 movies kaart -->
+    <div class="col s12 m12 l12 xl10 offset-xl1">
         <div class="col s12 m6 l4">
-            <div class="grey-text text-darken-2 card z-depth-0">
-                <div class="card-content">
-                    <h5>Last 5 movies</h5>
-                    <table class="bordered">
-                        <tbody id="last-movies-tbody">
-                        </tbody>
-                    </table>
+            <!-- Top 5 movies -->
+            <div class="col s12 m12 l12">
+                <div class="grey-text text-darken-2 card z-depth-0">
+                    <div class="card-content">
+                        <h5>Top 5 movies</h5>
+                        <table class="bordered highlight">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Times seen</th>
+                            </tr>
+                            </thead>
+                            <tbody id="top-movies-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Last 5 movies kaart -->
+            <div class="col s12 m12 l12">
+                <div class="grey-text text-darken-2 card z-depth-0">
+                    <div class="card-content">
+                        <h5>Last 5 views</h5>
+                        <table class="bordered highlight">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date seen</th>
+                            </tr>
+                            </thead>
+                            <tbody id="last-movies-tbody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Total stats -->
         <div class="col s12 m6 l4">
-            <div class="grey-text text-darken-2 card z-depth-0">
-                <div class="card-content">
-                    <h5>Total statistics</h5>
-                    <table class="bordered">
-                        <tbody id="total-stats-tbody">
-                        </tbody>
-                    </table>
+            <!-- Total stats -->
+            <div class="col s12 m12 l12">
+                <div class="grey-text text-darken-2 card z-depth-0">
+                    <div class="card-content">
+                        <h5>Total statistics</h5>
+                        <table class="bordered">
+                            <tbody id="total-stats-tbody">
+                            <tr>
+                                <td class="grey-text">Total views</td>
+                                <td class="content-key grey-text" id="total-views"></td>
+                            </tr>
+                            <tr>
+                                <td class="grey-text">Total new movie views</td>
+                                <td class="content-key grey-text" id="total-new-movies"></td>
+                            </tr>
+                            <tr>
+                                <td class="grey-text">Total different movies</td>
+                                <td class="content-key grey-text" id="total-different-movies"></td>
+                            </tr>
+                            <tr>
+                                <td class="grey-text">Total runtime</td>
+                                <td class="content-key grey-text" id="total-runtime"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Top 5 movies -->
         <div class="col s12 m6 l4">
-            <div class="grey-text text-darken-2 card z-depth-0">
-                <div class="card-content">
-                    <h5>Top 5 movies</h5>
-                    <table class="bordered">
-                        <tbody id="top-movies-tbody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <!-- Wishlist -->
-        <div class="col s12 m6 l4">
-            <div class="grey-text text-darken-2 card z-depth-0">
-                <div class="card-content">
-                    <h5>Wishlist</h5>
-                    <table class="bordered">
-                        <tbody id="wishlist-tbody">
-                        </tbody>
-                    </table>
+            <!-- Wishlist -->
+            <div class="col s12 m12 l12">
+                <div class="grey-text text-darken-2 card z-depth-0">
+                    <div class="card-content">
+                        <h5>Wishlist</h5>
+                        <table class="bordered highlight">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Release year</th>
+                            </tr>
+                            </thead>
+                            <tbody id="wishlist-tbody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

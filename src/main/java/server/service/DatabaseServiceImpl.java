@@ -110,13 +110,13 @@ public class DatabaseServiceImpl implements DatabaseService {
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
     public static final String SQL_GET_LAST_VIEWS =
-            "SELECT Title, Start From Views " +
+            "SELECT Title, Start, MovieId From Views " +
                     "JOIN Movies On Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";
 
     public static final String SQL_GET_HOME_WISHLIST =
-            "SELECT Title, Time, Year From Wishlist " +
+            "SELECT Title, Time, Year, MovieId From Wishlist " +
                     "JOIN Movies On Movies.Id = Wishlist.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Time DESC LIMIT 5";
@@ -126,6 +126,23 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
+
+    public static final String SQL_GET_TOTAL_MOVIE_COUNT =
+            "SELECT COUNT(*) As 'total_movies' FROM Views " +
+                    "WHERE Username = ?";
+
+    public static final String SQL_GET_NEW_MOVIE_COUNT =
+            "SELECT COUNT(WasFirst) As 'new_movies' FROM Views " +
+                    "WHERE Username = ? " +
+                    "AND WasFirst = 1";
+
+    public static final String SQL_GET_TOTAL_RUNTIME =
+            "SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
+                    "WHERE Username = ?";
+
+    public static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
+            "SELECT COUNT(DISTINCT MovieId) As 'unique_movies' FROM Views " +
+                    "WHERE Username = ?";
 
     private final JDBCClient client;
     private static boolean isTesting = false;
@@ -169,6 +186,10 @@ public class DatabaseServiceImpl implements DatabaseService {
         conn.prepareStatement(SQL_GET_LAST_VIEWS);
         conn.prepareStatement(SQL_GET_HOME_WISHLIST);
         conn.prepareStatement(SQL_GET_TOP_MOVIES);
+        conn.prepareStatement(SQL_GET_TOTAL_MOVIE_COUNT);
+        conn.prepareStatement(SQL_GET_NEW_MOVIE_COUNT);
+        conn.prepareStatement(SQL_GET_TOTAL_RUNTIME);
+        conn.prepareStatement(SQL_GET_TOTAL_DISTINCT_MOVIES);
     }
 
     private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
@@ -588,6 +609,34 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> getTopMoviesHome(String username) {
         return future(fut -> client.getConnection(connHandler(fut,
                 conn -> conn.queryWithParams(SQL_GET_TOP_MOVIES, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getTotalMovieCount(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_TOTAL_MOVIE_COUNT, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getNewMovieCount(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_NEW_MOVIE_COUNT, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getTotalRuntime(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_TOTAL_RUNTIME, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getTotalDistinctMoviesCount(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_TOTAL_DISTINCT_MOVIES, new JsonArray()
                         .add(username), resultHandler(conn, fut)))));
     }
 

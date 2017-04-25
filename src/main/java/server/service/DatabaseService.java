@@ -131,6 +131,14 @@ public interface DatabaseService {
 
     Future<JsonObject> getTopMoviesHome(String username);
 
+    Future<JsonObject> getTotalMovieCount(String username);
+
+    Future<JsonObject> getNewMovieCount(String username);
+
+    Future<JsonObject> getTotalRuntime(String username);
+
+    Future<JsonObject> getTotalDistinctMoviesCount(String username);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

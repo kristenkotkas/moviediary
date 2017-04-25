@@ -6,6 +6,10 @@ var lastMovies = $("#last-movies-tbody");
 var totalStat = $("#total-stats-tbody");
 var topMovies = $("#top-movies-tbody");
 var wishlist = $("#wishlist-tbody");
+var totalViews = $("#total-views");
+var totalNewViews = $("#total-new-movies");
+var totalRuntime = $("#total-runtime");
+var totalDifferentMovies = $("#total-different-movies");
 
 eventbus.onopen = function () {
     var lang;
@@ -18,6 +22,24 @@ eventbus.onopen = function () {
     });
 };
 
+function fillTopMovies(lang) {
+    eventbus.send("database_get_top_movies", {}, function (error, reply) {
+        topMovies.empty();
+        var data = reply['body']['rows'];
+        $.each(data, function (i) {
+            var movie = data[i];
+            topMovies.append(
+                $.parseHTML(
+                    '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
+                    '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
+                    '<td class="grey-text">' + movie['Count'] + '</td>' +
+                    '</tr>'
+                )
+            );
+        })
+    });
+}
+
 function fillLastMovies(lang) {
     eventbus.send("database_get_last_views", {}, function (error, reply) {
         lastMovies.empty();
@@ -26,7 +48,7 @@ function fillLastMovies(lang) {
             var movie = data[i];
             lastMovies.append(
                 $.parseHTML(
-                    '<tr>' +
+                    '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
                         '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
                         '<td class="grey-text">' + getMonth(movie['Start'], lang) + '</td>' +
                     '</tr>'
@@ -37,25 +59,24 @@ function fillLastMovies(lang) {
 }
 
 function fillTotalStat(lang) {
-
-}
-
-function fillTopMovies(lang) {
-    eventbus.send("database_get_top_movies", {}, function (error, reply) {
-        topMovies.empty();
+    eventbus.send("database_get_total_movie_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
-        console.log(data);
-        $.each(data, function (i) {
-            var movie = data[i];
-            topMovies.append(
-                $.parseHTML(
-                    '<tr>' +
-                    '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
-                    '<td class="grey-text">' + movie['Count'] + '</td>' +
-                    '</tr>'
-                )
-            );
-        })
+        totalViews.append(data[0]['total_movies'] + ' views');
+    });
+
+    eventbus.send("database_get_new_movie_count", {}, function (error, reply) {
+        var data = reply['body']['rows'];
+        totalNewViews.append(data[0]['new_movies'] + ' views');
+    });
+
+    eventbus.send("database_get_distinct_movie_count", {}, function (error, reply) {
+        var data = reply['body']['rows'];
+        totalDifferentMovies.append(data[0]['unique_movies'] + ' movies');
+    });
+
+    eventbus.send("database_get_total_runtime", {}, function (error, reply) {
+        var data = reply['body']['rows'];
+        totalRuntime.append(minutesToString(data[0]['Runtime']));
     });
 }
 
@@ -68,7 +89,7 @@ function fillWishlist(lang) {
             var movie = data[i];
             wishlist.append(
                 $.parseHTML(
-                    '<tr>' +
+                    '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
                     '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
                     '<td class="grey-text">' + movie['Year'] + '</td>' +
                     '</tr>'
@@ -76,4 +97,8 @@ function fillWishlist(lang) {
             );
         })
     });
+}
+
+function openMovie(movieId) {
+    location.href = 'movies/?id=' + movieId;
 }
