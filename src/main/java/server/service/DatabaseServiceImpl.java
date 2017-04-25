@@ -5,7 +5,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
@@ -19,8 +18,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.future;
+import static java.lang.System.currentTimeMillis;
 import static server.service.DatabaseService.Column.*;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
@@ -32,130 +31,136 @@ import static server.util.StringUtils.*;
  * Database service implementation.
  */
 public class DatabaseServiceImpl implements DatabaseService {
-    private static final Logger LOG = getLogger(DatabaseServiceImpl.class);
-    public static final String SQL_INSERT_WISHLIST =
+    private static final String SQL_INSERT_WISHLIST =
             "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
-    public static final String SQL_INSERT_EPISODE =
+    private static final String SQL_INSERT_EPISODE =
             "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
-    public static final String SQL_IS_IN_WISHLIST =
+    private static final String SQL_IS_IN_WISHLIST =
             "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
-    public static final String SQL_GET_WISHLIST =
+    private static final String SQL_GET_WISHLIST =
             "SELECT Title, Time, Year, Image, MovieId FROM Wishlist " +
                     "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
                     "WHERE Username =  ? ORDER BY Time DESC";
-    public static final String SQL_GET_YEARS_DIST =
+    private static final String SQL_GET_YEARS_DIST =
             "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    public static final String SQL_GET_WEEKDAYS_DIST =
+    private static final String SQL_GET_WEEKDAYS_DIST =
             "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    public static final String SQL_GET_TIME_DIST =
+    private static final String SQL_GET_TIME_DIST =
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
-    public static final String SQL_GET_ALL_TIME_META =
+    private static final String SQL_GET_ALL_TIME_META =
             "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ?";
-    public static final String SQL_INSERT_USER =
+    private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
-    public static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
+    private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username";
-    public static final String SQL_QUERY_USER = "SELECT * FROM Users " +
+    private static final String SQL_QUERY_USER = "SELECT * FROM Users " +
             "JOIN Settings ON Users.Username = Settings.Username " +
             "WHERE Users.Username = ?";
-    public static final String SQL_INSERT_VIEW =
+    private static final String SQL_INSERT_VIEW =
             "INSERT INTO Views (Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_QUERY_VIEWS =
+    private static final String SQL_QUERY_VIEWS =
             "SELECT Views.Id, MovieId, Title, Start, WasFirst, WasCinema, Image, Comment, " +
                     "TIMESTAMPDIFF(MINUTE, Start, End) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    public static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-    public static final String SQL_INSERT_MOVIE =
+    private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
+    private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
-    public static final String SQL_INSERT_SERIES =
+    private static final String SQL_INSERT_SERIES =
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
-    public static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
-    public static final String SQL_GET_MOVIE_VIEWS =
+    private static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
+    private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Id, Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
-    public static final String SQL_QUERY_VIEWS_META =
+    private static final String SQL_QUERY_VIEWS_META =
             "SELECT Count(*) AS Count " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
-    public static final String SQL_REMOVE_VIEW =
+    private static final String SQL_REMOVE_VIEW =
             "DELETE FROM Views WHERE Username = ? AND Id = ?";
-
     private static final String SQL_REMOVE_EPISODE =
             "DELETE FROM Series WHERE Username = ? AND EpisodeId = ?";
-
-    public static final String SQL_GET_SEEN_EPISODES =
-            "SELECT EpisodeId FROM Series " +
-                    "WHERE Username = ? " +
-                    "AND SeriesId = ?";
-
+    private static final String SQL_GET_SEEN_EPISODES = "SELECT EpisodeId FROM Series " +
+            "WHERE Username = ? AND SeriesId = ?";
     private static final String SQL_GET_WATCHING_SERIES =
             "SELECT Title, Image, SeriesId, COUNT(SeriesId) AS Count FROM Series " +
                     "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
                     "WHERE Username = ? " +
                     "GROUP BY Title, Image, SeriesId " +
                     "ORDER BY Title";
-
-    public static final String SQL_REMOVE_WISHLIST =
+    private static final String SQL_REMOVE_WISHLIST =
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
-
-    public static final String SQL_GET_LAST_VIEWS =
-            "SELECT Title, Start, MovieId From Views " +
-                    "JOIN Movies On Movies.Id = Views.MovieId " +
+    private static final String SQL_GET_LAST_VIEWS =
+            "SELECT Title, Start, MovieId FROM Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";
-
-    public static final String SQL_GET_HOME_WISHLIST =
-            "SELECT Title, Time, Year, MovieId From Wishlist " +
-                    "JOIN Movies On Movies.Id = Wishlist.MovieId " +
+    private static final String SQL_GET_HOME_WISHLIST =
+            "SELECT Title, Time, Year, MovieId FROM Wishlist " +
+                    "JOIN Movies ON Movies.Id = Wishlist.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Time DESC LIMIT 5";
-
-    public static final String SQL_GET_TOP_MOVIES =
+    private static final String SQL_GET_TOP_MOVIES =
             "SELECT MovieId, Title, COUNT(*) AS Count FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
-
-    public static final String SQL_GET_TOTAL_MOVIE_COUNT =
-            "SELECT COUNT(*) As 'total_movies' FROM Views " +
+    private static final String SQL_GET_TOTAL_MOVIE_COUNT =
+            "SELECT COUNT(*) AS 'total_movies' FROM Views " +
                     "WHERE Username = ?";
-
-    public static final String SQL_GET_NEW_MOVIE_COUNT =
-            "SELECT COUNT(WasFirst) As 'new_movies' FROM Views " +
+    private static final String SQL_GET_NEW_MOVIE_COUNT =
+            "SELECT COUNT(WasFirst) AS 'new_movies' FROM Views " +
                     "WHERE Username = ? " +
                     "AND WasFirst = 1";
-
-    public static final String SQL_GET_TOTAL_RUNTIME =
+    private static final String SQL_GET_TOTAL_RUNTIME =
             "SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
-
-    public static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
-            "SELECT COUNT(DISTINCT MovieId) As 'unique_movies' FROM Views " +
+    private static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
+            "SELECT COUNT(DISTINCT MovieId) AS 'unique_movies' FROM Views " +
                     "WHERE Username = ?";
 
-    private final JDBCClient client;
     private static boolean isTesting = false;
-
-    public static void setTesting() {
-        DatabaseServiceImpl.isTesting = true;
-    }
+    private final JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
     }
 
-    //for enabling intellij inspections on sql fragments
+    public static void setTesting() {
+        DatabaseServiceImpl.isTesting = true;
+    }
+
+    private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
+        return conn -> check(conn.succeeded(),
+                () -> handler.handle(conn.result()),
+                () -> future.fail(conn.cause()));
+    }
+
+    /**
+     * Convenience method for handling sql commands result.
+     */
+    private static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
+        return ar -> {
+            check(ar.succeeded(),
+                    () -> check(ar.result() instanceof ResultSet,
+                            () -> future.complete(((ResultSet) ar.result()).toJson()),
+                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
+                    () -> future.fail(ar.cause()));
+            conn.close();
+        };
+    }
+
+    //quick hack for enabling intellij inspections on sql fragments
     @SuppressWarnings("unused")
     private void test() throws SQLException {
         DataSource dataSource = new MysqlDataSource();
@@ -192,52 +197,28 @@ public class DatabaseServiceImpl implements DatabaseService {
         conn.prepareStatement(SQL_GET_TOTAL_DISTINCT_MOVIES);
     }
 
-    private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> check(conn.succeeded(),
-                () -> handler.handle(conn.result()),
-                () -> future.fail(conn.cause()));
-    }
-
-    /**
-     * Convenience method for handling sql commands result.
-     */
-    private static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            check(ar.succeeded(),
-                    () -> check(ar.result() instanceof ResultSet,
-                            () -> future.complete(((ResultSet) ar.result()).toJson()),
-                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
-                    () -> future.fail(ar.cause()));
-            conn.close();
-        };
-    }
-
     /**
      * Inserts a Facebook, Google or IdCard user into database.
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
-        return future(fut -> {
-            if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
-                fut.fail(new Throwable("Email, firstname and lastname must exist!"));
-                return;
-            }
-            String salt = genString();
-            client.getConnection(connHandler(fut, conn -> conn.updateWithParams(SQL_INSERT_USER, new JsonArray()
-                    .add(username)
-                    .add(firstname)
-                    .add(lastname)
-                    .add(hash(password, salt))
-                    .add(salt), ar -> {
-                check(ar.succeeded(),
-                        () -> insert(Table.SETTINGS, createDataMap(username)).setHandler(result ->
-                                check(result.succeeded(),
-                                        () -> fut.complete(ar.result().toJson()),
-                                        () -> fut.fail(result.cause()))),
-                        () -> fut.fail(ar.cause()));
-                conn.close();
-            })));
-        });
+        // TODO: 25.04.2017 if check rx-ga
+        return future(fut -> check(!nonNull(username, password, firstname, lastname) ||
+                        contains("", username, firstname, lastname),
+                () -> fut.fail(new Throwable("Email, firstname and lastname must exist!")),
+                () -> ifPresent(genString(), salt -> client.rxGetConnection()
+                        .flatMap(conn -> conn
+                                .rxUpdateWithParams(SQL_INSERT_USER, new JsonArray()
+                                        .add(username)
+                                        .add(firstname)
+                                        .add(lastname)
+                                        .add(hash(password, salt))
+                                        .add(salt))
+                                .doAfterTerminate(conn::close))
+                        .map(UpdateResult::toJson)
+                        .subscribe(res -> insert(Table.SETTINGS, createDataMap(username))
+                                .rxSetHandler()
+                                .subscribe(result -> fut.complete(res), fut::fail), fut::fail))));
     }
 
     /**
@@ -245,21 +226,19 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertView(String user, String param) {
-        JsonObject json = new JsonObject(param);
-        System.out.println("-------------------------------------");
-        System.out.println(json.encodePrettily());
-        System.out.println("-------------------------------------");
-
-        String movieId = json.getString("movieId");
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_INSERT_VIEW, new JsonArray()
-                        .add(user)
-                        .add(movieId)
-                        .add(movieDateToDBDate(json.getString("start")))
-                        .add(movieDateToDBDate(json.getString("end")))
-                        .add(json.getBoolean("wasFirst"))
-                        .add(json.getBoolean("wasCinema"))
-                        .add(json.getString("comment")), resultHandler(conn, fut)))));
+        return future(fut -> ifPresent(new JsonObject(param), json -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxUpdateWithParams(SQL_INSERT_VIEW, new JsonArray()
+                                .add(user)
+                                .add(json.getString("movieId"))
+                                .add(movieDateToDBDate(json.getString("start")))
+                                .add(movieDateToDBDate(json.getString("end")))
+                                .add(json.getBoolean("wasFirst"))
+                                .add(json.getBoolean("wasCinema"))
+                                .add(json.getString("comment")))
+                        .doAfterTerminate(conn::close))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail)));
     }
 
     /**
@@ -268,22 +247,30 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath) {
         String cmd = isTesting ? SQL_INSERT_MOVIE.replaceAll("IGNORE ", "") : SQL_INSERT_MOVIE;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(cmd, new JsonArray()
-                        .add(id)
-                        .add(movieTitle)
-                        .add(year)
-                        .add(posterPath), resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxUpdateWithParams(cmd, new JsonArray()
+                                .add(id)
+                                .add(movieTitle)
+                                .add(year)
+                                .add(posterPath))
+                        .doAfterTerminate(conn::close))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     @Override
     public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
         String cmd = isTesting ? SQL_INSERT_SERIES.replaceAll("IGNORE ", "") : SQL_INSERT_SERIES;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(cmd, new JsonArray()
-                        .add(id)
-                        .add(seriesTitle)
-                        .add(posterPath), resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxUpdateWithParams(cmd, new JsonArray()
+                                .add(id)
+                                .add(seriesTitle)
+                                .add(posterPath))
+                        .doAfterTerminate(conn::close))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -292,50 +279,61 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> insertWishlist(String username, int movieId) {
         String cmd = isTesting ? SQL_INSERT_WISHLIST.replaceAll("IGNORE ", "") : SQL_INSERT_WISHLIST;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(cmd, new JsonArray()
-                        .add(username)
-                        .add(movieId)
-                        .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxUpdateWithParams(cmd, new JsonArray()
+                                .add(username)
+                                .add(movieId)
+                                .add(currentTimeMillis()))
+                        .doAfterTerminate(conn::close))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     @Override
     public Future<JsonObject> insertEpisodeView(String username, String param) {
-        JsonObject json = new JsonObject(param);
         String cmd = isTesting ? SQL_INSERT_EPISODE.replaceAll("IGNORE ", "") : SQL_INSERT_EPISODE;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(cmd, new JsonArray()
-                        .add(username)
-                        .add(json.getInteger("seriesId"))
-                        .add(json.getInteger("episodeId"))
-                        .add(json.getString("seasonId"))
-                        .add(System.currentTimeMillis()), resultHandler(conn, fut)))));
-
+        return future(fut -> ifPresent(new JsonObject(param), json -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxUpdateWithParams(cmd, new JsonArray()
+                                .add(username)
+                                .add(json.getInteger("seriesId"))
+                                .add(json.getInteger("episodeId"))
+                                .add(json.getString("seasonId"))
+                                .add(currentTimeMillis()))
+                        .doAfterTerminate(conn::close))
+                .map(UpdateResult::toJson)
+                .subscribe(fut::complete, fut::fail)));
     }
 
     @Override
     public Future<JsonObject> getSeenEpisodes(String username, int seriesId) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_SEEN_EPISODES, new JsonArray()
-                        .add(username)
-                        .add(seriesId), resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQueryWithParams(SQL_GET_SEEN_EPISODES, new JsonArray().add(username).add(seriesId))
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     @Override
     public Future<JsonObject> isInWishlist(String username, int movieId) {
-        System.out.println("WISHLIST: " + username + ": " + movieId);
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_IS_IN_WISHLIST, new JsonArray()
-                        .add(username)
-                        .add(movieId), resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQueryWithParams(SQL_IS_IN_WISHLIST, new JsonArray().add(username).add(movieId))
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     @Override
     public Future<JsonObject> getWishlist(String username) {
-        System.out.println("USERNAME: " + username);
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username),
-                        resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQueryWithParams(SQL_GET_WISHLIST, new JsonArray().add(username))
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -343,9 +341,12 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> getSettings(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username),
-                        resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQueryWithParams(SQL_QUERY_SETTINGS, new JsonArray().add(username))
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -356,7 +357,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing update results
      */
     @Override
-    public Future<JsonObject> update(Table table, Map<Column, String> data) {
+    public Future<JsonObject> update(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx
         return future(fut -> {
             if (data.get(USERNAME) == null) {
                 fut.fail("Username required.");
@@ -381,7 +382,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing insertion results
      */
     @Override
-    public Future<JsonObject> insert(Table table, Map<Column, String> data) {
+    public Future<JsonObject> insert(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx
         return future(fut -> {
             if (data.get(USERNAME) == null) {
                 fut.fail("Username required.");
@@ -399,9 +400,12 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> getUser(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_QUERY_USER, new JsonArray().add(username),
-                        resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQueryWithParams(SQL_QUERY_USER, new JsonArray().add(username))
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -409,8 +413,12 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> getAllUsers() {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.query(SQL_QUERY_USERS, resultHandler(conn, fut)))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQuery(SQL_QUERY_USERS)
+                        .doAfterTerminate(conn::close))
+                .map(ResultSet::toJson)
+                .subscribe(fut::complete, fut::fail));
     }
 
     /**
@@ -645,11 +653,11 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<String> getUsersCount() {
-        return future(fut -> client.getConnection(connHandler(fut, conn -> conn.query(SQL_USERS_COUNT, ar -> {
-            check(ar.succeeded(),
-                    () -> fut.complete(ar.result().getRows().get(0).getLong("Count").toString()),
-                    () -> fut.fail(ar.cause()));
-            conn.close();
-        }))));
+        return future(fut -> client.rxGetConnection()
+                .flatMap(conn -> conn
+                        .rxQuery(SQL_USERS_COUNT)
+                        .doAfterTerminate(conn::close))
+                .map(resultSet -> resultSet.getRows().get(0).getLong("Count").toString())
+                .subscribe(fut::complete, fut::fail));
     }
 }

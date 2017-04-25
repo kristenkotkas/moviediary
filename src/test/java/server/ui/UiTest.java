@@ -16,7 +16,6 @@ import server.verticle.ServerVerticle;
 
 import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static server.util.CommonUtils.check;
 import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;
 import static server.util.LoginUtils.formLogin;
@@ -43,30 +42,23 @@ public abstract class UiTest {
         initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
                 .doOnSuccess(db -> localDatabase = db)
                 .doOnError(ctx::fail)
-                .flatMap(db -> deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions()
-                        .setConfig(config))
-                        .toSingle())
-                .test()
-                .awaitTerminalEvent(10, SECONDS)
-                .assertCompleted();
-        /*        initializeDatabase(vertx, config.getJsonObject("mysql")).rxSetHandler()
-                .doOnSuccess(db -> database = db)
-                .doOnError(ctx::fail)
                 .toCompletable()
                 .andThen(deployVerticle(vertx, new ServerVerticle(), new DeploymentOptions().setConfig(config)))
                 .test()
-                .awaitTerminalEvent(5, SECONDS)
-                .assertCompleted();*/
+                .awaitTerminalEvent(10, SECONDS)
+                .assertCompleted();
     }
 
     @AfterClass
     public static void tearDown(TestContext ctx) throws Exception {
         service.stop();
         Async async = ctx.async();
-        localDatabase.dropAll().setHandler(ar -> check(ar.succeeded(), () -> {
-            vertx.close(ctx.asyncAssertSuccess());
-            async.complete();
-        }, () -> ctx.fail(ar.cause())));
+        localDatabase.dropAll()
+                .rxSetHandler()
+                .doOnError(ctx::fail)
+                .toCompletable()
+                .andThen(vertx.rxClose())
+                .subscribe(v -> async.complete());
     }
 
     @Before

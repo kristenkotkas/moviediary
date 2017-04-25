@@ -30,10 +30,6 @@ dependencies {
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.6.3'
     compile 'org.codehaus.woodstox:woodstox-core-asl:4.1.4'
 
-    // https://mvnrepository.com/artifact/io.reactivex/rxjava-computation-expressions
-    compile group: 'io.reactivex', name: 'rxjava-computation-expressions', version: '0.21.0'
-
-
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.4.1'
     testCompile group: 'org.awaitility', name: 'awaitility', version: '3.0.0-rc3'

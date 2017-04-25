@@ -115,7 +115,7 @@ public interface DatabaseService {
 
     Future<JsonObject> removeEpisode(String username, String param);
 
-    Future<JsonObject> insertEpisodeView(String username, String param);
+    Future<JsonObject> insertEpisodeView(String username, String data);
 
     Future<JsonObject> getSeenEpisodes(String username, int seriesId);
 
@@ -202,7 +202,13 @@ public interface DatabaseService {
         PASSWORD("Password"),
         SALT("Salt"),
         RUNTIMETYPE("RuntimeType"),
-        VERIFIED("Verified");
+        VERIFIED("Verified"),
+        TITLE("Title"),
+        YEAR("Year"),
+        IMAGE("Image"),
+        MOVIEID("MovieId"),
+        EPISODEID("EpisodeId"),
+        TIME("Time");
 
         private final String columnName;
 
