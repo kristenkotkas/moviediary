@@ -125,6 +125,12 @@ public interface DatabaseService {
 
     Future<JsonObject> removeFromWishlist(String username, String param);
 
+    Future<JsonObject> getLastMoviesHome(String username);
+
+    Future<JsonObject> getLastWishlistHome(String username);
+
+    Future<JsonObject> getTopMoviesHome(String username);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

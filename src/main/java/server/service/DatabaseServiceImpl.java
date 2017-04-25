@@ -109,6 +109,24 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String SQL_REMOVE_WISHLIST =
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
 
+    public static final String SQL_GET_LAST_VIEWS =
+            "SELECT Title, Start From Views " +
+                    "JOIN Movies On Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? " +
+                    "ORDER BY Start DESC LIMIT 5";
+
+    public static final String SQL_GET_HOME_WISHLIST =
+            "SELECT Title, Time, Year From Wishlist " +
+                    "JOIN Movies On Movies.Id = Wishlist.MovieId " +
+                    "WHERE Username = ? " +
+                    "ORDER BY Time DESC LIMIT 5";
+
+    public static final String SQL_GET_TOP_MOVIES =
+            "SELECT MovieId, Title, COUNT(*) AS Count FROM Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? " +
+                    "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
+
     private final JDBCClient client;
     private static boolean isTesting = false;
 
@@ -147,6 +165,10 @@ public class DatabaseServiceImpl implements DatabaseService {
         conn.prepareStatement(SQL_REMOVE_VIEW);
         conn.prepareStatement(SQL_GET_SEEN_EPISODES);
         conn.prepareStatement(SQL_REMOVE_WISHLIST);
+        conn.prepareStatement(SQL_GET_WATCHING_SERIES);
+        conn.prepareStatement(SQL_GET_LAST_VIEWS);
+        conn.prepareStatement(SQL_GET_HOME_WISHLIST);
+        conn.prepareStatement(SQL_GET_TOP_MOVIES);
     }
 
     private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
@@ -546,6 +568,27 @@ public class DatabaseServiceImpl implements DatabaseService {
                 conn -> conn.updateWithParams(SQL_REMOVE_WISHLIST, new JsonArray()
                         .add(username)
                         .add(param), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getLastMoviesHome(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_LAST_VIEWS, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getLastWishlistHome(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_HOME_WISHLIST, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
+    }
+
+    @Override
+    public Future<JsonObject> getTopMoviesHome(String username) {
+        return future(fut -> client.getConnection(connHandler(fut,
+                conn -> conn.queryWithParams(SQL_GET_TOP_MOVIES, new JsonArray()
+                        .add(username), resultHandler(conn, fut)))));
     }
 
     /**

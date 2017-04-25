@@ -58,6 +58,9 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_REMOVE_EPISODE = "database_remove_episode";
     public static final String DATABASE_GET_WATCHING_SERIES = "database_get_watching_series";
     public static final String DATABASE_REMOVE_WISHLIST = "database_remove_wishlist";
+    public static final String DATABASE_GET_LAST_VIEWS = "database_get_last_views";
+    public static final String DATABASE_GET_HOME_WISHLIST = "database_get_home_wishlist";
+    public static final String DATABASE_GET_TOP_MOVIES = "database_get_top_movies";
     private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
@@ -89,6 +92,9 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
         listen(DATABASE_INSERT_WISHLIST, reply((user, param) ->database.insertWishlist(user, parseInt(param))));
         listen(DATABASE_REMOVE_WISHLIST, reply(database::removeFromWishlist));
+        listen(DATABASE_GET_LAST_VIEWS, reply((user, param) -> database.getLastMoviesHome(user), getDatabaseHomeViws()));
+        listen(DATABASE_GET_HOME_WISHLIST, reply((user, param) -> database.getLastWishlistHome(user)));
+        listen(DATABASE_GET_TOP_MOVIES, reply((user, param) -> database.getTopMoviesHome(user)));
     }
 
     @Override
@@ -134,6 +140,17 @@ public class DatabaseRouter extends EventBusRoutable {
                     .map(obj -> (JsonObject) obj)
                     .forEach(jsonObj -> jsonObj
                             .put("WasCinema", getCinema(jsonObj.getBoolean("WasCinema")))
+                            .put("Start", getNormalDTFromDB(jsonObj.getString("Start"), LONG_DATE)));
+            return json;
+        };
+    }
+
+    private BiFunction<String, JsonObject, Object> getDatabaseHomeViws() {
+        return (user, json) -> {
+            json.remove("results");
+            json.getJsonArray("rows").stream()
+                    .map(obj -> (JsonObject) obj)
+                    .forEach(jsonObj -> jsonObj
                             .put("Start", getNormalDTFromDB(jsonObj.getString("Start"), LONG_DATE)));
             return json;
         };
