@@ -56,6 +56,7 @@ public class UiCommonTest extends UiTest {
     @Test
     public void testNavBarLinksCanGetToPages() throws Exception {
         assertGoToPage(driver, URI + "/private/home");
+        driver.manage().window().maximize();
         //top
         checkCanGetToPage(driver.findElements(tagName("a")).get(0), URI + "/private/user");
         checkCanGetToPage(driver.findElements(tagName("a")).get(1), URI + "/private/home");
