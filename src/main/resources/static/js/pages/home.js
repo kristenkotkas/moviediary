@@ -62,6 +62,7 @@ function fillTotalStat(lang) {
     eventbus.send("database_get_total_movie_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
         totalViews.append(data[0]['total_movies'] + ' views');
+        totalRuntime.append(minutesToString(data[0]['Runtime']));
     });
 
     eventbus.send("database_get_new_movie_count", {}, function (error, reply) {
@@ -73,18 +74,12 @@ function fillTotalStat(lang) {
         var data = reply['body']['rows'];
         totalDifferentMovies.append(data[0]['unique_movies'] + ' movies');
     });
-
-    eventbus.send("database_get_total_runtime", {}, function (error, reply) {
-        var data = reply['body']['rows'];
-        totalRuntime.append(minutesToString(data[0]['Runtime']));
-    });
 }
 
 function fillWishlist(lang) {
     eventbus.send("database_get_home_wishlist", {}, function (error, reply) {
         wishlist.empty();
         var data = reply['body']['rows'];
-        console.log(data);
         $.each(data, function (i) {
             var movie = data[i];
             wishlist.append(

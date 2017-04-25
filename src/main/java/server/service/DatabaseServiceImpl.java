@@ -116,7 +116,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ? " +
                     "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
     private static final String SQL_GET_TOTAL_MOVIE_COUNT =
-            "SELECT COUNT(*) AS 'total_movies' FROM Views " +
+            "SELECT COUNT(*) AS 'total_movies', SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
     private static final String SQL_GET_NEW_MOVIE_COUNT =
             "SELECT COUNT(WasFirst) AS 'new_movies' FROM Views " +
