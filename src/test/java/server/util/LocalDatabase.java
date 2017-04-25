@@ -75,13 +75,13 @@ public class LocalDatabase {
     public static final String SQL_INSERT_FORM_USER = "INSERT INTO Users " +
             "(Username, Firstname, Lastname, Password, Salt) " +
             "VALUES ('unittest@kyngas.eu', 'Form', 'Tester', " +
-            "'d7d1b328a56a8c8bfd6dd4e3d9006365d3496b523ac4ff37bc68679b5433b486', 'f44a65de25274188')";
+            "'967a097e667b8ebcbab27a5327c504dbfefc3fac3ca9eb696e00de16b4005e60', '1ffa4de675252a4d')";
     public static final String SQL_INSERT_FORM_SETTING = "INSERT INTO Settings (Username, RuntimeType, Verified) " +
             "VALUES ('unittest@kyngas.eu', 'default', '1')";
     public static final String SQL_INSERT_FB_USER = "INSERT INTO Users " +
             "(Username, Firstname, Lastname, Password, Salt) " +
             "VALUES ('facebook_ekubamn_tester@tfbnw.net', 'Facebook', 'Tester', " +
-            "'38427f3f11e535e128a5e12f962070eb5c72bdfb324ba6b55d9caed2223ffaf8', 'a8eb1f3ed5882b83')";
+            "'1f27217a682d9631b4a839c72ef9bdc4dd5aed7319cc5b0df016ea8ddb81aa1f', '67d2ba0a146054b3')";
     public static final String SQL_INSERT_FB_SETTING = "INSERT INTO Settings (Username, RuntimeType, Verified) " +
             "VALUES ('facebook_ekubamn_tester@tfbnw.net', 'default', '0')";
     public static final String SQL_INSERT_MOVIES_HOBBIT = "INSERT INTO Movies (Id, Title, Year, Image) " +
@@ -136,8 +136,8 @@ public class LocalDatabase {
                         .flatMap(res -> conn.rxUpdate(SQL_INSERT_FB_SETTING))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_HOBBIT))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_GHOST))
-                        .flatMap(res -> conn.rxUpdate(SQL_INSERT_WISHLIST))
-                        .flatMap(res -> conn.rxUpdate(SQL_INSERT_VIEW))
+                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_WISHLIST))
+                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_VIEW))
                         .doAfterTerminate(conn::close))
                 .subscribe(res -> fut.complete(), fut::fail));
     }

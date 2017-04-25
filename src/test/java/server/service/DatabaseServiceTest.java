@@ -81,8 +81,8 @@ public class DatabaseServiceTest {
         assertThat(user.getString(Column.LASTNAME.getName()), is("Tester"));
         assertThat(user.getString(Column.USERNAME.getName()), is("unittest@kyngas.eu"));
         assertThat(user.getString(Column.PASSWORD.getName()),
-                is("d7d1b328a56a8c8bfd6dd4e3d9006365d3496b523ac4ff37bc68679b5433b486"));
-        assertThat(user.getString(Column.SALT.getName()), is("f44a65de25274188"));
+                is("967a097e667b8ebcbab27a5327c504dbfefc3fac3ca9eb696e00de16b4005e60"));
+        assertThat(user.getString(Column.SALT.getName()), is("1ffa4de675252a4d"));
         assertThat(user.getString(Column.RUNTIMETYPE.getName()), is("default"));
         assertThat(user.getString(Column.VERIFIED.getName()), is("1"));
     }

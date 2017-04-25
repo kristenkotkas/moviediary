@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 import static server.util.LocalDatabase.SQL_INSERT_MOVIES_HOBBIT;
+import static server.util.LocalDatabase.SQL_INSERT_WISHLIST;
 import static server.util.Utils.Eventbus.OPEN;
 import static server.util.Utils.Eventbus.isEventbus;
 import static server.util.Utils.assertGoToPage;
@@ -23,6 +24,7 @@ public class UiWishlistPageTest extends UiTest {
 
     private WebElement goAndWaitTillPosterVisible() {
         localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST, null);
         assertGoToPage(driver, URI + "/private/wishlist");
         await().until(() -> isEventbus(OPEN, driver));
         sleep(driver, 5,
