@@ -57,12 +57,8 @@ public class DatabaseServiceTest {
     @AfterClass
     public static void tearDown(TestContext ctx) throws Exception {
         Async async = ctx.async();
-        localDatabase.dropAll()
-                .rxSetHandler()
-                .doOnError(ctx::fail)
-                .toCompletable()
-                .andThen(vertx.rxClose())
-                .subscribe(v -> async.complete());
+        localDatabase.close();
+        vertx.rxClose().subscribe(v -> async.complete(), ctx::fail);
     }
 
     @Before
@@ -87,6 +83,7 @@ public class DatabaseServiceTest {
                 .map(DatabaseService::getRows)
                 .toBlocking()
                 .value();
+        System.out.println(users.encodePrettily());
         assertThat(users.size(), is(2));
         isCorrectUser(users.getJsonObject(0));
     }
@@ -270,6 +267,30 @@ public class DatabaseServiceTest {
                 .map(json -> false)
                 .onErrorReturn(err -> true)
                 .toBlocking().value(), is(true));
+    }
 
+    @Test
+    public void testGetViews(TestContext ctx) throws Exception {
+        JsonObject data = new JsonObject()
+                .put("start", "20 April, 2017")
+                .put("end", "26 April, 2017")
+                .put("is-first", false)
+                .put("is-cinema", false);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW, null);
+        JsonArray views = database.getViews("unittest@kyngas.eu", data.encode(), 0).rxSetHandler()
+                .doOnError(ctx::fail)
+                .map(DatabaseService::getRows)
+                .toBlocking().value();
+        assertThat(views.size(), is(1));
+        JsonObject view = views.getJsonObject(0);
+        assertThat(view.getInteger("MovieId"), is(49051));
+        assertThat(view.getString("Title"), is("The Hobbit: An Unexpected Journey"));
+        assertThat(view.getString("Start"), is("2017-04-23T14:58:00Z"));
+        assertThat(view.getInteger("WasFirst"), is(1));
+        assertThat(view.getInteger("WasCinema"), is(0));
+        assertThat(view.getString("Image"), is("/w29Guo6FX6fxzH86f8iAbEhQEFC.jpg"));
+        assertThat(view.getString("Comment"), is("random"));
+        assertThat(view.getInteger("Runtime"), is(106));
     }
 }

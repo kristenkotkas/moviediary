@@ -53,12 +53,8 @@ public abstract class UiTest {
     public static void tearDown(TestContext ctx) throws Exception {
         service.stop();
         Async async = ctx.async();
-        localDatabase.dropAll()
-                .rxSetHandler()
-                .doOnError(ctx::fail)
-                .toCompletable()
-                .andThen(vertx.rxClose())
-                .subscribe(v -> async.complete());
+        localDatabase.close();
+        vertx.rxClose().subscribe(v -> async.complete(), ctx::fail);
     }
 
     @Before

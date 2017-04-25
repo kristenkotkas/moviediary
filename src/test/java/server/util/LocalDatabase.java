@@ -1,6 +1,7 @@
 package server.util;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import ch.vorburger.exec.ManagedProcessException;
+import ch.vorburger.mariadb4j.DB;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
@@ -10,23 +11,12 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import rx.Single;
 import server.service.DatabaseService;
-import server.service.DatabaseServiceImpl;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
 import static server.util.CommonUtils.ifPresent;
 
 public class LocalDatabase {
-    public static final String SQL_TRUNCATE_TABLES = "TRUNCATE TABLE Users;" +
-            "TRUNCATE TABLE Settings;" +
-            "TRUNCATE TABLE Movies;" +
-            "TRUNCATE TABLE Series;" +
-            "TRUNCATE TABLE SeriesInfo;" +
-            "TRUNCATE TABLE Views;" +
-            "TRUNCATE TABLE Wishlist;";
     public static final String SQL_CREATE_USERS = "CREATE TABLE Users (" +
             "    Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
             "    Firstname VARCHAR(100) NOT NULL,\n" +
@@ -101,20 +91,42 @@ public class LocalDatabase {
             "VALUES ('unittest@kyngas.eu', '49051', '2017-04-23 17:58:00', '2017-04-23 19:44:00', '1', '0', 'random')";
 
     private final JDBCClient client;
+    private final DB database;
 
     private LocalDatabase(Vertx vertx, JsonObject config) {
-        DatabaseServiceImpl.setTesting();
+        database = createDatabase(config);
         this.client = JDBCClient.createShared(vertx, config);
+    }
+
+    private static DB createDatabase(JsonObject config) {
+        config.put("user", "root");
+        config.remove("password");
+        try {
+            DB db = DB.newEmbeddedDB(3366);
+            db.start();
+            return db;
+        } catch (ManagedProcessException e) {
+            throw new RuntimeException(e.getCause());
+        }
     }
 
     public static Future<LocalDatabase> initializeDatabase(Vertx vertx, JsonObject config) {
         return future(fut -> ifPresent(new LocalDatabase(vertx, config
-                .put("url", "jdbc:h2:mem:test;DATABASE_TO_UPPER=false")
-                .put("driver_class", "org.h2.Driver")
+                .put("url", "jdbc:mysql://localhost:3366/test")
+                .put("driver_class", "com.mysql.cj.jdbc.Driver")
                 .put("max_pool_size", 30)), db -> db.initTables()
                 .doOnError(fut::fail)
                 .map(res -> db.initData().rxSetHandler())
                 .subscribe(r -> fut.complete(db), fut::fail)));
+    }
+
+    public void close() {
+        client.close();
+        try {
+            database.stop();
+        } catch (ManagedProcessException e) {
+            throw new RuntimeException(e.getCause());
+        }
     }
 
     private Single<UpdateResult> initTables() {
@@ -144,7 +156,14 @@ public class LocalDatabase {
 
     public Future<Void> resetCleanState() {
         return future(fut -> client.rxGetConnection()
-                .flatMap(conn -> conn.rxExecute(SQL_TRUNCATE_TABLES).doAfterTerminate(conn::close))
+                .flatMap(conn -> conn.rxExecute("TRUNCATE TABLE test.users")
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.settings"))
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.movies"))
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.series"))
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.seriesInfo"))
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.views"))
+                        .flatMap(v -> conn.rxExecute("TRUNCATE TABLE test.wishlist"))
+                        .doAfterTerminate(conn::close))
                 .doOnError(fut::fail)
                 .flatMap(res -> initData().rxSetHandler())
                 .subscribe(res -> fut.complete(), fut::fail));
@@ -152,12 +171,6 @@ public class LocalDatabase {
 
     public void resetCleanStateBlocking() {
         resetCleanState().rxSetHandler().toBlocking().value();
-    }
-
-    public Future<Void> dropAll() {
-        return future(fut -> client.rxGetConnection()
-                .flatMap(conn -> conn.rxExecute("DROP ALL OBJECTS").doAfterTerminate(conn::close))
-                .subscribe(fut::complete, fut::fail));
     }
 
     public Future<JsonArray> query(String sql, JsonArray params) {
@@ -183,13 +196,5 @@ public class LocalDatabase {
 
     public JsonObject updateOrInsertBlocking(String sql, JsonArray params) {
         return updateOrInsert(sql, params).rxSetHandler().toBlocking().value();
-    }
-
-    @SuppressWarnings("unused")
-    private void test() throws SQLException {
-        Connection conn = new MysqlDataSource().getConnection();
-        conn.prepareStatement(SQL_CREATE_MOVIES);
-        conn.prepareStatement(SQL_CREATE_SERIES_INFO);
-        conn.prepareStatement(SQL_CREATE_SERIES);
     }
 }
