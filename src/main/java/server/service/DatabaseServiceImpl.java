@@ -97,7 +97,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_REMOVE_WISHLIST =
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
     private static final String SQL_GET_LAST_VIEWS =
-            "SELECT Title, Start, MovieId FROM Views " +
+            "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day' FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";

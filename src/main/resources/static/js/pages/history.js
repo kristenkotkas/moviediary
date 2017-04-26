@@ -295,6 +295,7 @@ function addHistory(data, lang, type) {
         } else {
             posterPath = '/static/img/nanPosterBig.jpg'
         }
+        console.log(data[i]);
         $("#table").append(
             $.parseHTML(
                 '<li class="z-depth-0" id="history-' + data[i]['Id'] + '">' +

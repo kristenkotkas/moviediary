@@ -49,6 +49,7 @@ function fillLastMovies(lang) {
             lastMovies.append(
                 $.parseHTML(
                     '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
+                    '<td class="grey-text top-movies-home">' + getShortDayOfWeek(lang, movie['week_day']) + '</td>' +
                         '<td>' +
                             '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
                             '<span class="grey-text">' + getMonth(movie['Start'], lang) + '</span>' +
@@ -58,6 +59,20 @@ function fillLastMovies(lang) {
             );
         })
     });
+}
+
+function getShortDayOfWeek(lang, dayIndex) {
+    var weekdays = [
+        lang['STATISTICS_MON'],
+        lang['STATISTICS_TUE'],
+        lang['STATISTICS_WED'],
+        lang['STATISTICS_THU'],
+        lang['STATISTICS_FRI'],
+        lang['STATISTICS_SAT'],
+        lang['STATISTICS_SUN']
+    ];
+
+    return weekdays[dayIndex];
 }
 
 function fillTotalStat(lang) {
