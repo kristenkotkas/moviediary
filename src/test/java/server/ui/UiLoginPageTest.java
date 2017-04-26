@@ -18,8 +18,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
+import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
 import static server.entity.Language.getString;
 import static server.util.Utils.assertGoToPage;
+import static server.util.Utils.sleep;
 
 @RunWith(VertxUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -64,6 +66,7 @@ public class UiLoginPageTest extends UiTest {
         JsonObject fbAuth = config.getJsonObject("unit_test").getJsonObject("facebook_user");
         assertGoToPage(driver, URI + "/login");
         driver.findElements(tagName("a")).get(1).click();
+        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper"))));
         assertTrue(driver.getCurrentUrl().contains("facebook"));
         driver.findElement(id("email")).sendKeys(fbAuth.getString("username"));
         driver.findElement(id("pass")).sendKeys(fbAuth.getString("password"));

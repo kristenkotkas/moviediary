@@ -39,7 +39,7 @@ public class UiSeriesPageTest extends UiTest {
     }
 
     private void openSeasonView() {
-        driver.findElementByCssSelector("span.truncate.series-search-title").click();
+        driver.findElementByCssSelector("img.series-poster").click();
         await().atMost(5, SECONDS)
                 .until(() -> driver.findElementById("series-title").getText().equals("Black Mirror"));
     }
