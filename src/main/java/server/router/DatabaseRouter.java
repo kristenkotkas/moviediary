@@ -83,9 +83,9 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
         listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
         listen(DATABASE_INSERT_VIEW, reply(database::insertView));
-        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDist));
-        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDist));
-        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDist));
+        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDistribution));
+        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDistribution));
+        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDistribution));
         listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta));
         listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta));
         listen(DATABASE_REMOVE_VIEW, reply(database::removeView));

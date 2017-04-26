@@ -101,11 +101,11 @@ public interface DatabaseService {
 
     Future<String> getUsersCount();
 
-    Future<JsonObject> getYearsDist(String username, String param);
+    Future<JsonObject> getYearsDistribution(String username, String param);
 
-    Future<JsonObject> getWeekdaysDist(String username, String param);
+    Future<JsonObject> getWeekdaysDistribution(String username, String param);
 
-    Future<JsonObject> getTimeDist(String username, String param);
+    Future<JsonObject> getTimeDistribution(String username, String param);
 
     Future<JsonObject> getAllTimeMeta(String username, String param);
 

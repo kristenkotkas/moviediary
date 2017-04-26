@@ -12,8 +12,11 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import rx.Observable;
+import server.util.CommonUtils;
 import server.util.LocalDatabase;
 import server.verticle.ServerVerticle;
+
+import java.util.Map;
 
 import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -277,13 +280,8 @@ public class DatabaseServiceTest {
                 .put("is-first", false)
                 .put("is-cinema", false);
         localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW, null);
-        JsonArray views = database.getViews("unittest@kyngas.eu", data.encode(), 0).rxSetHandler()
-                .doOnError(ctx::fail)
-                .map(DatabaseService::getRows)
-                .toBlocking().value();
-        assertThat(views.size(), is(1));
-        JsonObject view = views.getJsonObject(0);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        JsonObject view = getSingleItem(ctx, database.getViews("unittest@kyngas.eu", data.encode(), 0));
         assertThat(view.getInteger("MovieId"), is(49051));
         assertThat(view.getString("Title"), is("The Hobbit: An Unexpected Journey"));
         assertThat(view.getString("Start"), is("2017-04-23T14:58:00Z"));
@@ -292,5 +290,125 @@ public class DatabaseServiceTest {
         assertThat(view.getString("Image"), is("/w29Guo6FX6fxzH86f8iAbEhQEFC.jpg"));
         assertThat(view.getString("Comment"), is("random"));
         assertThat(view.getInteger("Runtime"), is(106));
+    }
+
+    @Test
+    public void testGetYearsDistribution(TestContext ctx) throws Exception {
+        JsonObject data = new JsonObject()
+                .put("start", "20 April, 2017")
+                .put("end", "26 April, 2017")
+                .put("is-first", false)
+                .put("is-cinema", false);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        JsonObject year = getSingleItem(ctx,
+                database.getYearsDistribution("unittest@kyngas.eu", data.encode()));
+        assertThat(year.getInteger("Year"), is(2012));
+        assertThat(year.getInteger("Count"), is(1));
+    }
+
+    @Test
+    public void testGetWeekdaysDistribution(TestContext ctx) throws Exception {
+        JsonObject data = new JsonObject()
+                .put("start", "20 April, 2017")
+                .put("end", "26 April, 2017")
+                .put("is-first", false)
+                .put("is-cinema", false);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        JsonObject day = getSingleItem(ctx,
+                database.getWeekdaysDistribution("unittest@kyngas.eu", data.encode()));
+        assertThat(day.getInteger("Day"), is(6));
+        assertThat(day.getInteger("Count"), is(1));
+    }
+
+    @Test
+    public void testGetTimeDistribution(TestContext ctx) throws Exception {
+        JsonObject data = new JsonObject()
+                .put("start", "20 April, 2017")
+                .put("end", "26 April, 2017")
+                .put("is-first", false)
+                .put("is-cinema", false);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        JsonObject hour = getSingleItem(ctx,
+                database.getTimeDistribution("unittest@kyngas.eu", data.encode()));
+        assertThat(hour.getInteger("Hour"), is(17));
+        assertThat(hour.getInteger("Count"), is(1));
+    }
+
+    @Test
+    public void testGetMovieViews(TestContext ctx) throws Exception {
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        JsonObject view = getSingleItem(ctx, database.getMovieViews("unittest@kyngas.eu", "49051"));
+        assertThat(view.getString("Start"), is("2017-04-23T14:58:00Z"));
+        assertThat(view.getInteger("WasCinema"), is(0));
+    }
+
+    @Test
+    public void testGetTotalDistinctMoviesCount(TestContext ctx) throws Exception {
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
+        JsonObject count = getSingleItem(ctx, database.getTotalDistinctMoviesCount("unittest@kyngas.eu"));
+        assertThat(count.getInteger("unique_movies"), is(2));
+    }
+
+    @Test
+    public void testGetTotalRuntime(TestContext ctx) throws Exception {
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
+        JsonObject runtime = getSingleItem(ctx, database.getTotalRuntime("unittest@kyngas.eu"));
+        assertThat(runtime.getInteger("Runtime"), is(212));
+    }
+
+    @Test
+    public void testGetNewMovieCount(TestContext ctx) throws Exception {
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
+        JsonObject newMovieCount = getSingleItem(ctx, database.getNewMovieCount("unittest@kyngas.eu"));
+        assertThat(newMovieCount.getInteger("new_movies"), is(1));
+    }
+
+    @Test
+    public void testGetTotalMovieCount(TestContext ctx) throws Exception {
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
+        JsonObject totalMovieCount = getSingleItem(ctx, database.getTotalMovieCount("unittest@kyngas.eu"));
+        assertThat(totalMovieCount.getInteger("total_movies"), is(2));
+        assertThat(totalMovieCount.getInteger("Runtime"), is(212));
+    }
+
+    @Test
+    public void testGetTopMoviesHome(TestContext ctx) throws Exception {
+        Map<Integer, JsonObject> data = CommonUtils.<Integer, JsonObject>mapBuilder()
+                .put(49051, new JsonObject().put("Title", "The Hobbit: An Unexpected Journey").put("Count", 1))
+                .put(315837, new JsonObject().put("Title", "Ghost in the Shell").put("Count", 1))
+                .build();
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_GHOST, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
+        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
+        JsonArray array = database.getTopMoviesHome("unittest@kyngas.eu").rxSetHandler()
+                .doOnError(ctx::fail)
+                .map(DatabaseService::getRows)
+                .toBlocking().value();
+        assertThat(array.size(), is(2));
+        JsonObject movie1 = array.getJsonObject(0);
+        JsonObject movie1data = data.get(movie1.getInteger("MovieId"));
+        assertThat(movie1.getString("Title"), is(movie1data.getString("Title")));
+        assertThat(movie1.getInteger("Count"), is(movie1data.getInteger("Count")));
+        JsonObject movie2 = array.getJsonObject(1);
+        JsonObject movie2data = data.get(movie2.getInteger("MovieId"));
+        assertThat(movie2.getString("Title"), is(movie2data.getString("Title")));
+        assertThat(movie2.getInteger("Count"), is(movie2data.getInteger("Count")));
+    }
+
+    private JsonObject getSingleItem(TestContext ctx, Future<JsonObject> future) {
+        JsonArray array = future.rxSetHandler()
+                .doOnError(ctx::fail)
+                .map(DatabaseService::getRows)
+                .toBlocking().value();
+        assertThat(array.size(), is(1));
+        return array.getJsonObject(0);
     }
 }

@@ -86,9 +86,12 @@ public class LocalDatabase {
             "('42009', 'Black Mirror', '/djUxgzSIdfS5vNP2EHIBDIz9I8A.jpg')";
     public static final String SQL_INSERT_WISHLIST = "INSERT INTO Wishlist (Username, MovieId, Time) " +
             "VALUES ('unittest@kyngas.eu', '49051', '" + currentTimeMillis() + "')";
-    public static final String SQL_INSERT_VIEW = "INSERT INTO Views " +
+    public static final String SQL_INSERT_VIEW_HOBBIT = "INSERT INTO Views " +
             "(Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
             "VALUES ('unittest@kyngas.eu', '49051', '2017-04-23 17:58:00', '2017-04-23 19:44:00', '1', '0', 'random')";
+    public static final String SQL_INSERT_VIEW_GHOST = "INSERT INTO Views " +
+            "(Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
+            "VALUES ('unittest@kyngas.eu', '315837', '2017-03-17 17:58:00', '2017-03-17 19:44:00', '0', '1', 'lamp')";
 
     private final JDBCClient client;
     private final DB database;
@@ -149,7 +152,7 @@ public class LocalDatabase {
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_HOBBIT))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_GHOST))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_WISHLIST))
-                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_VIEW))
+                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_VIEW_HOBBIT))
                         .doAfterTerminate(conn::close))
                 .subscribe(res -> fut.complete(), fut::fail));
     }

@@ -1,6 +1,5 @@
 package server.service;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -12,9 +11,6 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import io.vertx.rxjava.ext.sql.SQLConnection;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -169,43 +165,6 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .subscribe(fut::complete, fut::fail));
     }
 
-    //quick hack for enabling intellij inspections on sql fragments
-    @SuppressWarnings("unused")
-    private void test() throws SQLException {
-        DataSource dataSource = new MysqlDataSource();
-        Connection conn = dataSource.getConnection();
-        conn.prepareStatement(SQL_INSERT_WISHLIST);
-        conn.prepareStatement(SQL_INSERT_EPISODE);
-        conn.prepareStatement(SQL_IS_IN_WISHLIST);
-        conn.prepareStatement(SQL_GET_WISHLIST);
-        conn.prepareStatement(SQL_GET_YEARS_DIST);
-        conn.prepareStatement(SQL_GET_WEEKDAYS_DIST);
-        conn.prepareStatement(SQL_GET_TIME_DIST);
-        conn.prepareStatement(SQL_GET_ALL_TIME_META);
-        conn.prepareStatement(SQL_INSERT_USER);
-        conn.prepareStatement(SQL_QUERY_USER);
-        conn.prepareStatement(SQL_QUERY_USERS);
-        conn.prepareStatement(SQL_INSERT_VIEW);
-        conn.prepareStatement(SQL_QUERY_VIEWS);
-        conn.prepareStatement(SQL_QUERY_SETTINGS);
-        conn.prepareStatement(SQL_INSERT_MOVIE);
-        conn.prepareStatement(SQL_INSERT_SERIES);
-        conn.prepareStatement(SQL_USERS_COUNT);
-        conn.prepareStatement(SQL_GET_MOVIE_VIEWS);
-        conn.prepareStatement(SQL_QUERY_VIEWS_META);
-        conn.prepareStatement(SQL_REMOVE_VIEW);
-        conn.prepareStatement(SQL_GET_SEEN_EPISODES);
-        conn.prepareStatement(SQL_REMOVE_WISHLIST);
-        conn.prepareStatement(SQL_GET_WATCHING_SERIES);
-        conn.prepareStatement(SQL_GET_LAST_VIEWS);
-        conn.prepareStatement(SQL_GET_HOME_WISHLIST);
-        conn.prepareStatement(SQL_GET_TOP_MOVIES);
-        conn.prepareStatement(SQL_GET_TOTAL_MOVIE_COUNT);
-        conn.prepareStatement(SQL_GET_NEW_MOVIE_COUNT);
-        conn.prepareStatement(SQL_GET_TOTAL_RUNTIME);
-        conn.prepareStatement(SQL_GET_TOTAL_DISTINCT_MOVIES);
-    }
-
     /**
      * Inserts a Facebook, Google or IdCard user into database.
      */
@@ -315,7 +274,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing update results
      */
     @Override
-    public Future<JsonObject> update(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx
+    public Future<JsonObject> update(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx + test
         return future(fut -> {
             if (data.get(USERNAME) == null) {
                 fut.fail("Username required.");
@@ -340,7 +299,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing insertion results
      */
     @Override
-    public Future<JsonObject> insert(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx
+    public Future<JsonObject> insert(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx + test
         return future(fut -> {
             if (data.get(USERNAME) == null) {
                 fut.fail("Username required.");
@@ -389,85 +348,59 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getYearsDist(String username, String param) {
-        //GROUP BY Year ORDER BY Year DESC
+    public Future<JsonObject> getYearsDistribution(String username, String param) {
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
-        String SQL_QUERY_VIEWS_TEMP = SQL_GET_YEARS_DIST;
-        if (json.getBoolean("is-first")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
-        }
-        if (json.getBoolean("is-cinema")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
-        }
-
-        SQL_QUERY_VIEWS_TEMP += " GROUP BY Year ORDER BY Year DESC";
-        String SQL_QUERY_VIEWS_TEMP_FINAL = SQL_QUERY_VIEWS_TEMP;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_QUERY_VIEWS_TEMP_FINAL, new JsonArray()
-                        .add(username)
-                        .add(json.getString("start"))
-                        .add(json.getString("end")), resultHandler(conn, fut)))));
+        StringBuilder sb = new StringBuilder(SQL_GET_YEARS_DIST);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.append(" GROUP BY Year ORDER BY Year DESC").toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
     }
 
     @Override
-    public Future<JsonObject> getWeekdaysDist(String username, String param) {
-        //"GROUP BY Day ORDER BY Day"
+    public Future<JsonObject> getWeekdaysDistribution(String username, String param) {
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
-        String SQL_QUERY_VIEWS_TEMP = SQL_GET_WEEKDAYS_DIST;
-        if (json.getBoolean("is-first")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
-        }
-        if (json.getBoolean("is-cinema")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
-        }
-        SQL_QUERY_VIEWS_TEMP += " GROUP BY Day ORDER BY Day";
-        String SQL_QUERY_VIEWS_TEMP_FINAL = SQL_QUERY_VIEWS_TEMP;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_QUERY_VIEWS_TEMP_FINAL, new JsonArray()
-                        .add(username)
-                        .add(json.getString("start"))
-                        .add(json.getString("end")), resultHandler(conn, fut)))));
+        StringBuilder sb = new StringBuilder(SQL_GET_WEEKDAYS_DIST);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.append(" GROUP BY Day ORDER BY Day").toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
     }
 
     @Override
-    public Future<JsonObject> getTimeDist(String username, String param) {
-        //"GROUP BY Hour";
+    public Future<JsonObject> getTimeDistribution(String username, String param) {
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
-        String SQL_GET_TIME_DIST_TEMP = SQL_GET_TIME_DIST;
-        if (json.getBoolean("is-first")) {
-            SQL_GET_TIME_DIST_TEMP += " AND WasFirst";
-        }
-        if (json.getBoolean("is-cinema")) {
-            SQL_GET_TIME_DIST_TEMP += " AND WasCinema";
-        }
-        SQL_GET_TIME_DIST_TEMP += " GROUP BY Hour";
-        String SQL_GET_TIME_DIST_TEMP_FINAL = SQL_GET_TIME_DIST_TEMP;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_TIME_DIST_TEMP_FINAL, new JsonArray()
-                        .add(username)
-                        .add(json.getString("start"))
-                        .add(json.getString("end")), resultHandler(conn, fut)))));
+        StringBuilder sb = new StringBuilder(SQL_GET_TIME_DIST);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.append(" GROUP BY Hour").toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
     }
 
     /**
      * Gets a specific movie views for user.
      */
     @Override
-    public Future<JsonObject> getMovieViews(String username, String param) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_MOVIE_VIEWS, new JsonArray()
-                        .add(username)
-                        .add(param), resultHandler(conn, fut)))));
+    public Future<JsonObject> getMovieViews(String username, String movieId) {
+        return query(SQL_GET_MOVIE_VIEWS, new JsonArray()
+                .add(username)
+                .add(movieId));
     }
 
     @Override
-    public Future<JsonObject> getAllTimeMeta(String username, String param) {
+    public Future<JsonObject> getAllTimeMeta(String username, String param) { // TODO: 26/04/2017 test + rx
         JsonObject json = new JsonObject(param);
 
         String SQL_GET_ALL_TIME_META_TEMP = SQL_GET_ALL_TIME_META;
@@ -485,7 +418,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getViewsMeta(String username, String param) {
+    public Future<JsonObject> getViewsMeta(String username, String param) { // TODO: 26/04/2017 test + rx
         JsonObject json = new JsonObject(param);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
@@ -506,83 +439,58 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> removeView(String username, String param) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_REMOVE_VIEW, new JsonArray()
-                        .add(username)
-                        .add(param), resultHandler(conn, fut)))));
+    public Future<JsonObject> removeView(String username, String id) { // TODO: 26/04/2017 test
+        return updateOrInsert(SQL_REMOVE_VIEW, new JsonArray().add(username).add(id));
     }
 
     @Override
-    public Future<JsonObject> removeEpisode(String username, String param) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_REMOVE_EPISODE, new JsonArray()
-                        .add(username)
-                        .add(param), resultHandler(conn, fut)))));
+    public Future<JsonObject> removeEpisode(String username, String episodeId) { // TODO: 26/04/2017 test
+        return updateOrInsert(SQL_REMOVE_EPISODE, new JsonArray().add(username).add(episodeId));
     }
 
     @Override
-    public Future<JsonObject> getWatchingSeries(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_WATCHING_SERIES, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+    public Future<JsonObject> getWatchingSeries(String username) { // TODO: 26/04/2017 test
+        return query(SQL_GET_WATCHING_SERIES, new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> removeFromWishlist(String username, String param) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.updateWithParams(SQL_REMOVE_WISHLIST, new JsonArray()
-                        .add(username)
-                        .add(param), resultHandler(conn, fut)))));
+    public Future<JsonObject> removeFromWishlist(String username, String movieId) { // TODO: 26/04/2017 test
+        return updateOrInsert(SQL_REMOVE_WISHLIST, new JsonArray().add(username).add(movieId));
     }
 
     @Override
-    public Future<JsonObject> getLastMoviesHome(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_LAST_VIEWS, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+    public Future<JsonObject> getLastMoviesHome(String username) { // TODO: 26/04/2017 test
+        return query(SQL_GET_LAST_VIEWS, new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> getLastWishlistHome(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_HOME_WISHLIST, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+    public Future<JsonObject> getLastWishlistHome(String username) { // TODO: 26/04/2017 test
+        return query(SQL_GET_HOME_WISHLIST, new JsonArray().add(username));
     }
 
     @Override
     public Future<JsonObject> getTopMoviesHome(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_TOP_MOVIES, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+        return query(SQL_GET_TOP_MOVIES, new JsonArray().add(username));
     }
 
     @Override
     public Future<JsonObject> getTotalMovieCount(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_TOTAL_MOVIE_COUNT, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+        return query(SQL_GET_TOTAL_MOVIE_COUNT, new JsonArray().add(username));
     }
 
     @Override
     public Future<JsonObject> getNewMovieCount(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_NEW_MOVIE_COUNT, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+        return query(SQL_GET_NEW_MOVIE_COUNT, new JsonArray().add(username));
     }
 
     @Override
     public Future<JsonObject> getTotalRuntime(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_TOTAL_RUNTIME, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+        return query(SQL_GET_TOTAL_RUNTIME, new JsonArray().add(username));
     }
 
     @Override
     public Future<JsonObject> getTotalDistinctMoviesCount(String username) {
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_TOTAL_DISTINCT_MOVIES, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+        return query(SQL_GET_TOTAL_DISTINCT_MOVIES, new JsonArray().add(username));
     }
 
     /**
