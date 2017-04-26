@@ -490,13 +490,13 @@ header .brand-logo:hover {
 }
 
 /* Navbar fix */
-@media only screen and (max-width: 1155px) {
+@media only screen and (max-width: 750px) {
     .hide-nav-bar {
         display: none !important;
     }
 }
 
-@media only screen and (min-width: 1156px) {
+@media only screen and (min-width: 751px) {
     .hide-menu-button {
         display: none !important;
     }

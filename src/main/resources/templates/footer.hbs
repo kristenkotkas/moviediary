@@ -7,13 +7,15 @@
         </div>
         <div class="row">
             <div class="col">
-                <a class="grey-text text-lighten-3" href="/private/user">{{userName}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/home">{{i18n "NAVBAR_HOME" locale=lang}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/movies">{{i18n "NAVBAR_MOVIES" locale=lang}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/series">{{i18n "NAVBAR_SERIES" locale=lang}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/history">{{i18n "NAVBAR_HISTORY" locale=lang}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/statistics">{{i18n "NAVBAR_STATISTICS" locale=lang}} | </a>
-                <a class="grey-text text-lighten-3" href="/private/wishlist">{{i18n "NAVBAR_WISHLIST" locale=lang}}</a>
+                <a class="grey-text text-lighten-3" href="{{userPage}}">{{userName}} | </a>
+                <a class="grey-text text-lighten-3" href="{{homePage}}">{{i18n "NAVBAR_HOME" locale=lang}} | </a>
+                <a class="grey-text text-lighten-3" href="{{moviesPage}}">{{i18n "NAVBAR_MOVIES" locale=lang}} | </a>
+                <a class="grey-text text-lighten-3" href="{{seriesPage}}">{{i18n "NAVBAR_SERIES" locale=lang}} | </a>
+                <a class="grey-text text-lighten-3" href="{{historyPage}}">{{i18n "NAVBAR_HISTORY" locale=lang}} | </a>
+                <a class="grey-text text-lighten-3" href="{{statisticsPage}}">
+                    {{i18n "NAVBAR_STATISTICS" locale=lang}} |
+                </a>
+                <a class="grey-text text-lighten-3" href="{{wishlistPage}}">{{i18n "NAVBAR_WISHLIST" locale=lang}}</a>
             </div>
         </div>
     </div>
