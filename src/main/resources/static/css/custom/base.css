@@ -4,8 +4,22 @@
 }
 
 body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+body {
     background-size: cover;
     background-attachment: fixed;
+}
+
+.opacity-footer{
+    opacity: 0.85;
 }
 
 .episode-card:hover {
@@ -250,6 +264,12 @@ span.badge.new:after {
 }
 
 .episodes-count {
+    font-weight: 900;
+    opacity: 0.6;
+    font-size: 2em;
+}
+
+.top-movies-home {
     font-weight: 900;
     opacity: 0.6;
     font-size: 2em;

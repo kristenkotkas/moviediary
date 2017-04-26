@@ -20,11 +20,14 @@
 </div>
 {{> templates/navbar.hbs}}
 <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_WISHLIST" locale=lang}}</h3>
-<div class="row">
-    <div id="wishlist-result" class="col s12 m10 l8 offset-l2 offset-m1">
-        <!-- Siia tuleb otsingu sisu jqueryga -->
+<main>
+    <div class="row">
+        <div id="wishlist-result" class="col s12 m10 l10 offset-l1 offset-m1">
+            <!-- Siia tuleb otsingu sisu jqueryga -->
+        </div>
     </div>
-</div>
+</main>
+{{> templates/footer.hbs}}
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
 <script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
 <script defer type="text/javascript" src="/static/js/custom/materialize.min.js"></script>

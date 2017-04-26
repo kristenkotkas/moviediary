@@ -31,8 +31,8 @@ function fillTopMovies(lang) {
             topMovies.append(
                 $.parseHTML(
                     '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
-                    '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
-                    '<td class="grey-text">' + movie['Count'] + '</td>' +
+                        '<td class="grey-text center top-movies-home">' + movie['Count'] + '</td>' +
+                        '<td class="content-key grey-text text-darken-1">' + movie['Title'] + '</td>' +
                     '</tr>'
                 )
             );
@@ -49,8 +49,10 @@ function fillLastMovies(lang) {
             lastMovies.append(
                 $.parseHTML(
                     '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
-                        '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
-                        '<td class="grey-text">' + getMonth(movie['Start'], lang) + '</td>' +
+                        '<td>' +
+                            '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
+                            '<span class="grey-text">' + getMonth(movie['Start'], lang) + '</span>' +
+                        '</td>' +
                     '</tr>'
                 )
             );
@@ -85,8 +87,10 @@ function fillWishlist(lang) {
             wishlist.append(
                 $.parseHTML(
                     '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
-                    '<td class="content-key grey-text">' + movie['Title'] + '</td>' +
-                    '<td class="grey-text">' + movie['Year'] + '</td>' +
+                    '<td>' +
+                        '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
+                        '<span class="grey-text">' +  movie['Year'] + '</span>' +
+                    '</td>' +
                     '</tr>'
                 )
             );

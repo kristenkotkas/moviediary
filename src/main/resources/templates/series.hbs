@@ -18,52 +18,55 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navbar.hbs}}
-<h3 class="light grey-text text-lighten-1 page-heading truncate" id="series-title">
-    {{i18n "NAVBAR_SERIES" locale=lang}}
-</h3>
-<div class="row">
-    <div class="col s12 m12 l12">
-        <div class="row">
-            <div class="col movies-search-bar s12 m10 offset-m1 l6 offset-l3">
-                <div class="card z-depth-0 opacity-object">
-                    <div class="search-wrapper input-field">
-                        <input class="movies-search-bar movies-heading" tabindex="8" id="series-search" type="search"
-                               placeholder="{{i18n "SERIES_SEARCH_FOR" locale=lang}}" required>
-                        <label id="series-search-button" class="label-icon search-button" for="series-search">
-                            <i class="fa fa-search left"></i></label>
+<main>
+    <h3 class="light grey-text text-lighten-1 page-heading truncate" id="series-title">
+        {{i18n "NAVBAR_SERIES" locale=lang}}
+    </h3>
+    <div class="row">
+        <div class="col s12 m12 l12">
+            <div class="row">
+                <div class="col movies-search-bar s12 m10 offset-m1 l6 offset-l3">
+                    <div class="card z-depth-0 opacity-object">
+                        <div class="search-wrapper input-field">
+                            <input class="movies-search-bar movies-heading" tabindex="8" id="series-search" type="search"
+                                   placeholder="{{i18n "SERIES_SEARCH_FOR" locale=lang}}" required>
+                            <label id="series-search-button" class="label-icon search-button" for="series-search">
+                                <i class="fa fa-search left"></i></label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col s12 m10 l10 offset-l1 offset-m1">
-                <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
-                    <li class="z-depth-0">
-                        <div class="collapsible-header collapsible-header-tv history-object" id="seen-series-header">
-                            <span>{{i18n "SERIES_SEEN_SERIES" locale=lang}}</span>
-                        </div>
-                        <div class="collapsible-body collapsible-body-tv">
-                            <div class="row" id="seen-series-container">
-                                <!-- Siia tuleb seen series sisu -->
+                <div class="col s12 m10 l10 offset-l1 offset-m1">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
+                        <li class="z-depth-0">
+                            <div class="collapsible-header collapsible-header-tv history-object" id="seen-series-header">
+                                <span>{{i18n "SERIES_SEEN_SERIES" locale=lang}}</span>
                             </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="col s12 m10 l10 offset-l1 offset-m1">
-                <div id="tv-loader">
-                    <!-- Siia tuleb loader -->
+                            <div class="collapsible-body collapsible-body-tv">
+                                <div class="row" id="seen-series-container">
+                                    <!-- Siia tuleb seen series sisu -->
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-            </div>
-            <div class="col s12 m10 l10 offset-l1 offset-m1">
-                <div id="tv-search-result-container">
-                    <!-- Siia tuleb otsingu sisu jqueryga -->
+                <div class="col s12 m10 l10 offset-l1 offset-m1">
+                    <div id="tv-loader">
+                        <!-- Siia tuleb loader -->
+                    </div>
                 </div>
-                <ul class="collapsible popout z-depth-0" data-collapsible="accordion" id="series-data-container">
-                    <!-- Siia tuleb sarja info sisu jqueryga -->
-                </ul>
+                <div class="col s12 m10 l10 offset-l1 offset-m1">
+                    <div id="tv-search-result-container">
+                        <!-- Siia tuleb otsingu sisu jqueryga -->
+                    </div>
+                    <ul class="collapsible popout z-depth-0" data-collapsible="accordion" id="series-data-container">
+                        <!-- Siia tuleb sarja info sisu jqueryga -->
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</main>
+{{> templates/footer.hbs}}
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
 <script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
 <script defer type="text/javascript" src="/static/js/custom/materialize.min.js"></script>

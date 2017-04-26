@@ -19,86 +19,89 @@
     <div class="loader-section section-right"></div>
 </div>
 {{> templates/navbar.hbs}}
-<h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
-<div class="row">
-    <div class="col s12 m6 l6">
-        <div class="card white large z-depth-0">
-            <div class="card-content grey-text">
-                <span class="card-title">{{i18n "HOME_MESSENGER" locale=lang}}</span>
-                <label for="MessageInput">{{i18n "HOME_INSERT_MESSAGE" locale=lang}}</label>
-                <input id="MessageInput" type="text">
-                <div class="row">
-                    <div class="col s12">
-                        <a id="SendMessage" class="btn waves-effect waves-light z-depth-0">
-                            {{i18n "HOME_SEND" locale=lang}}
-                        </a>
+<main>
+    <h3 class="light grey-text text-lighten-1 page-heading">{{userName}}</h3>
+    <div class="row">
+        <div class="col s12 m6 l6">
+            <div class="card white large z-depth-0">
+                <div class="card-content grey-text">
+                    <span class="card-title">{{i18n "HOME_MESSENGER" locale=lang}}</span>
+                    <label for="MessageInput">{{i18n "HOME_INSERT_MESSAGE" locale=lang}}</label>
+                    <input id="MessageInput" type="text">
+                    <div class="row">
+                        <div class="col s12">
+                            <a id="SendMessage" class="btn waves-effect waves-light z-depth-0">
+                                {{i18n "HOME_SEND" locale=lang}}
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col s12">
-                        <form method="post" action="http://localhost:8083/banklink/ipizza">
-                            <!-- include all values as hidden form fields -->
-                            <input type="hidden" name="VK_SERVICE" value="{{vK_SERVICE}}">
-                            <input type="hidden" name="VK_VERSION" value="{{vK_VERSION}}">
-                            <input type="hidden" name="VK_SND_ID" value="{{vK_SND_ID}}">
-                            <input type="hidden" name="VK_STAMP" value="{{vK_STAMP}}">
-                            <input type="hidden" name="VK_AMOUNT" value="{{vK_AMOUNT}}">
-                            <input type="hidden" name="VK_CURR" value="{{vK_CURR}}">
-                            <input type="hidden" name="VK_ACC" value="{{vK_ACC}}">
-                            <input type="hidden" name="VK_NAME" value="{{vK_NAME}}">
-                            <input type="hidden" name="VK_REF" value="{{vK_REF}}">
-                            <input type="hidden" name="VK_LANG" value="{{vK_LANG}}">
-                            <input type="hidden" name="VK_MSG" value="{{vK_MSG}}">
-                            <input type="hidden" name="VK_RETURN" value="{{vK_RETURN}}">
-                            <input type="hidden" name="VK_CANCEL" value="{{vK_CANCEL}}">
-                            <input type="hidden" name="VK_DATETIME" value="{{vK_DATETIME}}">
-                            <input type="hidden" name="VK_ENCODING" value="{{vK_ENCODING}}">
-                            <input type="hidden" name="VK_MAC" value="{{vK_MAC}}">
-                            <input class="btn waves-effect waves-light z-depth-0" type="submit"
-                                   value="{{i18n "DONATE_A_FIVER" locale=lang}}"/>
-                        </form>
+                    <div class="row">
+                        <div class="col s12">
+                            <form method="post" action="http://localhost:8083/banklink/ipizza">
+                                <!-- include all values as hidden form fields -->
+                                <input type="hidden" name="VK_SERVICE" value="{{vK_SERVICE}}">
+                                <input type="hidden" name="VK_VERSION" value="{{vK_VERSION}}">
+                                <input type="hidden" name="VK_SND_ID" value="{{vK_SND_ID}}">
+                                <input type="hidden" name="VK_STAMP" value="{{vK_STAMP}}">
+                                <input type="hidden" name="VK_AMOUNT" value="{{vK_AMOUNT}}">
+                                <input type="hidden" name="VK_CURR" value="{{vK_CURR}}">
+                                <input type="hidden" name="VK_ACC" value="{{vK_ACC}}">
+                                <input type="hidden" name="VK_NAME" value="{{vK_NAME}}">
+                                <input type="hidden" name="VK_REF" value="{{vK_REF}}">
+                                <input type="hidden" name="VK_LANG" value="{{vK_LANG}}">
+                                <input type="hidden" name="VK_MSG" value="{{vK_MSG}}">
+                                <input type="hidden" name="VK_RETURN" value="{{vK_RETURN}}">
+                                <input type="hidden" name="VK_CANCEL" value="{{vK_CANCEL}}">
+                                <input type="hidden" name="VK_DATETIME" value="{{vK_DATETIME}}">
+                                <input type="hidden" name="VK_ENCODING" value="{{vK_ENCODING}}">
+                                <input type="hidden" name="VK_MAC" value="{{vK_MAC}}">
+                                <input class="btn waves-effect waves-light z-depth-0" type="submit"
+                                       value="{{i18n "DONATE_A_FIVER" locale=lang}}"/>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col s12">
-                        <a href="#" id="UserCount" class="btn waves-effect waves-light red z-depth-0">
-                            User Count: Loading...
-                        </a>
+                    <div class="row">
+                        <div class="col s12">
+                            <a href="#" id="UserCount" class="btn waves-effect waves-light red z-depth-0">
+                                User Count: Loading...
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col s12">
-                        <a href="{{logoutUrl}}" class="btn waves-effect waves-light red z-depth-0">
-                            <i class="fa fa-sign-out left re"></i>{{i18n "USER_LOGOUT" locale=lang}}
-                        </a>
+                    <div class="row">
+                        <div class="col s12">
+                            <a href="{{logoutUrl}}" class="btn waves-effect waves-light red z-depth-0">
+                                <i class="fa fa-sign-out left re"></i>{{i18n "USER_LOGOUT" locale=lang}}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col s12 m6 l6">
-        <div class="card white large z-depth-0">
-            <div class="card-content">
-                <span class="card-title grey-text">{{i18n "HOME_LOCATION" locale=lang}}</span>
-                <div id="map" class="card-image card-map"></div>
+        <div class="col s12 m6 l6">
+            <div class="card white large z-depth-0">
+                <div class="card-content">
+                    <span class="card-title grey-text">{{i18n "HOME_LOCATION" locale=lang}}</span>
+                    <div id="map" class="card-image card-map"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col s12 m6">
-        <div class="card white z-depth-0">
-            <div class="card-content">
-                <span class="card-title">{{i18n "USER_DETAILS" locale=lang}}</span>
-                <table>
-                    <tbody id="my-info">
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="card white z-depth-0">
+                <div class="card-content">
+                    <span class="card-title">{{i18n "USER_DETAILS" locale=lang}}</span>
+                    <table>
+                        <tbody id="my-info">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</main>
+{{> templates/footer.hbs}}
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
 <script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
 <script defer type="text/javascript" src="/static/js/custom/materialize.min.js"></script>
