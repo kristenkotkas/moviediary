@@ -18,6 +18,10 @@ body {
     background-attachment: fixed;
 }
 
+.home-link:hover {
+    text-decoration: underline;
+}
+
 .opacity-footer{
     opacity: 0.85;
 }
