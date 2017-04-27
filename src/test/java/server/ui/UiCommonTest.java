@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static server.entity.Language.getString;
-import static server.util.LoginUtils.formLogin;
 import static server.util.Utils.*;
 
 @RunWith(VertxUnitRunner.class)

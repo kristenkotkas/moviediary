@@ -3,11 +3,14 @@ package server.demo;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import server.ui.UiTest;
 
 import java.util.List;
@@ -28,6 +31,14 @@ import static server.util.Utils.*;
 @SuppressWarnings("Duplicates")
 @RunWith(VertxUnitRunner.class)
 public class DemoUiTest extends UiTest {
+
+    @Before
+    public void setUp() throws Exception {
+        localDatabase.resetCleanStateBlocking();
+        driver = new ChromeDriver(service);
+        driver.manage().window().setPosition(new Point(200, 0));
+        formLogin(driver, URI, config);
+    }
 
     @Test
     public void testNavBarLinksCanGetToPages() throws Exception {

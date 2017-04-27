@@ -189,8 +189,8 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Inserts a view into views table.
      */
     @Override
-    public Future<JsonObject> insertView(String user, String param) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> insertView(String user, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         return updateOrInsert(SQL_INSERT_VIEW, new JsonArray()
                 .add(user)
                 .add(json.getString("movieId"))
@@ -233,8 +233,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> insertEpisodeView(String username, String param) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> insertEpisodeView(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         return updateOrInsert(SQL_INSERT_EPISODE, new JsonArray()
                 .add(username)
                 .add(json.getInteger("seriesId"))
@@ -332,8 +332,8 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Gets all movies views for user.
      */
     @Override
-    public Future<JsonObject> getViews(String username, String param, int page) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> getViews(String username, String jsonParam, int page) {
+        JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS);
@@ -348,8 +348,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getYearsDistribution(String username, String param) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> getYearsDistribution(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_GET_YEARS_DIST);
@@ -362,8 +362,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getWeekdaysDistribution(String username, String param) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> getWeekdaysDistribution(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_GET_WEEKDAYS_DIST);
@@ -376,8 +376,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getTimeDistribution(String username, String param) {
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> getTimeDistribution(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_GET_TIME_DIST);
@@ -394,77 +394,59 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> getMovieViews(String username, String movieId) {
-        return query(SQL_GET_MOVIE_VIEWS, new JsonArray()
-                .add(username)
-                .add(movieId));
+        return query(SQL_GET_MOVIE_VIEWS, new JsonArray().add(username).add(movieId));
     }
 
     @Override
-    public Future<JsonObject> getAllTimeMeta(String username, String param) { // TODO: 26/04/2017 test + rx
-        JsonObject json = new JsonObject(param);
-
-        String SQL_GET_ALL_TIME_META_TEMP = SQL_GET_ALL_TIME_META;
-        if (json.getBoolean("is-first")) {
-            SQL_GET_ALL_TIME_META_TEMP += " AND WasFirst";
-        }
-        if (json.getBoolean("is-cinema")) {
-            SQL_GET_ALL_TIME_META_TEMP += " AND WasCinema";
-        }
-
-        String SQL_GET_ALL_TIME_META_TEMP_FINAL = SQL_GET_ALL_TIME_META_TEMP;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(SQL_GET_ALL_TIME_META_TEMP_FINAL, new JsonArray()
-                        .add(username), resultHandler(conn, fut)))));
+    public Future<JsonObject> getAllTimeMeta(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
+        StringBuilder sb = new StringBuilder(SQL_GET_ALL_TIME_META);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.toString(), new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> getViewsMeta(String username, String param) { // TODO: 26/04/2017 test + rx
-        JsonObject json = new JsonObject(param);
+    public Future<JsonObject> getViewsMeta(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
-        String SQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_META;
-        if (json.getBoolean("is-first")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasFirst";
-        }
-        if (json.getBoolean("is-cinema")) {
-            SQL_QUERY_VIEWS_TEMP += " AND WasCinema";
-        }
-
-        String finalSQL_QUERY_VIEWS_TEMP = SQL_QUERY_VIEWS_TEMP;
-        return future(fut -> client.getConnection(connHandler(fut,
-                conn -> conn.queryWithParams(finalSQL_QUERY_VIEWS_TEMP, new JsonArray()
-                        .add(username)
-                        .add(json.getString("start"))
-                        .add(json.getString("end")), resultHandler(conn, fut)))));
+        StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS_META);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
     }
 
     @Override
-    public Future<JsonObject> removeView(String username, String id) { // TODO: 26/04/2017 test
+    public Future<JsonObject> removeView(String username, String id) {
         return updateOrInsert(SQL_REMOVE_VIEW, new JsonArray().add(username).add(id));
     }
 
     @Override
-    public Future<JsonObject> removeEpisode(String username, String episodeId) { // TODO: 26/04/2017 test
+    public Future<JsonObject> removeEpisode(String username, String episodeId) {
         return updateOrInsert(SQL_REMOVE_EPISODE, new JsonArray().add(username).add(episodeId));
     }
 
     @Override
-    public Future<JsonObject> getWatchingSeries(String username) { // TODO: 26/04/2017 test
+    public Future<JsonObject> getWatchingSeries(String username) {
         return query(SQL_GET_WATCHING_SERIES, new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> removeFromWishlist(String username, String movieId) { // TODO: 26/04/2017 test
+    public Future<JsonObject> removeFromWishlist(String username, String movieId) {
         return updateOrInsert(SQL_REMOVE_WISHLIST, new JsonArray().add(username).add(movieId));
     }
 
     @Override
-    public Future<JsonObject> getLastMoviesHome(String username) { // TODO: 26/04/2017 test
+    public Future<JsonObject> getLastMoviesHome(String username) {
         return query(SQL_GET_LAST_VIEWS, new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> getLastWishlistHome(String username) { // TODO: 26/04/2017 test
+    public Future<JsonObject> getLastWishlistHome(String username) {
         return query(SQL_GET_HOME_WISHLIST, new JsonArray().add(username));
     }
 

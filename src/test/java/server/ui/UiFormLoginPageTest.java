@@ -17,8 +17,8 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static server.entity.Language.getString;
-import static server.util.LoginUtils.formLogin;
 import static server.util.Utils.assertGoToPage;
+import static server.util.Utils.formLogin;
 
 @RunWith(VertxUnitRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

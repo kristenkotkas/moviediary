@@ -79,7 +79,7 @@ public interface DatabaseService {
 
     Future<JsonObject> insertWishlist(String username, int movieId);
 
-    Future<JsonObject> insertView(String user, String param);
+    Future<JsonObject> insertView(String user, String jsonParam);
 
     Future<JsonObject> isInWishlist(String username, int movieId);
 
@@ -95,25 +95,25 @@ public interface DatabaseService {
 
     Future<JsonObject> getAllUsers();
 
-    Future<JsonObject> getViews(String username, String param, int page);
+    Future<JsonObject> getViews(String username, String jsonParam, int page);
 
-    Future<JsonObject> getMovieViews(String username, String param);
+    Future<JsonObject> getMovieViews(String username, String movieId);
 
     Future<String> getUsersCount();
 
-    Future<JsonObject> getYearsDistribution(String username, String param);
+    Future<JsonObject> getYearsDistribution(String username, String jsonParam);
 
-    Future<JsonObject> getWeekdaysDistribution(String username, String param);
+    Future<JsonObject> getWeekdaysDistribution(String username, String jsonParam);
 
-    Future<JsonObject> getTimeDistribution(String username, String param);
+    Future<JsonObject> getTimeDistribution(String username, String jsonParam);
 
-    Future<JsonObject> getAllTimeMeta(String username, String param);
+    Future<JsonObject> getAllTimeMeta(String username, String jsonParam);
 
-    Future<JsonObject> getViewsMeta(String username, String param);
+    Future<JsonObject> getViewsMeta(String username, String jsonParam);
 
-    Future<JsonObject> removeView(String username, String param);
+    Future<JsonObject> removeView(String username, String id);
 
-    Future<JsonObject> removeEpisode(String username, String param);
+    Future<JsonObject> removeEpisode(String username, String episodeId);
 
     Future<JsonObject> insertEpisodeView(String username, String data);
 
@@ -123,7 +123,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getWatchingSeries(String username);
 
-    Future<JsonObject> removeFromWishlist(String username, String param);
+    Future<JsonObject> removeFromWishlist(String username, String movieId);
 
     Future<JsonObject> getLastMoviesHome(String username);
 

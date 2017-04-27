@@ -18,9 +18,9 @@ import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static server.util.FileUtils.getConfig;
 import static server.util.LocalDatabase.initializeDatabase;
-import static server.util.LoginUtils.formLogin;
 import static server.util.NetworkUtils.HTTP_PORT;
 import static server.util.Utils.createDriverService;
+import static server.util.Utils.formLogin;
 
 public abstract class UiTest {
     protected static final int PORT = 8082;

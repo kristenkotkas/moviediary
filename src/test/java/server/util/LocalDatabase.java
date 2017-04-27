@@ -84,7 +84,7 @@ public class LocalDatabase {
     public static final String SQL_INSERT_SERIES_INFO = "INSERT INTO SeriesInfo " +
             "(Id, Title, Image) VALUES " +
             "('42009', 'Black Mirror', '/djUxgzSIdfS5vNP2EHIBDIz9I8A.jpg')";
-    public static final String SQL_INSERT_WISHLIST = "INSERT INTO Wishlist (Username, MovieId, Time) " +
+    public static final String SQL_INSERT_WISHLIST_HOBBIT = "INSERT INTO Wishlist (Username, MovieId, Time) " +
             "VALUES ('unittest@kyngas.eu', '49051', '" + currentTimeMillis() + "')";
     public static final String SQL_INSERT_VIEW_HOBBIT = "INSERT INTO Views " +
             "(Username, MovieId, Start, End, WasFirst, WasCinema, Comment) " +
@@ -151,7 +151,7 @@ public class LocalDatabase {
                         .flatMap(res -> conn.rxUpdate(SQL_INSERT_FB_SETTING))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_HOBBIT))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_MOVIES_GHOST))
-                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_WISHLIST))
+                        //.flatMap(res -> conn.rxUpdate(SQL_INSERT_WISHLIST_HOBBIT))
                         //.flatMap(res -> conn.rxUpdate(SQL_INSERT_VIEW_HOBBIT))
                         .doAfterTerminate(conn::close))
                 .subscribe(res -> fut.complete(), fut::fail));
