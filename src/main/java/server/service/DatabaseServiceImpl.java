@@ -97,7 +97,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_REMOVE_WISHLIST =
             "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
     private static final String SQL_GET_LAST_VIEWS =
-            "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day' FROM Views " +
+            "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day', WasCinema FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";
@@ -107,13 +107,16 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ? " +
                     "ORDER BY Time DESC LIMIT 5";
     private static final String SQL_GET_TOP_MOVIES =
-            "SELECT MovieId, Title, COUNT(*) AS Count FROM Views " +
+            "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
     private static final String SQL_GET_TOTAL_MOVIE_COUNT =
             "SELECT COUNT(*) AS 'total_movies', SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
+    private static final String SQL_GET_TOTAL_CINEMA_COUNT =
+            "SELECT COUNT(*) AS 'total_cinema' FROM Views " +
+                    "WHERE Username = ? AND WasCinema = 1";
     private static final String SQL_GET_NEW_MOVIE_COUNT =
             "SELECT COUNT(WasFirst) AS 'new_movies' FROM Views " +
                     "WHERE Username = ? " +
@@ -473,6 +476,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getTotalDistinctMoviesCount(String username) {
         return query(SQL_GET_TOTAL_DISTINCT_MOVIES, new JsonArray().add(username));
+    }
+
+    @Override
+    public Future<JsonObject> getTotalCinemaCount(String username) {
+        return query(SQL_GET_TOTAL_CINEMA_COUNT, new JsonArray().add(username));
     }
 
     /**

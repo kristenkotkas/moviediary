@@ -46,23 +46,23 @@ function addTableData(data, lang) {
             $("#wishlist-result").append(
                 $.parseHTML(
                     '<div class="col s12 m6 l4" id="' + cardId+ '">' +
-                        '<div class="card horizontal z-depth-0">' +
-                            '<div class="card-image">' +
-                                '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
-                                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
-                            '</div>' +
-                            '<div class="card-stacked truncate">' +
-                                '<div class="card-content">' +
-                                    '<a class="truncate content-key search-object-series black-text" onclick="openMovie(' + movieId + ')">' +
-                                    movie['Title'] +
-                                    '</a>' +
-                                    '<span>' + movie['Year'] + '</span>' +
-                                '</div>' +
-                                '<div class="card-action">' +
-                                    '<a class="search-object-series red-text" onclick="removeFromWishlist(' + movieId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
+                    '<div class="card horizontal z-depth-0">' +
+                    '<div class="card-image">' +
+                    '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
+                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
+                    '</div>' +
+                    '<div class="card-stacked truncate">' +
+                    '<div class="card-content">' +
+                    '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
+                    movie['Title'] +
+                    '</a>' +
+                    '<span>' + movie['Year'] + '</span>' +
+                    '</div>' +
+                    '<div class="card-action">' +
+                    '<a class="search-object-series red-text home-link" onclick="removeFromWishlist(' + movieId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
                     '</div>'
                 )
             );

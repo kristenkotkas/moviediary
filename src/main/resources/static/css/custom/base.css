@@ -146,6 +146,10 @@ body {
     opacity: 0.95;
 }
 
+.home-content-card {
+    padding: 15px;
+}
+
 .logout-button {
     margin: 0 0 2% 4%;
 }

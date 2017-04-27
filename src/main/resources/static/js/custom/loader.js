@@ -218,7 +218,11 @@ function minutesToString(minutes) {
         }
     }
 
-    return result;
+    if (result.length > 0) {
+        return result;
+    } else {
+        return '0 ' + minString;
+    }
 }
 
 function replaceUrlParameter(param, value) {

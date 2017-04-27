@@ -26,76 +26,105 @@
         <div class="col s12 m12 l12 xl10 offset-xl1">
             <div class="col s12 m6 l4">
                 <!-- Top 5 movies -->
-                <div class="col s12 m12 l12">
-                    <div class="grey-text text-darken-2 card z-depth-0">
-                        <div class="card-content">
-                            <h5 class="grey-text text-darken-3">Top movies</h5>
-                            <span class="grey-text">Times seen</span>
-                            <table class="bordered highlight">
-                                <tbody id="top-movies-tbody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="top-movies-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="text-darken-3 plot-title">Top movies</h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <span class="grey-text" id="times-seen" hidden>Times seen</span>
+                                <table class="bordered highlight">
+                                    <tbody id="top-movies-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
                 <!-- Last 5 movies kaart -->
-                <div class="col s12 m12 l12">
-                    <div class="grey-text text-darken-2 card z-depth-0">
-                        <div class="card-content">
-                            <h5><a class="grey-text text-darken-3 home-linkbbb" href="{{historyPage}}">Last views</a></h5>
-                            <table class="bordered highlight">
-                                <tbody id="last-movies-tbody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="last-views-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="plot-title"><a class="grey-text text-darken-3 home-link" href="{{historyPage}}">Last views</a></h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered highlight">
+                                    <tbody id="last-movies-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="col s12 m6 l4">
                 <!-- Total stats -->
-                <div class="col s12 m12 l12">
-                    <div class="grey-text text-darken-2 card z-depth-0">
-                        <div class="card-content">
-                            <h5 class="grey-text text-darken-3">Total statistics</h5>
-                            <table class="bordered">
-                                <tbody id="total-stats-tbody">
-                                <tr>
-                                    <td class="grey-text">Total views</td>
-                                    <td class="content-key grey-text text-darken-1" id="total-views"></td>
-                                </tr>
-                                <tr>
-                                    <td class="grey-text">Total new movie views</td>
-                                    <td class="content-key grey-text text-darken-1" id="total-new-movies"></td>
-                                </tr>
-                                <tr>
-                                    <td class="grey-text">Total different movies</td>
-                                    <td class="content-key grey-text text-darken-1" id="total-different-movies"></td>
-                                </tr>
-                                <tr>
-                                    <td class="grey-text">Total runtime</td>
-                                    <td class="content-key grey-text text-darken-1" id="total-runtime"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="stats-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="text-darken-3 plot-title">Total statistics</h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered">
+                                    <tbody id="total-stats-tbody">
+                                    <tr>
+                                        <td class="grey-text">Total views</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-views"></span> views
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Total new movie views</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-new-movies"></span> views
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Total different movies</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-different-movies"></span> movies
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Total cinema visits</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-cinema-visits"></span> movies
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Total runtime</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-runtime"></span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="col s12 m6 l4">
                 <!-- Wishlist -->
-                <div class="col s12 m12 l12">
-                    <div class="grey-text text-darken-2 card z-depth-0">
-                        <div class="card-content">
-                            <h5>
-                                <a class="grey-text text-darken-3 home-link" href="{{wishlistPage}}">Latest wishlist
-                                </a>
-                            </h5>
-                            <table class="bordered highlight">
-                                <tbody id="wishlist-tbody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="wishlist-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="plot-title">
+                                    <a class="grey-text text-darken-3 home-link" href="{{wishlistPage}}">Latest wishlist</a>
+                                </h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered highlight">
+                                    <tbody id="wishlist-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

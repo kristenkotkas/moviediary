@@ -45,62 +45,62 @@ eventbus.onopen = function () {
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             setTimeout(function () {
-                    eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
-                        var data = reply.body['results'];
-                        console.log(data.length);
-                        if (data.length > 0) {
-                            $.each(data, function (i) {
-                                var movie = data[i];
-                                var posterPath = "";
-                                if (movie['poster_path'] !== null) {
-                                    posterPath = 'https://image.tmdb.org/t/p/w300' + movie['poster_path'];
-                                } else {
-                                    posterPath = '/static/img/nanPosterBig.jpg'
-                                }
+                eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
+                    var data = reply.body['results'];
+                    console.log(data.length);
+                    if (data.length > 0) {
+                        $.each(data, function (i) {
+                            var movie = data[i];
+                            var posterPath = "";
+                            if (movie['poster_path'] !== null) {
+                                posterPath = 'https://image.tmdb.org/t/p/w300' + movie['poster_path'];
+                            } else {
+                                posterPath = '/static/img/nanPosterBig.jpg'
+                            }
 
-                                var arrayOfNodes = $.parseHTML(
-                                    '<div class="col s12 m6 l4">' +
-                                        '<div class="card horizontal z-depth-0 search-object-series" tabindex="' + (8 + i) + '">' +
-                                            '<div class="card-image">' +
-                                                '<img src="' + posterPath + '" alt="Poster for movie: '
-                                                    + movie['original_title'] + '" class="series-poster">' +
-                                            '</div>' +
-                                            '<div class="card-stacked truncate">' +
-                                                '<div class="card-content truncate">' +
-                                                    '<span class="truncate content-key">' +  movie['original_title'] + '</span>' +
-                                                    '<span class="truncate">' + getYear(movie['release_date']) + '</span>' +
-                                                '</div>' +
-                                            '</div>' +
-                                        '</div>' +
-                                    '</div>'
-                                );
+                            var arrayOfNodes = $.parseHTML(
+                                '<div class="col s12 m6 l4">' +
+                                '<div class="card horizontal z-depth-0 search-object-series" tabindex="' + (8 + i) + '">' +
+                                '<div class="card-image">' +
+                                '<img src="' + posterPath + '" alt="Poster for movie: '
+                                + movie['original_title'] + '" class="series-poster">' +
+                                '</div>' +
+                                '<div class="card-stacked truncate">' +
+                                '<div class="card-content truncate">' +
+                                '<span class="truncate content-key">' +  movie['original_title'] + '</span>' +
+                                '<span class="truncate">' + getYear(movie['release_date']) + '</span>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>'
+                            );
 
-                                arrayOfNodes[0].onclick = function () {
+                            arrayOfNodes[0].onclick = function () {
+                                searchMovie(eventbus, movie.id, lang);
+                            };
+
+                            arrayOfNodes[0].addEventListener("keyup", function (e) {
+                                if (e.keyCode === 13) {
                                     searchMovie(eventbus, movie.id, lang);
-                                };
-
-                                arrayOfNodes[0].addEventListener("keyup", function (e) {
-                                    if (e.keyCode === 13) {
-                                        searchMovie(eventbus, movie.id, lang);
-                                    }
-                                });
-
-                                $("#search-result").append(arrayOfNodes).show();
+                                }
                             });
-                        } else {
-                            $("#search-result").append(
-                                $.parseHTML(
-                                    '<li class="collection-item">' +
-                                    '<div class="row">' +
-                                    '<h5>' + lang['MOVIES_JS_NO_MOVIES'] + '</h5>' +
-                                    '</div>' +
-                                    '</li>'
-                                )
-                            ).show();
-                        }
-                        $("#movie-poster-card").empty();
-                    });
-                }, 405);
+
+                            $("#search-result").append(arrayOfNodes).show();
+                        });
+                    } else {
+                        $("#search-result").append(
+                            $.parseHTML(
+                                '<li class="collection-item">' +
+                                '<div class="row">' +
+                                '<h5>' + lang['MOVIES_JS_NO_MOVIES'] + '</h5>' +
+                                '</div>' +
+                                '</li>'
+                            )
+                        ).show();
+                    }
+                    $("#movie-poster-card").empty();
+                });
+            }, 405);
         });
     });
 };
@@ -340,9 +340,9 @@ var getMovieViews = function (eventbus, movieId, lang) {
                         '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
                         '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
                         '<td>' +
-                            '<a class="grey-text cursor" id="' + ('remove_view_' + viewId) + '">' +
-                                '<i class="fa fa-trash" aria-hidden="true"></i>' +
-                            '</a>' +
+                        '<a class="grey-text cursor home-link" id="' + ('remove_view_' + viewId) + '">' +
+                            lang['HISTORY_REMOVE'] +
+                        '</a>' +
                         '</td>' +
                         '</tr>'
                     )
