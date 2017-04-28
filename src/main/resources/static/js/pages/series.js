@@ -205,7 +205,6 @@ function fillResultSeries(seriesData, page, lang) {
     });
 }
 
-
 function getEpisodes(episodes, seasonNumber, seriesData, lang) {
     var elem = $(document.getElementById('episode_container_' + seasonNumber));
     elem.empty();
@@ -239,7 +238,8 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
                 param: episodeData,
                 id: id,
                 seriesData: seriesData,
-                seasonData: seasonData
+                seasonData: seasonData,
+                lang: lang
             }
             , cardOnClick);
     }
@@ -251,11 +251,12 @@ function cardOnClick(event) {
         $(document.getElementById(event.data.id + '_check')),
         event.data.param,
         event.data.seriesData,
-        event.data.seasonData
+        event.data.seasonData,
+        event.data.lang
     );
 }
 
-function addEpisode(card, element, data, seriesData, seasonData) {
+function addEpisode(card, element, data, seriesData, seasonData, lang) {
     if (element.children().length === 0) {
         addEpisodeToView(data, seriesData, seasonData, card, element);
     } else {
