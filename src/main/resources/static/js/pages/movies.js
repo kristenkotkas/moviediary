@@ -47,7 +47,7 @@ eventbus.onopen = function () {
             setTimeout(function () {
                 eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
                     var data = reply.body['results'];
-                    console.log(data.length);
+                    console.log(data);
                     if (data.length > 0) {
                         $.each(data, function (i) {
                             var movie = data[i];

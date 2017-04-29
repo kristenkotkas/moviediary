@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
+    <title>{{i18n "NAVBAR_SERIES" locale=lang}}</title>
+    <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/static/css/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/static/css/custom/materialize.min.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/static/css/clockpicker.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+</head>
+<body class="blue lighten-5 bc-image" id="body">
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+{{> templates/navbar.hbs}}
+<main>
+    <h3 class="light grey-text text-lighten-1 page-heading truncate" id="series-title">
+        Discover
+    </h3>
+    <div class="row">
+        <div class="col movies-search-bar s12 m8 l4">
+            <div class="card z-depth-0 opacity-object">
+                <div class="search-wrapper input-field">
+                    <input class="movies-search-bar movies-heading" tabindex="8" id="discover-add" type="search"
+                           placeholder="Add movies" required>
+                    <label id="series-search-button" class="label-icon search-button" for="series-search">
+                        <i class="fa fa-search left"></i></label>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m12 l8">
+            <table>
+                <tbody id="discover-body">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{{> templates/footer.hbs}}
+<script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
+<script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script defer type="text/javascript" src="/static/js/custom/materialize.min.js"></script>
+<script defer type="text/javascript" src="/static/js/sockjs.min.js"></script>
+<script defer type="text/javascript" src="/static/js/custom/vertx-eventbus.js"></script>
+<script defer type="text/javascript" src="/static/js/custom/clockpicker.js"></script>
+<script defer type="text/javascript" src="/static/js/pages/discover.js"></script>
+</body>
+</html>

@@ -27,6 +27,8 @@ public class TmdbRouter extends EventBusRoutable {
     public static final String API_GET_TV_SEARCH = "api_get_tv_search";
     public static final String API_GET_TV = "api_get_tv";
 
+    public static final String API_GET_RECOMMENDATIONS = "api_get_recommendations";
+
     private final TmdbService tmdb;
 
     public TmdbRouter(Vertx vertx, TmdbService tmdb) {
@@ -36,6 +38,7 @@ public class TmdbRouter extends EventBusRoutable {
         listen(API_GET_MOVIE, reply(tmdb::getMovieById));
         listen(API_GET_TV_SEARCH, reply(tmdb::getTVByName));
         listen(API_GET_TV, reply(tmdb::getTVById));
+        listen(API_GET_RECOMMENDATIONS, reply(tmdb::getMovieRecommendation));
     }
 
     @Override
@@ -79,6 +82,6 @@ public class TmdbRouter extends EventBusRoutable {
             badRequest(ctx);
             return;
         }
-        tmdb.getTVById(param).setHandler(resultHandler(ctx, jsonResponse(ctx))); //fixme arvestama page count
+        tmdb.getTVById(param).setHandler(resultHandler(ctx, jsonResponse(ctx)));
     }
 }

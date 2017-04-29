@@ -51,6 +51,7 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_HISTORY = "/private/history";
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
+    public static final String UI_DISCOVER = "/private/discover";
     public static final String UI_LOGIN = "/login";
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
@@ -65,6 +66,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_HISTORY = "templates/history.hbs";
     private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
     private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
+    private static final String TEMPL_DISCOVER = "templates/discover.hbs";
     private static final String TEMPL_LOGIN = "templates/login.hbs";
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
@@ -101,6 +103,7 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
+        router.get(UI_DISCOVER).handler(this::handleDiscover);
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
         router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
@@ -152,7 +155,6 @@ public class UiRouter extends EventBusRoutable {
         engine.render(getSafe(ctx, TEMPL_SERIES, SeriesTemplate.class), endHandler(ctx));
     }
 
-
     private void handleHistory(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_HISTORY, HistoryTemplate.class), endHandler(ctx));
     }
@@ -163,6 +165,10 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleWishlist(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
+    }
+
+    private void handleDiscover(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_DISCOVER, DiscoverTemplate.class), endHandler(ctx));
     }
 
 
@@ -251,6 +257,7 @@ public class UiRouter extends EventBusRoutable {
         baseTemplate.setHistoryPage(UI_HISTORY);
         baseTemplate.setStatisticsPage(UI_STATISTICS);
         baseTemplate.setWishlistPage(UI_WISHLIST);
+        baseTemplate.setWishlistPage(UI_DISCOVER);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
             baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());

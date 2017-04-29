@@ -27,6 +27,7 @@ function fillTopMovies(lang) {
     eventbus.send("database_get_top_movies", {}, function (error, reply) {
         topMovies.empty();
         var data = reply['body']['rows'];
+        console.log(data);
         if (data.length > 0) {
             $("#times-seen").show();
             $.each(data, function (i) {

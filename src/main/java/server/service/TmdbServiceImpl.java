@@ -34,6 +34,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     private static final String MOVIE_NAME = "/3/search/movie?query=";
     private static final String MOVIE_ID = "/3/movie/";
+    private static final String RECOMMENDATIONS = "/recommendations";
 
     private static final String TV_NAME = "/3/search/tv?query=";
     private static final String TV_ID = "/3/tv/";
@@ -82,8 +83,6 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     @Override
     public Future<JsonObject> getTVById(String param) {
         JsonObject jsonParam = new JsonObject(param);
-        System.out.println("JSON");
-        System.out.println(jsonParam.encodePrettily());
         String id = Integer.toString(jsonParam.getInteger("seriesId"));
         int page = jsonParam.getInteger("page");
         StringBuilder seasons = new StringBuilder(APPEND_TO_RESPONSE);
@@ -94,8 +93,6 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                 seasons.append("season/").append(i);
             }
         }
-        System.out.println("PAGE: " + page);
-        System.out.println("QUERY: " + seasons);
         return future(fut -> get(TV_ID + id + APIKEY_PREFIX2, getCached(TV.get(id + "_" + page)), seasons.toString()).setHandler(ar -> {
             if (ar.succeeded()) {
                 JsonObject json = ar.result();
@@ -107,18 +104,10 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
         }));
     }
 
-    private Future<JsonObject> getTVEpisodes(String id, int page) {
-        StringBuilder seasons = new StringBuilder(APPEND_TO_RESPONSE);
-        for (int i = ((page - 1) * 10); i <= page * 10; i++) {
-            if (i != page * 10 - 1) {
-                seasons.append("season/").append(i).append(",");
-            } else {
-                seasons.append("season/").append(i);
-            }
-        }
-        System.out.println("PAGE: " + page);
-        System.out.println("QUERY: " + seasons);
-        return get(TV_ID + id + APIKEY_PREFIX2, getCached(TV_EPISODE.get(id)), seasons.toString());
+    @Override
+    public Future<JsonObject> getMovieRecommendation(String id) {
+        return get(MOVIE_ID + id + RECOMMENDATIONS + APIKEY_PREFIX2,
+                getCached(Cache.RECOMMENDATIONS.get(id)), "");
     }
 
     private Future<JsonObject> get(String uri, CacheItem<JsonObject> cacheItem, String appendToResponse) {
@@ -154,7 +143,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
         MOVIE("movie_"),
         TV("tv_"),
         TV_EPISODE("tv_episode_"),
-        TV_SEARCH("tv_search_");
+        TV_SEARCH("tv_search_"),
+        RECOMMENDATIONS("movie_recomm_");
 
         private final String prefix;
 
