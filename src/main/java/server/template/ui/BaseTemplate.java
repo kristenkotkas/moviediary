@@ -23,6 +23,8 @@ public interface BaseTemplate extends TypeSafeTemplate {
 
     void setWishlistPage(String wishlistPage);
 
+    void setDiscoverPage(String wishlistPage);
+
     void setUserName(String name);
 
     void setUserFirstName(String name);
