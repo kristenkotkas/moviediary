@@ -27,7 +27,6 @@ function fillTopMovies(lang) {
     eventbus.send("database_get_top_movies", {}, function (error, reply) {
         topMovies.empty();
         var data = reply['body']['rows'];
-        console.log(data);
         if (data.length > 0) {
             $("#times-seen").show();
             $.each(data, function (i) {
@@ -59,6 +58,7 @@ function fillLastMovies(lang) {
         if (data.length > 0) {
             $.each(data, function (i) {
                 var movie = data[i];
+                console.log(movie);
                 lastMovies.append(
                     $.parseHTML(
                         '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +

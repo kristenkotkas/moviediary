@@ -54,22 +54,24 @@ function updateRecommendations(movie) {
 
 function updateTable() {
     discoverTable.empty();
-    for (var key in recommendations) {
-        var movie = recommendations[key];
-        if (movie['count'] >= 2) {
-            discoverTable.append(
-                $.parseHTML(
-                    '<tr>' +
-                    '<td>' + movie['count'] + '</td>' +
-                    '<td>' + movie['id'] + '</td>' +
-                    '<td><img width="100" src="' + getPosterPath(movie['poster']) +'"></td>' +
-                    '<td>' + movie['title'] + '</td>' +
-                    '</tr>'
-                )
-            );
-        }
-    }
 
+    var json = eval(recommendations);
+
+    Object.keys(json).sort(function (a, b) {
+        return (json[b].count.toString()).localeCompare(json[a].count);
+    }).forEach(function (key) {
+        var movie = json[key];
+        discoverTable.append(
+            $.parseHTML(
+                '<tr>' +
+                '<td>' + movie['count'] + '</td>' +
+                '<td>' + movie['id'] + '</td>' +
+                '<td><img width="100" src="' + getPosterPath(movie['poster']) +'"></td>' +
+                '<td>' + movie['title'] + '</td>' +
+                '</tr>'
+            )
+        );
+    });
 }
 
 function getPosterPath(posterPath) {
