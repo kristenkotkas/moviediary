@@ -35,6 +35,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
     private static final String MOVIE_NAME = "/3/search/movie?query=";
     private static final String MOVIE_ID = "/3/movie/";
     private static final String RECOMMENDATIONS = "/recommendations";
+    private static final String SIMILAR = "/similar";
 
     private static final String TV_NAME = "/3/search/tv?query=";
     private static final String TV_ID = "/3/tv/";
