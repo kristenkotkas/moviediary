@@ -66,6 +66,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_TOTAL_RUNTIME = "database_get_total_runtime";
     public static final String DATABASE_GET_DISTINCT_MOVIE_COUNT = "database_get_distinct_movie_count";
     public static final String DATABASE_GET_TOTAL_CINEMA_COUNT = "database_get_total_cinema_count";
+    public static final String DATABASE_GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
     private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
@@ -105,6 +106,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_TOTAL_RUNTIME, reply((user, param) -> database.getTotalRuntime(user)));
         listen(DATABASE_GET_TOTAL_CINEMA_COUNT, reply((user, param) -> database.getTotalCinemaCount(user)));
         listen(DATABASE_GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
+        listen(DATABASE_GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
     }
 
     @Override

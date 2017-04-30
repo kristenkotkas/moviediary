@@ -49,7 +49,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     private static final String SQL_GET_ALL_TIME_META =
-            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count FROM Views " +
+            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
@@ -67,6 +67,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
+    private static final String SQL_GET_TOP_MOVIES_STAT =
+            "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ?";
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
     private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
@@ -78,7 +82,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
     private static final String SQL_QUERY_VIEWS_META =
-            "SELECT Count(*) AS Count " +
+            "SELECT Count(*) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
@@ -351,6 +355,20 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
+    public Future<JsonObject> getTopMoviesStat(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        StringBuilder sb = new StringBuilder(SQL_GET_TOP_MOVIES_STAT);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.append(" GROUP BY MovieId ORDER BY Count DESC LIMIT 3").toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
+    }
+
+    @Override
     public Future<JsonObject> getYearsDistribution(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
@@ -412,11 +430,14 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getViewsMeta(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
+        System.out.println(json.encodePrettily());
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS_META);
         ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
         ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        System.out.println("QUERY");
+        System.out.println(sb.toString());
         return query(sb.toString(), new JsonArray()
                 .add(username)
                 .add(json.getString("start"))

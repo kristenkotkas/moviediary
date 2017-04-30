@@ -135,21 +135,65 @@
                 </ul>
             </div>
             <div class="col s12 m8 l9">
-                <div class="col s12 m12 l6">
-                    <div class="card z-depth-0" id="week-card">
-                        <div class="card-content">
-                            <div class="card-title">{{i18n "STATISTICS_DISTR_WEEKDAYS" locale=lang}}</div>
-                            <canvas class="hide-on-small-only" id="daysChart"></canvas>
-                            <canvas class="hide-on-med-and-up" id="daysChartSmall"></canvas>
+                <div class="col s12 m12 l12" id="stat-view-title"></div>
+                <div class="row last-row">
+                    <div class="col s12 m12 l6">
+                        <div class="card z-depth-0">
+                            <div class="card-content">
+                                <div class="card-title">Summary</div>
+                                <table class="bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="grey-text">Total views</td>
+                                        <td class="right content-key grey-text text-darken-1">
+                                            <span id="stat-total-views"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Total runtime</td>
+                                        <td class="right content-key grey-text text-darken-1">
+                                            <span id="stat-total-runtime"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">Average runtime</td>
+                                        <td class="right content-key grey-text text-darken-1">
+                                            <span id="stat-average-runtime"></span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col s12 m12 l6">
+                        <div class="card z-depth-0">
+                            <div class="card-content">
+                                <div class="card-title">Top movies</div>
+                                <table class="bordered highlight">
+                                    <tbody id="stat-top-movies"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col s12 m12 l6">
-                    <div class="card z-depth-0" id="time-card">
-                        <div class="card-content">
-                            <div class="card-title">{{i18n "STATISTICS_DISTR_TIME" locale=lang}}</div>
-                            <canvas class="hide-on-small-only" id="timeChart"></canvas>
-                            <canvas class="hide-on-med-and-up" id="timeChartSmall"></canvas>
+                <div class="row last-row">
+                    <div class="col s12 m12 l6">
+                        <div class="card z-depth-0" id="week-card">
+                            <div class="card-content">
+                                <div class="card-title">{{i18n "STATISTICS_DISTR_WEEKDAYS" locale=lang}}</div>
+                                <canvas class="hide-on-small-only" id="daysChart"></canvas>
+                                <canvas class="hide-on-med-and-up" id="daysChartSmall"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col s12 m12 l6">
+                        <div class="card z-depth-0" id="time-card">
+                            <div class="card-content">
+                                <div class="card-title">{{i18n "STATISTICS_DISTR_TIME" locale=lang}}</div>
+                                <canvas class="hide-on-small-only" id="timeChart"></canvas>
+                                <canvas class="hide-on-med-and-up" id="timeChartSmall"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -70,20 +70,20 @@ eventbus.onopen = function () {
         });
 
         search.click(function () {
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.search);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.today);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.week);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
 
@@ -91,7 +91,7 @@ eventbus.onopen = function () {
             var dates = getThisMonth(0);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
         allTime.click(function () {
@@ -102,17 +102,17 @@ eventbus.onopen = function () {
             var dates = getThisMonth(--monthIndex);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month, monthIndex);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
         monthNext.click(function () {
             var dates = getThisMonth(++monthIndex);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), types.month, monthIndex);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
         });
 
-        searchYear(new Date().getFullYear(), lang, startDateField, endDateField, new Date().getFullYear());
+        searchYear(new Date().getFullYear(), lang, startDateField, endDateField);
     });
 };
 
@@ -135,7 +135,7 @@ var fillDropDown = function (lang) {
         });
 };
 
-var makeHistory = function (eventbus, lang, start, end, type) {
+var makeHistory = function (eventbus, lang, start, end) {
     eventbus.send("database_get_history_meta",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -145,7 +145,7 @@ var makeHistory = function (eventbus, lang, start, end, type) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
-            searchHistory(eventbus, lang, start, end, data[0]['Count'], type);
+            searchHistory(eventbus, lang, start, end, data[0]['Count']);
         });
 };
 
@@ -161,11 +161,11 @@ var makeAllTime = function (eventbus, lang) {
             console.log(new Date(data[0]['Start']));
             startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
             endDateField.pickadate('picker').set('select', new Date());
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count'], types.all);
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
         });
 };
 
-var searchHistory = function (eventbus, lang, start, end, count, type) {
+var searchHistory = function (eventbus, lang, start, end, count) {
     eventbus.send("database_get_history",
         {
             'is-first': $("#seenFirst").is(':checked'),
@@ -179,11 +179,11 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
             console.log(data.length);
             if (data.length > 0) {
                 $("#viewsTitle").empty();
-                addTableHead(count, lang, type);
+                addTableHead(count, lang);
                 $("#table").empty();
                 //addTableHead(data.length);
 
-                addHistory(data, lang, type);
+                addHistory(data, lang);
 
                 if (data.length == 10) {
                     $("#load-more-holder").empty().append(
@@ -220,7 +220,7 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
                             if (addData.length < 10) {
                                 $("#load-more-holder").hide();
                             }
-                            addHistory(addData, lang, type);
+                            addHistory(addData, lang);
                             $(document).scrollTop($(document).height());
                         });
                 });
@@ -228,13 +228,12 @@ var searchHistory = function (eventbus, lang, start, end, count, type) {
             } else {
                 $("#load-more").hide();
                 $("#table").empty();
-                addNotFound(lang, type);
+                addNotFound(lang);
             }
         });
 };
 
-function addTableHead(data, lang, type) {
-    var date = getHistoryPeriodString(type, lang);
+function addTableHead(data, lang) {
     var views = '';
     if (data > 0) {
         if (data === 1) {
@@ -246,29 +245,28 @@ function addTableHead(data, lang, type) {
             '<div class="card z-depth-0">' +
             '<div class="card-title">' +
             '<span class="light grey-text text-lighten-1 not-found">' + data + ' ' + views + '</span><br>' +
-            '<span class="grey-text not-found-info">' + date + '</span>' +
+            //'<span class="grey-text not-found-info">' + date + '</span>' +
             '</div>' +
             '</div>'
         );
     } else {
-        addNotFound(lang, type);
+        addNotFound(lang);
     }
 }
 
-function addNotFound(lang, type) {
-    var date = getHistoryPeriodString(type, lang);
+function addNotFound(lang) {
     $("#viewsTitle").empty().append(
         '<div class="card z-depth-0">' +
         '<div class="card-title">' +
         '<span class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</span><br>' +
-        '<span class="grey-text not-found-info">' + date + '</span>' +
+        //'<span class="grey-text not-found-info">' + date + '</span>' +
         '</span>' +
         '</div>' +
         '</div>'
     );
 }
 
-function removeView(viewId, lang, type) {
+function removeView(viewId, lang) {
     console.log(viewId);
     eventbus.send("database_remove_view", viewId, function (error, reply) {
         console.log(viewId + ' removed');
@@ -282,12 +280,12 @@ function removeView(viewId, lang, type) {
             }
             , function (error, reply) {
                 var data = reply.body['rows'];
-                addTableHead(data[0]['Count'], lang, type);
+                addTableHead(data[0]['Count'], lang);
             });
     });
 }
 
-function addHistory(data, lang, type) {
+function addHistory(data, lang) {
     $.each(data, function (i) {
         var posterPath = "";
         if (data[i]['Image'] != "") {
@@ -361,7 +359,7 @@ function addHistory(data, lang, type) {
 
         var button = document.getElementById(data[i]['Id']);
         button.onclick = function () {
-            removeView(data[i]['Id'], lang, type);
+            removeView(data[i]['Id'], lang);
         };
     });
 }

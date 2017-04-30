@@ -33,7 +33,12 @@ var today = $("#today-stat");
 var thisWeek = $("#this-week-stat");
 var thisMonth = $("#this-month-stat");
 var allTime = $("#all-time-stat");
+var viewsTitle = $("#stat-view-title");
 var monthIndex = 0;
+var totalViews = $("#stat-total-views");
+var totalRuntime = $("#stat-total-runtime");
+var averageRuntime = $("#stat-average-runtime");
+var topMovies = $("#stat-top-movies");
 daysChartCtx.attr('height', '250%');
 daysChartSmallCtx.attr('height', '300%');
 timeChartCtx.attr('height', '250%');
@@ -58,7 +63,7 @@ var options = {
     }
 };
 var daysChart = new Chart(daysChartCtx, {
-    type : 'bar',
+    type: 'bar',
     data: {
         labels: [],
         datasets: [
@@ -80,7 +85,7 @@ var daysChart = new Chart(daysChartCtx, {
     options: options
 });
 var daysChartSmall = new Chart(daysChartSmallCtx, {
-    type : 'horizontalBar',
+    type: 'horizontalBar',
     data: {
         labels: [],
         datasets: [
@@ -102,7 +107,7 @@ var daysChartSmall = new Chart(daysChartSmallCtx, {
     options: options
 });
 var yearsChart = new Chart(yearsChartCtx, {
-    type : 'bar',
+    type: 'bar',
     data: {
         labels: [],
         datasets: [
@@ -116,7 +121,7 @@ var yearsChart = new Chart(yearsChartCtx, {
     options: options
 });
 var yearsChartSmall = new Chart(yearsChartSmallCtx, {
-    type : 'horizontalBar',
+    type: 'horizontalBar',
     data: {
         labels: [],
         datasets: [
@@ -130,7 +135,7 @@ var yearsChartSmall = new Chart(yearsChartSmallCtx, {
     options: options
 });
 var timeChart = new Chart(timeChartCtx, {
-    type : 'bar',
+    type: 'bar',
     data: {
         labels: [
             '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
@@ -147,7 +152,7 @@ var timeChart = new Chart(timeChartCtx, {
     options: options
 });
 var timeChartSmall = new Chart(timeChartSmallCtx, {
-    type : 'horizontalBar',
+    type: 'horizontalBar',
     data: {
         labels: [
             '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
@@ -168,7 +173,7 @@ eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
 
-        if ($( window ).width() > 600) {
+        if ($(window).width() > 600) {
             openCollapsible();
         }
 
@@ -216,31 +221,31 @@ eventbus.onopen = function () {
         });
 
         search.click(function () {
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex, types.search);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
         });
 
         today.click(function () {
             startDateField.pickadate('picker').set('select', new Date());
             endDateField.pickadate('picker').set('select', new Date());
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.today);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0);
         });
 
         thisWeek.click(function () {
             var dates = getThisWeek();
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.week);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0);
         });
 
         thisMonth.click(function () {
             var dates = getThisMonth(0);
             startDateField.pickadate('picker').set('select', dates['start']);
             endDateField.pickadate('picker').set('select', dates['end']);
-            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0, types.month);
+            makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), 0);
         });
 
         allTime.click(function () {
-            makeAllTime(eventbus);
+            makeAllTime(eventbus, lang);
         });
 
         monthBack.click(function () {
@@ -274,8 +279,8 @@ var openCollapsible = function () {
 var fillDropDown = function (lang) {
     eventbus.send("database_get_all_time_meta",
         {
-            'is-first': $("#seenFirst").is(':checked'),
-            'is-cinema': $("#wasCinema").is(':checked')
+            'is-first': $("#seenFirst-stat").is(':checked'),
+            'is-cinema': $("#wasCinema-stat").is(':checked')
         }
         , function (error, reply) {
             var data = reply.body['rows'];
@@ -284,16 +289,27 @@ var fillDropDown = function (lang) {
         });
 };
 
-var makeHistory = function (eventbus, lang, start, end, monthInd, type) {
+var makeHistory = function (eventbus, lang, start, end, monthInd) {
     monthIndex = monthInd;
-    getData(eventbus, lang, start, end);
+    eventbus.send("database_get_history_meta",
+        {
+            'is-first': $("#seenFirst-stat").is(':checked'),
+            'is-cinema': $("#wasCinema-stat").is(':checked'),
+            'start': start,
+            'end': end
+        }
+        , function (error, reply) {
+            var data = reply.body['rows'];
+            addTableHead(data, lang);
+            getData(eventbus, lang, start, end);
+        });
 };
 
 var makeAllTime = function (eventbus, lang) {
     eventbus.send("database_get_all_time_meta",
         {
-            'is-first': $("#seenFirst").is(':checked'),
-            'is-cinema': $("#wasCinema").is(':checked')
+            'is-first': $("#seenFirst-stat").is(':checked'),
+            'is-cinema': $("#wasCinema-stat").is(':checked')
         }, function (error, reply) {
             var data = reply.body['rows'];
             var start;
@@ -306,6 +322,7 @@ var makeAllTime = function (eventbus, lang) {
             monthIndex = -1 * ((now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
             startDateField.pickadate('picker').set('select', start);
             endDateField.pickadate('picker').set('select', now);
+            addTableHead(data, lang);
             getData(eventbus, lang, startDateField.val(), endDateField.val());
         });
 };
@@ -324,9 +341,10 @@ function getData(eventbus, lang, start, end) {
             if (data.length > 0) {
                 makeYearsChart(data);
             } else {
-                makeEmptyYearsChart()/*
-                $('#year-chart-container').empty();
-                $('#year-chart-small-container').empty();*/
+                makeEmptyYearsChart()
+                /*
+                 $('#year-chart-container').empty();
+                 $('#year-chart-small-container').empty();*/
             }
         });
 
@@ -342,9 +360,10 @@ function getData(eventbus, lang, start, end) {
             if (data.length > 0) {
                 makeDaysChart(data);
             } else {
-                makeDaysChart(data);/*
-                $('#days-chart-container').empty();
-                $('#days-chart-small-container').empty();*/
+                makeDaysChart(data);
+                /*
+                 $('#days-chart-container').empty();
+                 $('#days-chart-small-container').empty();*/
             }
         });
 
@@ -360,9 +379,10 @@ function getData(eventbus, lang, start, end) {
             if (data.length > 0) {
                 makeTimeChart(data);
             } else {
-                makeTimeChart(data);/*
-             $('#year-chart-container').empty();
-             $('#year-chart-small-container').empty();*/
+                makeTimeChart(data);
+                /*
+                 $('#year-chart-container').empty();
+                 $('#year-chart-small-container').empty();*/
             }
         });
 }
@@ -394,8 +414,10 @@ function makeEmptyYearsChart() {
 }
 
 function makeTimeChart(data) {
-    var distr = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0,
-        13:0, 14:0, 15:0, 16:0, 17:0, 18:0, 19:0, 20:0, 21:0, 22:0, 23:0};
+    var distr = {
+        0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0,
+        13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0
+    };
     var distrArray = [];
     fillTimeData(data, distr);
     for (var i = 0; i < 24; i++) {
@@ -453,4 +475,68 @@ function makeYChart(chart, years, distr) {
     chart.update();
     chart['data']['datasets'][0]['data'] = distr;
     chart.update();
+}
+
+function addTableHead(data, lang) {
+    fillTopMovies();
+    if (data[0]['Count'] > 0) {
+        viewsTitle.empty();
+        totalViews.empty().append(data[0]['Count']);
+        totalRuntime.empty().append(minutesToString(data[0]['Runtime']));
+        averageRuntime.empty().append(minutesToString(data[0]['Runtime'] / data[0]['Count']));
+    } else {
+        addNotFound(lang);
+        totalViews.empty().append('..');
+        totalRuntime.empty().append('..');
+        averageRuntime.empty().append('..');
+    }
+}
+
+function fillTopMovies() {
+    eventbus.send("database_get_top_movies_stat",
+        {
+            'is-first': $("#seenFirst-stat").is(':checked'),
+            'is-cinema': $("#wasCinema-stat").is(':checked'),
+            'start':  startDateField.val(),
+            'end': endDateField.val()
+        }
+        , function (error, reply) {
+            topMovies.empty();
+            var data = reply['body']['rows'];
+            console.log(data);
+            if (data.length > 0) {
+                $.each(data, function (i) {
+                    var movie = data[i];
+                    topMovies.append(
+                        $.parseHTML(
+                            '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
+                            '<td class="grey-text">' + movie['Count'] + '</td>' +
+                            '<td class="content-key grey-text text-darken-1">' + movie['Title'] + '</td>' +
+                            '</tr>'
+                        )
+                    );
+                })
+            } else {
+                topMovies.append(
+                    $.parseHTML(
+                        '<span class="card-title center grey-text text-darken-1">No movies</span>'
+                    )
+                );
+            }
+        });
+}
+
+function addNotFound(lang) {
+    viewsTitle.empty().append(
+        '<div class="card z-depth-0">' +
+        '<div class="card-title">' +
+        '<span class="light grey-text text-lighten-1 not-found">' + lang['HISTORY_NOT_PRESENT'] + '</span><br>' +
+        '</span>' +
+        '</div>' +
+        '</div>'
+    );
+}
+
+function openMovie(movieId) {
+    location.href = 'movies/?id=' + movieId;
 }

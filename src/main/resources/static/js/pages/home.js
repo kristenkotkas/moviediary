@@ -11,6 +11,7 @@ var totalNewViews = $("#total-new-movies");
 var totalRuntime = $("#total-runtime");
 var totalDifferentMovies = $("#total-different-movies");
 var totalCinema = $("#total-cinema-visits");
+var averageRuntime = $("#average-runtime");
 
 eventbus.onopen = function () {
     var lang;
@@ -110,6 +111,7 @@ function fillTotalStat(lang) {
         var data = reply['body']['rows'];
         totalViews.append(data[0]['total_movies']);
         totalRuntime.append(minutesToString(data[0]['Runtime']));
+        averageRuntime.append(minutesToString(data[0]['Runtime']/data[0]['total_movies']));
     });
 
     eventbus.send("database_get_new_movie_count", {}, function (error, reply) {

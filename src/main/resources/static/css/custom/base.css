@@ -200,6 +200,10 @@ span.badge.new:after {
     font-size: xx-large;
 }
 
+.history-add-info {
+    margin: 15px;
+}
+
 .not-found-info {
     margin: 15px;
     font-size: large;

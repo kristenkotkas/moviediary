@@ -130,7 +130,7 @@ function getYear(year) {
     return result;
 }
 
-function searchYear(year, lang, startDateField, endDateField, type) {
+function searchYear(year, lang, startDateField, endDateField) {
     var dates = getYear(year);
     var monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
     console.log(dates);
@@ -154,30 +154,9 @@ function makeDropList(start, lang, type, startDateField, endDateField) {
 
         var yearButton = document.getElementById(type + '-drop-' + array[i]);
         yearButton.onclick = function () {
-            searchYear(array[i], lang, startDateField, endDateField, array[i]);
+            searchYear(array[i], lang, startDateField, endDateField);
         }
     });
-}
-
-function getHistoryPeriodString(type, lang) {
-    switch (type) {
-        case types.today:
-            return lang['HISTORY_TODAY'];
-        case types.week:
-            //do sth
-            return lang['HISTORY_THIS_WEEK'];
-        case types.month:
-            //do sth
-            return lang['HISTORY_THIS_MONTH'];
-        case types.all:
-            //do sth
-            return lang['HISTORY_ALL_VIEWS'];
-        case types.search:
-            return startDateField.val() + ' - ' + endDateField.val();
-            break;
-        default:
-            return lang['MOVIES_YEAR'] + ': ' + type;
-    }
 }
 
 function minutesToString(minutes) {
