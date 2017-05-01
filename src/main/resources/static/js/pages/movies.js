@@ -20,6 +20,7 @@ $(document).ready(function () {
 });
 
 var eventbus = new EventBus("/eventbus");
+var oscarContainer = $('#oscar-container');
 eventbus.onopen = function () {
 
     var lang;
@@ -230,8 +231,11 @@ var searchMovie = function (eventbus, movieId, lang) {
             backgroundPath = 'https://image.tmdb.org/t/p/w1920' + data['backdrop_path'];
         }
 
+        getOmdb(data['imdb_id']);
+
         getMovieViews(eventbus, movieId, lang);
 
+        oscarContainer.empty();
         $("#body").attr("background", backgroundPath);
         $('#year').empty().append(nullCheck(data['release_date'], lang).split('-')[0]);
         $('#release').empty().append(getNormalDate(nullCheck(data['release_date'], lang), lang));
@@ -271,6 +275,39 @@ var searchMovie = function (eventbus, movieId, lang) {
         replaceUrlParameter("id", movieId);
     });
 };
+
+function getOmdb(imdbId) {
+    $.ajax({
+        url: 'http://www.omdbapi.com/?i=' + imdbId,
+        type: 'GET',
+        success: function (data) {
+            console.log('OMDB', data);
+            parseAwards(data['Awards']);
+            $("#awards").empty().append(data['Awards'].replace('.', '.<br>'));
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}
+
+function parseAwards(awardString) {
+    if (awardString !== 'N/A') {
+        var splited = awardString.split(' ');
+        if (splited[0] === 'Won' && (splited[2] === 'Oscars.' || splited[2] === 'Oscar.')) {
+            fillOscars(splited[1]);
+        }
+    }
+}
+
+function fillOscars(oscarCount) {
+    console.log('WON ' + oscarCount + ' Oscars');
+    oscarContainer.empty();
+    for (var i = 0; i < oscarCount; i++) {
+        oscarContainer.append('<img class="oscar-statue" src="/static/img/oscar.svg">');
+    }
+
+}
 
 function addToWishlist(eventbus, movieId, lang) {
     if (!$("#wishlist-text").hasClass('content-key')) {

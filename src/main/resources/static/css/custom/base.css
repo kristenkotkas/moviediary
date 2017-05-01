@@ -224,6 +224,15 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.oscar-statue {
+    max-width: 6%;
+    margin-right: 0.5em;
+}
+
+.oscar-container {
+    padding-bottom: 0;
+}
+
 .last-row {
     margin-bottom: 0;
 }
