@@ -212,7 +212,6 @@ function addPagins(seriesData, page, lang, type) {
 
             $(document.getElementById(id)).click(function () {
                 openSeries(seriesData['id'], pages + 1, lang);
-                //console.log('page', pages + 1);
             });
             $(document.getElementById('series-page_' + type + '_' + page)).addClass('active');
         });

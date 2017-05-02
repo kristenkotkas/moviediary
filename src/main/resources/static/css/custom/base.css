@@ -380,6 +380,10 @@ span.badge.new:after {
     font-weight: 300;
 }
 
+.pagination li.active {
+    background: #00bcd4;
+}
+
 .tv-season-title {
     font-weight: 500;
     font-size: x-large;
