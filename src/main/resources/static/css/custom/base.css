@@ -139,6 +139,10 @@ body {
     padding: 2rem;
 }
 
+.collapsible-body-tv {
+    padding: 1em 0;
+}
+
 .movies-heading {
     padding: 1% 0 1% 4%;
     margin: 1% 0 1% 0;

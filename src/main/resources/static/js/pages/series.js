@@ -74,13 +74,13 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
 function getSeriesSearch(lang) {
     eventbus.send("api_get_tv_search", searchBar.val(), function (error, reply) {
         seriesDataContainer.empty();
-        closeSeenSeries();
+        //closeSeenSeries();
         var searchResult = reply.body['results'];
         searchResultContainer.empty();
         $.each(searchResult, function (i) {
             var searchedTvSeries = searchResult[i];
             var resultCardId = 'result_search' + searchedTvSeries['id'];
-            console.log(searchedTvSeries);
+            //console.log(searchedTvSeries);
             searchResultContainer.append(
                 $.parseHTML(
                     '<div class="col s12 m6 l4">' +
@@ -115,20 +115,19 @@ function getSeriesSearch(lang) {
 
 function openSeries(seriesId, page, lang) {
     //seriesDataContainer.empty();
-    closeSeenSeries();
-    console.log('opened series', seriesId);
+    //closeSeenSeries();
     eventbus.send('api_get_tv',
         {
             seriesId: seriesId,
             page: page
         }
     , function (error, reply) {
-        closeSeenSeries();
+        //closeSeenSeries();
         searchResultContainer.empty();
 
         var seriesData = reply['body'];
 
-        console.log('seriesData', seriesData);
+        //console.log('seriesData', seriesData);
         changeDesign(seriesData);
         fillResultSeries(seriesData, page, lang);
             replaceUrlParameter("id", seriesId);
@@ -154,7 +153,7 @@ function fillResultSeries(seriesData, page, lang) {
 
                 $(document.getElementById(id)).click(function () {
                     openSeries(seriesData['id'], pages + 1, lang);
-                    console.log('page', pages + 1);
+                    //console.log('page', pages + 1);
                 })
             });
 
@@ -171,7 +170,7 @@ function fillResultSeries(seriesData, page, lang) {
                 } else {
                     episode += lang['SERIES_EPISODE_PLURAL'];
                 }
-                console.log(seasonData);
+                //console.log(seasonData);
                 seriesDataContainer.append(
                     $.parseHTML(
                         '<li>' +
@@ -214,7 +213,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
         var seasonData = seriesData[('season/' + seasonNumber)];
         var ep = lang['SERIES_EPISODE_SHORT'] + ': ';
         elem.append(
-            '<div class="col s12 m6 l3 grey-text">' +
+            '<div class="col s12 m12 l3 grey-text">' +
                 '<div class="card cursor episode-card" id="' + id + '">' +
                     '<div class="card-content">' +
                         '<div class="content-key truncate">' + episodeData['name'] + '</div>' +
@@ -258,9 +257,9 @@ function cardOnClick(event) {
 
 function addEpisode(card, element, data, seriesData, seasonData, lang) {
     if (element.children().length === 0) {
-        addEpisodeToView(data, seriesData, seasonData, card, element);
+        addEpisodeToView(data, seriesData, seasonData, card, element, lang);
     } else {
-        removeEpisode(card, element, data);
+        removeEpisode(card, element, data, lang);
     }
 }
 
@@ -270,7 +269,7 @@ function changeToInActive(card, element, data) {
     element.empty();
 }
 
-function addEpisodeToView(episodeData, seriesData, seasonData, card, element) {
+function addEpisodeToView(episodeData, seriesData, seasonData, card, element, lang) {
     var episodeId = episodeData['id'];
     var seriesId = seriesData['id'];
     console.log('seriesId', seriesId);
@@ -282,23 +281,29 @@ function addEpisodeToView(episodeData, seriesData, seasonData, card, element) {
             'seasonId': seasonData['_id']
         }
         , function (error, reply) {
-            console.log('reply', reply);
+            //console.log('reply', reply);
             if (reply['body']['updated'] != null) {
                 console.log('episode added');
                 changeToActive(card, element, episodeData);
+                eventbus.send("database_get_watching_series", {},  function (error, reply) {
+                    fillSeenSeries(reply.body['rows'], lang);
+                });
             }
         });
 }
 
-function removeEpisode(card, element, episodeData) {
+function removeEpisode(card, element, episodeData, lang) {
     var episodeId = episodeData['id'];
     eventbus.send("database_remove_episode",
         episodeId
         , function (error, reply) {
-            console.log('reply', reply);
+            //console.log('reply', reply);
             if (reply['body']['updated'] != null) {
                 console.log('episode removed');
                 changeToInActive(card, element, episodeData);
+                eventbus.send("database_get_watching_series", {},  function (error, reply) {
+                    fillSeenSeries(reply.body['rows'], lang);
+                });
             }
         });
 }
@@ -324,7 +329,7 @@ function changeDesign(seriesData) {
 function fillSeenSeries(seriesData, lang) {
     seenSeriesContainer.empty();
     $.each(seriesData, function (i) {
-       console.log('series', seriesData[i]);
+       //console.log('series', seriesData[i]);
        var info = seriesData[i];
        var cardId = 'img_' + info['SeriesId'];
        var cardIdTitle = 'title_' + info['SeriesId'];
@@ -332,7 +337,7 @@ function fillSeenSeries(seriesData, lang) {
        var resultCardId = 'result_' + info['SeriesId'];
        seenSeriesContainer.append(
            $.parseHTML(
-                '<div class="col s12 m6 l4">' +
+                '<div class="col s12 m12 l12">' +
                     '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
                         '<div class="card-image">' +
                             '<img id="' + cardId + '" class="series-poster" alt="Poster for series: ' + seriesData[i]['Title'] + '">' +

@@ -278,7 +278,7 @@ var searchMovie = function (eventbus, movieId, lang) {
 
 function getOmdb(imdbId) {
     $.ajax({
-        url: 'http://www.omdbapi.com/?i=' + imdbId,
+        url: 'https://www.omdbapi.com/?i=' + imdbId,
         type: 'GET',
         success: function (data) {
             console.log('OMDB', data);
