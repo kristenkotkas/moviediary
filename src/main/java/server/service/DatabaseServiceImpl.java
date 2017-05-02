@@ -1,7 +1,5 @@
 package server.service;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
@@ -9,11 +7,11 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
-import io.vertx.rxjava.ext.sql.SQLConnection;
 
 import java.util.List;
 import java.util.Map;
 
+import static io.vertx.rxjava.core.Future.failedFuture;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
 import static server.service.DatabaseService.Column.*;
@@ -138,26 +136,6 @@ public class DatabaseServiceImpl implements DatabaseService {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
     }
 
-    private static Handler<AsyncResult<SQLConnection>> connHandler(Future future, Handler<SQLConnection> handler) {
-        return conn -> check(conn.succeeded(),
-                () -> handler.handle(conn.result()),
-                () -> future.fail(conn.cause()));
-    }
-
-    /**
-     * Convenience method for handling sql commands result.
-     */
-    private static <T> Handler<AsyncResult<T>> resultHandler(SQLConnection conn, Future<JsonObject> future) {
-        return ar -> {
-            check(ar.succeeded(),
-                    () -> check(ar.result() instanceof ResultSet,
-                            () -> future.complete(((ResultSet) ar.result()).toJson()),
-                            () -> future.complete(((UpdateResult) ar.result()).toJson())),
-                    () -> future.fail(ar.cause()));
-            conn.close();
-        };
-    }
-
     private Future<JsonObject> query(String sql, JsonArray params) {
         return future(fut -> client.rxGetConnection()
                 .flatMap(conn -> conn.rxQueryWithParams(sql, params).doAfterTerminate(conn::close))
@@ -177,19 +155,18 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
-        // TODO: 25.04.2017 if check rx-ga
-        return future(fut -> check(!nonNull(username, password, firstname, lastname) ||
-                        contains("", username, firstname, lastname),
-                () -> fut.fail(new Throwable("Email, firstname and lastname must exist!")),
-                () -> ifPresent(genString(), salt -> updateOrInsert(SQL_INSERT_USER, new JsonArray()
-                        .add(username)
-                        .add(firstname)
-                        .add(lastname)
-                        .add(hash(password, salt))
-                        .add(salt)).rxSetHandler()
-                        .doOnError(fut::fail)
-                        .subscribe(res -> insert(Table.SETTINGS, createDataMap(username)).rxSetHandler()
-                                .subscribe(result -> fut.complete(res), fut::fail)))));
+        if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
+            return failedFuture("Email, firstname and lastname must exist!");
+        }
+        return future(fut -> ifPresent(genString(), salt -> updateOrInsert(SQL_INSERT_USER, new JsonArray()
+                .add(username)
+                .add(firstname)
+                .add(lastname)
+                .add(hash(password, salt))
+                .add(salt)).rxSetHandler()
+                .doOnError(fut::fail)
+                .subscribe(res -> insert(Table.SETTINGS, createDataMap(username)).rxSetHandler()
+                        .subscribe(result -> fut.complete(res), fut::fail))));
     }
 
     /**
@@ -281,21 +258,14 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing update results
      */
     @Override
-    public Future<JsonObject> update(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx + test
-        return future(fut -> {
-            if (data.get(USERNAME) == null) {
-                fut.fail("Username required.");
-                return;
-            }
-            if (data.size() == 1) {
-                fut.fail("No columns specified.");
-                return;
-            }
-            List<Column> columns = getSortedColumns(data);
-            client.getConnection(connHandler(fut,
-                    conn -> conn.updateWithParams(UPDATE.create(table, columns), getSortedValues(columns, data),
-                            resultHandler(conn, fut))));
-        });
+    public Future<JsonObject> update(Table table, Map<Column, String> data) { // TODO: 25.04.2017 test
+        if (data.get(USERNAME) == null) {
+            return failedFuture("Username required.");
+        } else if (data.size() == 1) {
+            return failedFuture("No columns specified.");
+        }
+        List<Column> columns = getSortedColumns(data);
+        return updateOrInsert(UPDATE.create(table, columns), getSortedValues(columns, data));
     }
 
     /**
@@ -306,17 +276,12 @@ public class DatabaseServiceImpl implements DatabaseService {
      * @return future of JsonObject containing insertion results
      */
     @Override
-    public Future<JsonObject> insert(Table table, Map<Column, String> data) { // TODO: 25.04.2017 rx + test
-        return future(fut -> {
-            if (data.get(USERNAME) == null) {
-                fut.fail("Username required.");
-                return;
-            }
-            List<Column> columns = getSortedColumns(data);
-            client.getConnection(connHandler(fut,
-                    conn -> conn.updateWithParams(INSERT.create(table, columns), getSortedValues(columns, data),
-                            resultHandler(conn, fut))));
-        });
+    public Future<JsonObject> insert(Table table, Map<Column, String> data) { // TODO: 25.04.2017 test
+        if (data.get(USERNAME) == null) {
+            return failedFuture("Username required.");
+        }
+        List<Column> columns = getSortedColumns(data);
+        return updateOrInsert(INSERT.create(table, columns), getSortedValues(columns, data));
     }
 
     /**
