@@ -385,6 +385,23 @@ span.badge.new:after {
     font-size: x-large;
 }
 
+.pagin-button {
+    background: #ffffff;
+    margin: 0.3em;
+    padding: 0.1em;
+}
+
+.pagin-text {
+    font-size: larger;
+    font-weight: 500;
+    padding: 0.5em;
+}
+
+.pagin-container {
+    margin-bottom: 0.8em;
+    margin-top: 0.8em;
+}
+
 .season-add-info {
     margin-left: 1em;
 }

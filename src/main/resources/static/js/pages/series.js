@@ -19,10 +19,14 @@ var body = $("#body");
 var seriesDataContainer = $("#series-data-container");
 var seenEpisodes;
 var seenSeriesHeader = $("#seen-series-header");
+var isMobile = false;
 
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
+        if ($( window ).width() <= 600) {
+            isMobile = true;
+        }
         lang = reply.body;
         enableParameterSeriesLoading(eventbus, lang);
 
@@ -74,16 +78,18 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
 function getSeriesSearch(lang) {
     eventbus.send("api_get_tv_search", searchBar.val(), function (error, reply) {
         seriesDataContainer.empty();
-        //closeSeenSeries();
+        if (isMobile) {
+            closeSeenSeries();
+        }
         var searchResult = reply.body['results'];
         searchResultContainer.empty();
         $.each(searchResult, function (i) {
             var searchedTvSeries = searchResult[i];
             var resultCardId = 'result_search' + searchedTvSeries['id'];
-            //console.log(searchedTvSeries);
+            console.log(searchedTvSeries);
             searchResultContainer.append(
                 $.parseHTML(
-                    '<div class="col s12 m6 l4">' +
+                    '<div class="col s12 m12 l4">' +
                         '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
                             '<div class="card-image">' +
                                 '<img src="' + getPosterPath(searchedTvSeries['poster_path']) + '" class="series-poster" ' +
@@ -122,7 +128,9 @@ function openSeries(seriesId, page, lang) {
             page: page
         }
     , function (error, reply) {
-        //closeSeenSeries();
+        if (isMobile) {
+            closeSeenSeries();
+        }
         searchResultContainer.empty();
 
         var seriesData = reply['body'];
@@ -139,26 +147,7 @@ function fillResultSeries(seriesData, page, lang) {
     endLoading();
     eventbus.send("database_get_seen_episodes", seriesData['id'], function (error, reply) {
         seriesDataContainer.empty();
-
-        if (seriesData['number_of_seasons'] > 9) {
-            var neededPages = Math.floor(seriesData['number_of_seasons'] / 10) + 1;
-
-            $.each(new Array(neededPages), function (pages) {
-                var id = 'series-page_' + (pages + 1);
-                seriesDataContainer.append(
-                    $.parseHTML(
-                        '<a class="btn waves-effect light-blue" id="' + id + '">' + (pages + 1) + '</a>'
-                    )
-                );
-
-                $(document.getElementById(id)).click(function () {
-                    openSeries(seriesData['id'], pages + 1, lang);
-                    //console.log('page', pages + 1);
-                })
-            });
-
-        }
-
+        addPagins(seriesData, page, lang, 'top');
         seenEpisodes = reply['body']['episodes'];
         for (var i = ((page - 1) * 10); i < page * 10; i++) {
             var season = 'season/' + i;
@@ -201,7 +190,34 @@ function fillResultSeries(seriesData, page, lang) {
                 getEpisodes(seasonData['episodes'], i, seriesData, lang);
             }
         }
+        addPagins(seriesData, page, lang, 'bottom');
     });
+}
+
+function addPagins(seriesData, page, lang, type) {
+    if (seriesData['number_of_seasons'] > 9) {
+        var neededPages = Math.floor(seriesData['number_of_seasons'] / 10) + 1;
+        seriesDataContainer.append(
+            $.parseHTML(
+                '<ul class="pagination center pagin-container" id="' + type + '-pagins-container"></ul>'
+            )
+        );
+        $.each(new Array(neededPages), function (pages) {
+            var id = 'series-page_' + type + '_' + (pages + 1);
+            $(document.getElementById(type + '-pagins-container')).append(
+                $.parseHTML(
+                    '<li class="waves-effect pagin-button" id="' + id + '"><a><span class="pagin-text">' + (pages + 1) + '</span></a></li>'
+                )
+            );
+
+            $(document.getElementById(id)).click(function () {
+                openSeries(seriesData['id'], pages + 1, lang);
+                //console.log('page', pages + 1);
+            });
+            $(document.getElementById('series-page_' + type + '_' + page)).addClass('active');
+        });
+
+    }
 }
 
 function getEpisodes(episodes, seasonNumber, seriesData, lang) {
