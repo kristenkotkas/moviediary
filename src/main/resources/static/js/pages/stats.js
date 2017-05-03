@@ -23,6 +23,7 @@ var yearsChartCtx = $("#yearsChart");
 var yearsChartSmallCtx = $("#yearsChartSmall");
 var timeChartCtx = $("#timeChart");
 var timeChartSmallCtx = $("#timeChartSmall");
+var monthChartCtx = $("#monthChart");
 var collSearch = $("#search-coll-search");
 var collFilters = $("#search-coll-filters");
 var collQkSearch = $("#search-coll-qk-search");
@@ -45,6 +46,7 @@ timeChartCtx.attr('height', '250%');
 timeChartSmallCtx.attr('height', '500%');
 yearsChartCtx.attr('height', '100%');
 yearsChartSmallCtx.attr('height', '900%');
+monthChartCtx.attr('height', '100%');
 var options = {
     scales: {
         yAxes: [{
@@ -169,6 +171,30 @@ var timeChartSmall = new Chart(timeChartSmallCtx, {
     options: options
 });
 
+var monthChart = new Chart(monthChartCtx, {
+    type: 'bar',
+    data: {
+        labels: [],
+        datasets: []
+    },
+    options: options
+});
+
+var monthColors = [
+    'rgb(234, 0, 38)',
+    'rgb(0, 107, 170)',
+    'rgb(86, 192, 201)',
+    'rgb(172, 201, 54)',
+    'rgb(0, 144, 64)',
+    'rgb(220, 203, 56)',
+    'rgb(247, 146, 44)',
+    'rgb(214, 179, 111)',
+    'rgb(168, 169, 127)',
+    'rgb(157, 191, 193)',
+    'rgb(0, 173, 226)',
+    'rgb(233, 0, 119)'
+];
+
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -187,6 +213,21 @@ eventbus.onopen = function () {
             lang['STATISTICS_FRI'],
             lang['STATISTICS_SAT'],
             lang['STATISTICS_SUN']
+        ];
+
+        var monthLabels = [
+            'Jaanuar',
+            'Veebruar',
+            'Märts',
+            'Aprill',
+            'Mai',
+            'Juuni',
+            'Juuli',
+            'August',
+            'September',
+            'Oktoober',
+            'November',
+            'Detsember'
         ];
 
         fillDropDown(lang);
@@ -266,6 +307,8 @@ eventbus.onopen = function () {
         daysChart.update();
         daysChartSmall['data']['labels'] = labels;
         daysChartSmall.update();
+        monthChart['data']['labels'] = monthLabels;
+        monthChart.update();
         allTime.click();
     });
 };
@@ -385,14 +428,39 @@ function getData(eventbus, lang, start, end) {
             'end': end
         }
         , function (error, reply) {
-            console.log(reply);
-            /*
+            var data = reply.body;
             if (data.length > 0) {
-                makeTimeChart(data);
+                makeMonthChart(data);
             } else {
-                makeTimeChart(data);
-            }*/
+                makeMonthChart(data);
+            }
         });
+}
+
+function makeMonthChart(data) {
+    var datasets = [];
+    var index = 0;
+    $.each(data, function (key, value) {
+        var dataset = {};
+        dataset['label'] = key.toString();
+        dataset['backgroundColor'] = monthColors[index++ % 12];
+        dataset['data'] = getMonthData(value);
+        datasets.push(dataset);
+    });
+    monthChart['data']['datasets'] = datasets;
+    monthChart.update();
+}
+
+function getMonthData(value) {
+    var distr = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0};
+    $.each(value, function (i) {
+        distr[i - 1] = value[i];
+    });
+    var distrArray = [];
+    for (var i = 0; i < 12; i++) {
+        distrArray.push(distr[i]);
+    }
+    return distrArray;
 }
 
 function makeDaysChart(data) {
