@@ -25,11 +25,13 @@ import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.BankLinkRouter.*;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
+import static server.security.DatabaseAuthorizer.UNAUTHORIZED;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
 import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
+import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 import static server.util.HandlerUtils.endHandler;
@@ -171,8 +173,6 @@ public class UiRouter extends EventBusRoutable {
         engine.render(getSafe(ctx, TEMPL_DISCOVER, DiscoverTemplate.class), endHandler(ctx));
     }
 
-
-
     /**
      * Renders login page.
      * Changes users language if user pressed any of language buttons.
@@ -211,15 +211,20 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleIdCardLogin(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_IDCARDLOGIN, IdCardLoginTemplate.class)
-                .setClientVerifiedHeader(CLIENT_VERIFIED_STATE)
-                .setClientCertificateHeader(CLIENT_CERTIFICATE)
-                .setClientVerifiedState(ctx.request().getHeader(CLIENT_VERIFIED_STATE))
-                .setClientCertificate(ctx.request().getHeader(CLIENT_CERTIFICATE))
-                .setCallbackUrl(securityConfig.getPac4jConfig()
-                        .getClients()
-                        .findClient(IdCardClient.class)
-                        .getCallbackUrl()), endHandler(ctx));
+        String state = ctx.request().getHeader(CLIENT_VERIFIED_STATE);
+        String cert = ctx.request().getHeader(CLIENT_CERTIFICATE);
+        String url = "https://movies.kyngas.eu" + addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED);
+        check("NONE".equals(state) || cert == null,
+                () -> redirect(ctx, url),
+                () -> engine.render(getSafe(ctx, TEMPL_IDCARDLOGIN, IdCardLoginTemplate.class)
+                        .setClientVerifiedHeader(CLIENT_VERIFIED_STATE)
+                        .setClientCertificateHeader(CLIENT_CERTIFICATE)
+                        .setClientVerifiedState(state)
+                        .setClientCertificate(cert)
+                        .setCallbackUrl(securityConfig.getPac4jConfig()
+                                .getClients()
+                                .findClient(IdCardClient.class)
+                                .getCallbackUrl()), endHandler(ctx)));
     }
 
     private void handleNotFound(RoutingContext ctx) {
@@ -227,11 +232,11 @@ public class UiRouter extends EventBusRoutable {
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
     }
 
-    private void handleDonateSuccess(RoutingContext ctx){
+    private void handleDonateSuccess(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_DONATE_SUCCESS, DonateSuccessTemplate.class), endHandler(ctx));
     }
 
-    private void handleDonateFailure(RoutingContext ctx){
+    private void handleDonateFailure(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_DONATE_FAILURE, DonateFailureTemplate.class), endHandler(ctx));
     }
 
@@ -239,9 +244,9 @@ public class UiRouter extends EventBusRoutable {
      * Gets template from TemplateEngine that is at least instance of BaseTemplate.
      * Sets parameters to template that are available to all subclasses of BaseTemplate.
      *
-     * @param ctx to use
+     * @param ctx      to use
      * @param fileName to load
-     * @param type of template to load
+     * @param type     of template to load
      * @return template of specified type
      */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
