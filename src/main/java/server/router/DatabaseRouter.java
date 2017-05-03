@@ -13,6 +13,8 @@ import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
 import server.service.MailService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 import static io.vertx.core.logging.LoggerFactory.getLogger;
@@ -67,6 +69,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_DISTINCT_MOVIE_COUNT = "database_get_distinct_movie_count";
     public static final String DATABASE_GET_TOTAL_CINEMA_COUNT = "database_get_total_cinema_count";
     public static final String DATABASE_GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
+    public static final String DATABASE_GET_MONTH_YEAR_DISTR = "database_get_month_year_distr";
     private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
@@ -88,6 +91,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDistribution));
         listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDistribution));
         listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDistribution));
+        listen(DATABASE_GET_MONTH_YEAR_DISTR, reply(database::getMontYearDistribution, getMonthYearsDistr()));
         listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta));
         listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta));
         listen(DATABASE_REMOVE_VIEW, reply(database::removeView));
@@ -96,7 +100,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)),
                 getSeenEpisodes()));
         listen(DATABASE_GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
-        listen(DATABASE_INSERT_WISHLIST, reply((user, param) ->database.insertWishlist(user, parseInt(param))));
+        listen(DATABASE_INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, parseInt(param))));
         listen(DATABASE_REMOVE_WISHLIST, reply(database::removeFromWishlist));
         listen(DATABASE_GET_LAST_VIEWS, reply((user, param) -> database.getLastMoviesHome(user), getDatabaseHomeViws()));
         listen(DATABASE_GET_HOME_WISHLIST, reply((user, param) -> database.getLastWishlistHome(user)));
@@ -165,6 +169,21 @@ public class DatabaseRouter extends EventBusRoutable {
                     .forEach(jsonObj -> jsonObj
                             .put("Start", getNormalDTFromDB(jsonObj.getString("Start"), LONG_DATE)));
             return json;
+        };
+    }
+
+    private BiFunction<String, JsonObject, Object> getMonthYearsDistr() {
+        return (user, json) -> {
+            json.remove("results");
+            Map<String, Object> result = new HashMap<>();
+
+            for (Object row : json.getJsonArray("rows")) {
+                JsonObject jsonData = (JsonObject) row;
+                result.putIfAbsent(Integer.toString(jsonData.getInteger("Year")), new HashMap<>());
+                ((Map<Integer, Integer>) result.get(Integer.toString(jsonData.getInteger("Year")))).putIfAbsent(jsonData.getInteger("Month"), jsonData.getInteger("Count"));
+            }
+
+            return new JsonObject(result);
         };
     }
 

@@ -341,10 +341,7 @@ function getData(eventbus, lang, start, end) {
             if (data.length > 0) {
                 makeYearsChart(data);
             } else {
-                makeEmptyYearsChart()
-                /*
-                 $('#year-chart-container').empty();
-                 $('#year-chart-small-container').empty();*/
+                makeEmptyYearsChart();
             }
         });
 
@@ -361,9 +358,6 @@ function getData(eventbus, lang, start, end) {
                 makeDaysChart(data);
             } else {
                 makeDaysChart(data);
-                /*
-                 $('#days-chart-container').empty();
-                 $('#days-chart-small-container').empty();*/
             }
         });
 
@@ -380,10 +374,24 @@ function getData(eventbus, lang, start, end) {
                 makeTimeChart(data);
             } else {
                 makeTimeChart(data);
-                /*
-                 $('#year-chart-container').empty();
-                 $('#year-chart-small-container').empty();*/
             }
+        });
+
+    eventbus.send("database_get_month_year_distr",
+        {
+            'is-first': $("#seenFirst-stat").is(':checked'),
+            'is-cinema': $("#wasCinema-stat").is(':checked'),
+            'start': start,
+            'end': end
+        }
+        , function (error, reply) {
+            console.log(reply);
+            /*
+            if (data.length > 0) {
+                makeTimeChart(data);
+            } else {
+                makeTimeChart(data);
+            }*/
         });
 }
 

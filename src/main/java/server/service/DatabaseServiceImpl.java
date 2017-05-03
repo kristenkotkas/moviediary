@@ -46,6 +46,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_TIME_DIST =
             "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
+    private static final String SQL_GET_MONTH_YEAR_DIST =
+            "SELECT MONTH(Start) AS Month, YEAR(Start) AS Year, COUNT(MONTHNAME(Start)) AS Count " +
+                    "FROM Views " +
+                    "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     private static final String SQL_GET_ALL_TIME_META =
             "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
@@ -370,6 +374,20 @@ public class DatabaseServiceImpl implements DatabaseService {
         ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
         ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
         return query(sb.append(" GROUP BY Hour").toString(), new JsonArray()
+                .add(username)
+                .add(json.getString("start"))
+                .add(json.getString("end")));
+    }
+
+    @Override
+    public Future<JsonObject> getMontYearDistribution(String username, String jsonParam) {
+        JsonObject json = new JsonObject(jsonParam);
+        json.put("start", formToDBDate(json.getString("start"), false));
+        json.put("end", formToDBDate(json.getString("end"), true));
+        StringBuilder sb = new StringBuilder(SQL_GET_MONTH_YEAR_DIST);
+        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
+        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
+        return query(sb.append(" GROUP BY Month, Year ORDER BY Year, Month").toString(), new JsonArray()
                 .add(username)
                 .add(json.getString("start"))
                 .add(json.getString("end")));

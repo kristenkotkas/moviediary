@@ -228,7 +228,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
         var seasonData = seriesData[('season/' + seasonNumber)];
         var ep = lang['SERIES_EPISODE_SHORT'] + ': ';
         elem.append(
-            '<div class="col s12 m12 l3 grey-text">' +
+            '<div class="col s12 m12 l6 xl3 grey-text">' +
                 '<div class="card cursor episode-card" id="' + id + '">' +
                     '<div class="card-content">' +
                         '<div class="content-key truncate">' + episodeData['name'] + '</div>' +
