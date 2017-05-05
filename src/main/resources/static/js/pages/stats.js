@@ -24,6 +24,7 @@ var yearsChartSmallCtx = $("#yearsChartSmall");
 var timeChartCtx = $("#timeChart");
 var timeChartSmallCtx = $("#timeChartSmall");
 var monthChartCtx = $("#monthChart");
+var monthChartSmallCtx = $("#monthChartSmall");
 var collSearch = $("#search-coll-search");
 var collFilters = $("#search-coll-filters");
 var collQkSearch = $("#search-coll-qk-search");
@@ -40,6 +41,7 @@ var totalViews = $("#stat-total-views");
 var totalRuntime = $("#stat-total-runtime");
 var averageRuntime = $("#stat-average-runtime");
 var topMovies = $("#stat-top-movies");
+var monthDatasets = [];
 daysChartCtx.attr('height', '250%');
 daysChartSmallCtx.attr('height', '300%');
 timeChartCtx.attr('height', '250%');
@@ -47,6 +49,7 @@ timeChartSmallCtx.attr('height', '500%');
 yearsChartCtx.attr('height', '100%');
 yearsChartSmallCtx.attr('height', '900%');
 monthChartCtx.attr('height', '100%');
+monthChartSmallCtx.attr('height', '900%');
 var options = {
     scales: {
         yAxes: [{
@@ -173,6 +176,15 @@ var timeChartSmall = new Chart(timeChartSmallCtx, {
 
 var monthChart = new Chart(monthChartCtx, {
     type: 'bar',
+    data: {
+        labels: [],
+        datasets: []
+    },
+    options: options
+});
+
+var monthChartSmall = new Chart(monthChartSmallCtx, {
+    type: 'horizontalBar',
     data: {
         labels: [],
         datasets: []
@@ -309,6 +321,8 @@ eventbus.onopen = function () {
         daysChartSmall.update();
         monthChart['data']['labels'] = monthLabels;
         monthChart.update();
+        monthChartSmall['data']['labels'] = monthLabels;
+        monthChartSmall.update();
         allTime.click();
     });
 };
@@ -438,17 +452,19 @@ function getData(eventbus, lang, start, end) {
 }
 
 function makeMonthChart(data) {
-    var datasets = [];
+    monthDatasets.length = 0;
     var index = 0;
     $.each(data, function (key, value) {
         var dataset = {};
         dataset['label'] = key.toString();
         dataset['backgroundColor'] = monthColors[index++ % 12];
         dataset['data'] = getMonthData(value);
-        datasets.push(dataset);
+        monthDatasets.push(dataset);
     });
-    monthChart['data']['datasets'] = datasets;
+    monthChart['data']['datasets'] = monthDatasets;
     monthChart.update();
+    monthChartSmall['data']['datasets'] = monthDatasets;
+    monthChartSmall.update();
 }
 
 function getMonthData(value) {
