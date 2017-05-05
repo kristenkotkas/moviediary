@@ -11,6 +11,9 @@ $(document).ready(function () {
         html: true
     });
     $(".sidebar-collapse").sideNav(); //sidebar initialization
+    $(document).ready(function(){
+        $('.collapsible').collapsible();
+    });
 });
 
 var eventbus = new EventBus("/eventbus");
@@ -157,8 +160,8 @@ var makeAllTime = function (eventbus, lang) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
-            console.log(data);
-            console.log(new Date(data[0]['Start']));
+            //console.log(data);
+            //console.log(new Date(data[0]['Start']));
             startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
             endDateField.pickadate('picker').set('select', new Date());
             searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
@@ -174,9 +177,9 @@ var searchHistory = function (eventbus, lang, start, end, count) {
             'end': end,
             'page': 0
         }, function (error, reply) {
-            console.log(reply);
+            //console.log(reply);
             var data = reply.body['rows'];
-            console.log(data.length);
+            //console.log(data.length);
             if (data.length > 0) {
                 $("#viewsTitle").empty();
                 addTableHead(count, lang);
@@ -293,12 +296,12 @@ function addHistory(data, lang) {
         } else {
             posterPath = '/static/img/nanPosterBig.jpg'
         }
-        console.log(data[i]);
+        //console.log(data[i]);
         $("#table").append(
             $.parseHTML(
                 '<li class="z-depth-0" id="history-' + data[i]['Id'] + '">' +
-                    '<div class="collapsible-header collapsible-header-history history-object content-key grey-text">' +
-                        '<span>' + data[i]['Title'] + '</span>'+
+                    '<div class="collapsible-header collapsible-header-history history-object content-key grey-text" id="header_' + data[i]['Id'] + '">' +
+                        '<span><i class="fa fa-angle-down grey-text" aria-hidden="true" id="arrow_' + data[i]['Id'] + '"></i>' + data[i]['Title'] + '</span>'+
                         '<span class="hide-on-small-only badge ' + data[i]['WasCinema'] + '" aria-hidden="true"></span>' +
                         '<span class="badge new ">' + getMonth(data[i]['Start'], lang) + '</span>' +
                     '</div>' +
@@ -361,5 +364,16 @@ function addHistory(data, lang) {
         button.onclick = function () {
             removeView(data[i]['Id'], lang);
         };
+
+        $(document.getElementById('table')).collapsible({
+            accordion: false, // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+            onOpen: function (el) {
+                $(el.find('i.fa')[0]).removeClass('fa-angle-down').addClass('fa-angle-up');
+            },
+            onClose: function (el) {
+                $(el.find('i.fa')[0]).removeClass('fa-angle-up').addClass('fa-angle-down');
+            }
+        });
+
     });
 }

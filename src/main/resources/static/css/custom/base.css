@@ -82,7 +82,11 @@ body {
 }
 
 .page-heading {
-    margin: 3% 0 1% 4%;
+    margin: 3% 0 0.5% 4%;
+}
+
+.tab-comment {
+    margin: 0 0 2% 4%;
 }
 
 .collapsible {
