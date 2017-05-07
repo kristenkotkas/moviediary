@@ -305,7 +305,7 @@ function fillOscars(oscarCount) {
     console.log('WON ' + oscarCount + ' Oscars');
     oscarContainer.empty();
     for (var i = 0; i < oscarCount; i++) {
-        oscarContainer.append('<img class="oscar-statue" src="/static/img/oscar.svg">');
+        oscarContainer.append('<img class="oscar-statue" src="/static/img/oscar.svg" alt="Oscar statue">');
     }
 
 }
