@@ -23,7 +23,7 @@ public class Utils {
 
     public static void formLogin(WebDriver driver, String uri, JsonObject config) {
         JsonObject user = config.getJsonObject("unit_test").getJsonObject("form_user");
-        Utils.assertGoToPage(driver, uri + "/formlogin");
+        assertGoToPage(driver, uri + "/formlogin");
         List<WebElement> fields = driver.findElements(tagName("input"));
         sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper"))));
         fields.get(0).sendKeys(user.getString("username"));

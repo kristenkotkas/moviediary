@@ -26,6 +26,7 @@ import static server.security.FormClient.*;
 import static server.service.DatabaseService.createDataMap;
 import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.*;
+import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
 import static server.util.NetworkUtils.isServer;
 import static server.util.StringUtils.*;
@@ -39,8 +40,8 @@ public class DatabaseRouter extends EventBusRoutable {
 
     private static final String API_USER_INFO = "/private/api/v1/user/info";
     private static final String API_USERS_COUNT = "/private/api/v1/views/count";
+    private static final String API_HISTORY = "/private/api/v1/history";
 
-    private static final String USERS_SIZE = "database_users_size";
     private static final String GET_HISTORY = "database_get_history";
     private static final String GET_MOVIE_HISTORY = "database_get_movie_history";
     private static final String INSERT_WISHLIST = "database_insert_wishlist";
@@ -79,9 +80,7 @@ public class DatabaseRouter extends EventBusRoutable {
         this.config = config;
         this.database = database;
         this.mail = mail;
-        listen(USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
-        listen(GET_HISTORY, reply((username, param) -> database.getViews(username, param,
-                new JsonObject(param).getInteger("page")), getDatabaseHistory()));
+        listen(GET_HISTORY, reply(database::getViews, transformDatabaseHistory()));
         listen(GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
         listen(IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
         listen(GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
@@ -118,6 +117,18 @@ public class DatabaseRouter extends EventBusRoutable {
         router.get(API_USER_INFO).handler(this::handleUserInfo);
         router.get(API_USERS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
+        router.get(API_HISTORY).handler(this::handleGetHistory);
+    }
+
+    private void handleGetHistory(RoutingContext ctx) { // TODO: 07/05/2017 test
+        if (ctx.getBody().length() == 0) {
+            serviceUnavailable(ctx, new Throwable("Missing parameters for query."));
+            return;
+        }
+        String username = getUsername(ctx);
+        database.getViews(username, ctx.getBodyAsString()).rxSetHandler()
+                .doOnError(err -> serviceUnavailable(ctx, err))
+                .subscribe(j -> jsonResponse(ctx).accept(transformDatabaseHistory().apply(username, j)));
     }
 
     private BiFunction<String, JsonObject, Object> getSeenEpisodes() {
@@ -129,9 +140,9 @@ public class DatabaseRouter extends EventBusRoutable {
     }
 
     /**
-     * Based on username and JsonObject parameter -> returns database history results.
+     * Transforms database history results for easier consuming in front end.
      */
-    private BiFunction<String, JsonObject, Object> getDatabaseHistory() {
+    private BiFunction<String, JsonObject, Object> transformDatabaseHistory() {
         return (user, json) -> {
             json.remove("results");
             json.getJsonArray("rows").stream()

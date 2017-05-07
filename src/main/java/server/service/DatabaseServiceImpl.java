@@ -308,7 +308,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Gets all movies views for user.
      */
     @Override
-    public Future<JsonObject> getViews(String username, String jsonParam, int page) {
+    public Future<JsonObject> getViews(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
@@ -319,7 +319,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(username)
                 .add(json.getString("start"))
                 .add(json.getString("end"))
-                .add(page * 10)
+                .add(json.getInteger("page") * 10)
                 .add(10));
     }
 

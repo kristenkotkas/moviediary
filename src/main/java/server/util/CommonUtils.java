@@ -46,6 +46,10 @@ public class CommonUtils {
         return new VertxProfileManager(new VertxWebContext(ctx.getDelegate())).get(true).orElse(null);
     }
 
+    public static String getUsername(RoutingContext ctx) {
+        return getProfile(ctx).getEmail();
+    }
+
     public static RSAPrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {
         return (RSAPrivateKey) KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
     }
