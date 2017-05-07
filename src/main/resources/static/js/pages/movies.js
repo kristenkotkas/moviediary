@@ -218,7 +218,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $("#search-result").empty().hide();
         $('#movie-views-table').empty();
         $('#movie-title').text(data['original_title']).addClass('movies-heading');
-        $('#navbar-background').addClass('transparent');
+        //$('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(
                 '<img src="' + posterPath + '" class="movie-poster" alt="Poster for movie: ' + data.title + '">'

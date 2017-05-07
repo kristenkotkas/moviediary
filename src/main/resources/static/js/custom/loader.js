@@ -159,14 +159,14 @@ function makeDropList(start, lang, type, startDateField, endDateField) {
     });
 }
 
-function minutesToString(minutes) {
+function minutesToString(minutes, lang) {
     var seconds = minutes * 60;
-    var daysString = 'day';
-    var hoursString = 'h';
-    var minString = 'min';
-    var daysStringPlur = 'days';
-    var hoursStringPlur = 'h';
-    var minStringPlur = 'min';
+    var daysString = lang['LOADER_DAY'];
+    var hoursString = lang['LODAER_HOUR'];
+    var minString = lang['LOADER_MIN'];
+    var daysStringPlur = lang['LOADER_DAYS'];
+    var hoursStringPlur = lang['LODAER_HOUR'];
+    var minStringPlur = lang['LOADER_MIN'];
     var result = '';
 
     var numdays = Math.floor(seconds / 86400);

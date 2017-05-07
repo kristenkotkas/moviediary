@@ -184,7 +184,7 @@ function fillResultSeries(seriesData, page, lang) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                                 '<div class="row">' +
-                                    '<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
+                                    //'<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
                                     '<div class="col s12 m12 l12" id="episode_container_' + i + '"></div>' +
                                 '</div>' +
                             '</div>' +
@@ -221,7 +221,7 @@ function addPagins(seriesData, page, lang, type) {
         var neededPages = Math.floor(seriesData['number_of_seasons'] / 10) + 1;
         seriesDataContainer.append(
             $.parseHTML(
-                '<ul class="pagination center pagin-container" id="' + type + '-pagins-container"></ul>'
+                '<li class="z-depth-0"><ul class="pagination center pagin-container" id="' + type + '-pagins-container"></ul></li>'
             )
         );
         $.each(new Array(neededPages), function (pages) {
@@ -360,7 +360,7 @@ function changeToActive(card, element, data) {
 
 function changeDesign(seriesData) {
     seriesTitle.text(seriesData['name']).addClass('movies-heading');
-    navbar.removeClass('cyan').addClass('transparent');
+    //navbar.removeClass('cyan').addClass('transparent');
     body.attr("background", getBackdropPath(seriesData['backdrop_path']));
 }
 

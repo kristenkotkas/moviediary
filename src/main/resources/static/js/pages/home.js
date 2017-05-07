@@ -44,7 +44,7 @@ function fillTopMovies(lang) {
         } else {
             topMovies.append(
                 $.parseHTML(
-                    '<span class="card-title center grey-text text-darken-1">No movies</span>'
+                    '<span class="card-title center grey-text text-darken-1">' + lang['HOME_NO_VIEWS'] + '</span>'
                 )
             );
         }
@@ -78,7 +78,7 @@ function fillLastMovies(lang) {
         } else {
             lastMovies.append(
                 $.parseHTML(
-                    '<span class="card-title center grey-text text-darken-1">No views</span>'
+                    '<span class="card-title center grey-text text-darken-1">' + lang['HOME_NO_VIEWS'] + '</span>'
                 )
             );
         }
@@ -106,27 +106,35 @@ function getShortDayOfWeek(lang, dayIndex) {
     return weekdays[dayIndex];
 }
 
+function getSingPlur(singularString, pluralString, count) {
+    if (count === 1) {
+        return singularString
+    } else {
+        return pluralString;
+    }
+}
+
 function fillTotalStat(lang) {
     eventbus.send("database_get_total_movie_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
-        totalViews.append(data[0]['total_movies']);
-        totalRuntime.append(minutesToString(data[0]['Runtime']));
-        averageRuntime.append(minutesToString(data[0]['Runtime']/data[0]['total_movies']));
+        totalViews.append(data[0]['total_movies'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data[0]['total_movies']));
+        totalRuntime.append(minutesToString(data[0]['Runtime'], lang));
+        averageRuntime.append(minutesToString(data[0]['Runtime']/data[0]['total_movies'], lang));
     });
 
     eventbus.send("database_get_new_movie_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
-        totalNewViews.append(data[0]['new_movies']);
+        totalNewViews.append(data[0]['new_movies'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data[0]['new_movies']));
     });
 
     eventbus.send("database_get_total_cinema_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
-        totalCinema.append(data[0]['total_cinema']);
+        totalCinema.append(data[0]['total_cinema'] + ' ' + getSingPlur(lang['HOME_VISIT'], lang['HOME_VISITS'], data[0]['total_cinema']));
     });
 
     eventbus.send("database_get_distinct_movie_count", {}, function (error, reply) {
         var data = reply['body']['rows'];
-        totalDifferentMovies.append(data[0]['unique_movies']);
+        totalDifferentMovies.append(data[0]['unique_movies'] + ' ' + getSingPlur(lang['HOME_MOVIE'], lang['HOME_MOVIES'], data[0]['unique_movies']));
     });
     $("#stats-header").collapsible('open', 0);
 }
@@ -152,7 +160,7 @@ function fillWishlist(lang) {
         } else {
             wishlist.append(
                 $.parseHTML(
-                    '<span class="card-title center grey-text text-darken-1">No movies</span>'
+                    '<span class="card-title center grey-text text-darken-1">' + lang['HOME_NO_MOVIES'] + '</span>'
                 )
             );
         }

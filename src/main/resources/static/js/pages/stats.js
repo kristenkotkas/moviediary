@@ -229,18 +229,18 @@ eventbus.onopen = function () {
         ];
 
         var monthLabels = [
-            'Jaanuar',
-            'Veebruar',
-            'Märts',
-            'Aprill',
-            'Mai',
-            'Juuni',
-            'Juuli',
-            'August',
-            'September',
-            'Oktoober',
-            'November',
-            'Detsember'
+            lang['STAT_JANUARY'],
+            lang['STAT_FEBRUARY'],
+            lang['STAT_MARCH'],
+            lang['STAT_APRIL'],
+            lang['STAT_MAY'],
+            lang['STAT_JUNE'],
+            lang['STAT_JULY'],
+            lang['STAT_AUGUST'],
+            lang['STAT_SEPTEMBER'],
+            lang['STAT_OCTOBER'],
+            lang['STAT_NOVEMBER'],
+            lang['STAT_DECEMBER']
         ];
 
         fillDropDown(lang);
@@ -575,8 +575,8 @@ function addTableHead(data, lang) {
     if (data[0]['Count'] > 0) {
         viewsTitle.empty();
         totalViews.empty().append(data[0]['Count']);
-        totalRuntime.empty().append(minutesToString(data[0]['Runtime']));
-        averageRuntime.empty().append(minutesToString(data[0]['Runtime'] / data[0]['Count']));
+        totalRuntime.empty().append(minutesToString(data[0]['Runtime'], lang));
+        averageRuntime.empty().append(minutesToString(data[0]['Runtime'] / data[0]['Count'], lang));
     } else {
         addNotFound(lang);
         totalViews.empty().append('..');

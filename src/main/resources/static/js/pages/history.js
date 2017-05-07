@@ -331,7 +331,7 @@ function addHistory(data, lang) {
                                                     '<td class="col s12 m2 l2"><span class="content-key grey-text">' + lang[data[i]['DayOfWeek']] + '</span></td>' +
                                                 '</tr>' +
                                                 '<tr>' +
-                                                    '<td class="col s12 m10 l10"><span class="content-key grey-text">' + minutesToString(data[i]['Runtime']) + '</span></td>' +
+                                                    '<td class="col s12 m10 l10"><span class="content-key grey-text">' + minutesToString(data[i]['Runtime'], lang) + '</span></td>' +
                                                     '<td></td>' +
                                                 '</tr>' +
                                                 '<tr>' +
