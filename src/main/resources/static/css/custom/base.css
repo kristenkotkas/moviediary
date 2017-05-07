@@ -22,7 +22,7 @@ body {
     text-decoration: underline;
 }
 
-.opacity-footer{
+.opacity-footer {
     opacity: 0.85;
 }
 
@@ -135,7 +135,6 @@ body {
     font-size: smaller;
 }
 
-
 .collapsible-body {
     display: none;
     border-bottom: none;
@@ -199,7 +198,7 @@ span.badge.new:after {
 }
 
 .card .card-map {
-    width:100%;
+    width: 100%;
     height: 420px;
 }
 
@@ -273,7 +272,6 @@ span.badge.new:after {
     opacity: 0.85;
     cursor: pointer;
 }
-
 
 .wishlist-object:hover {
     opacity: 0.9;
@@ -454,6 +452,17 @@ span.badge.new:after {
     right: 50%;
 }
 
+.navbar-text {
+    font-weight: 300;
+    font-size: larger;
+
+}
+
+.navbar-text-active {
+    font-weight: 900;
+    font-size: larger;
+}
+
 .scale-transition {
     transition: -webkit-transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3) !important;
     transition: transform .5s cubic-bezier(0.53, 0.01, 0.36, 1.3),
@@ -473,7 +482,6 @@ span.badge.new:after {
     left: 10px;
     top: 20px;
 }
-
 
 header .brand-logo:hover {
     background-color: transparent;
@@ -533,7 +541,6 @@ header .brand-logo:hover {
          padding-left: 2%;
          width: 100%;
      }*/
-
     .collapsible-body-tv {
         padding: 2em 0;
     }

@@ -70,6 +70,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String DATABASE_GET_TOTAL_CINEMA_COUNT = "database_get_total_cinema_count";
     public static final String DATABASE_GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
     public static final String DATABASE_GET_MONTH_YEAR_DISTR = "database_get_month_year_distr";
+    public static final String DATABASE_INSERT_SEASON_VIEWS = "database_insert_season_views";
     private static final Logger LOG = getLogger(DatabaseRouter.class);
     private final JsonObject config;
     private final DatabaseService database;
@@ -111,6 +112,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(DATABASE_GET_TOTAL_CINEMA_COUNT, reply((user, param) -> database.getTotalCinemaCount(user)));
         listen(DATABASE_GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
         listen(DATABASE_GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
+        listen(DATABASE_INSERT_SEASON_VIEWS, reply(database::insertSeasonViews));
     }
 
     @Override

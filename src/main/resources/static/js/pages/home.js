@@ -1,3 +1,4 @@
+$("#navbar-home").addClass('navbar-text-active');
 $(document).ready(function () {
     $(".sidebar-collapse").sideNav(); //sidebar initialization
 });
@@ -12,7 +13,6 @@ var totalRuntime = $("#total-runtime");
 var totalDifferentMovies = $("#total-different-movies");
 var totalCinema = $("#total-cinema-visits");
 var averageRuntime = $("#average-runtime");
-
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {

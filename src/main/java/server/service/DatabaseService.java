@@ -145,6 +145,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getMontYearDistribution(String username, String jsonParam);
 
+    Future<JsonObject> insertSeasonViews(String username, String jsonParam);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

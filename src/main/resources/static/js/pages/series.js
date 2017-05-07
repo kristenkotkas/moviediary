@@ -1,3 +1,4 @@
+$("#navbar-series").addClass('navbar-text-active');
 $(document).ready(function () {
     $('.tooltipped').tooltip({ //tooltips initialization
         delay: 150,
@@ -159,6 +160,8 @@ function fillResultSeries(seriesData, page, lang) {
                 } else {
                     episode += lang['SERIES_EPISODE_PLURAL'];
                 }
+                seasonData['series_id'] = seriesData['id'];
+                console.log(seasonData);
                 //console.log(seasonData);
                 seriesDataContainer.append(
                     $.parseHTML(
@@ -181,17 +184,36 @@ function fillResultSeries(seriesData, page, lang) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                                 '<div class="row">' +
+                                    '<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
                                     '<div class="col s12 m12 l12" id="episode_container_' + i + '"></div>' +
                                 '</div>' +
                             '</div>' +
                         '</li>'
                     )
                 );
+
+                /*$(document.getElementById('add-season-' + seasonData['_id']))
+                    .click({seasonData: seasonData}, addSeasonToWatch);*/
+
                 getEpisodes(seasonData['episodes'], i, seriesData, lang);
+
             }
         }
         addPagins(seriesData, page, lang, 'bottom');
     });
+}
+
+function addSeasonToWatch(event) {
+    var data = event.data.seasonData;
+    console.log('seasonData', data);
+    eventbus.send("database_insert_season_views",
+        {
+            seriesId: data['series_id'],
+            seasonNr: data['season_number']
+        }
+        , function (error, reply) {
+            console.log(reply);
+        });
 }
 
 function addPagins(seriesData, page, lang, type) {
@@ -271,6 +293,7 @@ function cardOnClick(event) {
 }
 
 function addEpisode(card, element, data, seriesData, seasonData, lang) {
+    console.log(seriesData);
     if (element.children().length === 0) {
         addEpisodeToView(data, seriesData, seasonData, card, element, lang);
     } else {

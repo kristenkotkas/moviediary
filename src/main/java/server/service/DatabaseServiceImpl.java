@@ -487,6 +487,22 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_GET_TOTAL_CINEMA_COUNT, new JsonArray().add(username));
     }
 
+    @Override
+    public Future<JsonObject> insertSeasonViews(String username, String jsonParam) {
+        System.out.println("Series inserrt");
+        System.out.println("-------------------------");
+        System.out.println(new JsonObject(jsonParam).encodePrettily());
+        /*
+        INSERT INTO tbl_name
+            (a,b,c)
+        VALUES
+            (1,2,3),
+            (4,5,6),
+            (7,8,9);
+         */
+        return null;
+    }
+
     /**
      * Gets users count in database.
      */

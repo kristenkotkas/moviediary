@@ -1,3 +1,5 @@
+var navbarButton = $("#navbar-history");
+navbarButton.addClass('navbar-text-active');
 $(document).ready(function () {
     $(".datepicker").pickadate({ //calendar initialization
         //http://amsul.ca/pickadate.js/date/#options
@@ -11,9 +13,7 @@ $(document).ready(function () {
         html: true
     });
     $(".sidebar-collapse").sideNav(); //sidebar initialization
-    $(document).ready(function(){
-        $('.collapsible').collapsible();
-    });
+    $('.collapsible').collapsible();
 });
 
 var eventbus = new EventBus("/eventbus");

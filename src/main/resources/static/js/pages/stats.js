@@ -1,3 +1,4 @@
+$("#navbar-statistics").addClass('navbar-text-active');
 $(document).ready(function () {
     $(".datepicker").pickadate({ //calendar initialization
         //http://amsul.ca/pickadate.js/date/#options

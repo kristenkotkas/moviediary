@@ -1,3 +1,4 @@
+$("#navbar-user").addClass('navbar-text-active');
 $(document).ready(function () {
     $(".sidebar-collapse").sideNav(); //sidebar initialization
     initMap();
