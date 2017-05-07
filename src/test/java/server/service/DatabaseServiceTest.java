@@ -278,10 +278,11 @@ public class DatabaseServiceTest {
                 .put("start", "20 April, 2017")
                 .put("end", "26 April, 2017")
                 .put("is-first", false)
-                .put("is-cinema", false);
+                .put("is-cinema", false)
+                .put("page", 0);
         localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
         localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
-        JsonObject view = getSingleItem(ctx, database.getViews("unittest@kyngas.eu", data.encode(), 0));
+        JsonObject view = getSingleItem(ctx, database.getViews("unittest@kyngas.eu", data.encode()));
         assertThat(view.getInteger("MovieId"), is(49051));
         assertThat(view.getString("Title"), is("The Hobbit: An Unexpected Journey"));
         assertThat(view.getString("Start"), is("2017-04-23T14:58:00Z"));

@@ -95,7 +95,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getAllUsers();
 
-    Future<JsonObject> getViews(String username, String jsonParam, int page);
+    Future<JsonObject> getViews(String username, String jsonParam);
 
     Future<JsonObject> getMovieViews(String username, String movieId);
 
