@@ -25,11 +25,18 @@ public class JsonObj extends JsonObject {
         super(json);
     }
 
+    public JsonObj(Map<String, Object> map) {
+        super(map);
+    }
+
     public JsonObj() {
     }
 
-    public JsonObj(Map<String, Object> map) {
-        super(map);
+    public static JsonObj fromParent(Object parent) {
+        if (parent == null || !(parent instanceof JsonObject)) {
+            return null;
+        }
+        return new JsonObj(((JsonObject) parent).getMap());
     }
 
     private Object get(String key) {
@@ -284,6 +291,11 @@ public class JsonObj extends JsonObject {
     @Override
     public byte[] getBinary(String key, byte[] def) {
         return get(key) != null ? getBinary(key) : def;
+    }
+
+    public JsonObj putIfAbsent(String key, Object value) {
+        getMap().putIfAbsent(key, value);
+        return this;
     }
 
     /**

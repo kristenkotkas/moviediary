@@ -380,7 +380,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getMontYearDistribution(String username, String jsonParam) {
+    public Future<JsonObject> getMonthYearDistribution(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));

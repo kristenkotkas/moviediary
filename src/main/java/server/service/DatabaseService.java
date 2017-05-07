@@ -143,7 +143,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getTopMoviesStat(String username, String jsonParam);
 
-    Future<JsonObject> getMontYearDistribution(String username, String jsonParam);
+    Future<JsonObject> getMonthYearDistribution(String username, String jsonParam);
 
     Future<JsonObject> insertSeasonViews(String username, String jsonParam);
 

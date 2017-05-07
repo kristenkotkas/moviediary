@@ -435,7 +435,7 @@ function getData(eventbus, lang, start, end) {
             }
         });
 
-    eventbus.send("database_get_month_year_distr",
+    eventbus.send("database_get_month_year_distribution",
         {
             'is-first': $("#seenFirst-stat").is(':checked'),
             'is-cinema': $("#wasCinema-stat").is(':checked'),

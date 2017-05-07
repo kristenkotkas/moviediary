@@ -1,23 +1,20 @@
 package server.router;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
 import io.vertx.rxjava.core.CompositeFuture;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import server.entity.JsonObj;
 import server.entity.User;
 import server.service.DatabaseService;
 import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
 import server.service.MailService;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiFunction;
 
-import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 import static server.entity.Status.redirect;
@@ -38,40 +35,41 @@ import static server.util.StringUtils.*;
  */
 public class DatabaseRouter extends EventBusRoutable {
     public static final String DISPLAY_MESSAGE = "message";
-    public static final String API_USER_INFO = "/private/api/v1/user/info";
-    public static final String API_USERS_COUNT = "/private/api/v1/views/count";
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
-    public static final String DATABASE_USERS = "database_users";
-    public static final String DATABASE_USERS_SIZE = "database_users_size";
-    public static final String DATABASE_GET_HISTORY = "database_get_history";
-    public static final String DATABASE_GET_MOVIE_HISTORY = "database_get_movie_history";
-    public static final String DATABASE_INSERT_WISHLIST = "database_insert_wishlist";
-    public static final String DATABASE_IS_IN_WISHLIST = "database_get_in_wishlist";
-    public static final String DATABASE_GET_WISHLIST = "database_get_wishlist";
-    public static final String DATABASE_INSERT_VIEW = "database_insert_view";
-    public static final String DATABASE_GET_YEARS_DIST = "database_get_years_dist";
-    public static final String DATABASE_GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
-    public static final String DATABASE_GET_TIME_DIST = "database_get_time_dist";
-    public static final String DATABASE_GET_ALL_TIME_META = "database_get_all_time_meta";
-    public static final String DATABASE_GET_HISTORY_META = "database_get_history_meta";
-    public static final String DATABASE_REMOVE_VIEW = "database_remove_view";
-    public static final String DATABASE_INSERT_EPISODE = "database_insert_episode";
-    public static final String DATABASE_GET_SEEN_EPISODES = "database_get_seen_episodes";
-    public static final String DATABASE_REMOVE_EPISODE = "database_remove_episode";
-    public static final String DATABASE_GET_WATCHING_SERIES = "database_get_watching_series";
-    public static final String DATABASE_REMOVE_WISHLIST = "database_remove_wishlist";
-    public static final String DATABASE_GET_LAST_VIEWS = "database_get_last_views";
-    public static final String DATABASE_GET_HOME_WISHLIST = "database_get_home_wishlist";
-    public static final String DATABASE_GET_TOP_MOVIES = "database_get_top_movies";
-    public static final String DATABASE_GET_TOTAL_MOVIE_COUNT = "database_get_total_movie_count";
-    public static final String DATABASE_GET_NEW_MOVIE_COUNT = "database_get_new_movie_count";
-    public static final String DATABASE_GET_TOTAL_RUNTIME = "database_get_total_runtime";
-    public static final String DATABASE_GET_DISTINCT_MOVIE_COUNT = "database_get_distinct_movie_count";
-    public static final String DATABASE_GET_TOTAL_CINEMA_COUNT = "database_get_total_cinema_count";
-    public static final String DATABASE_GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
-    public static final String DATABASE_GET_MONTH_YEAR_DISTR = "database_get_month_year_distr";
-    public static final String DATABASE_INSERT_SEASON_VIEWS = "database_insert_season_views";
-    private static final Logger LOG = getLogger(DatabaseRouter.class);
+
+    private static final String API_USER_INFO = "/private/api/v1/user/info";
+    private static final String API_USERS_COUNT = "/private/api/v1/views/count";
+
+    private static final String USERS_SIZE = "database_users_size";
+    private static final String GET_HISTORY = "database_get_history";
+    private static final String GET_MOVIE_HISTORY = "database_get_movie_history";
+    private static final String INSERT_WISHLIST = "database_insert_wishlist";
+    private static final String IS_IN_WISHLIST = "database_get_in_wishlist";
+    private static final String GET_WISHLIST = "database_get_wishlist";
+    private static final String INSERT_VIEW = "database_insert_view";
+    private static final String GET_YEARS_DIST = "database_get_years_dist";
+    private static final String GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
+    private static final String GET_TIME_DIST = "database_get_time_dist";
+    private static final String GET_ALL_TIME_META = "database_get_all_time_meta";
+    private static final String GET_HISTORY_META = "database_get_history_meta";
+    private static final String REMOVE_VIEW = "database_remove_view";
+    private static final String INSERT_EPISODE = "database_insert_episode";
+    private static final String GET_SEEN_EPISODES = "database_get_seen_episodes";
+    private static final String REMOVE_EPISODE = "database_remove_episode";
+    private static final String GET_WATCHING_SERIES = "database_get_watching_series";
+    private static final String REMOVE_WISHLIST = "database_remove_wishlist";
+    private static final String GET_LAST_VIEWS = "database_get_last_views";
+    private static final String GET_HOME_WISHLIST = "database_get_home_wishlist";
+    private static final String GET_TOP_MOVIES = "database_get_top_movies";
+    private static final String GET_TOTAL_MOVIE_COUNT = "database_get_total_movie_count";
+    private static final String GET_NEW_MOVIE_COUNT = "database_get_new_movie_count";
+    private static final String GET_TOTAL_RUNTIME = "database_get_total_runtime";
+    private static final String GET_DISTINCT_MOVIE_COUNT = "database_get_distinct_movie_count";
+    private static final String GET_TOTAL_CINEMA_COUNT = "database_get_total_cinema_count";
+    private static final String GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
+    private static final String GET_MONTH_YEAR_DISTRIBUTION = "database_get_month_year_distribution";
+    private static final String INSERT_SEASON_VIEWS = "database_insert_season_views";
+
     private final JsonObject config;
     private final DatabaseService database;
     private final MailService mail;
@@ -81,38 +79,38 @@ public class DatabaseRouter extends EventBusRoutable {
         this.config = config;
         this.database = database;
         this.mail = mail;
-        listen(DATABASE_USERS, reply(param -> database.getAllUsers()));
-        listen(DATABASE_USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
-        listen(DATABASE_GET_HISTORY, reply((username, param) -> database.getViews(username, param,
+        listen(USERS_SIZE, reply((user, param) -> database.getAllUsers(), (user, json) -> json.size()));
+        listen(GET_HISTORY, reply((username, param) -> database.getViews(username, param,
                 new JsonObject(param).getInteger("page")), getDatabaseHistory()));
-        listen(DATABASE_GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
-        listen(DATABASE_IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
-        listen(DATABASE_GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
-        listen(DATABASE_INSERT_VIEW, reply(database::insertView));
-        listen(DATABASE_GET_YEARS_DIST, reply(database::getYearsDistribution));
-        listen(DATABASE_GET_WEEKDAYS_DIST, reply(database::getWeekdaysDistribution));
-        listen(DATABASE_GET_TIME_DIST, reply(database::getTimeDistribution));
-        listen(DATABASE_GET_MONTH_YEAR_DISTR, reply(database::getMontYearDistribution, getMonthYearsDistr()));
-        listen(DATABASE_GET_ALL_TIME_META, reply(database::getAllTimeMeta));
-        listen(DATABASE_GET_HISTORY_META, reply(database::getViewsMeta));
-        listen(DATABASE_REMOVE_VIEW, reply(database::removeView));
-        listen(DATABASE_INSERT_EPISODE, reply(database::insertEpisodeView));
-        listen(DATABASE_REMOVE_EPISODE, reply(database::removeEpisode));
-        listen(DATABASE_GET_SEEN_EPISODES, reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)),
-                getSeenEpisodes()));
-        listen(DATABASE_GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
-        listen(DATABASE_INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, parseInt(param))));
-        listen(DATABASE_REMOVE_WISHLIST, reply(database::removeFromWishlist));
-        listen(DATABASE_GET_LAST_VIEWS, reply((user, param) -> database.getLastMoviesHome(user), getDatabaseHomeViws()));
-        listen(DATABASE_GET_HOME_WISHLIST, reply((user, param) -> database.getLastWishlistHome(user)));
-        listen(DATABASE_GET_TOP_MOVIES, reply((user, param) -> database.getTopMoviesHome(user)));
-        listen(DATABASE_GET_TOTAL_MOVIE_COUNT, reply((user, param) -> database.getTotalMovieCount(user)));
-        listen(DATABASE_GET_NEW_MOVIE_COUNT, reply((user, param) -> database.getNewMovieCount(user)));
-        listen(DATABASE_GET_TOTAL_RUNTIME, reply((user, param) -> database.getTotalRuntime(user)));
-        listen(DATABASE_GET_TOTAL_CINEMA_COUNT, reply((user, param) -> database.getTotalCinemaCount(user)));
-        listen(DATABASE_GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
-        listen(DATABASE_GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
-        listen(DATABASE_INSERT_SEASON_VIEWS, reply(database::insertSeasonViews));
+        listen(GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
+        listen(IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
+        listen(GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
+        listen(INSERT_VIEW, reply(database::insertView));
+        listen(GET_YEARS_DIST, reply(database::getYearsDistribution));
+        listen(GET_WEEKDAYS_DIST, reply(database::getWeekdaysDistribution));
+        listen(GET_TIME_DIST, reply(database::getTimeDistribution));
+        listen(GET_MONTH_YEAR_DISTRIBUTION,
+                reply(database::getMonthYearDistribution, transformMonthYearDistribution()));
+        listen(GET_ALL_TIME_META, reply(database::getAllTimeMeta));
+        listen(GET_HISTORY_META, reply(database::getViewsMeta));
+        listen(REMOVE_VIEW, reply(database::removeView));
+        listen(INSERT_EPISODE, reply(database::insertEpisodeView));
+        listen(REMOVE_EPISODE, reply(database::removeEpisode));
+        listen(GET_SEEN_EPISODES,
+                reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)), getSeenEpisodes()));
+        listen(GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
+        listen(INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, parseInt(param))));
+        listen(REMOVE_WISHLIST, reply(database::removeFromWishlist));
+        listen(GET_LAST_VIEWS, reply((user, param) -> database.getLastMoviesHome(user), getDatabaseHomeViews()));
+        listen(GET_HOME_WISHLIST, reply((user, param) -> database.getLastWishlistHome(user)));
+        listen(GET_TOP_MOVIES, reply((user, param) -> database.getTopMoviesHome(user)));
+        listen(GET_TOTAL_MOVIE_COUNT, reply((user, param) -> database.getTotalMovieCount(user)));
+        listen(GET_NEW_MOVIE_COUNT, reply((user, param) -> database.getNewMovieCount(user)));
+        listen(GET_TOTAL_RUNTIME, reply((user, param) -> database.getTotalRuntime(user)));
+        listen(GET_TOTAL_CINEMA_COUNT, reply((user, param) -> database.getTotalCinemaCount(user)));
+        listen(GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
+        listen(GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
+        listen(INSERT_SEASON_VIEWS, reply(database::insertSeasonViews));
     }
 
     @Override
@@ -163,7 +161,7 @@ public class DatabaseRouter extends EventBusRoutable {
         };
     }
 
-    private BiFunction<String, JsonObject, Object> getDatabaseHomeViws() {
+    private BiFunction<String, JsonObject, Object> getDatabaseHomeViews() {
         return (user, json) -> {
             json.remove("results");
             json.getJsonArray("rows").stream()
@@ -174,18 +172,15 @@ public class DatabaseRouter extends EventBusRoutable {
         };
     }
 
-    private BiFunction<String, JsonObject, Object> getMonthYearsDistr() {
+    private BiFunction<String, JsonObject, Object> transformMonthYearDistribution() {
         return (user, json) -> {
-            json.remove("results");
-            Map<String, Object> result = new HashMap<>();
-
-            for (Object row : json.getJsonArray("rows")) {
-                JsonObject jsonData = (JsonObject) row;
-                result.putIfAbsent(Integer.toString(jsonData.getInteger("Year")), new HashMap<>());
-                ((Map<Integer, Integer>) result.get(Integer.toString(jsonData.getInteger("Year")))).putIfAbsent(jsonData.getInteger("Month"), jsonData.getInteger("Count"));
-            }
-
-            return new JsonObject(result);
+            JsonObj result = new JsonObj();
+            getRows(json).stream()
+                    .map(JsonObj::fromParent)
+                    .peek(j -> result.putIfAbsent(j.getString("Year"), new JsonObj()))
+                    .forEach(j -> result.getJsonObject(j.getString("Year"))
+                            .put(j.getString("Month"), j.getInteger("Count")));
+            return result;
         };
     }
 
@@ -193,10 +188,8 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns current users count in database as String response.
      */
     private void handleUsersCount(RoutingContext ctx) {
-        database.getUsersCount()
-                .rxSetHandler()
-                .doOnError(err -> serviceUnavailable(ctx, err))
-                .subscribe(count -> ctx.response().end(count));
+        database.getUsersCount().rxSetHandler()
+                .subscribe(count -> ctx.response().end(count), err -> serviceUnavailable(ctx, err));
     }
 
     /**
@@ -239,8 +232,10 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns all users in database as JSON response.
      */
     private void handleUserInfo(RoutingContext ctx) {
-        database.getUser(getProfile(ctx).getEmail()).setHandler(resultHandler(ctx,
-                json -> ctx.response().setStatusCode(200).end(toXml(new User(getRows(json).getJsonObject(0))))));
+        database.getUser(getProfile(ctx).getEmail())
+                .setHandler(resultHandler(ctx, json -> ctx.response()
+                        .setStatusCode(200)
+                        .end(toXml(new User(getRows(json).getJsonObject(0))))));
     }
 
     private String userExists() {
