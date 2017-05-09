@@ -56,7 +56,7 @@ eventbus.onopen = function () {
 };
 
 function startLoading() {
-    loaderContainer.append('<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>');
+    loaderContainer.append('<i class="fa fa-circle-o-notch white-text fa-spin fa-3x fa-fw"></i>');
 }
 
 function endLoading() {
@@ -256,7 +256,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
                         '<div class="content-key truncate">' + episodeData['name'] + '</div>' +
                             '<span class="badge" id="' + (id + '_check') + '"></span>' +
                         '<div class="">' + ep + episodeData['episode_number'] + '</div>' +
-                        '<div class="smaller">' + episodeData['air_date'] + '</div>' +
+                        '<div class="smaller">' + getNormalDate(episodeData['air_date'], lang) + '</div>' +
                     '</div>' +
                 '</div>' +
             '</div>'
@@ -464,4 +464,32 @@ function decorateSeriesCard(card, titleCard, episodeCard, info, lang) {
             '<span class="episodes-count">' +  info['Count'] + '</span>' + '<span class="episodes-seen">' + episodeSeen + '</span>'
         )
     );
+}
+
+function getNormalDate (date, lang) {
+    if (date === null) {
+        return lang['MOVIES_JS_UNKNOWN'];
+    } else {
+        var startArray = date.split('-');
+        var dateFormat = new Date(date),
+            locale = "en-us";
+        var month = dateFormat.toLocaleString(locale, {month: "long"});
+        var weekday = new Date(startArray[0], startArray[1] - 1, startArray[2]).getDay();
+        //console.log(weekday); //0=Sun, 1=Mon, ..., 6=Sat
+        return getShortDayOfWeek(lang, weekday) + ' ' + startArray[2] + lang[month.toUpperCase()] + ' ' + startArray[0];
+    }
+}
+
+function getShortDayOfWeek(lang, dayIndex) {
+    var weekdays = [
+        lang['STATISTICS_SUN'],
+        lang['STATISTICS_MON'],
+        lang['STATISTICS_TUE'],
+        lang['STATISTICS_WED'],
+        lang['STATISTICS_THU'],
+        lang['STATISTICS_FRI'],
+        lang['STATISTICS_SAT']
+    ];
+
+    return weekdays[dayIndex];
 }
