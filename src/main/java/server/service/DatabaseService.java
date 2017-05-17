@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import server.util.CommonUtils;
+import server.verticle.ServerVerticle;
 
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ public interface DatabaseService {
                 .build();
     }
 
-    static DatabaseService create(Vertx vertx, JsonObject config) {
-        return new DatabaseServiceImpl(vertx, config);
+    static DatabaseService create(Vertx vertx, JsonObject config, ServerVerticle tmdb) {
+        return new DatabaseServiceImpl(vertx, config, tmdb);
     }
 
     /**
@@ -145,7 +146,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getMonthYearDistribution(String username, String jsonParam);
 
-    Future<JsonObject> insertSeasonViews(String username, String jsonParam);
+    Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId);
 
     /**
      * Creates a SQL command string from given Table and list of Columns.

@@ -39,6 +39,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     private static final String TV_NAME = "/3/search/tv?query=";
     private static final String TV_ID = "/3/tv/";
+    private static final String TV_SEASON = "/season/";
 
     private final Vertx vertx;
     private final JsonObject config;
@@ -78,7 +79,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getTVByName(String name) {
-        return get(TV_NAME + name.replaceAll(" ", "-") + APIKEY_PREFIX1, getCached(TV_SEARCH.get(name)),"");
+        return get(TV_NAME + name.replaceAll(" ", "-") + APIKEY_PREFIX1, getCached(TV_SEARCH.get(name)), "");
     }
 
     @Override
@@ -101,6 +102,30 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                 fut.complete(json);
                 database.insertSeries(json.getInteger("id"), json.getString("name"),
                         json.getString("poster_path") == null ? "" : json.getString("poster_path"));
+            }
+        }));
+    }
+
+    @Override
+    public Future<JsonObject> getTvSeason(String param) {
+        JsonObject jsonParam = new JsonObject(param);
+        String seriesId = jsonParam.getString("seriesId");
+        String seasonNr = jsonParam.getString("seasonNr");
+        return get(TV_ID + seriesId + TV_SEASON + seasonNr + APIKEY_PREFIX2,
+                getCached(SEASON.get(seriesId + "_" + seasonNr)), "");
+    }
+
+    @Override
+    public Future<JsonObject> insertSeasonViews(String username, String jsonParam) {
+        return future(fut -> getTvSeason(jsonParam).setHandler(ar -> {
+            if (ar.succeeded()) {
+                JsonObject result = ar.result();
+                database.insertSeasonViews(username, result, new JsonObject(jsonParam).getString("seriesId"))
+                        .setHandler(ar2 -> {
+                            if (ar2.succeeded()) {
+                                fut.complete(ar2.result());
+                            }
+                        });
             }
         }));
     }
@@ -145,7 +170,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
         TV("tv_"),
         TV_EPISODE("tv_episode_"),
         TV_SEARCH("tv_search_"),
-        RECOMMENDATIONS("movie_recomm_");
+        RECOMMENDATIONS("movie_recomm_"),
+        SEASON("season_");
 
         private final String prefix;
 

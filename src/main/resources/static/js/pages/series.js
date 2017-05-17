@@ -87,7 +87,7 @@ function getSeriesSearch(lang) {
         $.each(searchResult, function (i) {
             var searchedTvSeries = searchResult[i];
             var resultCardId = 'result_search' + searchedTvSeries['id'];
-            console.log(searchedTvSeries);
+            //console.log(searchedTvSeries);
             searchResultContainer.append(
                 $.parseHTML(
                     '<div class="col s12 m12 l4">' +
@@ -161,7 +161,7 @@ function fillResultSeries(seriesData, page, lang) {
                     episode += lang['SERIES_EPISODE_PLURAL'];
                 }
                 seasonData['series_id'] = seriesData['id'];
-                console.log(seasonData);
+                //console.log(seasonData);
                 //console.log(seasonData);
                 seriesDataContainer.append(
                     $.parseHTML(
@@ -184,7 +184,7 @@ function fillResultSeries(seriesData, page, lang) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                                 '<div class="row">' +
-                                    //'<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
+                                    '<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
                                     '<div class="col s12 m12 l12" id="episode_container_' + i + '"></div>' +
                                 '</div>' +
                             '</div>' +
@@ -192,8 +192,8 @@ function fillResultSeries(seriesData, page, lang) {
                     )
                 );
 
-                /*$(document.getElementById('add-season-' + seasonData['_id']))
-                    .click({seasonData: seasonData}, addSeasonToWatch);*/
+                $(document.getElementById('add-season-' + seasonData['_id']))
+                    .click({seasonData: seasonData}, addSeasonToWatch);
 
                 getEpisodes(seasonData['episodes'], i, seriesData, lang);
 
@@ -205,11 +205,11 @@ function fillResultSeries(seriesData, page, lang) {
 
 function addSeasonToWatch(event) {
     var data = event.data.seasonData;
-    console.log('seasonData', data);
+    //console.log('seasonData', data);
     eventbus.send("database_insert_season_views",
         {
-            seriesId: data['series_id'],
-            seasonNr: data['season_number']
+            seriesId: data['series_id'].toString(),
+            seasonNr: data['season_number'].toString()
         }
         , function (error, reply) {
             console.log(reply);
@@ -267,7 +267,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
                 $(document.getElementById(id)),
                 $(document.getElementById(id + '_check')),
                 episodeData);
-            console.log('inarray');
+            //console.log('inarray');
         }
         $(document.getElementById(id)).click(
             {
@@ -293,7 +293,7 @@ function cardOnClick(event) {
 }
 
 function addEpisode(card, element, data, seriesData, seasonData, lang) {
-    console.log(seriesData);
+    //console.log(seriesData);
     if (element.children().length === 0) {
         addEpisodeToView(data, seriesData, seasonData, card, element, lang);
     } else {

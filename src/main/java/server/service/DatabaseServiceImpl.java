@@ -7,6 +7,7 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
+import server.verticle.ServerVerticle;
 
 import java.util.List;
 import java.util.Map;
@@ -135,9 +136,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ?";
 
     private final JDBCClient client;
+    private final ServerVerticle verticle;
 
-    protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
+    protected DatabaseServiceImpl(Vertx vertx, JsonObject config, ServerVerticle verticle) {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
+        this.verticle = verticle;
     }
 
     private Future<JsonObject> query(String sql, JsonArray params) {
@@ -488,10 +491,24 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> insertSeasonViews(String username, String jsonParam) {
-        System.out.println("Series inserrt");
-        System.out.println("-------------------------");
-        System.out.println(new JsonObject(jsonParam).encodePrettily());
+    public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) {
+        System.out.println("Series: " + seriesId);
+        System.out.println("Season: " + seasonData.getString("_id"));
+        System.out.println("Season: " + seasonData.getString("name"));
+        StringBuilder values = new StringBuilder();
+        JsonArray episodes = seasonData.getJsonArray("episodes");
+        if (!episodes.isEmpty()) {
+            for (Object jsonObject : episodes) {
+                String line = "(" + username +
+                        ", " + seriesId +
+                        ", " + ((JsonObject) jsonObject).getInteger("id") +
+                        ", " + seasonData.getString("_id") + "),\n";
+                values.append(line);
+            }
+            values.deleteCharAt(values.length() - 1);
+            System.out.println(values);
+        }
+
         /*
         INSERT INTO tbl_name
             (a,b,c)
