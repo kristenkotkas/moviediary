@@ -184,7 +184,12 @@ function fillResultSeries(seriesData, page, lang) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                                 '<div class="row">' +
-                                    '<a class="btn blue lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
+                                    '<div class="row">' +
+                                        '<a class="btn green lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
+                                    '</div>' +
+                                    '<div class="row">' +
+                                        '<a class="btn red lighten-2 z-depth-0" id="remove-season-' + seasonData['_id'] + '">Remove whole season</a>' +
+                                    '</div>' +
                                     '<div class="col s12 m12 l12" id="episode_container_' + i + '"></div>' +
                                 '</div>' +
                             '</div>' +
@@ -193,7 +198,18 @@ function fillResultSeries(seriesData, page, lang) {
                 );
 
                 $(document.getElementById('add-season-' + seasonData['_id']))
-                    .click({seasonData: seasonData}, addSeasonToWatch);
+                    .click({
+                        seasonData: seasonData,
+                        lang: lang,
+                        container: $(document.getElementById('episode_container_' + i))
+                    }, addSeasonToWatch);
+
+                $(document.getElementById('remove-season-' + seasonData['_id']))
+                    .click({
+                        seasonData: seasonData,
+                        lang: lang,
+                        container: $(document.getElementById('episode_container_' + i))
+                    }, removeSeasonFromWatch);
 
                 getEpisodes(seasonData['episodes'], i, seriesData, lang);
 
@@ -201,19 +217,6 @@ function fillResultSeries(seriesData, page, lang) {
         }
         addPagins(seriesData, page, lang, 'bottom');
     });
-}
-
-function addSeasonToWatch(event) {
-    var data = event.data.seasonData;
-    //console.log('seasonData', data);
-    eventbus.send("database_insert_season_views",
-        {
-            seriesId: data['series_id'].toString(),
-            seasonNr: data['season_number'].toString()
-        }
-        , function (error, reply) {
-            console.log(reply);
-        });
 }
 
 function addPagins(seriesData, page, lang, type) {
@@ -249,7 +252,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
         var episodeData = episodes[episode - 1];
         var seasonData = seriesData[('season/' + seasonNumber)];
         var ep = lang['SERIES_EPISODE_SHORT'] + ': ';
-        elem.append(
+        var episodeCard = $.parseHTML(
             '<div class="col s12 m12 l6 xl3 grey-text">' +
                 '<div class="card cursor episode-card" id="' + id + '">' +
                     '<div class="card-content">' +
@@ -261,6 +264,8 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
                 '</div>' +
             '</div>'
         );
+        elem.append(episodeCard);
+        $(episodeCard).data('episodeData', episodeData);
 
         if (jQuery.inArray(episodeData['id'], seenEpisodes) !== -1) {
             changeToActive(
@@ -346,16 +351,74 @@ function removeEpisode(card, element, episodeData, lang) {
         });
 }
 
-function changeToActive(card, element, data) {
+function addSeasonToWatch(event) {
+    var data = event.data.seasonData;
+    //console.log('seasonData', data);
+    eventbus.send("database_insert_season_views",
+        {
+            seriesId: data['series_id'].toString(),
+            seasonNr: data['season_number'].toString()
+        }
+        , function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                eventbus.send("database_get_watching_series", {},  function (error, reply) {
+                    fillSeenSeries(reply.body['rows'], event.data.lang);
+                    var episodesContainer = event.data.container;
+                    var timeout = 0;
+                    $.each(data['episodes'], function (i) {
+                        setTimeout(function () {
+                            var card = episodesContainer[0]['childNodes'][i]['childNodes'];
+                            var episodeData = data['episodes'][i];
+                            var element = $(card).find('span.badge');
+                            /*console.log(card);
+                             console.log(episodeData);
+                             console.log('elemenr', element);*/
+                            changeToActive($(card), element, episodeData);
+                        }, timeout += 25);
+                    })
+                });
+            }
+        });
+}
+
+function removeSeasonFromWatch(event) {
+    var data = event.data.seasonData;
+    var seasonId = data['_id'];
+    console.log(seasonId);
+    eventbus.send("database_remove_season_views", seasonId, function (error, reply) {
+        console.log(reply.body);
+        if (reply['body']['updated'] != null) {
+            eventbus.send("database_get_watching_series", {},  function (error, reply) {
+                fillSeenSeries(reply.body['rows'], event.data.lang);
+                var episodesContainer = event.data.container;
+                var timeout = 0;
+                $.each(data['episodes'], function (i) {
+                    setTimeout(function () {
+                        var card = episodesContainer[0]['childNodes'][i]['childNodes'];
+                        var element = $(card).find('span.badge');
+                        /*console.log(card);
+                         console.log(episodeData);
+                         console.log('elemenr', element);*/
+                        changeToInActive($(card), element);
+                    }, timeout += 25);
+                })
+            });
+        }
+    });
+}
+
+function changeToActive(card, element, episodeData) {
     card.addClass('green').addClass('lighten-2').addClass('white-text');
-    if (data['still_path'] !== null) {
-        var path = 'https://image.tmdb.org/t/p/w300' + data['still_path'];
+    if (episodeData['still_path'] !== null) {
+        var path = 'https://image.tmdb.org/t/p/w300' + episodeData['still_path'];
         card
             .css("background-image", "url(" + path + ")")
             .css("background-size", "cover");
         card.addClass('white-text');
     }
-    element.append('<i class="fa fa-check fa-2x white-text" aria-hidden="true"></i>');
+    if (element.empty()) {
+        element.append('<i class="fa fa-check fa-2x white-text" aria-hidden="true"></i>');
+    }
 }
 
 function changeDesign(seriesData) {

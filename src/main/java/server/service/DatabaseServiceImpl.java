@@ -134,6 +134,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
             "SELECT COUNT(DISTINCT MovieId) AS 'unique_movies' FROM Views " +
                     "WHERE Username = ?";
+    private static final String SQL_INSERT_SEASON =
+            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES";
+    private static final String  SQL_REMOVE_SEASON =
+            "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
 
     private final JDBCClient client;
     private final ServerVerticle verticle;
@@ -492,23 +496,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) {
-        System.out.println("Series: " + seriesId);
-        System.out.println("Season: " + seasonData.getString("_id"));
-        System.out.println("Season: " + seasonData.getString("name"));
-        StringBuilder values = new StringBuilder();
+        StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
         JsonArray episodes = seasonData.getJsonArray("episodes");
+        JsonArray valuesArray = new JsonArray();
+        //currentTimeMillis()
         if (!episodes.isEmpty()) {
             for (Object jsonObject : episodes) {
-                String line = "(" + username +
-                        ", " + seriesId +
-                        ", " + ((JsonObject) jsonObject).getInteger("id") +
-                        ", " + seasonData.getString("_id") + "),\n";
-                values.append(line);
+                query.append(" (?, ?, ?, ?, ?),");
+                valuesArray
+                        .add(username)
+                        .add(seriesId)
+                        .add(((JsonObject) jsonObject).getInteger("id"))
+                        .add(seasonData.getString("_id"))
+                        .add(currentTimeMillis());
             }
-            values.deleteCharAt(values.length() - 1);
-            System.out.println(values);
+            query.deleteCharAt(query.length() - 1);
         }
-
         /*
         INSERT INTO tbl_name
             (a,b,c)
@@ -517,7 +520,12 @@ public class DatabaseServiceImpl implements DatabaseService {
             (4,5,6),
             (7,8,9);
          */
-        return null;
+        return updateOrInsert(query.toString(), valuesArray);
+    }
+
+    @Override
+    public Future<JsonObject> removeSeasonViews(String username, String seasonId) {
+        return updateOrInsert(SQL_REMOVE_SEASON, new JsonArray().add(username).add(seasonId));
     }
 
     /**
