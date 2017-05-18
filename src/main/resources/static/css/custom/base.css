@@ -18,6 +18,10 @@ body {
     background-attachment: fixed;
 }
 
+.test {
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+}
+
 .home-link:hover {
     text-decoration: underline;
 }
@@ -95,7 +99,7 @@ body {
 }
 
 .cursor:hover {
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .opacity-object-hover:hover {
@@ -104,7 +108,7 @@ body {
 
 .collapsible-header {
     display: block;
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
     min-height: 3rem;
     line-height: 3rem;
     padding: 0 1rem;
@@ -228,7 +232,7 @@ span.badge.new:after {
 
 .add-wishlist:hover {
     background: #dbded9;
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .oscar-statue {
@@ -264,13 +268,13 @@ span.badge.new:after {
 .search-object:hover,
 .search-object:focus {
     background: #bfc2be;
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .search-object-series:hover,
 .search-object-series:focus {
     opacity: 0.85;
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .wishlist-object:hover {
@@ -320,7 +324,7 @@ span.badge.new:after {
 .load-more:hover,
 .load-more:focus,
 .search-button:hover {
-    cursor: pointer;
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .statistics-chart-days {
