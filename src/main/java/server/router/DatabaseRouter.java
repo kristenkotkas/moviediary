@@ -40,7 +40,7 @@ public class DatabaseRouter extends EventBusRoutable {
 
     private static final String API_USER_INFO = "/private/api/v1/user/info";
     private static final String API_USERS_COUNT = "/private/api/v1/views/count";
-    private static final String API_HISTORY = "/private/api/v1/history";
+    public static final String API_HISTORY = "/private/api/v1/history";
 
     private static final String GET_HISTORY = "database_get_history";
     private static final String GET_MOVIE_HISTORY = "database_get_movie_history";
@@ -145,8 +145,9 @@ public class DatabaseRouter extends EventBusRoutable {
     private BiFunction<String, JsonObject, Object> transformDatabaseHistory() {
         return (user, json) -> {
             json.remove("results");
+            System.out.println(json.encodePrettily());
             json.getJsonArray("rows").stream()
-                    .map(obj -> (JsonObject) obj)
+                    .map(JsonObj::fromParent)
                     .forEach(jsonObj -> jsonObj
                             .put("WasFirst", getFirstSeen(jsonObj.getBoolean("WasFirst")))
                             .put("WasCinema", getCinema(jsonObj.getBoolean("WasCinema")))
@@ -240,13 +241,14 @@ public class DatabaseRouter extends EventBusRoutable {
     }
 
     /**
-     * Returns all users in database as JSON response.
+     * Returns user info as XML response.
      */
     private void handleUserInfo(RoutingContext ctx) {
-        database.getUser(getProfile(ctx).getEmail())
-                .setHandler(resultHandler(ctx, json -> ctx.response()
+        database.getUser(getUsername(ctx)).rxSetHandler()
+                .doOnError(err -> serviceUnavailable(ctx, err))
+                .subscribe(json -> ctx.response()
                         .setStatusCode(200)
-                        .end(toXml(new User(getRows(json).getJsonObject(0))))));
+                        .end(toXml(new User(getRows(json).getJsonObject(0)))));
     }
 
     private String userExists() {

@@ -7,7 +7,6 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
-import server.verticle.ServerVerticle;
 
 import java.util.List;
 import java.util.Map;
@@ -140,11 +139,9 @@ public class DatabaseServiceImpl implements DatabaseService {
             "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
 
     private final JDBCClient client;
-    private final ServerVerticle verticle;
 
-    protected DatabaseServiceImpl(Vertx vertx, JsonObject config, ServerVerticle verticle) {
+    protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
-        this.verticle = verticle;
     }
 
     private Future<JsonObject> query(String sql, JsonArray params) {
@@ -317,6 +314,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getViews(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
+        System.out.println(json.encodePrettily());
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS);
@@ -495,32 +493,20 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) {
+    public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) { // TODO: 18/05/2017 test
         StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
-        JsonArray episodes = seasonData.getJsonArray("episodes");
-        JsonArray valuesArray = new JsonArray();
-        //currentTimeMillis()
-        if (!episodes.isEmpty()) {
-            for (Object jsonObject : episodes) {
-                query.append(" (?, ?, ?, ?, ?),");
-                valuesArray
+        JsonArray values = new JsonArray();
+        seasonData.getJsonArray("episodes").stream()
+                .map(obj -> (JsonObject) obj)
+                .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
+                .forEach(json -> values
                         .add(username)
                         .add(seriesId)
-                        .add(((JsonObject) jsonObject).getInteger("id"))
+                        .add(json.getInteger("id"))
                         .add(seasonData.getString("_id"))
-                        .add(currentTimeMillis());
-            }
-            query.deleteCharAt(query.length() - 1);
-        }
-        /*
-        INSERT INTO tbl_name
-            (a,b,c)
-        VALUES
-            (1,2,3),
-            (4,5,6),
-            (7,8,9);
-         */
-        return updateOrInsert(query.toString(), valuesArray);
+                        .add(currentTimeMillis()));
+        query.deleteCharAt(query.length() - 1); // TODO: 18/05/2017 can episodes be empty? -> do not delete last char
+        return updateOrInsert(query.toString(), values);
     }
 
     @Override

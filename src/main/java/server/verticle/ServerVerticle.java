@@ -54,7 +54,7 @@ public class ServerVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) throws Exception {
         Router router = Router.router(vertx);
-        database = createIfMissing(database, () -> DatabaseService.create(vertx, config(), this));
+        database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
         tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
         bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
         mail = createIfMissing(mail, () -> MailService.create(vertx, database));
@@ -78,46 +78,6 @@ public class ServerVerticle extends AbstractVerticle {
     public ServerVerticle setDatabase(DatabaseService database) {
         this.database = database;
         return this;
-    }
-
-    public ServerVerticle setTmdb(TmdbService tmdb) {
-        this.tmdb = tmdb;
-        return this;
-    }
-
-    public ServerVerticle setBankLink(BankLinkService bankLink) {
-        this.bankLink = bankLink;
-        return this;
-    }
-
-    public ServerVerticle setMail(MailService mail) {
-        this.mail = mail;
-        return this;
-    }
-
-    public ServerVerticle setSecurityConfig(SecurityConfig securityConfig) {
-        this.securityConfig = securityConfig;
-        return this;
-    }
-
-    public DatabaseService getDatabase() {
-        return database;
-    }
-
-    public TmdbService getTmdb() {
-        return tmdb;
-    }
-
-    public BankLinkService getBankLink() {
-        return bankLink;
-    }
-
-    public MailService getMail() {
-        return mail;
-    }
-
-    public SecurityConfig getSecurityConfig() {
-        return securityConfig;
     }
 
     @Override

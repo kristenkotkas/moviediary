@@ -28,6 +28,7 @@ import static server.util.NetworkUtils.isServer;
 public class AuthRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(AuthRouter.class);
     private static final String XSS_PROTECTION = "xssprotection";
+    private static final String CSRF_TOKEN = "csrf";
     private static final String CALLBACK = "/callback";
     public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
@@ -67,7 +68,7 @@ public class AuthRouter extends EventBusRoutable {
         SecurityHandler securityHandler = new SecurityHandler(vertx.getDelegate(), securityConfig.getPac4jConfig(),
                 securityConfig.getAuthProvider(), new SecurityHandlerOptions()
                 .withClients(getClientNames())
-                .withAuthorizers(AUTHORIZER + "," + XSS_PROTECTION));
+                .withAuthorizers(AUTHORIZER + "," + XSS_PROTECTION + "," + CSRF_TOKEN));
         router.route(AUTH_PRIVATE).getDelegate().handler(securityHandler);
         router.route(EVENTBUS_ALL).getDelegate().handler(securityHandler);
 

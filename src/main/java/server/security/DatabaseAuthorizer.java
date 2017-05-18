@@ -52,6 +52,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
         if (profile == null) {
             return false;
         }
+        // FIXME: 7.05.2017 fails when 15 users are logging in concurrently
         SyncResult<JsonObject> result = new SyncResult<>();
         result.executeAsync(() -> database.getAllUsers().setHandler(ar -> result.setReady(ar.result())));
         // TODO: 12/03/2017 retryable

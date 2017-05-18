@@ -4,7 +4,6 @@ import eu.kyngas.template.engine.HandlebarsTemplateEngine;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
-import io.vertx.rxjava.ext.web.Cookie;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.StaticHandler;
@@ -17,6 +16,7 @@ import server.template.ui.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.*;
@@ -98,7 +98,6 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_FORM_LOGIN).handler(this::handleFormLogin);
         router.get(UI_FORM_REGISTER).handler(this::handleFormRegister);
         router.get(UI_IDCARDLOGIN).handler(this::handleIdCardLogin);
-
         router.get(UI_USER).handler(this::handleUser);
         router.get(UI_MOVIES).handler(this::handleMovies);
         router.get(UI_SERIES).handler(this::handleSeries);
@@ -183,7 +182,7 @@ public class UiRouter extends EventBusRoutable {
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
             ctx.removeCookie(LANGUAGE);
-            ctx.addCookie(Cookie.cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
+            ctx.addCookie(cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
             template.setLang(lang);
         }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
@@ -250,24 +249,24 @@ public class UiRouter extends EventBusRoutable {
      * @return template of specified type
      */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
-        S baseTemplate = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
-        baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
+        S base = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
+        base.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
                 ENGLISH.getLocale().getLanguage());
-        baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
-        baseTemplate.setLoginPage(UI_LOGIN);
-        baseTemplate.setUserPage(UI_USER);
-        baseTemplate.setHomePage(UI_HOME);
-        baseTemplate.setMoviesPage(UI_MOVIES);
-        baseTemplate.setSeriesPage(UI_SERIES);
-        baseTemplate.setHistoryPage(UI_HISTORY);
-        baseTemplate.setStatisticsPage(UI_STATISTICS);
-        baseTemplate.setWishlistPage(UI_WISHLIST);
-        baseTemplate.setDiscoverPage(UI_DISCOVER);
+        base.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
+        base.setLoginPage(UI_LOGIN);
+        base.setUserPage(UI_USER);
+        base.setHomePage(UI_HOME);
+        base.setMoviesPage(UI_MOVIES);
+        base.setSeriesPage(UI_SERIES);
+        base.setHistoryPage(UI_HISTORY);
+        base.setStatisticsPage(UI_STATISTICS);
+        base.setWishlistPage(UI_WISHLIST);
+        base.setDiscoverPage(UI_DISCOVER);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
-            baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
-            baseTemplate.setUserFirstName(profile.getFirstName());
+            base.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
+            base.setUserFirstName(profile.getFirstName());
         }
-        return baseTemplate;
+        return base;
     }
 }
