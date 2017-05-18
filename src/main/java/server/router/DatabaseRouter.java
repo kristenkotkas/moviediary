@@ -109,7 +109,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_TOTAL_CINEMA_COUNT, reply((user, param) -> database.getTotalCinemaCount(user)));
         listen(GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
         listen(GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
-        listen(REMOVE_SEASON_VIEWS, reply((user, param) -> database.removeSeasonViews(user, param)));
+        listen(REMOVE_SEASON_VIEWS, reply(database::removeSeasonViews));
     }
 
     @Override

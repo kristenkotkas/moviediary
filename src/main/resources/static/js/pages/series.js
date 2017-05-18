@@ -56,7 +56,9 @@ eventbus.onopen = function () {
 };
 
 function startLoading() {
-    loaderContainer.append('<i class="fa fa-circle-o-notch white-text fa-spin fa-3x fa-fw"></i>');
+    if (loaderContainer.empty()) {
+        loaderContainer.append('<i class="fa fa-circle-o-notch white-text fa-spin fa-3x fa-fw"></i>');
+    }
 }
 
 function endLoading() {
@@ -140,6 +142,7 @@ function openSeries(seriesId, page, lang) {
         changeDesign(seriesData);
         fillResultSeries(seriesData, page, lang);
             replaceUrlParameter("id", seriesId);
+            endLoading();
     });
     //page = 1;
 }
@@ -237,6 +240,7 @@ function addPagins(seriesData, page, lang, type) {
 
             $(document.getElementById(id)).click(function () {
                 openSeries(seriesData['id'], pages + 1, lang);
+                startLoading();
             });
             $(document.getElementById('series-page_' + type + '_' + page)).addClass('active');
         });
