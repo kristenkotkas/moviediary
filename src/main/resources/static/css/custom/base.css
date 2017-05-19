@@ -244,6 +244,11 @@ span.badge.new:after {
     cursor: pointer;
 }
 
+.star-wars-add-wishlist:hover {
+    background: #dbded9;
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+}
+
 .oscar-statue {
     max-width: 6%;
     margin-right: 0.5em;

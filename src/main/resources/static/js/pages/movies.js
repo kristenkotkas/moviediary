@@ -360,7 +360,11 @@ function decorateInWishlist(lang) {
 }
 
 function decorateNotInWIshlist(lang) {
-    $("#add-wishlist").addClass('add-wishlist');
+    if (isStarWars) {
+        $("#add-wishlist").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
+    } else {
+        $("#add-wishlist").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
+    }
     $("#wishlist-text").empty().append(
         $.parseHTML(lang['MOVIES_ADD_WISHLIST'])
     ).addClass('content-key');
