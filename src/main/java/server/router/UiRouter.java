@@ -15,6 +15,7 @@ import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -76,6 +77,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
     private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
     private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
+    private final String[] notFoundPictures = {"alien", "forrest-gump", "pulp-fiction", "titanic"};
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -228,7 +230,8 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
-        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
+        int rnd = new Random().nextInt(notFoundPictures.length);
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class).setNotFoundPic(notFoundPictures[rnd]), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {
