@@ -1,8 +1,6 @@
 package server.router;
 
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
@@ -15,7 +13,7 @@ import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -41,10 +39,10 @@ import static server.util.HandlerUtils.endHandler;
  * Contains routes which user interface is handled on.
  */
 public class UiRouter extends EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
+    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic"};
 
     public static final String UI_INDEX = "/";
     public static final String UI_USER = "/private/user";
@@ -77,7 +75,6 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
     private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
     private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
-    private final String[] notFoundPictures = {"alien", "forrest-gump", "pulp-fiction", "titanic"};
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -115,6 +112,9 @@ public class UiRouter extends EventBusRoutable {
                 .setCachingEnabled(true)
                 .setMaxAgeSeconds(DAYS.toSeconds(7))
                 .setIncludeHidden(false));
+
+        router.route("/fail").handler(ctx -> ctx.fail(new Throwable("500: Oh noes it crashed")));
+        router.route().failureHandler(this::handleFailure);
         router.get().last().handler(this::handleNotFound);
     }
 
@@ -180,6 +180,11 @@ public class UiRouter extends EventBusRoutable {
      * Displays message if one is specified.
      */
     private void handleLogin(RoutingContext ctx) {
+        // TODO: 19.05.2017 access csrf token generator -> new or from pac4j
+        // TODO: 19.05.2017 put token to handlebars + to cookie or session or whatever
+        // TODO: 19.05.2017 pac4j will be checking session or cookie previous cookie and compare?
+
+
         LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
@@ -228,10 +233,19 @@ public class UiRouter extends EventBusRoutable {
                                 .getCallbackUrl()), endHandler(ctx)));
     }
 
+    private void handleFailure(RoutingContext ctx) {
+        ctx.response().setStatusCode(500);
+        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
+                .setErrorMessage(ctx.failure().getMessage())
+                .setNotFoundName(fileName), endHandler(ctx));
+    }
+
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
-        int rnd = new Random().nextInt(notFoundPictures.length);
-        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class).setNotFoundPic(notFoundPictures[rnd]), endHandler(ctx));
+        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
+                .setNotFoundName(fileName), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {
