@@ -18,8 +18,17 @@ body {
     background-attachment: fixed;
 }
 
-.test {
+/*.btn:hover {
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+}*/
+
+.star-wars {
     cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+}
+
+.star-wars-link:hover {
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+    text-decoration: underline;
 }
 
 .home-link:hover {
@@ -99,7 +108,7 @@ body {
 }
 
 .cursor:hover {
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
 }
 
 .opacity-object-hover:hover {
@@ -108,7 +117,7 @@ body {
 
 .collapsible-header {
     display: block;
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
     min-height: 3rem;
     line-height: 3rem;
     padding: 0 1rem;
@@ -232,7 +241,7 @@ span.badge.new:after {
 
 .add-wishlist:hover {
     background: #dbded9;
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
 }
 
 .oscar-statue {
@@ -268,13 +277,13 @@ span.badge.new:after {
 .search-object:hover,
 .search-object:focus {
     background: #bfc2be;
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
 }
 
 .search-object-series:hover,
 .search-object-series:focus {
     opacity: 0.85;
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
 }
 
 .wishlist-object:hover {
@@ -324,7 +333,7 @@ span.badge.new:after {
 .load-more:hover,
 .load-more:focus,
 .search-button:hover {
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: pointer;
 }
 
 .statistics-chart-days {
