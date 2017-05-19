@@ -22,6 +22,10 @@ body {
     cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
 }*/
 
+.not-found-image {
+    width: 100%;
+}
+
 .star-wars {
     cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
