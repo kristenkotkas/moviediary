@@ -1,8 +1,6 @@
 package server.security;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import org.pac4j.core.client.IndirectClientV2;
 import org.pac4j.core.client.RedirectAction;
 import org.pac4j.core.context.WebContext;
@@ -11,6 +9,7 @@ import org.pac4j.core.util.CommonHelper;
 import server.service.DatabaseService;
 
 import static server.router.UiRouter.UI_FORM_LOGIN;
+import static server.security.SecurityConfig.CSRF_TOKEN;
 import static server.util.CommonUtils.nonNull;
 import static server.util.NetworkUtils.isServer;
 
@@ -18,7 +17,6 @@ import static server.util.NetworkUtils.isServer;
  * Indirect client for form login.
  */
 public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
-    private static final Logger LOG = LoggerFactory.getLogger(FormClient.class);
     public static final String FORM_USERNAME = "username";
     public static final String FORM_PASSWORD = "password";
     public static final String FORM_FIRSTNAME = "firstname";
@@ -36,7 +34,7 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
             String username = ctx.getRequestParameter(FORM_USERNAME);
             String password = ctx.getRequestParameter(FORM_PASSWORD);
             if (!nonNull(username, password)) {
-                return null;
+                throw new CredentialsException("No credentials provided.");
             }
             return new FormCredentials(username, password);
         });
@@ -57,6 +55,12 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
             }
             if (CommonHelper.isBlank(password)) {
                 throw new CredentialsException("Password cannot be blank.");
+            }
+            String csrfToken = context.getRequestParameter(CSRF_TOKEN);
+            String sessionCsrfToken = (String) context.getSessionAttribute(CSRF_TOKEN);
+            context.setSessionAttribute(CSRF_TOKEN, null);
+            if (!nonNull(csrfToken, sessionCsrfToken) || !csrfToken.equals(sessionCsrfToken)) {
+                throw new CredentialsException("Csrf check failed.");
             }
             credentials.setUserProfile(new FormProfile(email, password, database));
         });

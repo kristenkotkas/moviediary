@@ -2,7 +2,6 @@ package server.security;
 
 import io.vertx.core.json.JsonObject;
 import org.pac4j.core.profile.CommonProfile;
-import server.entity.SyncResult;
 import server.service.DatabaseService;
 
 import static server.security.SecurityConfig.*;
@@ -19,10 +18,7 @@ public class FormProfile extends CommonProfile {
         setId(email);
         addAttribute(PAC4J_EMAIL, email);
         addAttribute(PAC4J_PASSWORD, password);
-        SyncResult<JsonObject> result = new SyncResult<>();
-        result.executeAsync(() -> database.getUser(email).setHandler(ar -> result.setReady(ar.result())));
-        // TODO: 12/03/2017 timeout + retryable
-        getRows(result.await().get()).stream()
+        getRows(database.getUser(email).rxSetHandler().toBlocking().value()).stream()
                 .map(obj -> (JsonObject) obj)
                 .filter(json -> email.equals(json.getString(Column.USERNAME.getName())))
                 .findAny()
@@ -33,7 +29,6 @@ public class FormProfile extends CommonProfile {
                 });
     }
 
-    // TODO: 22/02/2017 show hash only
     public String getPassword() {
         return (String) getAttribute(PAC4J_PASSWORD);
     }

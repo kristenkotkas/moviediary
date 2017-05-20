@@ -4,4 +4,6 @@ public interface FormRegisterTemplate extends BaseTemplate {
     FormRegisterTemplate setRegisterRestUrl(String registerRestUrl);
 
     FormRegisterTemplate setDisplayMessage(String displayMessage);
+
+    FormRegisterTemplate setCsrfToken(String token);
 }
