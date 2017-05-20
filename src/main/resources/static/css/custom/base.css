@@ -18,6 +18,23 @@ body {
     background-attachment: fixed;
 }
 
+/*.btn:hover {
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+}*/
+
+.not-found-image {
+    width: 100%;
+}
+
+.star-wars {
+    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+}
+
+.star-wars-link:hover {
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+    text-decoration: underline;
+}
+
 .home-link:hover {
     text-decoration: underline;
 }
@@ -229,6 +246,11 @@ span.badge.new:after {
 .add-wishlist:hover {
     background: #dbded9;
     cursor: pointer;
+}
+
+.star-wars-add-wishlist:hover {
+    background: #dbded9;
+    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
 }
 
 .oscar-statue {

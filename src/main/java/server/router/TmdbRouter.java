@@ -28,6 +28,7 @@ public class TmdbRouter extends EventBusRoutable {
     public static final String API_GET_TV = "api_get_tv";
 
     public static final String API_GET_RECOMMENDATIONS = "api_get_recommendations";
+    private static final String INSERT_SEASON_VIEWS = "database_insert_season_views";
 
     private final TmdbService tmdb;
 
@@ -39,6 +40,7 @@ public class TmdbRouter extends EventBusRoutable {
         listen(API_GET_TV_SEARCH, reply(tmdb::getTVByName));
         listen(API_GET_TV, reply(tmdb::getTVById));
         listen(API_GET_RECOMMENDATIONS, reply(tmdb::getMovieRecommendation));
+        listen(INSERT_SEASON_VIEWS, reply(tmdb::insertSeasonViews));
     }
 
     @Override

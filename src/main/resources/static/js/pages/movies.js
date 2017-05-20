@@ -22,6 +22,7 @@ $(document).ready(function () {
 
 var eventbus = new EventBus("/eventbus");
 var oscarContainer = $('#oscar-container');
+var isStarWars = false;
 eventbus.onopen = function () {
 
     var lang;
@@ -165,6 +166,15 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         var data = reply.body;
         var posterPath = "";
+        var title = data['title'].toLowerCase();
+
+        if (title.indexOf('star') !== -1 && title.indexOf('war') !== -1) {
+            isStarWars = true;
+            decorateStarWars();
+        } else {
+            isStarWars = false;
+            removeStarWars();
+        }
 
         addButton.click(function () {
             if (startDate.val() != '' &&  endDate.val() != '' && startTime.val() != '' && endTime.val() != '' && commentFiled.val().length <= 500) {
@@ -277,6 +287,14 @@ var searchMovie = function (eventbus, movieId, lang) {
     });
 };
 
+function decorateStarWars() {
+    $("#body").addClass('star-wars');
+}
+
+function removeStarWars() {
+    $("#body").removeClass('star-wars');
+}
+
 function getOmdb(imdbId) {
     $.ajax({
         url: 'https://www.omdbapi.com/?i=' + imdbId,
@@ -342,7 +360,11 @@ function decorateInWishlist(lang) {
 }
 
 function decorateNotInWIshlist(lang) {
-    $("#add-wishlist").addClass('add-wishlist');
+    if (isStarWars) {
+        $("#add-wishlist").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
+    } else {
+        $("#add-wishlist").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
+    }
     $("#wishlist-text").empty().append(
         $.parseHTML(lang['MOVIES_ADD_WISHLIST'])
     ).addClass('content-key');
@@ -378,7 +400,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
                         '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
                         '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
                         '<td>' +
-                        '<a class="grey-text cursor home-link" id="' + ('remove_view_' + viewId) + '">' +
+                        '<a class="grey-text" id="' + ('remove_view_' + viewId) + '">' +
                             lang['HISTORY_REMOVE'] +
                         '</a>' +
                         '</td>' +
@@ -387,6 +409,11 @@ var getMovieViews = function (eventbus, movieId, lang) {
                 );
 
                 var deleteView = document.getElementById('remove_view_' + viewId);
+                if (isStarWars) {
+                    $(deleteView).removeClass('home-link').removeClass('cursor').addClass('star-wars-link');
+                } else {
+                    $(deleteView).removeClass('star-wars-link').addClass('home-link').addClass('cursor');
+                }
                 deleteView.onclick = function () {
                     removeView(movieId, viewId, lang, data[i]['Start']);
                 };

@@ -86,7 +86,6 @@ public class DatabaseServiceTest {
                 .map(DatabaseService::getRows)
                 .toBlocking()
                 .value();
-        System.out.println(users.encodePrettily());
         assertThat(users.size(), is(2));
         isCorrectUser(users.getJsonObject(0));
     }

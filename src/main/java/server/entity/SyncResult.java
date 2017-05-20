@@ -22,13 +22,17 @@ public class SyncResult<T> {
     private final CountDownLatch latch = new CountDownLatch(1);
 
     private T value;
+    private Throwable error;
 
     public T get() {
+        if (error != null) {
+            throw new RuntimeException(error);
+        }
         return value;
     }
 
     public T get(T def) {
-        return value != null ? value : def;
+        return value != null ? get() : def;
     }
 
     public SyncResult<T> set(T obj) {
@@ -81,5 +85,11 @@ public class SyncResult<T> {
 
     public void ready() {
         latch.countDown();
+    }
+
+    public SyncResult<T> fail(Throwable err) {
+        error = err;
+        ready();
+        return this;
     }
 }

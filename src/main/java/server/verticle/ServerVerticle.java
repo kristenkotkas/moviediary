@@ -80,26 +80,6 @@ public class ServerVerticle extends AbstractVerticle {
         return this;
     }
 
-    public ServerVerticle setTmdb(TmdbService tmdb) {
-        this.tmdb = tmdb;
-        return this;
-    }
-
-    public ServerVerticle setBankLink(BankLinkService bankLink) {
-        this.bankLink = bankLink;
-        return this;
-    }
-
-    public ServerVerticle setMail(MailService mail) {
-        this.mail = mail;
-        return this;
-    }
-
-    public ServerVerticle setSecurityConfig(SecurityConfig securityConfig) {
-        this.securityConfig = securityConfig;
-        return this;
-    }
-
     @Override
     public void stop() throws Exception {
         closeEventbus();

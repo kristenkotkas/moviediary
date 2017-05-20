@@ -1,10 +1,7 @@
 package server.router;
 
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
-import io.vertx.rxjava.ext.web.Cookie;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.StaticHandler;
@@ -16,7 +13,9 @@ import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ThreadLocalRandom;
 
+import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.*;
@@ -40,10 +39,10 @@ import static server.util.HandlerUtils.endHandler;
  * Contains routes which user interface is handled on.
  */
 public class UiRouter extends EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
+    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic"};
 
     public static final String UI_INDEX = "/";
     public static final String UI_USER = "/private/user";
@@ -98,7 +97,6 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_FORM_LOGIN).handler(this::handleFormLogin);
         router.get(UI_FORM_REGISTER).handler(this::handleFormRegister);
         router.get(UI_IDCARDLOGIN).handler(this::handleIdCardLogin);
-
         router.get(UI_USER).handler(this::handleUser);
         router.get(UI_MOVIES).handler(this::handleMovies);
         router.get(UI_SERIES).handler(this::handleSeries);
@@ -114,6 +112,9 @@ public class UiRouter extends EventBusRoutable {
                 .setCachingEnabled(true)
                 .setMaxAgeSeconds(DAYS.toSeconds(7))
                 .setIncludeHidden(false));
+
+        router.route("/fail").handler(ctx -> ctx.fail(new Throwable("500: Oh noes it crashed")));
+        router.route().failureHandler(this::handleFailure);
         router.get().last().handler(this::handleNotFound);
     }
 
@@ -179,11 +180,16 @@ public class UiRouter extends EventBusRoutable {
      * Displays message if one is specified.
      */
     private void handleLogin(RoutingContext ctx) {
+        // TODO: 19.05.2017 access csrf token generator -> new or from pac4j
+        // TODO: 19.05.2017 put token to handlebars + to cookie or session or whatever
+        // TODO: 19.05.2017 pac4j will be checking session or cookie previous cookie and compare?
+
+
         LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
             ctx.removeCookie(LANGUAGE);
-            ctx.addCookie(Cookie.cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
+            ctx.addCookie(cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
             template.setLang(lang);
         }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
@@ -227,9 +233,19 @@ public class UiRouter extends EventBusRoutable {
                                 .getCallbackUrl()), endHandler(ctx)));
     }
 
+    private void handleFailure(RoutingContext ctx) {
+        ctx.response().setStatusCode(500);
+        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
+                .setErrorMessage(ctx.failure().getMessage())
+                .setNotFoundName(fileName), endHandler(ctx));
+    }
+
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
-        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class), endHandler(ctx));
+        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
+        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
+                .setNotFoundName(fileName), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {
@@ -250,24 +266,24 @@ public class UiRouter extends EventBusRoutable {
      * @return template of specified type
      */
     private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
-        S baseTemplate = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
-        baseTemplate.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
+        S base = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
+        base.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
                 ENGLISH.getLocale().getLanguage());
-        baseTemplate.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
-        baseTemplate.setLoginPage(UI_LOGIN);
-        baseTemplate.setUserPage(UI_USER);
-        baseTemplate.setHomePage(UI_HOME);
-        baseTemplate.setMoviesPage(UI_MOVIES);
-        baseTemplate.setSeriesPage(UI_SERIES);
-        baseTemplate.setHistoryPage(UI_HISTORY);
-        baseTemplate.setStatisticsPage(UI_STATISTICS);
-        baseTemplate.setWishlistPage(UI_WISHLIST);
-        baseTemplate.setDiscoverPage(UI_DISCOVER);
+        base.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
+        base.setLoginPage(UI_LOGIN);
+        base.setUserPage(UI_USER);
+        base.setHomePage(UI_HOME);
+        base.setMoviesPage(UI_MOVIES);
+        base.setSeriesPage(UI_SERIES);
+        base.setHistoryPage(UI_HISTORY);
+        base.setStatisticsPage(UI_STATISTICS);
+        base.setWishlistPage(UI_WISHLIST);
+        base.setDiscoverPage(UI_DISCOVER);
         CommonProfile profile = getProfile(ctx);
         if (profile != null) {
-            baseTemplate.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
-            baseTemplate.setUserFirstName(profile.getFirstName());
+            base.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
+            base.setUserFirstName(profile.getFirstName());
         }
-        return baseTemplate;
+        return base;
     }
 }

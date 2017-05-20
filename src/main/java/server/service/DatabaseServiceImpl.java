@@ -133,6 +133,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
             "SELECT COUNT(DISTINCT MovieId) AS 'unique_movies' FROM Views " +
                     "WHERE Username = ?";
+    private static final String SQL_INSERT_SEASON =
+            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES";
+    private static final String  SQL_REMOVE_SEASON =
+            "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
 
     private final JDBCClient client;
 
@@ -310,6 +314,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getViews(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
+        System.out.println(json.encodePrettily());
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS);
@@ -488,19 +493,25 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> insertSeasonViews(String username, String jsonParam) {
-        System.out.println("Series inserrt");
-        System.out.println("-------------------------");
-        System.out.println(new JsonObject(jsonParam).encodePrettily());
-        /*
-        INSERT INTO tbl_name
-            (a,b,c)
-        VALUES
-            (1,2,3),
-            (4,5,6),
-            (7,8,9);
-         */
-        return null;
+    public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) { // TODO: 18/05/2017 test
+        StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
+        JsonArray values = new JsonArray();
+        seasonData.getJsonArray("episodes").stream()
+                .map(obj -> (JsonObject) obj)
+                .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
+                .forEach(json -> values
+                        .add(username)
+                        .add(seriesId)
+                        .add(json.getInteger("id"))
+                        .add(seasonData.getString("_id"))
+                        .add(currentTimeMillis()));
+        query.deleteCharAt(query.length() - 1); // TODO: 18/05/2017 can episodes be empty? -> do not delete last char
+        return updateOrInsert(query.toString(), values);
+    }
+
+    @Override
+    public Future<JsonObject> removeSeasonViews(String username, String seasonId) {
+        return updateOrInsert(SQL_REMOVE_SEASON, new JsonArray().add(username).add(seasonId));
     }
 
     /**
