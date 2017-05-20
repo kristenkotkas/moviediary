@@ -314,7 +314,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getViews(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
-        System.out.println(json.encodePrettily());
+        //System.out.println(json.encodePrettily());
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS);
@@ -496,16 +496,18 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) { // TODO: 18/05/2017 test
         StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
         JsonArray values = new JsonArray();
-        seasonData.getJsonArray("episodes").stream()
-                .map(obj -> (JsonObject) obj)
-                .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
-                .forEach(json -> values
-                        .add(username)
-                        .add(seriesId)
-                        .add(json.getInteger("id"))
-                        .add(seasonData.getString("_id"))
-                        .add(currentTimeMillis()));
-        query.deleteCharAt(query.length() - 1); // TODO: 18/05/2017 can episodes be empty? -> do not delete last char
+        if (!values.isEmpty()) {
+            seasonData.getJsonArray("episodes").stream()
+                    .map(obj -> (JsonObject) obj)
+                    .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
+                    .forEach(json -> values
+                            .add(username)
+                            .add(seriesId)
+                            .add(json.getInteger("id"))
+                            .add(seasonData.getString("_id"))
+                            .add(currentTimeMillis()));
+            query.deleteCharAt(query.length() - 1);
+        }
         return updateOrInsert(query.toString(), values);
     }
 

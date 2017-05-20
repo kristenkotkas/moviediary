@@ -38,6 +38,9 @@ public enum Language {
     }
 
     public static String getString(String key, String lang) {
+        if (key == null) {
+            return null;
+        }
         return Stream.of(values())
                 .filter(language -> language.getLocale().getLanguage().equals(lang))
                 .findAny()

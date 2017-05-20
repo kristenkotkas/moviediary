@@ -14,6 +14,7 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.SplittableRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -21,6 +22,7 @@ import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
 public class StringUtils {
     private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class);
+    public static final SplittableRandom RANDOM = new SplittableRandom();
     public static final int SHORT_DATE = 1;
     public static final int LONG_DATE = 2;
     private static ImmutableMap<String, String> MONTHS = ImmutableMap.<String, String>builder()
@@ -151,4 +153,6 @@ public class StringUtils {
         }
         return null;
     }
+
+
 }

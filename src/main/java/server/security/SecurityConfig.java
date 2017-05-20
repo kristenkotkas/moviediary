@@ -1,8 +1,6 @@
 package server.security;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.oauth.client.FacebookClient;
@@ -23,10 +21,10 @@ import static server.util.NetworkUtils.isServer;
  * Contains login clients used for user authentication.
  */
 public class SecurityConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     public static final String CLIENT_VERIFIED_STATE = "SSL_CLIENT_VERIFY";
     public static final String CLIENT_CERTIFICATE = "SSL_CLIENT_CERT";
     public static final String AUTHORIZER = "DatabaseAuthorizer";
+    public static final String CSRF_TOKEN = "csrfToken";
 
     public static final String PAC4J_EMAIL = "email";
     public static final String PAC4J_PASSWORD = "password";
@@ -50,6 +48,7 @@ public class SecurityConfig {
         this.pac4jConfig.getClients().findClient(FormClient.class).enable(database, config);
         this.pac4jConfig.addAuthorizer(AUTHORIZER, new DatabaseAuthorizer(database));
     }
+
 
     public Config getPac4jConfig() {
         return pac4jConfig;

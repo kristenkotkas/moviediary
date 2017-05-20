@@ -19,3 +19,4 @@ Etapid:
 - [Etapp 4](https://github.com/kristenkotkas/moviediary/wiki/Etapp-4)
 - [Etapp 5](https://github.com/kristenkotkas/moviediary/wiki/Etapp-5)
 - [Etapp 6](https://github.com/kristenkotkas/moviediary/wiki/Etapp-6)
+- [Etapp 7](https://github.com/kristenkotkas/moviediary/wiki/Etapp-7)

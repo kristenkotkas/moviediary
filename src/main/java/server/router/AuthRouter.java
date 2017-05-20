@@ -1,8 +1,6 @@
 package server.router;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.auth.AuthProvider;
 import io.vertx.rxjava.ext.web.Router;
@@ -26,15 +24,13 @@ import static server.util.NetworkUtils.isServer;
  * Sets up body handling, cookie handling and user session handling.
  */
 public class AuthRouter extends EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthRouter.class);
-    private static final String XSS_PROTECTION = "xssprotection";
-    private static final String CSRF_TOKEN = "csrf";
-    private static final String CALLBACK = "/callback";
-    public static final String AUTH_PRIVATE = "/private/*";
     public static final String AUTH_LOGOUT = "/logout";
-
     public static final String TRANSLATIONS = "translations";
     public static final String MESSENGER = "messenger";
+    public static final String CSRF = "csrf";
+    private static final String XSS = "xssprotection";
+    private static final String CALLBACK = "/callback";
+    private static final String AUTH_PRIVATE = "/private/*";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -62,36 +58,25 @@ public class AuthRouter extends EventBusRoutable {
                 .setBodyLimit(MAX_BODY_SIZE)
                 .setMergeFormAttributes(true));
         router.route().handler(CookieHandler.create());
-        router.route().handler(createSessionHandler());
+
+        router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx))
+                .setCookieSecureFlag(isServer(config))
+                .setCookieHttpOnlyFlag(isServer(config))
+                .setNagHttps(false));
         router.route().handler(UserSessionHandler.create(new AuthProvider(securityConfig.getAuthProvider())));
 
         SecurityHandler securityHandler = new SecurityHandler(vertx.getDelegate(), securityConfig.getPac4jConfig(),
                 securityConfig.getAuthProvider(), new SecurityHandlerOptions()
                 .withClients(getClientNames())
-                .withAuthorizers(AUTHORIZER + "," + XSS_PROTECTION + "," + CSRF_TOKEN));
+                .withAuthorizers(AUTHORIZER + "," + XSS + "," + CSRF));
         router.route(AUTH_PRIVATE).getDelegate().handler(securityHandler);
         router.route(EVENTBUS_ALL).getDelegate().handler(securityHandler);
 
         CallbackHandler callback = new CallbackHandler(vertx.getDelegate(), securityConfig.getPac4jConfig(),
-                new CallbackHandlerOptions()
-                        .setDefaultUrl(UI_HOME)
-                        .setMultiProfile(false));
+                new CallbackHandlerOptions().setDefaultUrl(UI_HOME).setMultiProfile(false));
         router.route(CALLBACK).getDelegate().handler(callback);
 
         router.route(AUTH_LOGOUT).getDelegate().handler(new ApplicationLogoutHandler(vertx.getDelegate(),
                 new ApplicationLogoutHandlerOptions(), securityConfig.getPac4jConfig()));
-    }
-
-    /**
-     * Creates a session handler which on server environment enables some security measures.
-     *
-     * @return session handler
-     */
-    private SessionHandler createSessionHandler() {
-        boolean isServer = isServer(config);
-        return SessionHandler.create(LocalSessionStore.create(vertx))
-                .setCookieSecureFlag(isServer)
-                .setCookieHttpOnlyFlag(isServer)
-                .setNagHttps(false);
     }
 }

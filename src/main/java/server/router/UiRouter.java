@@ -13,7 +13,7 @@ import server.template.ui.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.UUID;
 
 import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -28,12 +28,12 @@ import static server.security.DatabaseAuthorizer.UNAUTHORIZED;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
-import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
-import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
+import static server.security.SecurityConfig.*;
 import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.getProfile;
 import static server.util.FileUtils.isRunningFromJar;
 import static server.util.HandlerUtils.endHandler;
+import static server.util.StringUtils.RANDOM;
 
 /**
  * Contains routes which user interface is handled on.
@@ -113,7 +113,7 @@ public class UiRouter extends EventBusRoutable {
                 .setMaxAgeSeconds(DAYS.toSeconds(7))
                 .setIncludeHidden(false));
 
-        router.route("/fail").handler(ctx -> ctx.fail(new Throwable("500: Oh noes it crashed")));
+        router.route("/fail").handler(ctx -> ctx.fail(new Throwable("500: Oh noes it crashed"))); // TODO: 20.05.2017 remove
         router.route().failureHandler(this::handleFailure);
         router.get().last().handler(this::handleNotFound);
     }
@@ -180,11 +180,6 @@ public class UiRouter extends EventBusRoutable {
      * Displays message if one is specified.
      */
     private void handleLogin(RoutingContext ctx) {
-        // TODO: 19.05.2017 access csrf token generator -> new or from pac4j
-        // TODO: 19.05.2017 put token to handlebars + to cookie or session or whatever
-        // TODO: 19.05.2017 pac4j will be checking session or cookie previous cookie and compare?
-
-
         LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
         String lang = ctx.request().getParam(LANGUAGE);
         if (lang != null) {
@@ -193,7 +188,7 @@ public class UiRouter extends EventBusRoutable {
             template.setLang(lang);
         }
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
-        engine.render(template.setDisplayMessage(key != null ? getString(key, ctx) : null)
+        engine.render(template.setDisplayMessage(getString(key, ctx))
                 .setFormUrl(UI_HOME + FORM.getClientNamePrefixed())
                 .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
                 .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
@@ -201,7 +196,10 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleFormLogin(RoutingContext ctx) {
+        String token = UUID.randomUUID().toString();
+        ctx.session().put(CSRF_TOKEN, token);
         engine.render(getSafe(ctx, TEMPL_FORM_LOGIN, FormLoginTemplate.class)
+                .setCsrfToken(token)
                 .setRegisterUrl(UI_FORM_REGISTER)
                 .setCallbackUrl(securityConfig.getPac4jConfig()
                         .getClients()
@@ -211,8 +209,11 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleFormRegister(RoutingContext ctx) {
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
+        String token = UUID.randomUUID().toString();
+        ctx.session().put(CSRF_TOKEN, token);
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
-                .setDisplayMessage(key != null ? getString(key, ctx) : null)
+                .setCsrfToken(token)
+                .setDisplayMessage(getString(key, ctx))
                 .setRegisterRestUrl(API_USERS_FORM_INSERT), endHandler(ctx));
     }
 
@@ -235,17 +236,15 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleFailure(RoutingContext ctx) {
         ctx.response().setStatusCode(500);
-        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                .setErrorMessage(ctx.failure().getMessage())
-                .setNotFoundName(fileName), endHandler(ctx));
+                //.setErrorMessage(ctx.failure().getMessage())
+                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)]), endHandler(ctx));
     }
 
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
-        String fileName = POSTERS[ThreadLocalRandom.current().nextInt(POSTERS.length)];
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                .setNotFoundName(fileName), endHandler(ctx));
+                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)]), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {

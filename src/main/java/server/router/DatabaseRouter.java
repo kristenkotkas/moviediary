@@ -23,6 +23,7 @@ import static server.router.MailRouter.userVerified;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
+import static server.security.SecurityConfig.CSRF_TOKEN;
 import static server.service.DatabaseService.createDataMap;
 import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.*;
@@ -136,16 +137,16 @@ public class DatabaseRouter extends EventBusRoutable {
                 .put("episodes", json.getJsonArray("rows").stream()
                         .map(obj -> (JsonObject) obj)
                         .map(j -> j.getInteger("EpisodeId"))
-                        .collect(toList()));
+                        .collect(toList())); // TODO: 19.05.2017 should collect to jsonArray instead?
     }
 
     /**
-     * Transforms database history results for easier consuming in front end.
+     * Transforms database history results for easier consuming in frontend.
      */
     private BiFunction<String, JsonObject, Object> transformDatabaseHistory() {
         return (user, json) -> {
             json.remove("results");
-            System.out.println(json.encodePrettily());
+            //System.out.println(json.encodePrettily());
             json.getJsonArray("rows").stream()
                     .map(JsonObj::fromParent)
                     .forEach(jsonObj -> jsonObj
@@ -216,8 +217,15 @@ public class DatabaseRouter extends EventBusRoutable {
         String password = ctx.request().getFormAttribute(FORM_PASSWORD);
         String firstname = ctx.request().getFormAttribute(FORM_FIRSTNAME);
         String lastname = ctx.request().getFormAttribute(FORM_LASTNAME);
-        if (contains("", username, password, firstname, lastname)) {
+        String csrfToken = ctx.request().getFormAttribute("csrfToken");
+        String sessionCsrfToken = ctx.session().remove(CSRF_TOKEN);
+        if (!nonNull(username, password, firstname, lastname) ||
+                contains("", username, password, firstname, lastname)) {
             serviceUnavailable(ctx, new Throwable("All fields must be filled!"));
+            return;
+        }
+        if (!nonNull(csrfToken, sessionCsrfToken) || !csrfToken.equals(sessionCsrfToken)) {
+            serviceUnavailable(ctx, new Throwable("Csrf check failed."));
             return;
         }
         database.getUser(username).setHandler(resultHandler(ctx, result -> check(getRows(result).stream()
