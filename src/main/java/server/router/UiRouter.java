@@ -42,7 +42,7 @@ public class UiRouter extends EventBusRoutable {
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
-    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic"};
+    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic", "avatar"};
 
     public static final String UI_INDEX = "/";
     public static final String UI_USER = "/private/user";
