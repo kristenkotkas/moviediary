@@ -8,7 +8,6 @@ import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.handler.UserSessionHandler;
-import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
 import org.pac4j.vertx.handler.impl.*;
 import server.entity.Language;
 import server.security.SecurityConfig;
@@ -59,24 +58,31 @@ public class AuthRouter extends EventBusRoutable {
                 .setMergeFormAttributes(true));
         router.route().handler(CookieHandler.create());
 
-        router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx))
+        router.route().handler(SessionHandler.create(securityConfig.getSessionStore())
                 .setCookieSecureFlag(isServer(config))
                 .setCookieHttpOnlyFlag(isServer(config))
                 .setNagHttps(false));
         router.route().handler(UserSessionHandler.create(new AuthProvider(securityConfig.getAuthProvider())));
 
-        SecurityHandler securityHandler = new SecurityHandler(vertx.getDelegate(), securityConfig.getPac4jConfig(),
-                securityConfig.getAuthProvider(), new SecurityHandlerOptions()
-                .withClients(getClientNames())
-                .withAuthorizers(AUTHORIZER + "," + XSS + "," + CSRF));
+        SecurityHandler securityHandler = new SecurityHandler(vertx.getDelegate(),
+                securityConfig.getVertxSessionStore(),
+                securityConfig.getPac4jConfig(),
+                securityConfig.getAuthProvider(),
+                new SecurityHandlerOptions()
+                        .setClients(getClientNames())
+                        .setAuthorizers(AUTHORIZER + "," + XSS + "," + CSRF));
         router.route(AUTH_PRIVATE).getDelegate().handler(securityHandler);
         router.route(EVENTBUS_ALL).getDelegate().handler(securityHandler);
 
-        CallbackHandler callback = new CallbackHandler(vertx.getDelegate(), securityConfig.getPac4jConfig(),
+        CallbackHandler callback = new CallbackHandler(vertx.getDelegate(),
+                securityConfig.getVertxSessionStore(),
+                securityConfig.getPac4jConfig(),
                 new CallbackHandlerOptions().setDefaultUrl(UI_HOME).setMultiProfile(false));
         router.route(CALLBACK).getDelegate().handler(callback);
 
-        router.route(AUTH_LOGOUT).getDelegate().handler(new ApplicationLogoutHandler(vertx.getDelegate(),
-                new ApplicationLogoutHandlerOptions(), securityConfig.getPac4jConfig()));
+        router.route(AUTH_LOGOUT).getDelegate().handler(new LogoutHandler(vertx.getDelegate(),
+                securityConfig.getVertxSessionStore(),
+                new LogoutHandlerOptions(),
+                securityConfig.getPac4jConfig()));
     }
 }

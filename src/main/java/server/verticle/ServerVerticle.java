@@ -2,8 +2,6 @@ package server.verticle;
 
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.ext.web.Router;
 import server.router.*;
@@ -23,8 +21,6 @@ import static server.util.NetworkUtils.*;
  * Creates a HTTP server.
  */
 public class ServerVerticle extends AbstractVerticle {
-    private static final Logger LOG = LoggerFactory.getLogger(ServerVerticle.class);
-
     private DatabaseService database;
     private TmdbService tmdb;
     private OmdbService omdb;
@@ -57,13 +53,13 @@ public class ServerVerticle extends AbstractVerticle {
         omdb = createIfMissing(omdb, () -> OmdbService.create(vertx, config(), database));
         bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
         mail = createIfMissing(mail, () -> MailService.create(vertx, database));
-        securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(config(), database));
+        securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(vertx, config(), database));
         Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig),
                 new TmdbRouter(vertx, tmdb),
                 new OmdbRouter(vertx, omdb),
                 new BankLinkRouter(vertx, bankLink),
-                new DatabaseRouter(vertx, config(), database, mail),
+                new DatabaseRouter(vertx, config(), securityConfig, database, mail),
                 new MailRouter(vertx, mail),
                 new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));
         startEventbus(router, vertx);

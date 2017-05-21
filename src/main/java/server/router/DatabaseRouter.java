@@ -8,6 +8,7 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import server.entity.JsonObj;
 import server.entity.User;
+import server.security.SecurityConfig;
 import server.service.DatabaseService;
 import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
@@ -73,12 +74,15 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String REMOVE_SEASON_VIEWS = "database_remove_season_views";
 
     private final JsonObject config;
+    private final SecurityConfig securityConfig;
     private final DatabaseService database;
     private final MailService mail;
 
-    public DatabaseRouter(Vertx vertx, JsonObject config, DatabaseService database, MailService mail) {
+    public DatabaseRouter(Vertx vertx, JsonObject config, SecurityConfig securityConfig,
+                          DatabaseService database, MailService mail) {
         super(vertx);
         this.config = config;
+        this.securityConfig = securityConfig;
         this.database = database;
         this.mail = mail;
         listen(GET_HISTORY, reply(database::getViews, transformDatabaseHistory()));
@@ -126,7 +130,7 @@ public class DatabaseRouter extends EventBusRoutable {
             serviceUnavailable(ctx, new Throwable("Missing parameters for query."));
             return;
         }
-        String username = getUsername(ctx);
+        String username = getUsername(ctx, securityConfig);
         database.getViews(username, ctx.getBodyAsString()).rxSetHandler()
                 .doOnError(err -> serviceUnavailable(ctx, err))
                 .subscribe(j -> jsonResponse(ctx).accept(transformDatabaseHistory().apply(username, j)));
@@ -252,7 +256,7 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns user info as XML response.
      */
     private void handleUserInfo(RoutingContext ctx) {
-        database.getUser(getUsername(ctx)).rxSetHandler()
+        database.getUser(getUsername(ctx, securityConfig)).rxSetHandler()
                 .doOnError(err -> serviceUnavailable(ctx, err))
                 .subscribe(json -> ctx.response()
                         .setStatusCode(200)

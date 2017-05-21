@@ -1,11 +1,11 @@
 package server.util;
 
-import io.vertx.core.logging.Logger;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxProfileManager;
 import org.pac4j.vertx.VertxWebContext;
+import server.security.SecurityConfig;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -16,12 +16,10 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.rxjava.core.Future.failedFuture;
 import static io.vertx.rxjava.core.Future.succeededFuture;
 
 public class CommonUtils {
-    private static final Logger LOG = getLogger(CommonUtils.class);
 
     public static boolean nonNull(Object... objects) {
         for (Object obj : objects) {
@@ -42,12 +40,13 @@ public class CommonUtils {
         return false;
     }
 
-    public static CommonProfile getProfile(RoutingContext ctx) {
-        return new VertxProfileManager(new VertxWebContext(ctx.getDelegate())).get(true).orElse(null);
+    public static CommonProfile getProfile(RoutingContext ctx, SecurityConfig securityConfig) {
+        return new VertxProfileManager(new VertxWebContext(ctx.getDelegate(), securityConfig.getVertxSessionStore()))
+                .get(true).orElse(null);
     }
 
-    public static String getUsername(RoutingContext ctx) {
-        return getProfile(ctx).getEmail();
+    public static String getUsername(RoutingContext ctx, SecurityConfig securityConfig) {
+        return getProfile(ctx, securityConfig).getEmail();
     }
 
     public static RSAPrivateKey getDerPrivateKey(byte[] keyBytes, String algorithm) throws Exception {

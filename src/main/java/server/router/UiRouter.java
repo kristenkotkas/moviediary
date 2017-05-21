@@ -283,7 +283,7 @@ public class UiRouter extends EventBusRoutable {
         base.setStatisticsPage(UI_STATISTICS);
         base.setWishlistPage(UI_WISHLIST);
         base.setDiscoverPage(UI_DISCOVER);
-        CommonProfile profile = getProfile(ctx);
+        CommonProfile profile = getProfile(ctx, securityConfig);
         if (profile != null) {
             base.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
             base.setUserFirstName(profile.getFirstName());

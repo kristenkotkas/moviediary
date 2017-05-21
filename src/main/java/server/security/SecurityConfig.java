@@ -1,11 +1,15 @@
 package server.security;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
+import io.vertx.rxjava.ext.web.sstore.SessionStore;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.Google2Client;
 import org.pac4j.vertx.auth.Pac4jAuthProvider;
+import org.pac4j.vertx.context.session.VertxSessionStore;
 import server.service.DatabaseService;
 
 import java.util.Arrays;
@@ -37,11 +41,15 @@ public class SecurityConfig {
 
     private final Pac4jAuthProvider authProvider = new Pac4jAuthProvider();
     private final Config pac4jConfig;
+    private final SessionStore sessionStore;
+    private final VertxSessionStore vertxSessionStore;
 
     /**
      * Initializes Pac4j security engine with authentication clients and database authorizer.
      */
-    public SecurityConfig(JsonObject config, DatabaseService database) {
+    public SecurityConfig(Vertx vertx, JsonObject config, DatabaseService database) {
+        this.sessionStore = LocalSessionStore.create(vertx);
+        this.vertxSessionStore = new VertxSessionStore(sessionStore.getDelegate());
         this.pac4jConfig = new Config(getCallback(config), Arrays.stream(values())
                 .map(client -> client.create(config))
                 .collect(toList()));
@@ -56,6 +64,14 @@ public class SecurityConfig {
 
     public Pac4jAuthProvider getAuthProvider() {
         return authProvider;
+    }
+
+    public SessionStore getSessionStore() {
+        return sessionStore;
+    }
+
+    public VertxSessionStore getVertxSessionStore() {
+        return vertxSessionStore;
     }
 
     /**

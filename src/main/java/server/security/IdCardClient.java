@@ -2,9 +2,9 @@ package server.security;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.pac4j.core.client.IndirectClientV2;
-import org.pac4j.core.client.RedirectAction;
+import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
 import server.router.UiRouter;
 
@@ -21,7 +21,7 @@ import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
 /**
  * Indirect client for ID Card login.
  */
-public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProfile> {
+public class IdCardClient extends IndirectClient<IdCardCredentials, IdCardProfile> {
     private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
     private static final String URL = "https://id.movies.kyngas.eu" + UI_IDCARDLOGIN;
     private static final String CERT_TYPE = "X.509";
@@ -34,9 +34,8 @@ public class IdCardClient extends IndirectClientV2<IdCardCredentials, IdCardProf
     }
 
     @Override
-    protected void internalInit(WebContext context) {
-        super.internalInit(context);
-        loginUrl = callbackUrlResolver.compute(URL, context);
+    protected void clientInit(WebContext context) {
+        loginUrl = urlResolver.compute(URL, context);
         setRedirectActionBuilder(webContext -> RedirectAction.redirect(loginUrl));
         setCredentialsExtractor(webContext -> {
             String verify = webContext.getRequestParameter(CLIENT_VERIFIED_STATE);
