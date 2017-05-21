@@ -295,6 +295,7 @@ span.badge.new:after {
 
 .container {
     width: 90%;
+    margin-left: 2%;
 }
 
 .oscar-statue {
