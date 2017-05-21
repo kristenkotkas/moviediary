@@ -1,3 +1,4 @@
+asyncLoadCSS('/static/css/clockpicker.css');
 $("#navbar-movies").addClass('navbar-text-active');
 $(document).ready(function () {
     $(".datepicker").pickadate({ //calendar initialization

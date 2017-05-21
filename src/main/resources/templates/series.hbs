@@ -6,10 +6,13 @@
     <meta name="theme-color" content="#E3F2FD">
     <title>{{i18n "NAVBAR_SERIES" locale=lang}}</title>
     <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
-    <link href="/static/css/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen">
-    <link href="/static/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen">
-    <link href="/static/css/clockpicker.css" type="text/css" rel="stylesheet" media="screen">
-    <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+    <noscript>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+    </noscript>
 </head>
 <body class="blue lighten-5 bc-image" id="body">
 <div id="loader-wrapper">
@@ -70,11 +73,12 @@
 </main>
 {{> templates/footer.hbs}}
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
-<script defer type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script defer type="text/javascript" src="/static/js/materialize.min.js"></script>
-<script defer type="text/javascript" src="/static/js/sockjs.min.js"></script>
+<script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
 <script defer type="text/javascript" src="/static/js/custom/vertx-eventbus.js"></script>
-<script defer type="text/javascript" src="/static/js/custom/clockpicker.js"></script>
 <script defer type="text/javascript" src="/static/js/pages/series.js"></script>
 </body>
 </html>

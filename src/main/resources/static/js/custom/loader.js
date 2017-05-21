@@ -44,8 +44,8 @@ if ('serviceWorker' in navigator) {
     log("service workers not supported")
 }
 
-asyncLoadCSS('/static/css/font-awesome/css/font-awesome.min.css');
-asyncLoadCSS('/static/css/materialize.min.css');
+asyncLoadCSS('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+asyncLoadCSS('https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css');
 asyncLoadCSS('/static/css/custom/base.css');
 
 var tagsToReplace = {
