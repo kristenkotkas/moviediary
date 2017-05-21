@@ -5,9 +5,9 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.client.WebClient;
-import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import server.entity.Retryable;
 
+import static io.vertx.rxjava.ext.web.codec.BodyCodec.jsonObject;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static server.entity.Status.OK;
 import static server.service.OmdbServiceImpl.Cache.AWARD;
@@ -50,7 +50,7 @@ public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements O
     private void get(String uri, CacheItem<JsonObject> cache, Future<JsonObject> future, Retryable retryable) {
         client.get(HTTPS, endpoint, uri)
                 .timeout(5000L)
-                .as(BodyCodec.jsonObject())
+                .as(jsonObject())
                 .send(ar -> check(ar.succeeded(),
                         () -> check(ar.result().statusCode() == OK,
                                 () -> future.complete(cache.set(ar.result().body())),

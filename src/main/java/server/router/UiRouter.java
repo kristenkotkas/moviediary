@@ -42,7 +42,8 @@ public class UiRouter extends EventBusRoutable {
     private static final Path RESOURCES = Paths.get("src/main/resources");
     private static final String STATIC_PATH = "/static/*";
     private static final String STATIC_FOLDER = "static";
-    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic", "avatar", "into-the-wild", "truman-show"};
+    private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic", "avatar",
+            "into-the-wild", "truman-show"};
 
     public static final String UI_INDEX = "/";
     public static final String UI_USER = "/private/user";
@@ -72,7 +73,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
     private static final String TEMPL_IDCARDLOGIN = "templates/idcardlogin.hbs";
-    private static final String TEMPL_NOTFOUND = "templates/notfound.hbs";
+    private static final String TEMPL_ERROR = "templates/error.hbs";
     private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
     private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
 
@@ -113,7 +114,7 @@ public class UiRouter extends EventBusRoutable {
                 .setMaxAgeSeconds(DAYS.toSeconds(7))
                 .setIncludeHidden(false));
 
-        router.route("/fail").handler(ctx -> ctx.fail(new Throwable("500: Oh noes it crashed"))); // TODO: 20.05.2017 remove
+        router.route("/fail").handler(ctx -> ctx.fail(555)); // TODO: 20.05.2017 remove
         router.route().failureHandler(this::handleFailure);
         router.get().last().handler(this::handleNotFound);
     }
@@ -235,18 +236,20 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleFailure(RoutingContext ctx) {
-        ctx.response().setStatusCode(500);
-        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                .setErrorMessage(ctx.failure() != null ? ctx.failure().getMessage() : null)
-                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)])
-                .setErrorCode("500"), endHandler(ctx));
+        check(ctx.statusCode() == -1,
+                () -> ctx.response().setStatusCode(500),
+                () -> ctx.response().setStatusCode(ctx.statusCode()));
+        engine.render(getSafe(ctx, TEMPL_ERROR, ErrorTemplate.class)
+                .setErrorMessage(ctx.failure() != null ?
+                        ctx.failure().getMessage() : getString("ERROR_TITLE", ctx))
+                .setPosterFileName(POSTERS[RANDOM.nextInt(POSTERS.length)])
+                .setErrorCode(ctx.response().getStatusCode()), endHandler(ctx));
     }
 
     private void handleNotFound(RoutingContext ctx) {
-        ctx.response().setStatusCode(404);
-        engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)])
-                .setErrorCode("404"), endHandler(ctx));
+        engine.render(getSafe(ctx, TEMPL_ERROR, ErrorTemplate.class)
+                .setPosterFileName(POSTERS[RANDOM.nextInt(POSTERS.length)])
+                .setErrorCode(ctx.response().setStatusCode(404).getStatusCode()), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {

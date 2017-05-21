@@ -495,9 +495,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) { // TODO: 18/05/2017 test
         StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
+        JsonArray episodes = seasonData.getJsonArray("episodes");
         JsonArray values = new JsonArray();
-        if (!values.isEmpty()) {
-            seasonData.getJsonArray("episodes").stream()
+        ifFalse(episodes.isEmpty(), () -> {
+            episodes.stream()
                     .map(obj -> (JsonObject) obj)
                     .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
                     .forEach(json -> values
@@ -507,7 +508,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                             .add(seasonData.getString("_id"))
                             .add(currentTimeMillis()));
             query.deleteCharAt(query.length() - 1);
-        }
+        });
         return updateOrInsert(query.toString(), values);
     }
 
