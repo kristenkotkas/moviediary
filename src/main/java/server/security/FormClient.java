@@ -34,7 +34,7 @@ public class FormClient extends IndirectClientV2<FormCredentials, FormProfile> {
             String username = ctx.getRequestParameter(FORM_USERNAME);
             String password = ctx.getRequestParameter(FORM_PASSWORD);
             if (!nonNull(username, password)) {
-                throw new CredentialsException("No credentials provided.");
+                return null;
             }
             return new FormCredentials(username, password);
         });

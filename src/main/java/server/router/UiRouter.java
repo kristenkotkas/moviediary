@@ -237,7 +237,7 @@ public class UiRouter extends EventBusRoutable {
     private void handleFailure(RoutingContext ctx) {
         ctx.response().setStatusCode(500);
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                //.setErrorMessage(ctx.failure().getMessage())
+                .setErrorMessage(ctx.failure() != null ? ctx.failure().getMessage() : null)
                 .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)]), endHandler(ctx));
     }
 

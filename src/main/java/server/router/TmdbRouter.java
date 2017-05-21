@@ -1,7 +1,5 @@
 package server.router;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
@@ -14,7 +12,6 @@ import static server.util.HandlerUtils.*;
  * Contains routes that handle TheMovieDatabase services.
  */
 public class TmdbRouter extends EventBusRoutable {
-    private static final Logger LOG = LoggerFactory.getLogger(TmdbRouter.class);
     private static final String API_TMDB_GET_SEARCH = "/private/api/v1/search/:movieName";
     private static final String API_TMDB_GET_MOVIE = "/private/api/v1/movie/:movieId";
 

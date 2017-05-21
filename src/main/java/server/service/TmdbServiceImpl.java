@@ -11,9 +11,8 @@ import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import server.entity.Retryable;
 
-import java.util.concurrent.TimeUnit;
-
 import static io.vertx.rxjava.core.Future.future;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static server.entity.Status.OK;
 import static server.entity.Status.RATE_LIMIT;
 import static server.service.TmdbServiceImpl.Cache.*;
@@ -24,7 +23,7 @@ import static server.service.TmdbServiceImpl.Cache.*;
 public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements TmdbService {
     private static final Logger LOG = LoggerFactory.getLogger(TmdbServiceImpl.class);
     private static final int HTTPS = 443;
-    private static final long DEFAULT_DELAY = TimeUnit.SECONDS.toMillis(1);
+    private static final long DEFAULT_DELAY = SECONDS.toMillis(1);
     private static final String ENDPOINT = "api.themoviedb.org";
     private static final String RATE_RESET_HEADER = "X-RateLimit-Reset";
     private static final String APIKEY_PREFIX1 = "&api_key="; // for search

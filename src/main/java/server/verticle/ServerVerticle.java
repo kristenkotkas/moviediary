@@ -8,10 +8,7 @@ import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.ext.web.Router;
 import server.router.*;
 import server.security.SecurityConfig;
-import server.service.BankLinkService;
-import server.service.DatabaseService;
-import server.service.MailService;
-import server.service.TmdbService;
+import server.service.*;
 
 import java.util.Arrays;
 
@@ -30,6 +27,7 @@ public class ServerVerticle extends AbstractVerticle {
 
     private DatabaseService database;
     private TmdbService tmdb;
+    private OmdbService omdb;
     private BankLinkService bankLink;
     private MailService mail;
     private SecurityConfig securityConfig;
@@ -56,12 +54,14 @@ public class ServerVerticle extends AbstractVerticle {
         Router router = Router.router(vertx);
         database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
         tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
+        omdb = createIfMissing(omdb, () -> OmdbService.create(vertx, config(), database));
         bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
         mail = createIfMissing(mail, () -> MailService.create(vertx, database));
         securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(config(), database));
         Arrays.asList(
                 new AuthRouter(vertx, config(), securityConfig),
                 new TmdbRouter(vertx, tmdb),
+                new OmdbRouter(vertx, omdb),
                 new BankLinkRouter(vertx, bankLink),
                 new DatabaseRouter(vertx, config(), database, mail),
                 new MailRouter(vertx, mail),
