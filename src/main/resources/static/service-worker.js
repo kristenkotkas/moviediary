@@ -1,5 +1,5 @@
 var log = console.log.bind(console);
-var version = "0.0.4";
+var version = "0.0.5";
 var cacheName = "moviediary";
 var cache = cacheName + "-" + version;
 var filesToCache = [
