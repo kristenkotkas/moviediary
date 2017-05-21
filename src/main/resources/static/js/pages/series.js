@@ -187,11 +187,9 @@ function fillResultSeries(seriesData, page, lang) {
                             '</div>' +
                             '<div class="collapsible-body collapsible-body-tv grey lighten-4">' +
                                 '<div class="row">' +
-                                    '<div class="row">' +
-                                        '<a class="btn green lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">Add whole season</a>' +
-                                    '</div>' +
-                                    '<div class="row">' +
-                                        '<a class="btn red lighten-2 z-depth-0" id="remove-season-' + seasonData['_id'] + '">Remove whole season</a>' +
+                                    '<div class="col s12 m12 l12">' +
+                                        '<div class="row" id="whole-season-btn-container-' + seasonData['_id'] + '">' +
+                                        '</div>' +
                                     '</div>' +
                                     '<div class="col s12 m12 l12" id="episode_container_' + i + '"></div>' +
                                 '</div>' +
@@ -199,6 +197,35 @@ function fillResultSeries(seriesData, page, lang) {
                         '</li>'
                     )
                 );
+
+                if (seasonData['episodes'].length !== 0) {
+                    $(document.getElementById('whole-season-btn-container-' + seasonData['_id'])).append(
+                        $.parseHTML(
+                            '<div class="col s12 m12 l6 xl3">' +
+                                '<div class="card cursor green whole-season lighten-2 z-depth-0" id="add-season-' + seasonData['_id'] + '">' +
+                                    '<div class="card-content">' +
+                                        '<div class="truncate white-text">' + lang['SERIES_ADD_SEASON'] + '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col s12 m12 l6 xl3">' +
+                                '<div class="card cursor red whole-season lighten-2 z-depth-0" id="remove-season-' + seasonData['_id'] + '">' +
+                                    '<div class="card-content">' +
+                                        '<div class="truncate white-text">' + lang['SERIES_REMOVE_SEASON'] + '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
+                        )
+                    );
+                } else {
+                    $(document.getElementById('whole-season-btn-container-' + seasonData['_id'])).append(
+                        $.parseHTML(
+                            '<div class="col">' +
+                            '<h5 class="truncate grey-text text-darken-2">' + lang['SERIES_NO_EPISODES'] + '</h5>' +
+                            '</div>'
+                        )
+                    );
+                }
 
                 $(document.getElementById('add-season-' + seasonData['_id']))
                     .click({

@@ -40,7 +40,6 @@ eventbus.onopen = function () {
         }
 
         lang = reply.body;
-        console.log(lang);
         fillDropDown(lang);
         search.keyup(function (e) {
             if (e.keyCode === 13) {
@@ -121,8 +120,15 @@ eventbus.onopen = function () {
 
 var openCollapsible = function () {
     collFilters.collapsible('open', 0);
-    collSearch.collapsible('open', 0);
     collQkSearch.collapsible('open', 0);
+    collSearch.collapsible('open', 0);
+/*
+    collFilters.collapsible({
+        accordion: false,
+        onOpen: function (el) {
+            console.log('filter open');
+        }
+    });*/
 };
 
 var fillDropDown = function (lang) {
