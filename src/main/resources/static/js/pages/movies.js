@@ -24,6 +24,7 @@ $(document).ready(function () {
 var eventbus = new EventBus("/eventbus");
 var oscarContainer = $('#oscar-container');
 var isStarWars = false;
+var modal = $('#modal1');
 eventbus.onopen = function () {
 
     var lang;
@@ -165,7 +166,7 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         addToWatchBtn.click(function () {
             console.log('click');
-            $('#modal1').modal('open');
+            modal.modal('open');
             startDate.val('');
             startTime.val('');
             endDate.val('');
