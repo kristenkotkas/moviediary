@@ -47,6 +47,9 @@ eventbus.onopen = function () {
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
+            $("#awards").empty();
+            oscarContainer.empty();
+
             setTimeout(function () {
                 eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
                     var data = reply.body['results'];
@@ -121,11 +124,18 @@ var enableParameterMovieLoading = function (eventbus, lang) {
     loadMovie(eventbus, lang); //load movie if url has param
 };
 
+function startAwardLoading() {
+    $("#awards").append(
+        $.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>')
+    );
+}
+
 var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
     $('#add-btn').off('click').off('keyup');
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
+        startAwardLoading();
         var startDate = $("#watchStartDay");
         var startTime = $("#watchStartTime");
         var startNow = $("#watchStartNow");
@@ -301,8 +311,8 @@ function getOmdb(imdbId) {
     eventbus.send("api_get_awards", imdbId, function (error, reply) {
         console.log('OMDB', reply);
         if (reply.body != 'Failure: Too many failures.') {
-            parseAwards(reply['Awards']);
-            $("#awards").empty().append(data['Awards'].replace('.', '.<br>'));
+            parseAwards(reply.body['Awards']);
+            $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
         }
     });
 }
