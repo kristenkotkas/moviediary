@@ -26,12 +26,28 @@ body {
     width: 100%;
 }
 
+.wrap {
+    margin: auto;
+    text-align: center;
+    position: relative;
+}
+
+.text_over_image {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 10%;
+    color: #fff;
+    font-weight: 200;
+    font-size: 5vw;
+}
+
 .star-wars {
-    cursor:url(http://puu.sh/vTNeH/035e26e901.gif), auto;
+    cursor: url(http://puu.sh/vTNeH/035e26e901.gif), auto;
 }
 
 .star-wars-link:hover {
-    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+    cursor: url(http://puu.sh/vU9WA/71571866ef.gif), auto;
     text-decoration: underline;
 }
 
@@ -250,7 +266,7 @@ span.badge.new:after {
 
 .star-wars-add-wishlist:hover {
     background: #dbded9;
-    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
+    cursor: url(http://puu.sh/vU9WA/71571866ef.gif), auto;
 }
 
 .oscar-statue {
@@ -543,6 +559,16 @@ header .brand-logo:hover {
     .collapsible-body-tv {
         padding: 2em 0;
     }
+
+    .text_over_image {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 5%;
+        color: #fff;
+        font-weight: 200;
+        font-size: 8vw;
+    }
 }
 
 /* Tablet mode */
@@ -565,6 +591,16 @@ header .brand-logo:hover {
      }*/
     .collapsible-body-tv {
         padding: 2em 0;
+    }
+
+    .text_over_image {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 5%;
+        color: #fff;
+        font-weight: 200;
+        font-size: 7vw;
     }
 }
 

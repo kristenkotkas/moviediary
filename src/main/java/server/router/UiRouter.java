@@ -238,13 +238,15 @@ public class UiRouter extends EventBusRoutable {
         ctx.response().setStatusCode(500);
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
                 .setErrorMessage(ctx.failure() != null ? ctx.failure().getMessage() : null)
-                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)]), endHandler(ctx));
+                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)])
+                .setErrorCode("500"), endHandler(ctx));
     }
 
     private void handleNotFound(RoutingContext ctx) {
         ctx.response().setStatusCode(404);
         engine.render(getSafe(ctx, TEMPL_NOTFOUND, NotFoundTemplate.class)
-                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)]), endHandler(ctx));
+                .setNotFoundName(POSTERS[RANDOM.nextInt(POSTERS.length)])
+                .setErrorCode("404"), endHandler(ctx));
     }
 
     private void handleDonateSuccess(RoutingContext ctx) {
