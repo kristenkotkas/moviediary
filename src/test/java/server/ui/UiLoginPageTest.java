@@ -66,7 +66,7 @@ public class UiLoginPageTest extends UiTest {
         JsonObject fbAuth = config.getJsonObject("unit_test").getJsonObject("facebook_user");
         assertGoToPage(driver, URI + "/login");
         driver.findElements(tagName("a")).get(1).click();
-        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper"))));
+        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper")))); // FIXME: 19/05/2017 didnt find wrapper?
         assertTrue(driver.getCurrentUrl().contains("facebook"));
         driver.findElement(id("email")).sendKeys(fbAuth.getString("username"));
         driver.findElement(id("pass")).sendKeys(fbAuth.getString("password"));

@@ -81,7 +81,7 @@ public class Utils {
     public static HttpClientResponse doRequest(HttpClientRequest req, MultiMap headers, String data) {
         req.headers().addAll(createIfMissing(headers, MultiMap::caseInsensitiveMultiMap));
         SyncResult<HttpClientResponse> result = new SyncResult<>();
-        req.handler(res -> result.set(res).ready());
+        req.handler(result::setReady);
         req.end(createIfMissing(data, () -> ""));
         return result.await().get();
     }

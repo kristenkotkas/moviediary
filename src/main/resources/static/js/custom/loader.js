@@ -45,7 +45,7 @@ if ('serviceWorker' in navigator) {
 }
 
 asyncLoadCSS('/static/css/font-awesome/css/font-awesome.min.css');
-asyncLoadCSS('/static/css/custom/materialize.min.css');
+asyncLoadCSS('/static/css/materialize.min.css');
 asyncLoadCSS('/static/css/custom/base.css');
 
 var tagsToReplace = {
