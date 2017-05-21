@@ -296,17 +296,10 @@ function removeStarWars() {
 }
 
 function getOmdb(imdbId) {
-    $.ajax({
-        url: 'https://www.omdbapi.com/?i=' + imdbId,
-        type: 'GET',
-        success: function (data) {
-            console.log('OMDB', data);
-            parseAwards(data['Awards']);
-            $("#awards").empty().append(data['Awards'].replace('.', '.<br>'));
-        },
-        error: function (e) {
-            console.log(e);
-        }
+    eventbus.send("api_get_awards", imdbId, function (error, reply) {
+        console.log('OMDB', reply);
+        parseAwards(reply['Awards']);
+        $("#awards").empty().append(data['Awards'].replace('.', '.<br>'));
     });
 }
 
