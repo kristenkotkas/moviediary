@@ -29,8 +29,7 @@ import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.*;
-import static server.util.CommonUtils.check;
-import static server.util.CommonUtils.getProfile;
+import static server.util.CommonUtils.*;
 import static server.util.FileUtils.isRunningFromJar;
 import static server.util.HandlerUtils.endHandler;
 import static server.util.StringUtils.RANDOM;
@@ -236,6 +235,7 @@ public class UiRouter extends EventBusRoutable {
     }
 
     private void handleFailure(RoutingContext ctx) {
+        ifPresent(ctx.failure(), Throwable::printStackTrace);
         check(ctx.statusCode() == -1,
                 () -> ctx.response().setStatusCode(500),
                 () -> ctx.response().setStatusCode(ctx.statusCode()));

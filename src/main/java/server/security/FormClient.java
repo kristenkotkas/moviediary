@@ -24,10 +24,6 @@ public class FormClient extends IndirectClient<FormCredentials, FormProfile> {
 
     private String loginUrl;
 
-    public FormClient() {
-
-    }
-
     @Override
     protected void clientInit(WebContext context) {
         setRedirectActionBuilder(webContext -> RedirectAction.redirect(urlResolver.compute(loginUrl, context)));
