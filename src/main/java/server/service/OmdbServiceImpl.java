@@ -26,7 +26,7 @@ public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements O
     private final JsonObject config;
     private final WebClient client;
     private final DatabaseService database;
-    private final String endpoint;
+    private final String apikey;
 
     protected OmdbServiceImpl(Vertx vertx, JsonObject config, DatabaseService database) {
         super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
@@ -34,21 +34,20 @@ public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements O
         this.config = config;
         this.database = database;
         this.client = WebClient.create(vertx, new WebClientOptions().setSsl(true).setKeepAlive(false));
-        this.endpoint = ENDPOINT + "/?apikey=" + config.getString(APIKEY) + "&";
+        this.apikey = "/?apikey=" + config.getString(APIKEY) + "&";
     }
 
     @Override
     public Future<JsonObject> getMovieAwards(String imdbId) {
-        return get(endpoint, getCached(AWARD.get(imdbId)), "i=" + imdbId);
+        return get("i=" + imdbId, getCached(AWARD.get(imdbId)));
     }
 
-    private Future<JsonObject> get(String uri, CacheItem<JsonObject> cacheItem, String appendToUri) {
-        return cacheItem.get(true, (fut, cache) -> get(uri + config.getString(APIKEY) + appendToUri,
-                cache, fut, Retryable.create(5)));
+    private Future<JsonObject> get(String uri, CacheItem<JsonObject> cacheItem) {
+        return cacheItem.get(true, (fut, cache) -> get(uri, cache, fut, Retryable.create(5)));
     }
 
     private void get(String uri, CacheItem<JsonObject> cache, Future<JsonObject> future, Retryable retryable) {
-        client.get(HTTPS, endpoint, uri)
+        client.get(HTTPS, ENDPOINT, apikey + uri)
                 .timeout(5000L)
                 .as(jsonObject())
                 .send(ar -> check(ar.succeeded(),
