@@ -289,10 +289,12 @@ var searchMovie = function (eventbus, movieId, lang) {
 
 function decorateStarWars() {
     $("#body").addClass('star-wars');
+    $("#add-watch").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
 }
 
 function removeStarWars() {
     $("#body").removeClass('star-wars');
+    $("#add-watch").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
 }
 
 function getOmdb(imdbId) {
@@ -346,6 +348,11 @@ function removeFromWishlist(eventbus, movieId, lang) {
 }
 
 function decorateInWishlist(lang) {
+    if (isStarWars) {
+        $("#add-wishlist").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
+    } else {
+        $("#add-wishlist").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
+    }
     $("#wishlist-text").empty().append(
         $.parseHTML(
             '<i class="fa fa-check left" aria-hidden="true"></i>' +
