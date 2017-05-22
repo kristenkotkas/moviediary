@@ -9,11 +9,6 @@ eventbus.onopen = function () {
         console.log(msg);
         Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
     });
-    eventbus.registerHandler("messenger_current_users", function (err, reply) {
-        console.log(reply);
-        $('#CurrentUserCount').text("Live users: " + reply['body']);
-    });
-    eventbus.send("messenger_register_user", {});
     var sendMessage = function () {
         var input = $("#MessageInput").val();
         eventbus.publish("messenger", safe_tags_replace(input));
@@ -28,8 +23,24 @@ eventbus.onopen = function () {
     });
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
-
         var lang;
+        eventbus.registerHandler("messenger_current_users", function (err, reply) {
+            $('#CurrentUserCount').text(lang["USER_LIVE_USERS"] + " " + reply['body']);
+        });
+        eventbus.send("messenger_query_users", {}, function (err, reply) {
+            $('#CurrentUserCount').text(lang["USER_LIVE_USERS"] + " " + reply['body']);
+        });
+        $.ajax({
+            url: '/private/api/v1/user/count',
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (data) {
+                $('#UserCount').text(lang["USER_TOTAL_USERS"] + " " + JSON.parse(data)["Count"]);
+            },
+            error: function (e) {
+                console.log(e.message())
+            }
+        });
         $.ajax({
             url: '/private/api/v1/user/info',
             type: 'GET',
@@ -65,18 +76,6 @@ var initMap = function () {
         map: map
     });
 };
-
-$.ajax({
-    url: '/private/api/v1/user/count',
-    type: 'GET',
-    contentType: 'application/json',
-    success: function (data) {
-        $('#UserCount').text("User Count: " + JSON.parse(data)["Count"]);
-    },
-    error: function (e) {
-        console.log(e.message())
-    }
-});
 
 function addUserInfo(key, value) {
     $("#my-info").append(

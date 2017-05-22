@@ -14,9 +14,10 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
-import server.entity.Language;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -33,22 +34,17 @@ public abstract class EventBusRoutable {
     private static final Logger LOG = getLogger(EventBusRoutable.class);
     protected static final Map<String, MessageConsumer> CONSUMERS = new HashMap<>();
     protected static final Map<String, MessageConsumer> GATEWAYS = new HashMap<>();
-    private static final Set<String> CURRENT_USERS = new HashSet<>();
+    protected static final Map<String, Integer> CURRENT_USERS = new HashMap<>();
     public static final String EVENTBUS_ALL = "/eventbus/*";
-    public static final String TRANSLATIONS = "translations";
-    public static final String MESSENGER = "messenger";
+    protected static final String TRANSLATIONS = "translations";
+    protected static final String MESSENGER = "messenger";
+    protected static final String MESSENGER_CURRENT_USERS = "messenger_current_users";
+    protected static final String MESSENGER_QUERY_USERS = "messenger_query_users";
 
     protected final Vertx vertx;
 
     public EventBusRoutable(Vertx vertx) {
         this.vertx = vertx;
-        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
-        gateway(MESSENGER, log());
-        gateway("messenger_current_users", log());
-        listen("messenger_register_user", msg -> {
-            CURRENT_USERS.add(msg.headers().get("user"));
-            vertx.eventBus().publish("messenger_current_users", CURRENT_USERS.size());
-        });
     }
 
     /**
@@ -70,7 +66,15 @@ public abstract class EventBusRoutable {
                         .pac4jUserProfiles().values().stream()
                         .findAny()
                         .orElse(null);
-                CURRENT_USERS.remove(profile.getEmail());
+                CURRENT_USERS.compute(profile.getEmail(), (s, i) -> i == 1 ? null : i - 1);
+                vertx.eventBus().publish("messenger_current_users", CURRENT_USERS.keySet().size());
+            } else if (event.type() == BridgeEventType.SOCKET_CREATED) {
+                CommonProfile profile = ((Pac4jUser) event.socket().webUser().getDelegate())
+                        .pac4jUserProfiles().values().stream()
+                        .findAny()
+                        .orElse(null);
+                CURRENT_USERS.compute(profile.getEmail(), (s, i) -> i == null ? 1 : i + 1);
+                vertx.eventBus().publish("messenger_current_users", CURRENT_USERS.keySet().size());
             }
             ifTrue(event.getRawMessage() != null && event.type() != RECEIVE, () ->
                     ifPresent(((Pac4jUser) event.socket().webUser().getDelegate())

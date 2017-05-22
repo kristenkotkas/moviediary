@@ -9,6 +9,7 @@ import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.handler.UserSessionHandler;
 import org.pac4j.vertx.handler.impl.*;
+import server.entity.Language;
 import server.security.SecurityConfig;
 
 import static server.router.UiRouter.UI_HOME;
@@ -35,6 +36,10 @@ public class AuthRouter extends EventBusRoutable {
         super(vertx);
         this.config = config;
         this.securityConfig = securityConfig;
+        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
+        gateway(MESSENGER, log());
+        gateway(MESSENGER_CURRENT_USERS, log());
+        listen(MESSENGER_QUERY_USERS, msg -> msg.reply(CURRENT_USERS.keySet().size()));
     }
 
     /**
