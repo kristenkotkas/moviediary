@@ -99,7 +99,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getMovieViews(String username, String movieId);
 
-    Future<String> getUsersCount();
+    Future<JsonObject> getUsersCount();
 
     Future<JsonObject> getYearsDistribution(String username, String jsonParam);
 

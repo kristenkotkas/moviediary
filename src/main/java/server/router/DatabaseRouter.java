@@ -41,7 +41,7 @@ public class DatabaseRouter extends EventBusRoutable {
     public static final String API_USERS_FORM_INSERT = "/public/api/v1/users/form/insert";
 
     private static final String API_USER_INFO = "/private/api/v1/user/info";
-    private static final String API_USERS_COUNT = "/private/api/v1/views/count";
+    private static final String API_USERS_COUNT = "/private/api/v1/user/count";
     public static final String API_HISTORY = "/private/api/v1/history";
 
     private static final String GET_HISTORY = "database_get_history";
@@ -206,7 +206,8 @@ public class DatabaseRouter extends EventBusRoutable {
      */
     private void handleUsersCount(RoutingContext ctx) {
         database.getUsersCount().rxSetHandler()
-                .subscribe(count -> ctx.response().end(count), err -> serviceUnavailable(ctx, err));
+                .doOnError(ctx::fail)
+                .subscribe(count -> ctx.response().end(count.encodePrettily()));
     }
 
     /**
@@ -223,6 +224,7 @@ public class DatabaseRouter extends EventBusRoutable {
         String lastname = ctx.request().getFormAttribute(FORM_LASTNAME);
         String csrfToken = ctx.request().getFormAttribute("csrfToken");
         String sessionCsrfToken = ctx.session().remove(CSRF_TOKEN);
+        ctx.removeCookie(CSRF_TOKEN);
         if (!nonNull(username, password, firstname, lastname) ||
                 contains("", username, password, firstname, lastname)) {
             serviceUnavailable(ctx, new Throwable("All fields must be filled!"));

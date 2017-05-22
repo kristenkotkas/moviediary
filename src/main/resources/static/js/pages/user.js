@@ -9,6 +9,11 @@ eventbus.onopen = function () {
         console.log(msg);
         Materialize.toast(msg.headers.name + ": " + msg.body, 2500);
     });
+    eventbus.registerHandler("messenger_current_users", function (err, reply) {
+        console.log(reply);
+        $('#CurrentUserCount').text("Live users: " + reply['body']);
+    });
+    eventbus.send("messenger_register_user", {});
     var sendMessage = function () {
         var input = $("#MessageInput").val();
         eventbus.publish("messenger", safe_tags_replace(input));
@@ -62,11 +67,11 @@ var initMap = function () {
 };
 
 $.ajax({
-    url: '/private/api/v1/views/count',
+    url: '/private/api/v1/user/count',
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-        $('#UserCount').text("User Count: " + data);
+        $('#UserCount').text("User Count: " + JSON.parse(data)["Count"]);
     },
     error: function (e) {
         console.log(e.message())

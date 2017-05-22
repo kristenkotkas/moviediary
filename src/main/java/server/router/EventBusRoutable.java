@@ -3,6 +3,7 @@ package server.router;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
+import io.vertx.ext.web.handler.sockjs.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.rxjava.core.Future;
@@ -11,11 +12,11 @@ import io.vertx.rxjava.core.eventbus.Message;
 import io.vertx.rxjava.core.eventbus.MessageConsumer;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
+import server.entity.Language;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -29,14 +30,25 @@ import static server.util.CommonUtils.*;
  * Generic class that contains routes.
  */
 public abstract class EventBusRoutable {
-    public static final String EVENTBUS_ALL = "/eventbus/*";
-    protected static final Map<String, MessageConsumer> consumers = new HashMap<>();
-    protected static final Map<String, MessageConsumer> gateways = new HashMap<>();
     private static final Logger LOG = getLogger(EventBusRoutable.class);
+    protected static final Map<String, MessageConsumer> CONSUMERS = new HashMap<>();
+    protected static final Map<String, MessageConsumer> GATEWAYS = new HashMap<>();
+    private static final Set<String> CURRENT_USERS = new HashSet<>();
+    public static final String EVENTBUS_ALL = "/eventbus/*";
+    public static final String TRANSLATIONS = "translations";
+    public static final String MESSENGER = "messenger";
+
     protected final Vertx vertx;
 
     public EventBusRoutable(Vertx vertx) {
         this.vertx = vertx;
+        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
+        gateway(MESSENGER, log());
+        gateway("messenger_current_users", log());
+        listen("messenger_register_user", msg -> {
+            CURRENT_USERS.add(msg.headers().get("user"));
+            vertx.eventBus().publish("messenger_current_users", CURRENT_USERS.size());
+        });
     }
 
     /**
@@ -46,13 +58,20 @@ public abstract class EventBusRoutable {
      */
     public static void startEventbus(Router router, Vertx vertx) {
         BridgeOptions options = new BridgeOptions();
-        consumers.keySet().stream()
+        CONSUMERS.keySet().stream()
                 .map(key -> new PermittedOptions().setAddress(key))
                 .forEach(options::addInboundPermitted);
-        gateways.keySet().stream()
+        GATEWAYS.keySet().stream()
                 .map(key -> new PermittedOptions().setAddress(key))
                 .forEach(permitted -> options.addInboundPermitted(permitted).addOutboundPermitted(permitted));
         router.route(EVENTBUS_ALL).handler(SockJSHandler.create(vertx).bridge(options, event -> {
+            if (event.type() == BridgeEventType.SOCKET_CLOSED) {
+                CommonProfile profile = ((Pac4jUser) event.socket().webUser().getDelegate())
+                        .pac4jUserProfiles().values().stream()
+                        .findAny()
+                        .orElse(null);
+                CURRENT_USERS.remove(profile.getEmail());
+            }
             ifTrue(event.getRawMessage() != null && event.type() != RECEIVE, () ->
                     ifPresent(((Pac4jUser) event.socket().webUser().getDelegate())
                             .pac4jUserProfiles().values().stream()
@@ -66,7 +85,7 @@ public abstract class EventBusRoutable {
     }
 
     public static void closeEventbus() throws Exception {
-        Stream.of(consumers, gateways)
+        Stream.of(CONSUMERS, GATEWAYS)
                 .flatMap(map -> map.values().stream())
                 .filter(Objects::nonNull)
                 .forEach(MessageConsumer::unregister);
@@ -83,7 +102,7 @@ public abstract class EventBusRoutable {
      * @param replyHandler to call for reply handling
      */
     protected <T> void listen(String address, Handler<Message<T>> replyHandler) {
-        consumers.put(address, vertx.eventBus().consumer(address, replyHandler));
+        CONSUMERS.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
     /**
@@ -95,7 +114,7 @@ public abstract class EventBusRoutable {
      * @param replyHandler to call for reply handling
      */
     protected <T> void gateway(String address, Handler<Message<T>> replyHandler) {
-        gateways.put(address, vertx.eventBus().consumer(address, replyHandler));
+        GATEWAYS.put(address, vertx.eventBus().consumer(address, replyHandler));
     }
 
     /**
@@ -104,7 +123,7 @@ public abstract class EventBusRoutable {
      * @param address to listen on
      */
     protected <T> void listen(String address, BiFunction<String, String, Future<T>> processor) {
-        consumers.put(address, vertx.eventBus().consumer(address,
+        CONSUMERS.put(address, vertx.eventBus().consumer(address,
                 msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))));
     }
 

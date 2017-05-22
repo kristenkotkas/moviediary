@@ -143,6 +143,7 @@ public class UiRouter extends EventBusRoutable {
      * Redirects user to some other page if session contains specified url.
      */
     private void handleHome(RoutingContext ctx) {
+        ctx.removeCookie(CSRF_TOKEN);
         if (ctx.session().getDelegate().data().containsKey(REDIRECT_URL)) {
             redirect(ctx, (String) ctx.session().getDelegate().data().remove(REDIRECT_URL));
             return;
@@ -198,6 +199,8 @@ public class UiRouter extends EventBusRoutable {
     private void handleFormLogin(RoutingContext ctx) {
         String token = UUID.randomUUID().toString();
         ctx.session().put(CSRF_TOKEN, token);
+        ctx.removeCookie(CSRF_TOKEN);
+        ctx.addCookie(cookie(CSRF_TOKEN, token));
         engine.render(getSafe(ctx, TEMPL_FORM_LOGIN, FormLoginTemplate.class)
                 .setCsrfToken(token)
                 .setRegisterUrl(UI_FORM_REGISTER)
@@ -211,6 +214,8 @@ public class UiRouter extends EventBusRoutable {
         String key = ctx.request().getParam(DISPLAY_MESSAGE);
         String token = UUID.randomUUID().toString();
         ctx.session().put(CSRF_TOKEN, token);
+        ctx.removeCookie(CSRF_TOKEN);
+        ctx.addCookie(cookie(CSRF_TOKEN, token));
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
                 .setCsrfToken(token)
                 .setDisplayMessage(getString(key, ctx))

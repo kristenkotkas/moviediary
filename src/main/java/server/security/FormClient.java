@@ -8,6 +8,7 @@ import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
 import server.service.DatabaseService;
 
+import static org.pac4j.core.util.CommonHelper.isBlank;
 import static server.router.UiRouter.UI_FORM_LOGIN;
 import static server.security.SecurityConfig.CSRF_TOKEN;
 import static server.util.CommonUtils.nonNull;
@@ -47,10 +48,10 @@ public class FormClient extends IndirectClient<FormCredentials, FormProfile> {
             }
             String email = credentials.getEmail();
             String password = credentials.getPassword();
-            if (CommonHelper.isBlank(email)) {
+            if (isBlank(email)) {
                 throw new CredentialsException("Username cannot be blank.");
             }
-            if (CommonHelper.isBlank(password)) {
+            if (isBlank(password)) {
                 throw new CredentialsException("Password cannot be blank.");
             }
             String csrfToken = context.getRequestParameter(CSRF_TOKEN);

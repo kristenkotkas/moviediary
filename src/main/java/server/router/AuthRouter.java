@@ -9,7 +9,6 @@ import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.handler.UserSessionHandler;
 import org.pac4j.vertx.handler.impl.*;
-import server.entity.Language;
 import server.security.SecurityConfig;
 
 import static server.router.UiRouter.UI_HOME;
@@ -24,8 +23,6 @@ import static server.util.NetworkUtils.isServer;
  */
 public class AuthRouter extends EventBusRoutable {
     public static final String AUTH_LOGOUT = "/logout";
-    public static final String TRANSLATIONS = "translations";
-    public static final String MESSENGER = "messenger";
     public static final String CSRF = "csrf";
     private static final String XSS = "xssprotection";
     private static final String CALLBACK = "/callback";
@@ -38,8 +35,6 @@ public class AuthRouter extends EventBusRoutable {
         super(vertx);
         this.config = config;
         this.securityConfig = securityConfig;
-        listen(TRANSLATIONS, reply(Language::getJsonTranslations));
-        gateway(MESSENGER, log());
     }
 
     /**

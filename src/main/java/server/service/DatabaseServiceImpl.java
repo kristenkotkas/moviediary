@@ -521,10 +521,10 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Gets users count in database.
      */
     @Override
-    public Future<String> getUsersCount() {
+    public Future<JsonObject> getUsersCount() {
         return future(fut -> query(SQL_USERS_COUNT, null).rxSetHandler()
                 .map(DatabaseService::getRows)
-                .map(array -> array.getJsonObject(0).getLong("Count").toString())
+                .map(array -> array.getJsonObject(0))
                 .subscribe(fut::complete, fut::fail));
     }
 }
