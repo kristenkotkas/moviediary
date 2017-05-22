@@ -270,6 +270,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#revenue').empty().append(toNormalRevenue(nullCheck(data['revenue'], lang), lang));
         $('#country').empty().append(getStringFormArray(nullCheck(data['production_countries'], lang), lang));
         $('#rating').empty().append(getRating(nullCheck(data['vote_average'], lang), lang) + ' <i>(' + data['vote_count'] + ')</i>');
+        $('#plot-text').empty();
 
         $('#basic-info-box').removeClass('scale-out').addClass('scale-in');
         $('#seen-times').removeClass('scale-out').addClass('scale-in');
@@ -291,7 +292,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             }
         });
 
-        if (data['overview'].length > 0) {
+        if (data['overview'] != null) {
             $('#plot-text').empty().append(data['overview']);
         }
 
@@ -523,7 +524,7 @@ function getNormalDate (date, lang) {
 
 var nullCheck = function (data, lang) {
     console.log(data);
-    if (data === 0 || data.length === 0) {
+    if (data === 0 || data == null) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else return data;
 };
