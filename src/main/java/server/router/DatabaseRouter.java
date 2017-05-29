@@ -222,9 +222,8 @@ public class DatabaseRouter extends EventBusRoutable {
         String password = ctx.request().getFormAttribute(FORM_PASSWORD);
         String firstname = ctx.request().getFormAttribute(FORM_FIRSTNAME);
         String lastname = ctx.request().getFormAttribute(FORM_LASTNAME);
-        String csrfToken = ctx.request().getFormAttribute("csrfToken");
+        String csrfToken = ctx.removeCookie(CSRF_TOKEN).getValue();
         String sessionCsrfToken = ctx.session().remove(CSRF_TOKEN);
-        ctx.removeCookie(CSRF_TOKEN);
         if (!nonNull(username, password, firstname, lastname) ||
                 contains("", username, password, firstname, lastname)) {
             serviceUnavailable(ctx, new Throwable("All fields must be filled!"));

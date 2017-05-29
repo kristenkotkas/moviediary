@@ -4,6 +4,8 @@ import ch.vorburger.exec.ManagedProcessException;
 import ch.vorburger.mariadb4j.DB;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
@@ -17,6 +19,7 @@ import static java.lang.System.currentTimeMillis;
 import static server.util.CommonUtils.ifPresent;
 
 public class LocalDatabase {
+    private static final Logger LOG = LoggerFactory.getLogger(LocalDatabase.class);
     public static final String SQL_CREATE_USERS = "CREATE TABLE Users (" +
             "    Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
             "    Firstname VARCHAR(100) NOT NULL,\n" +
@@ -109,6 +112,7 @@ public class LocalDatabase {
             db.start();
             return db;
         } catch (ManagedProcessException e) {
+            LOG.debug("DB startup failed", e);
             throw new RuntimeException(e.getCause());
         }
     }
@@ -128,6 +132,7 @@ public class LocalDatabase {
         try {
             database.stop();
         } catch (ManagedProcessException e) {
+            LOG.debug("DB close failed", e);
             throw new RuntimeException(e.getCause());
         }
     }

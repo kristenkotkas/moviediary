@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -18,17 +19,17 @@ import java.util.function.Consumer;
  */
 public class SyncResult<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SyncResult.class);
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private CountDownLatch latch = new CountDownLatch(1);
 
-    private T value;
-    private Throwable error;
+    private AtomicReference<T> value = new AtomicReference<>();
+    private AtomicReference<Throwable> error = new AtomicReference<>();
 
     public T get() {
-        if (error != null) {
-            throw new RuntimeException(error);
+        if (error.get() != null) {
+            throw new RuntimeException(error.get());
         }
-        return value;
+        return value.get();
     }
 
     public T get(T def) {
@@ -36,12 +37,12 @@ public class SyncResult<T> {
     }
 
     public SyncResult<T> set(T obj) {
-        this.value = obj;
+        value.set(obj);
         return this;
     }
 
     public SyncResult<T> setReady(T obj) {
-        this.value = obj;
+        value.set(obj);
         ready();
         return this;
     }
@@ -51,12 +52,12 @@ public class SyncResult<T> {
     }
 
     public SyncResult<T> ifPresent(Consumer<? super T> consumer) {
-        CommonUtils.ifPresent(value, consumer::accept);
+        CommonUtils.ifPresent(value.get(), consumer::accept);
         return this;
     }
 
     public SyncResult<T> peek(Consumer<? super T> consumer) {
-        consumer.accept(value);
+        consumer.accept(value.get());
         return this;
     }
 
@@ -87,8 +88,14 @@ public class SyncResult<T> {
         latch.countDown();
     }
 
+    public void reset() {
+        value.set(null);
+        error.set(null);
+        latch = new CountDownLatch(1);
+    }
+
     public SyncResult<T> fail(Throwable err) {
-        error = err;
+        error.set(err);
         ready();
         return this;
     }

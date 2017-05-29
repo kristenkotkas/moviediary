@@ -92,8 +92,11 @@ public class DatabaseServiceTest {
 
     @Test
     public void testGetUsersCount(TestContext ctx) throws Exception {
-        String count = database.getUsersCount().rxSetHandler().doOnError(ctx::fail).toBlocking().value();
-        assertThat(count, is("2"));
+        Long count = database.getUsersCount().rxSetHandler()
+                .doOnError(ctx::fail)
+                .toBlocking().value()
+                .getLong("Count");
+        assertThat(count, is(2L));
     }
 
     private void isCorrectUser(JsonObject user) {

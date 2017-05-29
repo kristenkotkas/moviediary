@@ -2,6 +2,7 @@ package server.security;
 
 import io.vertx.core.json.JsonObject;
 import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.redirect.RedirectAction;
@@ -54,7 +55,11 @@ public class FormClient extends IndirectClient<FormCredentials, FormProfile> {
             if (isBlank(password)) {
                 throw new CredentialsException("Password cannot be blank.");
             }
-            String csrfToken = context.getRequestParameter(CSRF_TOKEN);
+            String csrfToken = context.getRequestCookies().stream()
+                    .filter(cookie -> cookie.getName().equals(CSRF_TOKEN))
+                    .findAny()
+                    .map(Cookie::getValue)
+                    .orElse(null);
             String sessionCsrfToken = (String) context.getSessionAttribute(CSRF_TOKEN);
             context.setSessionAttribute(CSRF_TOKEN, null);
             if (!nonNull(csrfToken, sessionCsrfToken) || !csrfToken.equals(sessionCsrfToken)) {

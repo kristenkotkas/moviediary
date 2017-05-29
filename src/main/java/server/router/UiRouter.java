@@ -202,7 +202,6 @@ public class UiRouter extends EventBusRoutable {
         ctx.removeCookie(CSRF_TOKEN);
         ctx.addCookie(cookie(CSRF_TOKEN, token));
         engine.render(getSafe(ctx, TEMPL_FORM_LOGIN, FormLoginTemplate.class)
-                .setCsrfToken(token)
                 .setRegisterUrl(UI_FORM_REGISTER)
                 .setCallbackUrl(securityConfig.getPac4jConfig()
                         .getClients()
@@ -217,7 +216,6 @@ public class UiRouter extends EventBusRoutable {
         ctx.removeCookie(CSRF_TOKEN);
         ctx.addCookie(cookie(CSRF_TOKEN, token));
         engine.render(getSafe(ctx, TEMPL_FORM_REGISTER, FormRegisterTemplate.class)
-                .setCsrfToken(token)
                 .setDisplayMessage(getString(key, ctx))
                 .setRegisterRestUrl(API_USERS_FORM_INSERT), endHandler(ctx));
     }

@@ -1,7 +1,9 @@
 package server.util;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.TestContext;
 import io.vertx.rxjava.core.MultiMap;
+import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.core.http.HttpClientRequest;
 import io.vertx.rxjava.core.http.HttpClientResponse;
 import org.openqa.selenium.Dimension;
@@ -11,22 +13,27 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import server.entity.SyncResult;
+import rx.Emitter;
+import rx.Observable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
-import static io.vertx.core.http.HttpHeaders.SET_COOKIE;
 import static java.io.File.separator;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
-import static server.util.CommonUtils.createIfMissing;
+import static server.util.CommonUtils.check;
+import static server.util.CommonUtils.ifPresent;
 
 public class Utils {
-    public static final String SESSION_COOKIE = "vertx-web.session";
+
+    public static MultiMap headers() {
+        return MultiMap.caseInsensitiveMultiMap();
+    }
 
     public static void formLogin(WebDriver driver, String uri, JsonObject config) {
         JsonObject user = config.getJsonObject("unit_test").getJsonObject("form_user");
@@ -78,25 +85,56 @@ public class Utils {
         }
     }
 
-    public static HttpClientResponse doRequest(HttpClientRequest req, MultiMap headers, String data) {
-        req.headers().addAll(createIfMissing(headers, MultiMap::caseInsensitiveMultiMap));
-        SyncResult<HttpClientResponse> result = new SyncResult<>();
-        req.handler(result::setReady);
-        req.end(createIfMissing(data, () -> ""));
-        return result.await().get();
+    public static Observable<HttpClientResponse> doRequest(HttpClientRequest req, TestContext ctx, MultiMap cookies,
+                                                           MultiMap headers, String data) {
+        Objects.requireNonNull(req);
+        Objects.requireNonNull(ctx);
+        Objects.requireNonNull(cookies);
+        return Observable.<HttpClientResponse>create(emitter -> {
+            req.putHeader("cookie", getCookieString(cookies));
+            req.handler(emitter::onNext);
+            req.exceptionHandler(emitter::onError);
+            ifPresent(headers, h -> req.headers().addAll(h));
+            check(data == null, req::end, () -> req.end(data));
+        }, Emitter.BackpressureMode.ERROR)
+                .doOnError(ctx::fail)
+                .doOnNext(res -> updateCookies(res.cookies(), cookies));
     }
 
-    public static String getSession(MultiMap headers) {
-        return headers.getAll(SET_COOKIE.toString()).stream()
-                .filter(s -> s.contains(SESSION_COOKIE))
-                .findFirst()
-                .orElse(null);
+    private static void updateCookies(List<String> cookies, MultiMap previous) {
+        cookies.stream()
+                .map(cookie -> cookie.split("=", 2))
+                .filter(array -> !previous.contains(array[0]) || !previous.get(array[0]).equals(array[1]))
+                .forEach(array -> previous.set(array[0], array[1]));
     }
 
+    private static String getCookieString(MultiMap cookies) {
+        StringBuilder sb = new StringBuilder();
+        cookies.getDelegate().forEach(e -> sb.append(e.getKey()).append("=").append(e.getValue()).append(";"));
+        return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : "";
+    }
+
+    public static Observable<HttpClientResponse> doRequest(HttpClientRequest req, TestContext ctx, MultiMap cookies,
+                                                           MultiMap headers) {
+        return doRequest(req, ctx, cookies, headers, null);
+    }
+
+    public static Observable<HttpClientResponse> doRequest(HttpClientRequest req, TestContext ctx, MultiMap cookies,
+                                                           String data) {
+        return doRequest(req, ctx, cookies, null, data);
+    }
+
+    public static Observable<HttpClientResponse> doRequest(HttpClientRequest req, TestContext ctx, MultiMap cookies) {
+        return doRequest(req, ctx, cookies, null, null);
+    }
 
     public static String getAuthenticationData(JsonObject user) {
         return "username=" + user.getString("username") +
                 "&password=" + user.getString("password") +
                 "&client_name=FormClient";
+    }
+
+    public static Observable<Buffer> bodyToObservable(HttpClientResponse res) {
+        return Observable.create(emitter -> res.bodyHandler(emitter::onNext), Emitter.BackpressureMode.NONE);
     }
 }
