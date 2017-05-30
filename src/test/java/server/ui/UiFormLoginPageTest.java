@@ -12,7 +12,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.List;
 
-import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
@@ -28,7 +27,7 @@ public class UiFormLoginPageTest extends UiTest {
     @Override
     public void setUp() throws Exception {
         localDatabase.resetCleanStateBlocking();
-        driver = new ChromeDriver(service);
+        driver = new ChromeDriver(service); // TODO: 30.05.2017 update
     }
 
     @Test
@@ -69,9 +68,7 @@ public class UiFormLoginPageTest extends UiTest {
         List<WebElement> textFields = driver.findElements(tagName("label"));
         assertEquals(getString("FORM_LOGIN_EMAIL", lang), textFields.get(0).getText());
         assertEquals(getString("FORM_LOGIN_PASSWORD", lang), textFields.get(1).getText());
-        assertEquals(getString("LOGIN_TITLE", lang).toUpperCase(ENGLISH),
-                driver.findElement(tagName("button")).getText());
-        assertEquals(getString("FORM_LOGIN_REGISTER", lang).toUpperCase(ENGLISH),
-                driver.findElement(tagName("a")).getText());
+        assertEquals(getString("LOGIN_TITLE", lang), driver.findElement(tagName("button")).getText());
+        assertEquals(getString("FORM_LOGIN_REGISTER", lang), driver.findElement(tagName("a")).getText());
     }
 }

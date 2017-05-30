@@ -1,5 +1,6 @@
 package server.ui;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -91,13 +92,8 @@ public class UiCommonTest extends UiTest {
         assertEquals(urlToCheck, driver.getCurrentUrl());
     }
 
-    // TODO: 23.04.2017 switch to tooltips
-/*    @Test
+    @Test
     public void testNavBarTranslations() throws Exception {
-        assertGoToPage(driver, URI + "/private/home");
-        JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
-        assertEquals(formAuth.getString("firstname") + " " + formAuth.getString("lastname"),
-                driver.findElements(tagName("a")).get(6).getText());
         checkNavBarTranslations("en");
         checkNavBarTranslations("et");
         checkNavBarTranslations("de");
@@ -107,20 +103,25 @@ public class UiCommonTest extends UiTest {
         assertGoToPage(driver, URI + "/login?lang=" + lang);
         assertGoToPage(driver, URI + "/private/home");
         List<WebElement> links = driver.findElements(tagName("a"));
+        JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
+        String username = formAuth.getString("firstname") + " " + formAuth.getString("lastname");
         //top
         assertEquals(getString("NAVBAR_ME", lang), links.get(0).getText());
         assertEquals(getString("NAVBAR_HOME", lang), links.get(1).getText());
         assertEquals(getString("NAVBAR_MOVIES", lang), links.get(2).getText());
-        assertEquals(getString("NAVBAR_HISTORY", lang), links.get(3).getText());
-        assertEquals(getString("NAVBAR_STATISTICS", lang), links.get(4).getText());
-        assertEquals(getString("NAVBAR_WISHLIST", lang), links.get(5).getText());
+        assertEquals(getString("NAVBAR_SERIES", lang), links.get(3).getText());
+        assertEquals(getString("NAVBAR_HISTORY", lang), links.get(4).getText());
+        assertEquals(getString("NAVBAR_STATISTICS", lang), links.get(5).getText());
+        assertEquals(getString("NAVBAR_WISHLIST", lang), links.get(6).getText());
         //mobile
-        assertEquals(getString("NAVBAR_HOME", lang), links.get(7).getText());
-        assertEquals(getString("NAVBAR_MOVIES", lang), links.get(8).getText());
-        assertEquals(getString("NAVBAR_HISTORY", lang), links.get(9).getText());
-        assertEquals(getString("NAVBAR_STATISTICS", lang), links.get(10).getText());
-        assertEquals(getString("NAVBAR_WISHLIST", lang), links.get(11).getText());
-    }*/
+        assertEquals(username, links.get(7).getText());
+        assertEquals(getString("NAVBAR_HOME", lang), links.get(8).getText());
+        assertEquals(getString("NAVBAR_MOVIES", lang), links.get(9).getText());
+        assertEquals(getString("NAVBAR_SERIES", lang), links.get(10).getText());
+        assertEquals(getString("NAVBAR_HISTORY", lang), links.get(11).getText());
+        assertEquals(getString("NAVBAR_STATISTICS", lang), links.get(12).getText());
+        assertEquals(getString("NAVBAR_WISHLIST", lang), links.get(13).getText());
+    }
 
     @Test
     public void testNotFoundPageLinks() throws Exception {
@@ -139,8 +140,8 @@ public class UiCommonTest extends UiTest {
         assertGoToPage(driver, URI + "/login?lang=" + lang);
         assertGoToPage(driver, URI + "/somethingRandom");
         assertEquals(getString("NOTFOUND_TITLE", lang), driver.getTitle());
-        assertEquals("404: " + getString("NOTFOUND_TITLE", lang),
-                driver.findElement(tagName("h3")).getText());
+        assertEquals(getString("NOTFOUND_TITLE", lang), driver.findElement(tagName("h3")).getText());
         assertEquals(getString("NOTFOUND_RETURN", lang), driver.findElement(tagName("a")).getText());
+        assertEquals("404", driver.findElement(tagName("h1")).getText());
     }
 }

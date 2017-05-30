@@ -12,7 +12,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.List;
 
-import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -65,8 +64,8 @@ public class UiLoginPageTest extends UiTest {
         driver.manage().deleteAllCookies();
         JsonObject fbAuth = config.getJsonObject("unit_test").getJsonObject("facebook_user");
         assertGoToPage(driver, URI + "/login");
+        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper"))));
         driver.findElements(tagName("a")).get(1).click();
-        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper")))); // FIXME: 19/05/2017 didnt find wrapper?
         assertTrue(driver.getCurrentUrl().contains("facebook"));
         driver.findElement(id("email")).sendKeys(fbAuth.getString("username"));
         driver.findElement(id("pass")).sendKeys(fbAuth.getString("password"));
@@ -78,6 +77,7 @@ public class UiLoginPageTest extends UiTest {
     @Test
     public void testFromLoginPageCanGetToFormLoginPage() throws Exception {
         assertGoToPage(driver, URI + "/login?lang=en");
+        sleep(driver, 5, invisibilityOf(driver.findElement(id("loader-wrapper"))));
         driver.findElement(tagName("a")).click();
         assertEquals(getString("FORM_LOGIN_TITLE", "en"), driver.getTitle());
     }
@@ -102,10 +102,10 @@ public class UiLoginPageTest extends UiTest {
         assertEquals(getString("LOGIN_TITLE", lang), messages.get(0).getText());
         assertEquals(getString("LOGIN_VERIFIED", lang), messages.get(1).getText());
         List<WebElement> loginButtons = driver.findElements(tagName("a"));
-        assertEquals(getString("LOGIN_PASSWORD", lang).toUpperCase(ENGLISH), loginButtons.get(0).getText());
-        assertEquals(getString("LOGIN_FACEBOOK", lang).toUpperCase(ENGLISH), loginButtons.get(1).getText());
-        assertEquals(getString("LOGIN_GOOGLE", lang).toUpperCase(ENGLISH), loginButtons.get(2).getText());
-        assertEquals(getString("LOGIN_IDCARD", lang).toUpperCase(ENGLISH), loginButtons.get(3).getText());
+        assertEquals(getString("LOGIN_PASSWORD", lang), loginButtons.get(0).getText());
+        assertEquals(getString("LOGIN_FACEBOOK", lang), loginButtons.get(1).getText());
+        assertEquals(getString("LOGIN_GOOGLE", lang), loginButtons.get(2).getText());
+        assertEquals(getString("LOGIN_IDCARD", lang), loginButtons.get(3).getText());
     }
 
     private void checkLoginPageVerifyEmailTranslation(String lang) {

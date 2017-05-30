@@ -30,4 +30,6 @@ public class UiHomePageTest extends UiTest {
         assertEquals(getString("HOME_HELLO", lang) + " " + formAuth.getString("firstname"),
                 driver.findElement(tagName("h3")).getText());
     }
+
+    // TODO: 30.05.2017 tests for cards
 }

@@ -11,7 +11,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.List;
 
-import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
@@ -58,7 +57,6 @@ public class UiFormRegisterPageTest extends UiTest {
         assertEquals(getString("FORM_REGISTER_LASTNAME", lang), textFields.get(1).getText());
         assertEquals(getString("FORM_LOGIN_EMAIL", lang), textFields.get(2).getText());
         assertEquals(getString("FORM_LOGIN_PASSWORD", lang), textFields.get(3).getText());
-        assertEquals(getString("FORM_LOGIN_REGISTER", lang).toUpperCase(ENGLISH),
-                driver.findElement(tagName("button")).getText());
+        assertEquals(getString("FORM_LOGIN_REGISTER", lang), driver.findElement(tagName("button")).getText());
     }
 }

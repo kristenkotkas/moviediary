@@ -60,7 +60,7 @@ public abstract class UiTest {
     @Before
     public void setUp() throws Exception {
         localDatabase.resetCleanStateBlocking();
-        driver = new ChromeDriver(service);
+        driver = new ChromeDriver(service); // TODO: 30.05.2017 update
         formLogin(driver, URI, config);
     }
 
