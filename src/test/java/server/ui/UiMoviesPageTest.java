@@ -24,6 +24,10 @@ import static server.util.Utils.sleep;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UiMoviesPageTest extends UiTest {
 
+    // TODO: 1.06.2017 fix tests
+    // TODO: 1.06.2017 movies, series and wishlist
+    // TODO: 1.06.2017 missing tests
+
     private void goAndWaitForPageToLoad() {
         assertGoToPage(driver, URI + "/private/movies");
         await().until(() -> isEventbus(OPEN, driver));
