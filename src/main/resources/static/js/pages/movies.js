@@ -25,6 +25,9 @@ var eventbus = new EventBus("/eventbus");
 var oscarContainer = $('#oscar-container');
 var isStarWars = false;
 var modal = $('#modal1');
+var showEndTime = $('#show-end-time');
+var showEndTimeText = $('#show-end-time-text');
+var interval;
 eventbus.onopen = function () {
 
     var lang;
@@ -48,6 +51,7 @@ eventbus.onopen = function () {
             $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
+            showEndTime.removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             $("#awards").empty();
             oscarContainer.empty();
@@ -113,6 +117,26 @@ eventbus.onopen = function () {
     });
 };
 
+function openShowEndtime(length) {
+    if (length !== 0) {
+        showEndTime.removeClass('scale-out').addClass('scale-in');
+        showEndTimeClick(length);
+        interval = setInterval(function () {
+            showEndTimeClick(length);
+        }, 1000);
+    }
+}
+
+function showEndTimeClick(length) {
+    var endtime = plusMins(new Date(), length);
+    showEndTimeText.empty().append(
+        $.parseHTML(
+            getDualTime(endtime.getHours()) + ':' +
+            getDualTime(endtime.getMinutes())
+        )
+    );
+}
+
 var enableParameterMovieLoading = function (eventbus, lang) {
     var loadMovie = function (eventbus, lang) {
         var query = getUrlParam("id");
@@ -137,6 +161,7 @@ var searchMovie = function (eventbus, movieId, lang) {
     $('#add-btn').off('click').off('keyup');
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
+        clearInterval(interval);
         startAwardLoading();
         var startDate = $("#watchStartDay");
         var startTime = $("#watchStartTime");
@@ -279,6 +304,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-watch').removeClass('scale-out').addClass('scale-in');
         $('#plot').removeClass('scale-out').addClass('scale-in');
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
+        openShowEndtime(data['runtime']);
 
         inWishlist(eventbus, movieId, lang);
 
