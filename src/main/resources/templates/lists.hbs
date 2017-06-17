@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
+    <title>Movie Diary | Lists</title>
+    <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
+    <noscript>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+    </noscript>
+</head>
+<body class="blue lighten-5">
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+{{> templates/navbar.hbs}}
+<main>
+    <h3 class="light grey-text text-lighten-1 page-heading">Lists</h3>
+</main>
+{{> templates/footer.hbs}}
+<script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
+<script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script defer type="text/javascript" src="/static/js/custom/vertx-eventbus.js"></script>
+<script defer type="text/javascript" src="/static/js/pages/lists.js"></script>
+</body>
+</html>
