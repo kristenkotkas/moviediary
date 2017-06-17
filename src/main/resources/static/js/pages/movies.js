@@ -271,7 +271,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             posterPath = 'https://image.tmdb.org/t/p/w500' + data['poster_path'];
         }
 
-        document.title = lang['NAVBAR_MOVIES'] + ' - ' + data.title;
+        document.title = 'Movie Diary | ' + data.title;
         console.log(data);
 
         $("#search-result").empty().hide();
