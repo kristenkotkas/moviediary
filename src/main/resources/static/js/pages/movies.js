@@ -28,6 +28,9 @@ var modal = $('#modal1');
 var showEndTime = $('#show-end-time');
 var showEndTimeText = $('#show-end-time-text');
 var interval;
+var actors = $('#actors');
+var director = $('#director');
+var writers = $('#writer');
 eventbus.onopen = function () {
 
     var lang;
@@ -51,10 +54,12 @@ eventbus.onopen = function () {
             $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
+            $('#crew-box').removeClass('scale-in').addClass('scale-out');
             showEndTime.removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             $("#awards").empty();
             oscarContainer.empty();
+            clearCrew();
 
             setTimeout(function () {
                 eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
@@ -156,6 +161,12 @@ function startAwardLoading() {
     );
 }
 
+function startLoadingCrew() {
+    actors.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    director.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    writers.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+}
+
 var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
     $('#add-btn').off('click').off('keyup');
@@ -163,6 +174,7 @@ var searchMovie = function (eventbus, movieId, lang) {
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
         clearInterval(interval);
         startAwardLoading();
+        startLoadingCrew();
         var startDate = $("#watchStartDay");
         var startTime = $("#watchStartTime");
         var startNow = $("#watchStartNow");
@@ -279,7 +291,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             backgroundPath = 'https://image.tmdb.org/t/p/w1920' + data['backdrop_path'];
         }
 
-        getOmdb(data['imdb_id']);
+        getOmdb(data['imdb_id'], lang);
 
         getMovieViews(eventbus, movieId, lang);
 
@@ -304,6 +316,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-watch').removeClass('scale-out').addClass('scale-in');
         $('#plot').removeClass('scale-out').addClass('scale-in');
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
+        $('#crew-box').removeClass('scale-out').addClass('scale-in');
         openShowEndtime(data['runtime']);
 
         inWishlist(eventbus, movieId, lang);
@@ -336,14 +349,42 @@ function removeStarWars() {
     $("#add-watch").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
 }
 
-function getOmdb(imdbId) {
+function getOmdb(imdbId, lang) {
     eventbus.send("api_get_awards", imdbId, function (error, reply) {
         console.log('OMDB', reply);
         if (reply.body != 'Failure: Too many failures.') {
             parseAwards(reply.body['Awards']);
             $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
+            fillCrew(reply.body, lang);
         }
     });
+}
+
+function fillCrew(omdb, lang) {
+    console.log('crewOmdb', omdb);
+    actors.empty().append(OMDBArrayToString(omdb['Actors'], lang));
+    director.empty().append(OMDBArrayToString(omdb['Director'], lang));
+    writers.empty().append(OMDBArrayToString(omdb['Writer'], lang));
+}
+
+function clearCrew() {
+    actors.empty();
+    director.empty();
+    writers.empty();
+}
+
+function OMDBArrayToString(value, lang) {
+    if (value === 'N/A') {
+        return lang['MOVIES_JS_UNKNOWN'];
+    } else {
+        var dataParts = value.split(',');
+        var result = '';
+        $.each(dataParts, function (i) {
+            result += dataParts[i] + '<br>'
+        });
+
+        return result;
+    }
 }
 
 function parseAwards(awardString) {
