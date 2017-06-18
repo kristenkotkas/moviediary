@@ -2,8 +2,28 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
+      <module name="api-gateway_main" target="1.8" />
+      <module name="api-gateway_test" target="1.8" />
+      <module name="api-microservice_main" target="1.8" />
+      <module name="api-microservice_test" target="1.8" />
+      <module name="database-microservice_main" target="1.8" />
+      <module name="database-microservice_test" target="1.8" />
+      <module name="mail-microservice_main" target="1.8" />
+      <module name="mail-microservice_test" target="1.8" />
+      <module name="moviediary-database-microservice_main" target="1.8" />
+      <module name="moviediary-database-microservice_test" target="1.8" />
+      <module name="moviediary-mail-microservice_main" target="1.8" />
+      <module name="moviediary-mail-microservice_test" target="1.8" />
+      <module name="moviediary-omdb-microservice_main" target="1.8" />
+      <module name="moviediary-omdb-microservice_test" target="1.8" />
       <module name="moviediary_main" target="1.8" />
       <module name="moviediary_test" target="1.8" />
+      <module name="omdb-microservice_main" target="1.8" />
+      <module name="omdb-microservice_test" target="1.8" />
+      <module name="tmdb-microservice_main" target="1.8" />
+      <module name="tmdb-microservice_test" target="1.8" />
+      <module name="ui-microservice_main" target="1.8" />
+      <module name="ui-microservice_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

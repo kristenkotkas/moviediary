@@ -35,7 +35,7 @@ public class BankLinkRouter extends EventBusRoutable {
     public static final String vk_amount = "5"; // Makse summa
     public static final String vk_curr = "EUR"; // Makse valuuta
     public static final String vk_acc = "EE371600000123456789"; // Saaja (arendajate) konto nr
-    public static final String vk_name = "MovieDiary MTÜ"; // Saaja (arendajate) nimi
+  public static final String vk_name = "MovieDiary MTU"; // Saaja (arendajate) nimi
     public static final String vk_ref = "1234561"; // Viitenumber
     public static final String vk_lang = "EST"; //tehingu keel
     public static final String vk_msg = "Donation"; // Toode/makse kirjeldus

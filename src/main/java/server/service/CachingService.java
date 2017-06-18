@@ -1,63 +1,58 @@
 package server.service;
 
+import io.vertx.core.Handler;
+import io.vertx.ext.web.impl.ConcurrentLRUCache;
 import io.vertx.rxjava.core.Future;
-
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
-
-import static io.vertx.rxjava.core.Future.future;
-import static java.lang.System.currentTimeMillis;
-import static server.util.CommonUtils.check;
+import rx.Single;
+import server.entity.CacheItem;
 
 /**
- * Service which allows caching data as CacheItems for a set period of time.
- */
-public interface CachingService<T> {
+ * Caching implementation for services.
+ **/
+public abstract class CachingService<T> {
+  protected static final int DEFAULT_MAX_CACHE_SIZE = 10000;
+  private final ConcurrentLRUCache<String, CacheItem<T>> cache;
 
-    /**
-     * Gets cached item or creates a new one if it does not exist.
-     *
-     * @param key to get cache value from
-     */
-    CacheItem<T> getCached(String key);
+  protected CachingService() {
+    this(CachingService.DEFAULT_MAX_CACHE_SIZE);
+  }
 
-    /**
-     * Cached value wrapper.
-     * Default timeout is 1 hour.
-     **/
-    class CacheItem<T> {
-        private long timeout = TimeUnit.HOURS.toMillis(1);
-        private long timestamp = 0;
-        private T value;
-
-        public T get() {
-            return value;
-        }
-
-        public T set(T value) {
-            this.value = value;
-            timestamp = currentTimeMillis();
-            return value;
-        }
-
-        public CacheItem<T> setTimeout(TimeUnit unit, long length) {
-            timeout = unit.toMillis(length);
-            return this;
-        }
-
-        public CacheItem<T> invalidate() {
-            timestamp = 0;
-            return this;
-        }
-
-        public boolean isUpToDate() {
-            return currentTimeMillis() - timestamp <= timeout;
-        }
-
-        public Future<T> get(boolean use, BiConsumer<Future<T>, CacheItem<T>> updater) {
-            return future(fut -> check(use && isUpToDate(),
-                    () -> fut.complete(value),
-                    () -> updater.accept(fut, this)));
-        }
+  protected CachingService(int maxCacheSize) {
+    if (maxCacheSize < 1) {
+      throw new IllegalArgumentException("maxCacheSize must be >= 1");
     }
+    cache = new ConcurrentLRUCache<>(maxCacheSize);
+  }
+
+  /**
+   * Gets cached item or creates a new one if it does not exist.
+   *
+   * @param key to get cache value from
+   */
+  void getCached(String key, Handler<CacheItem<T>> handler) { // TODO: 18/06/2017 migrate to handler
+    handler.handle(getCached(key));
+  }
+
+  public Single<CacheItem<T>> rxGetCached(String key) {
+    return Single.create(sub -> getCached(key, sub::onSuccess));
+  }
+
+  public CacheItem<T> getCached(String key) {
+    return cache.computeIfAbsent(key, it -> new CacheItem<>());
+  }
+
+  /**
+   * Tries to complete given future using cached value if using cache is allowed, cache exists and is up to date.
+   *
+   * @param useCache  only uses cache if allowed
+   * @param cacheItem to use
+   * @param future    to complete
+   */
+  protected boolean tryCachedResult(boolean useCache, CacheItem<T> cacheItem, Future<T> future) {
+    if (useCache && cacheItem.isUpToDate()) {
+      future.complete(cacheItem.get());
+      return true;
+    }
+    return false;
+  }
 }

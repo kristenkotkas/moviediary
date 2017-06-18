@@ -8,6 +8,7 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.core.http.HttpClient;
 import io.vertx.rxjava.core.http.HttpClientResponse;
+import server.entity.CacheItem;
 
 import static io.vertx.rxjava.core.Future.future;
 import static server.entity.Status.OK;
@@ -15,7 +16,7 @@ import static server.service.BankLinkServiceImpl.Cache.PAYMENT;
 import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.ifTrue;
 
-public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implements BankLinkService {
+public class BankLinkServiceImpl extends CachingService<JsonObject> implements BankLinkService {
     private static final Logger LOG = LoggerFactory.getLogger(BankLinkServiceImpl.class);
     private static final int HTTP = 8083;
     private static final String ENDPOINT = "localhost";
@@ -28,7 +29,7 @@ public class BankLinkServiceImpl extends CachingServiceImpl<JsonObject> implemen
     private final HttpClient client;
 
     protected BankLinkServiceImpl(Vertx vertx, JsonObject config) {
-        super(CachingServiceImpl.DEFAULT_MAX_CACHE_SIZE);
+      super(CachingService.DEFAULT_MAX_CACHE_SIZE);
         this.config = config;
         this.client = vertx.createHttpClient();
     }

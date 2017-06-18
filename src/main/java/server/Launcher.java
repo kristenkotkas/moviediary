@@ -5,12 +5,8 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import server.verticle.ServerVerticle;
+import io.vertx.rxjava.core.Vertx;
 
-import java.io.IOException;
-
-import static io.vertx.rxjava.core.RxHelper.deployVerticle;
-import static io.vertx.rxjava.core.Vertx.vertx;
 import static server.util.CommonUtils.setLoggingToSLF4J;
 import static server.util.FileUtils.getConfig;
 
@@ -19,14 +15,14 @@ import static server.util.FileUtils.getConfig;
  * Forces DNS resolver to use Google's DNS servers.
  */
 public class Launcher {
-    private static final Logger LOG = LoggerFactory.getLogger(Launcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Launcher.class);
 
-    public static void main(String[] args) throws IOException {
-        setLoggingToSLF4J();
-        deployVerticle(vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
-                .addServer("8.8.8.8")
-                .addServer("8.8.4.4"))), new ServerVerticle(), new DeploymentOptions()
-                .setConfig(getConfig(args)))
-                .subscribe(ar -> LOG.info("Server up!"), LOG::error);
-    }
+  public static void main(String[] args) {
+    setLoggingToSLF4J();
+    Vertx.vertx(new VertxOptions().setAddressResolverOptions(new AddressResolverOptions()
+        .addServer("8.8.8.8")
+        .addServer("8.8.4.4")))
+        .rxDeployVerticle("server.verticle.ServerVerticle", new DeploymentOptions().setConfig(getConfig(args)))
+        .subscribe(s -> LOG.info("Server up!"), LOG::error);
+  }
 }

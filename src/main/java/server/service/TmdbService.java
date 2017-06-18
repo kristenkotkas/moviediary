@@ -1,29 +1,44 @@
 package server.service;
 
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava.core.Future;
-import io.vertx.rxjava.core.Vertx;
 
 /**
  * Service which interacts with TheMovieDatabase API.
  */
-public interface TmdbService extends CachingService<JsonObject> {
+@VertxGen
+@ProxyGen
+public interface TmdbService {
 
-    static TmdbService create(Vertx vertx, JsonObject config, DatabaseService database) {
-        return new TmdbServiceImpl(vertx, config, database);
-    }
+  @GenIgnore
+  static TmdbService create(Vertx vertx, JsonObject config, DatabaseService database) {
+    return new TmdbServiceImpl(vertx, config, database);
+  }
 
-    Future<JsonObject> getMovieByName(String name);
+  @Fluent
+  TmdbService getMovieByName(String name, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> getMovieById(String id);
+  @Fluent
+  TmdbService getMovieById(String id, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> getTVByName(String name);
+  @Fluent
+  TmdbService getTVByName(String name, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> getTVById(String param);
+  @Fluent
+  TmdbService getTVById(String param, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> getMovieRecommendation(String id);
+  @Fluent
+  TmdbService getMovieRecommendation(String id, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> getTvSeason(String param);
+  @Fluent
+  TmdbService getTvSeason(String param, Handler<AsyncResult<JsonObject>> handler);
 
-    Future<JsonObject> insertSeasonViews(String username, String jsonParam);
+  @Fluent
+  TmdbService insertSeasonViews(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 }

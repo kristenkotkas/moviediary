@@ -2,27 +2,66 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id "com.github.johnrengelman.shadow" version "2.0.0"
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'org.hidetake.ssh' version '2.9.0'
 }
 
-targetCompatibility = 1.8
-sourceCompatibility = 1.8
+mainClassName = 'server.Launcher'
+
+ext {
+    vertxVersion = '3.4.1'
+}
 
 repositories {
     mavenCentral()
+}
+
+shadowJar {
+    baseName = 'moviediary'
+    classifier = ''
+}
+
+task cleanGenerated(type: Delete) {
+    delete 'src/main/generated'
+}
+
+task vertxApiGeneration(type: JavaCompile) {
+    dependsOn cleanGenerated
+    source = sourceSets.main.java
+    classpath = configurations.compile + configurations.compileOnly
+    destinationDir = project.file('src/main/generated')
+    options.compilerArgs = [
+            "-proc:only",
+            "-processor", "io.vertx.codegen.CodeGenProcessor",
+            "-Acodegen.output=${project.projectDir}/src/main"
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += 'src/main/generated'
+        }
+    }
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
+    dependsOn vertxApiGeneration
 }
 
 dependencies {
     compile files('/libs/templ-handlebars.jar')
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'com.github.jknack', name: 'handlebars', version: '4.0.6'
-    compile group: 'io.vertx', name: 'vertx-core', version: '3.4.1'
-    compile group: 'io.vertx', name: 'vertx-web', version: '3.4.1'
-    compile group: 'io.vertx', name: 'vertx-rx-java', version: '3.4.1'
-    compile group: 'io.vertx', name: 'vertx-mail-client', version: '3.4.1'
-    compile group: 'io.vertx', name: 'vertx-jdbc-client', version: '3.4.1'
-    compile group: 'io.vertx', name: 'vertx-web-client', version: '3.4.1'
+    compile group: 'io.vertx', name: 'vertx-core', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-rx-java', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-mail-client', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-web-client', version: "${vertxVersion}"
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: '3.0.0'
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: '2.0.0'
@@ -30,8 +69,11 @@ dependencies {
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.8.8'
     compile 'org.codehaus.woodstox:woodstox-core-asl:4.4.1'
 
+    compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${vertxVersion}"
+    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${vertxVersion}"
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.4.1'
+    testCompile group: 'io.vertx', name: 'vertx-unit', version: "${vertxVersion}"
     testCompile group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
     testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: '2.2.3'
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.4.0'
@@ -44,18 +86,6 @@ configurations.all {
     }
 }
 
-mainClassName = 'server.Launcher'
-group 'org.movies'
-
-shadowJar {
-    baseName = 'moviediary'
-    classifier = ''
-}
-
-compileJava {
-    options.encoding = "UTF-8"
-}
-
 remotes {
     master {
         role 'master'
@@ -66,17 +96,14 @@ remotes {
 }
 
 ssh.settings {
-    knownHosts = file("/misc/known_hosts")
+    knownHosts = file('/misc/known_hosts')
 }
 
 task deployMovieDiary(dependsOn: shadowJar) {
     doLast {
         ssh.run {
             session(remotes.master) {
-                File server = file('C:\\Users\\Kristjan\\ownCloud\\java\\moviediary\\build\\libs\\moviediary.jar')
-                if (server.exists()) {
-                    put from: server, into: '/home/kristjan/Downloads/'
-                }
+                put from: 'build/libs/moviediary.jar', into: '/home/kristjan/Downloads/'
             }
         }
         println ':deploy:done'
