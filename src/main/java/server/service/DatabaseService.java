@@ -151,6 +151,8 @@ public interface DatabaseService {
 
     Future<JsonObject> insertList(String username, String listName);
 
+    Future<JsonObject> getLists(String username);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

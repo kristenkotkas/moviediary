@@ -139,6 +139,8 @@ public class DatabaseServiceImpl implements DatabaseService {
             "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
+    private static final String SQL_GET_LISTS =
+            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ?;";
 
     private final JDBCClient client;
 
@@ -526,6 +528,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> removeSeasonViews(String username, String seasonId) {
         return updateOrInsert(SQL_REMOVE_SEASON, new JsonArray().add(username).add(seasonId));
+    }
+
+    @Override
+    public Future<JsonObject> getLists(String username) {
+        return query(SQL_GET_LISTS, new JsonArray().add(username));
     }
 
     /**
