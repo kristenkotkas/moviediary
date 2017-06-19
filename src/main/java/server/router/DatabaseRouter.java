@@ -72,6 +72,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String GET_TOP_MOVIES_STAT = "database_get_top_movies_stat";
     private static final String GET_MONTH_YEAR_DISTRIBUTION = "database_get_month_year_distribution";
     private static final String REMOVE_SEASON_VIEWS = "database_remove_season_views";
+    private static final String INSERT_NEW_LIST = "database_insert_new_list";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -115,6 +116,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_DISTINCT_MOVIE_COUNT, reply((user, param) -> database.getTotalDistinctMoviesCount(user)));
         listen(GET_TOP_MOVIES_STAT, reply(database::getTopMoviesStat));
         listen(REMOVE_SEASON_VIEWS, reply(database::removeSeasonViews));
+        listen(INSERT_NEW_LIST, reply(database::insertList));
     }
 
     @Override

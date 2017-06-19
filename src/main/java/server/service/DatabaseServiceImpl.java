@@ -137,6 +137,8 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES";
     private static final String  SQL_REMOVE_SEASON =
             "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
+    private static final String SQL_INSERT_NEW_LIST =
+            "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
 
     private final JDBCClient client;
 
@@ -510,6 +512,15 @@ public class DatabaseServiceImpl implements DatabaseService {
             query.deleteCharAt(query.length() - 1);
         });
         return updateOrInsert(query.toString(), values);
+    }
+
+    @Override
+    public Future<JsonObject> insertList(String username, String listName) {
+        // INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);
+        return updateOrInsert(SQL_INSERT_NEW_LIST, new JsonArray()
+                .add(username)
+                .add(listName)
+                .add(currentTimeMillis()));
     }
 
     @Override

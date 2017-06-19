@@ -149,6 +149,8 @@ public interface DatabaseService {
 
     Future<JsonObject> removeSeasonViews(String username, String seasonId);
 
+    Future<JsonObject> insertList(String username, String listName);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

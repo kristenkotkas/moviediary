@@ -25,9 +25,15 @@ function modalClose() {
 }
 
 function createNewList() {
-    if (inputNewListName.val().length > 0) {
-        console.log('new list created');
-        newListModal.modal('close');
+    if (inputNewListName.val().length > 0 && inputNewListName.val().length <= 50) {
+        eventbus.send('database_insert_new_list', inputNewListName.val(), function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                console.log('new list created');
+                newListModal.modal('close');
+            } else {
+                //tuli error
+            }
+        });
     }
 }
 
