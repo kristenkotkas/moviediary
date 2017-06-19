@@ -58,11 +58,11 @@ public class ServerVerticle extends AbstractVerticle {
   @Override
   public void start(Future<Void> future) throws Exception {
     Router router = Router.router(vertx);
-    database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
+    database = createIfMissing(database, () -> DatabaseService.create(vertx.getDelegate(), config()));
     tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx.getDelegate(), config(), database));
     omdb = createIfMissing(omdb, () -> OmdbService.create(vertx.getDelegate(), config()));
     bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
-    mail = createIfMissing(mail, () -> MailService.create(vertx, database));
+    mail = createIfMissing(mail, () -> MailService.create(vertx.getDelegate(), database));
     securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(vertx, config(), database));
     Arrays.asList(
         new AuthRouter(vertx, config(), securityConfig),
@@ -71,7 +71,8 @@ public class ServerVerticle extends AbstractVerticle {
         new BankLinkRouter(vertx, bankLink),
         new DatabaseRouter(vertx, config(), securityConfig, database, mail),
         new MailRouter(vertx, mail),
-        new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));
+        new UiRouter(vertx, securityConfig))
+        .forEach(routable -> routable.route(router));
     startEventbus(router, vertx);
     vertx.createHttpServer(new HttpServerOptions()
         .setCompressionSupported(true)

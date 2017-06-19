@@ -41,12 +41,6 @@ public class HandlerUtils {
         });
     }
 
-    public static <T> Handler<AsyncResult<T>> resultHandler(Consumer<T> success, Consumer<AsyncResult<T>> failure) {
-        return ar -> check(ar.succeeded(),
-                () -> success.accept(ar.result()),
-                () -> failure.accept(ar));
-    }
-
     /**
      * Ends the response and sends client the result.
      *

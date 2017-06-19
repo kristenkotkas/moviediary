@@ -16,20 +16,20 @@ import static server.util.Utils.assertGoToPage;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UiHomePageTest extends UiTest {
 
-    @Test
-    public void testHomePageTranslations() throws Exception {
-        checkHomePageTranslations("en");
-        checkHomePageTranslations("et");
-        checkHomePageTranslations("de");
-    }
+  @Test
+  public void testHomePageTranslations() throws Exception {
+    checkHomePageTranslations("en");
+    checkHomePageTranslations("et");
+    checkHomePageTranslations("de");
+  }
 
-    private void checkHomePageTranslations(String lang) {
-        JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
-        assertGoToPage(driver, URI + "/login?lang=" + lang);
-        assertGoToPage(driver, URI + "/private/home");
-        assertEquals(getString("HOME_HELLO", lang) + " " + formAuth.getString("firstname"),
-                driver.findElement(tagName("h3")).getText());
-    }
+  private void checkHomePageTranslations(String lang) {
+    JsonObject formAuth = config.getJsonObject("unit_test").getJsonObject("form_user");
+    assertGoToPage(driver, URI + "/login?lang=" + lang);
+    assertGoToPage(driver, URI + "/private/home");
+    assertEquals(getString("HOME_HELLO", lang) + " " + formAuth.getString("firstname"),
+        driver.findElement(tagName("h3")).getText());
+  }
 
-    // TODO: 30.05.2017 tests for cards
+  // TODO: 30.05.2017 tests for cards
 }

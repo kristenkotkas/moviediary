@@ -6,7 +6,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.ext.web.handler.sockjs.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
-import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.core.eventbus.Message;
 import io.vertx.rxjava.core.eventbus.MessageConsumer;
@@ -14,6 +13,7 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
+import rx.Single;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,8 @@ import java.util.stream.Stream;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static java.lang.String.valueOf;
-import static server.util.CommonUtils.*;
+import static server.util.CommonUtils.ifPresent;
+import static server.util.CommonUtils.ifTrue;
 
 /**
  * Generic class that contains routes.
@@ -121,35 +122,22 @@ public abstract class EventBusRoutable {
   }
 
   /**
-   * Listen for messages on address and processes them.
-   *
-   * @param address to listen on
-   */
-  protected <T> void listen(String address, BiFunction<String, String, Future<T>> processor) {
-    CONSUMERS.put(address, vertx.eventBus().consumer(address,
-        msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))));
-  }
-
-  /**
    * Reply to message.
    *
    * @param processor to get some data from some service
    * @param compiler  to transform service data into usable form
    * @return replyHandler
    */
-  protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor,
+  protected <T> Handler<Message<T>> reply(BiFunction<String, String, Single<T>> processor,
                                           BiFunction<String, T, Object> compiler) {
-    return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
-        check(ar.succeeded(),
-            () -> msg.reply(compiler.apply(msg.headers().get("user"), ar.result())),
-            () -> msg.reply("Failure: " + ar.cause().getMessage())));
+    return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))
+        .doOnError(err -> msg.reply("Failure: " + err.getMessage()))
+        .subscribe(result -> msg.reply(compiler.apply(msg.headers().get("user"), result)));
   }
 
-  protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor) {
-    return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
-        check(ar.succeeded(),
-            () -> msg.reply(ar.result()),
-            () -> msg.reply("Failure: " + ar.cause().getMessage())));
+  protected <T> Handler<Message<T>> reply(BiFunction<String, String, Single<T>> processor) {
+    return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))
+        .subscribe(msg::reply, err -> msg.reply("Failure: " + err.getMessage()));
   }
 
   /**
@@ -158,11 +146,9 @@ public abstract class EventBusRoutable {
    * @param processor to get some data from some service
    * @return replyHandler
    */
-  protected <T> Handler<Message<T>> reply(Function<String, Future<T>> processor) {
-    return msg -> processor.apply(valueOf(msg.body())).setHandler(ar ->
-        check(ar.succeeded(),
-            () -> msg.reply(ar.result()),
-            () -> msg.reply("Failure: " + ar.cause().getMessage())));
+  protected <T> Handler<Message<T>> reply(Function<String, Single<T>> processor) {
+    return msg -> processor.apply(valueOf(msg.body()))
+        .subscribe(msg::reply, err -> msg.reply("Failure: " + err.getMessage()));
   }
 
   protected <T> Handler<Message<T>> log() {

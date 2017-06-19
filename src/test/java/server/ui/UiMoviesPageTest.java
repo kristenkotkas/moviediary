@@ -24,72 +24,72 @@ import static server.util.Utils.sleep;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UiMoviesPageTest extends UiTest {
 
-    // TODO: 1.06.2017 fix tests
-    // TODO: 1.06.2017 movies, series and wishlist
-    // TODO: 1.06.2017 missing tests
+  // TODO: 1.06.2017 fix tests
+  // TODO: 1.06.2017 movies, series and wishlist
+  // TODO: 1.06.2017 missing tests
 
-    private void goAndWaitForPageToLoad() {
-        assertGoToPage(driver, URI + "/private/movies");
-        await().until(() -> isEventbus(OPEN, driver));
-    }
+  private void goAndWaitForPageToLoad() {
+    assertGoToPage(driver, URI + "/private/movies");
+    await().until(() -> isEventbus(OPEN, driver));
+  }
 
-    private void searchForMovie() {
-        driver.findElementById("search").sendKeys("ghost in the shell");
-        driver.findElementByXPath("//label[@id='search-button']/i").click();
-        await().ignoreExceptionsInstanceOf(NoSuchElementException.class).atMost(5, SECONDS)
-                .until(() -> driver.findElementByCssSelector("div.card-content.truncate").isDisplayed());
-        assertTrue(driver.findElementByCssSelector("div.card-content.truncate")
-                .getText().contains("Ghost in the Shell"));
-    }
+  private void searchForMovie() {
+    driver.findElementById("search").sendKeys("ghost in the shell");
+    driver.findElementByXPath("//label[@id='search-button']/i").click();
+    await().ignoreExceptionsInstanceOf(NoSuchElementException.class).atMost(5, SECONDS)
+        .until(() -> driver.findElementByCssSelector("div.card-content.truncate").isDisplayed());
+    assertTrue(driver.findElementByCssSelector("div.card-content.truncate")
+        .getText().contains("Ghost in the Shell"));
+  }
 
-    private void openDetailView() {
-        driver.findElementByCssSelector("div.card-content.truncate").click();
-        await().atMost(5, SECONDS)
-                .until(() -> driver.findElementById("movie-title").getText().equals("Ghost in the Shell"));
-    }
+  private void openDetailView() {
+    driver.findElementByCssSelector("div.card-content.truncate").click();
+    await().atMost(5, SECONDS)
+        .until(() -> driver.findElementById("movie-title").getText().equals("Ghost in the Shell"));
+  }
 
-    @Test
-    public void testSearchingMovieFindsResult() throws Exception {
-        goAndWaitForPageToLoad();
-        searchForMovie();
-    }
+  @Test
+  public void testSearchingMovieFindsResult() throws Exception {
+    goAndWaitForPageToLoad();
+    searchForMovie();
+  }
 
-    @Test
-    public void testOpeningDetailView() throws Exception {
-        goAndWaitForPageToLoad();
-        searchForMovie();
-        openDetailView();
-    }
+  @Test
+  public void testOpeningDetailView() throws Exception {
+    goAndWaitForPageToLoad();
+    searchForMovie();
+    openDetailView();
+  }
 
-    @Test
-    public void testAddingToWishlist() throws Exception {
-        goAndWaitForPageToLoad();
-        searchForMovie();
-        openDetailView();
-        WebElement addToWishlistButton = driver.findElementById("wishlist-text");
-        sleep(driver, 5, visibilityOf(addToWishlistButton));
-        sleep(driver, 5, elementToBeClickable(addToWishlistButton));
-        addToWishlistButton.click();
-        await().atMost(5, SECONDS).until(() -> localDatabase
-                .queryBlocking("SELECT * FROM Wishlist WHERE MovieId = ?", new JsonArray().add(315837))
-                .size() > 0);
-    }
+  @Test
+  public void testAddingToWishlist() throws Exception {
+    goAndWaitForPageToLoad();
+    searchForMovie();
+    openDetailView();
+    WebElement addToWishlistButton = driver.findElementById("wishlist-text");
+    sleep(driver, 5, visibilityOf(addToWishlistButton));
+    sleep(driver, 5, elementToBeClickable(addToWishlistButton));
+    addToWishlistButton.click();
+    await().atMost(5, SECONDS).until(() -> localDatabase
+        .queryBlocking("SELECT * FROM Wishlist WHERE MovieId = ?", new JsonArray().add(315837))
+        .size() > 0);
+  }
 
-    @Test
-    public void testAddingView() throws Exception {
-        goAndWaitForPageToLoad();
-        searchForMovie();
-        openDetailView();
-        WebElement addToViewsButton = driver.findElementByCssSelector("#add-watch > div.card-content");
-        sleep(driver, 5, visibilityOf(addToViewsButton));
-        addToViewsButton.click();
-        WebElement watchStartNowButton = driver.findElementById("watchStartNow");
-        sleep(driver, 5, visibilityOf(watchStartNowButton));
-        watchStartNowButton.click();
-        driver.findElement(id("watchEndCalculate")).click();
-        driver.findElement(id("add-btn")).click();
-        await().atMost(5, SECONDS).until(() -> localDatabase
-                .queryBlocking("SELECT * FROM Views WHERE MovieId = ?", new JsonArray().add(315837))
-                .size() > 0);
-    }
+  @Test
+  public void testAddingView() throws Exception {
+    goAndWaitForPageToLoad();
+    searchForMovie();
+    openDetailView();
+    WebElement addToViewsButton = driver.findElementByCssSelector("#add-watch > div.card-content");
+    sleep(driver, 5, visibilityOf(addToViewsButton));
+    addToViewsButton.click();
+    WebElement watchStartNowButton = driver.findElementById("watchStartNow");
+    sleep(driver, 5, visibilityOf(watchStartNowButton));
+    watchStartNowButton.click();
+    driver.findElement(id("watchEndCalculate")).click();
+    driver.findElement(id("add-btn")).click();
+    await().atMost(5, SECONDS).until(() -> localDatabase
+        .queryBlocking("SELECT * FROM Views WHERE MovieId = ?", new JsonArray().add(315837))
+        .size() > 0);
+  }
 }

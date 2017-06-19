@@ -1,4 +1,4 @@
 package server.template.ui;
 
-public interface HistoryTemplate extends BaseTemplate{
+public interface HistoryTemplate extends BaseTemplate {
 }

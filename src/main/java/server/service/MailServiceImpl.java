@@ -1,25 +1,23 @@
 package server.service;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
-import io.vertx.rxjava.core.Future;
-import io.vertx.rxjava.core.Vertx;
+import io.vertx.ext.mail.MailResult;
+import io.vertx.rx.java.RxHelper;
 import io.vertx.rxjava.ext.mail.MailClient;
-import io.vertx.rxjava.ext.web.RoutingContext;
-import server.service.DatabaseService.Column;
-import server.service.DatabaseService.Table;
+import rx.Single;
+import server.util.CommonUtils;
 
-import java.util.Map;
-
-import static io.vertx.rxjava.core.Future.future;
 import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
-import static server.service.DatabaseService.createDataMap;
-import static server.service.DatabaseService.getRows;
-import static server.util.CommonUtils.check;
+import static server.util.CommonUtils.getRows;
 import static server.util.StringUtils.genString;
 
 /**
@@ -29,49 +27,61 @@ public class MailServiceImpl implements MailService {
   private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
   private static final String FROM = "moviediary@kyngas.eu";
 
-  private final DatabaseService database;
+  private final server.service.rxjava.DatabaseService database;
   private final MailClient client;
 
   protected MailServiceImpl(Vertx vertx, DatabaseService database) {
-    this.database = database;
-    this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
+    this.database = new server.service.rxjava.DatabaseService(database);
+    this.client = new MailClient(io.vertx.ext.mail.MailClient.createNonShared(vertx, new MailConfig()
+        .setTrustAll(true)));
   }
 
   /**
    * Sends verification mail to user.
    */
   @Override
-  public Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail) {
-    // TODO: 19.04.2017 rewrite with singles
+  public MailService sendVerificationEmail(String lang, String email,
+                                           Handler<AsyncResult<JsonObject>> handler) { // TODO: 19.06.2017 test 
     String unique = genString();
-    MailMessage email = new MailMessage()
-        .setFrom(FROM)
-        .setTo(userEmail)
-        .setSubject(getString("MAIL_REGISTER_TITLE", ctx))
-        .setHtml(createContent(ctx, userEmail, unique));
-    Map<Column, String> data = createDataMap(userEmail); // TODO: 19.04.2017 map builder?
-    data.put(Column.VERIFIED, unique);
-    return future(fut -> database.update(Table.SETTINGS, data).setHandler(ar -> check(ar.succeeded(),
-        () -> client.sendMail(email, result -> check(result.succeeded(),
-            () -> fut.complete(result.result().toJson()),
-            () -> fut.fail("Failed to send email to user: " + result.cause()))),
-        () -> fut.fail("Could not set unique verification string DB: " + ar.cause()))));
-        /*return future(fut -> database.update(Table.SETTINGS, data)
-                .rxSetHandler()
-                .doOnError(err -> fut.fail("Could not set unique verification string DB: " + err))
-                .toCompletable()
-                .andThen(client.rxSendMail(email))
-                .doOnError(err -> fut.fail("Failed to send email to user: " + err))
-                .map(MailResult::toJson)
-                .subscribe(fut::complete));*/
+    CommonUtils.<JsonObject>single(h -> database.updateUserVerifyStatus(email, unique, h))
+        .doOnError(err -> Future
+            .<JsonObject>failedFuture("Could not set unique verification string DB: " + err)
+            .setHandler(handler))
+        .flatMap(json -> client.rxSendMail(new MailMessage()
+            .setFrom(FROM)
+            .setTo(email)
+            .setSubject(getString("MAIL_REGISTER_TITLE", lang))
+            .setHtml(createContent(lang, email, unique))))
+        .map(MailResult::toJson)
+        .subscribe(RxHelper.toSubscriber(handler));
+    return this;
+/*    return future(fut -> database.update(Table.SETTINGS, data).setHandler(ar -> check(ar.succeeded(),
+            () -> client.sendMail(email, result -> check(result.succeeded(),
+                    () -> fut.complete(result.result().toJson()),
+                    () -> fut.fail("Failed to send email to user: " + result.cause()))),
+            () -> fut.fail("Could not set unique verification string DB: " + ar.cause()))));*/
   }
 
   /**
    * Verifies user email based on unique code.
    */
   @Override
-  public Future<JsonObject> verifyEmail(String email, String unique) {
-    return future(fut -> database.getSettings(email).setHandler(ar -> check(ar.succeeded(),
+  public MailService verifyEmail(String email, String unique, Handler<AsyncResult<JsonObject>> handler) { // TODO: 19.06.2017 test
+    database.rxGetSettings(email)
+        .doOnError(err -> Future
+            .<JsonObject>failedFuture("Failed to get user settings from DB: " + err)
+            .setHandler(handler))
+        .map(json -> getRows(json).getJsonObject(0).getString("Verified").equals(unique))
+        .flatMap(isValid -> {
+          if (!isValid) {
+            return Single.<JsonObject>error(new Throwable("User presented unique string does not match DB."));
+          }
+          return Single.just(true);
+        })
+        .flatMap(b -> CommonUtils.<JsonObject>single(h -> database.updateUserVerifyStatus(email, "1", h)))
+        .subscribe(RxHelper.toSubscriber(handler));
+    return this;
+/*    return future(fut -> database.getSettings(email).setHandler(ar -> check(ar.succeeded(),
         () -> check(getRows(ar.result()).getJsonObject(0)
             .getString(Column.VERIFIED.getName()).equals(unique), () -> {
           Map<Column, String> map = createDataMap(email);
@@ -80,34 +90,18 @@ public class MailServiceImpl implements MailService {
               () -> fut.complete(result.result()),
               () -> fut.fail("Failed to update user unique string DB: " + result.cause())));
         }, () -> fut.fail("User presented unique string does not match DB.")),
-        () -> fut.fail("Failed to get user settings from DB: " + ar.cause()))));
-
-
-        /*return future(fut -> database.getSettings(email)
-                .rxSetHandler()
-                .doOnError(err -> fut.fail("Failed to get user settings from DB: " + err))
-                .map(json -> getRows(json).getJsonObject(0).getString(Column.VERIFIED.getName()).equals(unique))
-                .toObservable()
-                .flatMap(bool -> ifThen(() -> bool, database.update(Table.SETTINGS, ImmutableMap
-                                .<Column, String>builder()
-                                .put(Column.VERIFIED, "1").build())
-                                .rxSetHandler()
-                                .toObservable(),
-                        Observable.error(new Throwable("User presented unique string does not match DB."))))
-                .toSingle()
-                .doOnError(err -> fut.fail("Failed to update user unique string DB: " + err))
-                .subscribe(fut::complete));*/
+        () -> fut.fail("Failed to get user settings from DB: " + ar.cause()))));*/
   }
 
   /**
    * Creates email content that is displayed in users verification email.
    */
-  private String createContent(RoutingContext ctx, String userEmail, String unique) {
-    return "<p>" + getString("MAIL_REGISTER_TEXT", ctx) + "</p>" +
+  private String createContent(String lang, String userEmail, String unique) {
+    return "<p>" + getString("MAIL_REGISTER_TEXT", lang) + "</p>" +
         "<a href=\"https://movies.kyngas.eu" + API_MAIL_VERIFY +
         "?" + EMAIL + "=" + userEmail +
         "&" + UNIQUE + "=" + unique + "\">" +
-        getString("MAIL_REGISTER_CLICK_ME", ctx) +
+        getString("MAIL_REGISTER_CLICK_ME", lang) +
         "</a>";
   }
 }

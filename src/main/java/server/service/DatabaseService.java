@@ -1,247 +1,144 @@
 package server.service;
 
-import io.vertx.core.json.JsonArray;
+import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava.core.Future;
-import io.vertx.rxjava.core.Vertx;
-import server.util.CommonUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-
-import static java.util.stream.Collectors.toList;
-import static server.service.DatabaseService.Column.USERNAME;
 
 /**
  * Service which interacts with database.
  */
+@VertxGen
+@ProxyGen
 public interface DatabaseService {
 
-  static Map<Column, String> createDataMap(String username) {
-    return CommonUtils.<Column, String>mapBuilder()
-        .put(USERNAME, username)
-        .build();
-  }
-
+  @GenIgnore
   static DatabaseService create(Vertx vertx, JsonObject config) {
     return new DatabaseServiceImpl(vertx, config);
   }
 
-  /**
-   * Gets columns as json array.
-   *
-   * @param json to use
-   */
-  static JsonArray getColumns(JsonObject json) {
-    return json.getJsonArray("columnNames");
-  }
+  @Fluent
+  DatabaseService insertOAuth2User(String username, String password, String firstname, String lastname,
+                                   Handler<AsyncResult<JsonObject>> handler);
 
-  /**
-   * Gets results as json objects in a json array.
-   *
-   * @param json to use
-   */
-  static JsonArray getRows(JsonObject json) {
-    return json.getJsonArray("rows");
-  }
+  @Fluent
+  DatabaseService insertFormUser(String username, String password, String firstname, String lastname, String verified,
+                                 Handler<AsyncResult<JsonObject>> handler);
 
-  /**
-   * Gets results as json arrays in a json array.
-   *
-   * @param json to use
-   */
-  static JsonArray getResults(JsonObject json) {
-    return json.getJsonArray("results");
-  }
+  @Fluent
+  DatabaseService insertMovie(int id, String movieTitle, int year, String posterPath,
+                              Handler<AsyncResult<JsonObject>> handler);
 
-  /**
-   * Gets number of columns.
-   *
-   * @param json to use
-   */
-  static Integer getNumColumns(JsonObject json) {
-    return json.getInteger("numColumns");
-  }
+  @Fluent
+  DatabaseService insertWishlist(String username, int movieId, Handler<AsyncResult<JsonObject>> handler);
 
-  /**
-   * Gets number of results.
-   *
-   * @param json to use
-   */
-  static Integer getNumRows(JsonObject json) {
-    return json.getInteger("numRows");
-  }
+  @Fluent
+  DatabaseService insertView(String user, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
+  @Fluent
+  DatabaseService isInWishlist(String username, int movieId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath);
+  @Fluent
+  DatabaseService getWishlist(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertWishlist(String username, int movieId);
+  @Fluent
+  DatabaseService getSettings(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertView(String user, String jsonParam);
+  @Fluent
+  DatabaseService getUser(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> isInWishlist(String username, int movieId);
+  @Fluent
+  DatabaseService getAllUsers(Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getWishlist(String username);
+  @Fluent
+  DatabaseService getViews(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getSettings(String username);
+  @Fluent
+  DatabaseService getMovieViews(String username, String movieId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> update(Table table, Map<Column, String> data);
+  @Fluent
+  DatabaseService getUsersCount(Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insert(Table table, Map<Column, String> data);
+  @Fluent
+  DatabaseService getYearsDistribution(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getUser(String username);
+  @Fluent
+  DatabaseService getWeekdaysDistribution(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getAllUsers();
+  @Fluent
+  DatabaseService getTimeDistribution(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getViews(String username, String jsonParam);
+  @Fluent
+  DatabaseService getAllTimeMeta(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getMovieViews(String username, String movieId);
+  @Fluent
+  DatabaseService getViewsMeta(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getUsersCount();
+  @Fluent
+  DatabaseService removeView(String username, String id, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getYearsDistribution(String username, String jsonParam);
+  @Fluent
+  DatabaseService removeEpisode(String username, String episodeId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getWeekdaysDistribution(String username, String jsonParam);
+  @Fluent
+  DatabaseService insertEpisodeView(String username, String data, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTimeDistribution(String username, String jsonParam);
+  @Fluent
+  DatabaseService getSeenEpisodes(String username, int seriesId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getAllTimeMeta(String username, String jsonParam);
+  @Fluent
+  DatabaseService insertSeries(int id, String seriesTitle, String posterPath, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getViewsMeta(String username, String jsonParam);
+  @Fluent
+  DatabaseService getWatchingSeries(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> removeView(String username, String id);
+  @Fluent
+  DatabaseService removeFromWishlist(String username, String movieId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> removeEpisode(String username, String episodeId);
+  @Fluent
+  DatabaseService getLastMoviesHome(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertEpisodeView(String username, String data);
+  @Fluent
+  DatabaseService getLastWishlistHome(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getSeenEpisodes(String username, int seriesId);
+  @Fluent
+  DatabaseService getTopMoviesHome(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath);
+  @Fluent
+  DatabaseService getTotalMovieCount(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getWatchingSeries(String username);
+  @Fluent
+  DatabaseService getNewMovieCount(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> removeFromWishlist(String username, String movieId);
+  @Fluent
+  DatabaseService getTotalRuntime(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getLastMoviesHome(String username);
+  @Fluent
+  DatabaseService getTotalDistinctMoviesCount(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getLastWishlistHome(String username);
+  @Fluent
+  DatabaseService getTotalCinemaCount(String username, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTopMoviesHome(String username);
+  @Fluent
+  DatabaseService getTopMoviesStat(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTotalMovieCount(String username);
+  @Fluent
+  DatabaseService getMonthYearDistribution(String username, String jsonParam, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getNewMovieCount(String username);
+  @Fluent
+  DatabaseService insertSeasonViews(String username, JsonObject seasonData, String seriesId,
+                                    Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTotalRuntime(String username);
+  @Fluent
+  DatabaseService removeSeasonViews(String username, String seasonId, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTotalDistinctMoviesCount(String username);
+  @Fluent
+  DatabaseService updateUserVerifyStatus(String username, String value, Handler<AsyncResult<JsonObject>> handler);
 
-  Future<JsonObject> getTotalCinemaCount(String username);
-
-  Future<JsonObject> getTopMoviesStat(String username, String jsonParam);
-
-  Future<JsonObject> getMonthYearDistribution(String username, String jsonParam);
-
-  Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId);
-
-  Future<JsonObject> removeSeasonViews(String username, String seasonId);
-
-  /**
-   * Creates a SQL command string from given Table and list of Columns.
-   * Does not set values.
-   */
-  enum SQLCommand {
-    UPDATE((table, columns) -> {
-      StringBuilder sb = new StringBuilder("UPDATE ").append(table.getName()).append(" SET ");
-      columns.stream()
-          .filter(column -> column != USERNAME)
-          .forEach(column -> sb
-              .append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()).append(" = ?"));
-      return sb.append(" WHERE Username = ?").toString();
-    }),
-    INSERT((table, columns) -> {
-      StringBuilder sb = new StringBuilder("INSERT INTO ").append(table.getName()).append(" (");
-      columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append(column.getName()));
-      sb.append(") VALUES (");
-      columns.forEach(column -> sb.append(columns.indexOf(column) == 0 ? "" : ", ").append("?"));
-      return sb.append(")").toString();
-    });
-
-    private final BiFunction<Table, List<Column>, String> commandCreator;
-
-    SQLCommand(BiFunction<Table, List<Column>, String> commandCreator) {
-      this.commandCreator = commandCreator;
-    }
-
-    public String create(Table table, List<Column> columns) {
-      return commandCreator.apply(table, columns);
-    }
-  }
-
-  /**
-   * Tables used in database.
-   */
-  enum Table {
-    MOVIES("Movies"),
-    SETTINGS("Settings"),
-    USERS("Users"),
-    VIEWS("Views"),
-    WISHLIST("Wishlist");
-
-    private final String tableName;
-
-    Table(String tableName) {
-      this.tableName = tableName;
-    }
-
-    public String getName() {
-      return tableName;
-    }
-  }
-
-  /**
-   * Columns used in database.
-   */
-  enum Column {
-    FIRSTNAME("Firstname"),
-    LASTNAME("Lastname"),
-    USERNAME("Username"),
-    PASSWORD("Password"),
-    SALT("Salt"),
-    RUNTIMETYPE("RuntimeType"),
-    VERIFIED("Verified"),
-    TITLE("Title"),
-    YEAR("Year"),
-    IMAGE("Image"),
-    MOVIEID("MovieId"),
-    EPISODEID("EpisodeId"),
-    TIME("Time");
-
-    private final String columnName;
-
-    Column(String columnName) {
-      this.columnName = columnName;
-    }
-
-    public static List<Column> getSortedColumns(Map<Column, String> data) {
-      List<Column> columns = data.keySet().stream()
-          .filter(column -> column != USERNAME)
-          .collect(toList());
-      columns.add(USERNAME);
-      return columns;
-    }
-
-    public static JsonArray getSortedValues(List<Column> columns, Map<Column, String> data) {
-      return columns.stream()
-          .map(data::get)
-          .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-    }
-
-    public String getName() {
-      return columnName;
-    }
-  }
+  @Fluent
+  DatabaseService insertUserSettings(String username, String unique, Handler<AsyncResult<JsonObject>> handler);
 }

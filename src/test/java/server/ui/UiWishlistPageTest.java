@@ -22,24 +22,26 @@ import static server.util.Utils.sleep;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UiWishlistPageTest extends UiTest {
 
-    private WebElement goAndWaitTillPosterVisible() {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
-        assertGoToPage(driver, URI + "/private/wishlist");
-        await().until(() -> isEventbus(OPEN, driver));
-        sleep(driver, 5,
-                visibilityOfElementLocated(cssSelector("img.series-poster.search-object-series")));
-        return driver.findElementByCssSelector("img.series-poster.search-object-series");
-    }
+  // TODO: 20.06.2017 needs fixing?
 
-    @Test
-    public void testWishlistMoviesAreLoaded() throws Exception {
-        goAndWaitTillPosterVisible();
-    }
+  private WebElement goAndWaitTillPosterVisible() {
+    localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
+    localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
+    assertGoToPage(driver, URI + "/private/wishlist");
+    await().until(() -> isEventbus(OPEN, driver));
+    sleep(driver, 5,
+        visibilityOfElementLocated(cssSelector("img.series-poster.search-object-series")));
+    return driver.findElementByCssSelector("img.series-poster.search-object-series");
+  }
 
-    @Test
-    public void testClickingMovieRedirectsToMoviePage() throws Exception {
-        goAndWaitTillPosterVisible().click();
-        assertEquals(URI + "/private/movies/?id=49051", driver.getCurrentUrl());
-    }
+  @Test
+  public void testWishlistMoviesAreLoaded() throws Exception {
+    goAndWaitTillPosterVisible();
+  }
+
+  @Test
+  public void testClickingMovieRedirectsToMoviePage() throws Exception {
+    goAndWaitTillPosterVisible().click();
+    assertEquals(URI + "/private/movies/?id=49051", driver.getCurrentUrl());
+  }
 }

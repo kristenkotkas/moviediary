@@ -1,11 +1,13 @@
 package server.service;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClientOptions;
+import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import server.entity.CacheItem;
 import server.entity.Retryable;
@@ -14,12 +16,12 @@ import static io.vertx.rxjava.ext.web.codec.BodyCodec.jsonObject;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static server.entity.Status.OK;
 import static server.service.OmdbServiceImpl.Cache.AWARD;
-import static server.util.CommonUtils.check;
 
 /**
  * The Open Movie Database service implementation.
  */
 public class OmdbServiceImpl extends CachingService<JsonObject> implements OmdbService {
+  private static final Logger LOG = LoggerFactory.getLogger(OmdbServiceImpl.class);
   private static final String APIKEY = "omdb_key";
   private static final int HTTPS = 443;
   private static final String ENDPOINT = "omdbapi.com";
@@ -52,14 +54,21 @@ public class OmdbServiceImpl extends CachingService<JsonObject> implements OmdbS
     client.get(HTTPS, ENDPOINT, apikey + uri)
         .timeout(5000L)
         .as(jsonObject())
-        .send(ar -> check(ar.succeeded(),
-            () -> check(ar.result().statusCode() == OK,
-                () -> future.complete(cache.set(ar.result().body())),
-                () -> future.fail("OMDB API returned code: " + ar.result().statusCode() +
-                    "; message: " + ar.result().statusMessage())),
-            () -> retryable.retry(
+        .send(ar -> {
+          if (ar.succeeded()) {
+            if (ar.result().statusCode() == OK) {
+              future.complete(cache.set(ar.result().body()));
+            } else {
+              future.fail("OMDB API returned code: " + ar.result().statusCode() +
+                  "; message: " + ar.result().statusMessage());
+            }
+          } else {
+            LOG.info("OMDB API request failed: " + ar.cause());
+            retryable.retry(
                 () -> vertx.setTimer(DEFAULT_DELAY, timer -> get(uri, cache, future, retryable)),
-                () -> future.fail("Too many failures."))));
+                () -> future.fail("Too many failures."));
+          }
+        });
   }
 
   public enum Cache {

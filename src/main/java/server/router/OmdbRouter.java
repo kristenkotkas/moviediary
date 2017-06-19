@@ -1,7 +1,5 @@
 package server.router;
 
-import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
@@ -19,11 +17,11 @@ public class OmdbRouter extends EventBusRoutable {
 
   private final OmdbService omdb;
 
-  public OmdbRouter(Vertx vertx, server.service.OmdbService omdb) {
+  public OmdbRouter(Vertx vertx, server.service.OmdbService omdbDelegate) {
     super(vertx);
-    this.omdb = new OmdbService(omdb);
+    this.omdb = new OmdbService(omdbDelegate);
     // TODO: 18/06/2017 service proxies instead of listeners
-    listen(API_GET_AWARDS, reply((user, param) -> Future.<JsonObject>future(fut -> omdb.getMovieAwards(param, fut.completer()))));
+    listen(API_GET_AWARDS, reply((user, param) -> omdb.rxGetMovieAwards(param)));
   }
 
   @Override
