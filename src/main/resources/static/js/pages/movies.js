@@ -657,12 +657,12 @@ function fillLists(lists, movieId) {
     if (lists.length > 0) {
         $.each(lists, function (i) {
             listsTable.append($.parseHTML(
-                '<tr>' +
-                    '<td class="content-key grey-text">' +
+                '<tr id="list-row-' + lists[i][0] + '" class="grey-text">' +
+                    '<td class="content-key">' +
                         safe_tags_replace(lists[i][1]) +
                     '</td>' +
                     '<td>' +
-                        '<span id="list-' + lists[i][0] + '" class="home-link cursor grey-text" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
+                        '<span id="list-' + lists[i][0] + '" class="home-link cursor" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
                             'Add' +
                         '</span>' +
                     '</td>' +
@@ -711,9 +711,15 @@ function removeFromList(movieId, listId) {
 }
 
 function decorateInList(listId) {
-    $(document.getElementById('list-' + listId)).empty().append('Remove');
+    var button = $(document.getElementById('list-' + listId));
+    var row = $(document.getElementById('list-row-' + listId));
+    button.empty().append('Remove');
+    row.addClass('text-darken-4');
 }
 
 function decorateNotInList(listId) {
-    $(document.getElementById('list-' + listId)).empty().append('Add');
+    var button = $(document.getElementById('list-' + listId));
+    var row = $(document.getElementById('list-row-' + listId));
+    button.empty().append('Add');
+    row.removeClass('text-darken-4');
 }

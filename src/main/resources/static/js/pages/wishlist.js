@@ -30,6 +30,7 @@ eventbus.onclose = function (json) {
 };
 
 function addTableData(data, lang) {
+    console.log(data);
     var timeout = 0;
     $.each(data, function (i) {
         setTimeout(function () {

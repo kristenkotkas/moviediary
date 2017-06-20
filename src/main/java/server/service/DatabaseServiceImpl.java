@@ -135,7 +135,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ?";
     private static final String SQL_INSERT_SEASON =
             "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES";
-    private static final String  SQL_REMOVE_SEASON =
+    private static final String SQL_REMOVE_SEASON =
             "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
@@ -147,6 +147,10 @@ public class DatabaseServiceImpl implements DatabaseService {
             "DELETE FROM ListEntries WHERE Username = ? && ListId = ? && MovieId = ?;";
     private static final String SQL_GET_IN_LISTS =
             "SELECT ListId FROM ListEntries WHERE Username = ? && MovieId = ?;";
+    private static final String SQL_GET_LIST_ENTRIES =
+            "SELECT MovieId, Title, Year, Image FROM ListEntries " +
+                    "JOIN Movies On ListEntries.MovieId = Movies.Id " +
+                    "WHERE Username = ? && ListId = ?;";
 
     private final JDBCClient client;
 
@@ -562,6 +566,13 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_GET_IN_LISTS, new JsonArray()
                 .add(username)
                 .add(movieId));
+    }
+
+    @Override
+    public Future<JsonObject> getListEntries(String username, String listId) {
+        return query(SQL_GET_LIST_ENTRIES, new JsonArray()
+                .add(username)
+                .add(listId));
     }
 
     /**
