@@ -91,7 +91,7 @@ function addListTitle(title, listId) {
                 '<div class="card-content">' +
                     '<div class="card-title">' +
                         '<span class="light grey-text text-darken-2 list-title" id="list-title">' +
-                            title +
+                            '<div onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">' + title + '</div>' +
                         '</span>' +
                     '</div>' +
                     '<a class="home-link cursor blue-text text-darken-2" ' +
@@ -154,45 +154,43 @@ function unboundOnClick() {
 
 function addListBody(data, listId) {
     console.log(data);
-    var timeout = 0;
     listContainer.empty();
     $.each(data, function (i) {
-        setTimeout(function () {
-            var posterPath = "";
-            var movie = data[i];
-            if (movie['Image'] !== "") {
-                posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
-            } else {
-                posterPath = '/static/img/nanPosterBig.jpg'
-            }
 
-            var movieId = movie['MovieId'];
-            var cardId = 'card_' + movieId;
+        var posterPath = "";
+        var movie = data[i];
+        if (movie['Image'] !== "") {
+            posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
+        } else {
+            posterPath = '/static/img/nanPosterBig.jpg'
+        }
 
-            listContainer.append(
-                $.parseHTML(
-                    '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
-                    '<div class="card horizontal z-depth-0">' +
-                    '<div class="card-image">' +
-                    '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
-                    '</div>' +
-                    '<div class="card-stacked truncate">' +
-                    '<div class="card-content">' +
-                    '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
-                    movie['Title'] +
-                    '</a>' +
-                    '<span>' + movie['Year'] + '</span>' +
-                    '</div>' +
-                    '<div class="card-action">' +
-                    '<a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>'
-                )
-            );
-        }, timeout += 0);
+        var movieId = movie['MovieId'];
+        var cardId = 'card_' + movieId;
+
+        listContainer.append(
+            $.parseHTML(
+                '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
+                '<div class="card horizontal z-depth-0">' +
+                '<div class="card-image">' +
+                '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
+                movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
+                '</div>' +
+                '<div class="card-stacked truncate">' +
+                '<div class="card-content">' +
+                '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
+                movie['Title'] +
+                '</a>' +
+                '<span>' + movie['Year'] + '</span>' +
+                '</div>' +
+                '<div class="card-action">' +
+                '<a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+            )
+        );
     });
 }
 
