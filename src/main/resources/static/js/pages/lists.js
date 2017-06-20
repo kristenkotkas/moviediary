@@ -10,7 +10,10 @@ var eventbus = new EventBus("/eventbus");
 var inputNewListName = $('#createListName');
 var newListModal = $('#modalList');
 var listsTable = $('#lists-tabel');
-var listContent = $('#list-content');
+var listTitleHolder = $('#list-title-holder');
+var listContainer = $('#list-container');
+var btnDeleteList = $('#delete-list');
+var modalDeleteList = $('#modal-delete-list');
 var lang;
 
 eventbus.onopen = function () {
@@ -23,6 +26,7 @@ eventbus.onopen = function () {
 function modalClose() {
     console.log('modal closed');
     inputNewListName.val('');
+    unboundOnClick();
 }
 
 function createNewList() {
@@ -70,33 +74,88 @@ function fillLists(lists) {
 function openList(listId, listName) {
     eventbus.send('database_get_list_entries', listId, function (error, reply) {
         console.log('opened list', listId);
+        unboundOnClick();
         fillMovies(reply.body['rows'], listName, listId);
     });
 }
 
 function fillMovies(resultRows, listName, listId) {
-    listContent.empty();
-    addListTitle(listName);
+    addListTitle(listName, listId);
     addListBody(resultRows, listId);
 }
 
-function addListTitle(title) {
-    listContent.append($.parseHTML(
+function addListTitle(title, listId) {
+    listTitleHolder.empty().append($.parseHTML(
         '<div class="row">' +
             '<div class="card z-depth-0">' +
-                '<div class="card-title">' +
-                    '<span class="light grey-text text-lighten-1 not-found">' +
-                        title +
-                    '</span>' +
+                '<div class="card-content">' +
+                    '<div class="card-title">' +
+                        '<span class="light grey-text text-darken-2 list-title" id="list-title">' +
+                            title +
+                        '</span>' +
+                    '</div>' +
+                    '<a class="home-link cursor blue-text text-darken-2" ' +
+                        'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">Muuda nimekirja nime</a><br>' +
+                    '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">Kustuta nimekiri</a>' +
                 '</div>' +
             '</div>' +
         '</div>'
     ));
 }
 
+function changeNameOnClick(listId, title) {
+    var element = $('#list-title');
+    element.empty().append(
+        $.parseHTML(
+            '<div class="input-field custom-input">' +
+                '<input class="custom-input-field grey-text" id="changeNameInput" type="text" value="' + title + '" data-length="50">' +
+            '</div>' +
+            '<a class="btn z-depth-0 red lighten-2" onclick="addListTitle(\'' + title + '\',' + listId +')">Cancel</a>' +
+            '<a> </a>' +
+            '<a class="btn z-depth-0 green lighten-2" id="save-name-' + listId + '">Save</a>'
+        )
+    );
+    $(document.getElementById('save-name-' + listId)).click(function () {
+        changeListName($('#changeNameInput').val(), listId);
+    });
+}
+
+function changeListName(title, listId) {
+    if (title.length > 0 && title.length <= 50) {
+        eventbus.send('database_change_list_name',
+            {
+                'listName': title.toString(),
+                'listId': listId.toString()
+            }, function (error, reply) {
+                if (reply['body']['updated'] != null) {
+                    addListTitle(title, listId);
+                    getLists();
+                }
+            }
+        )
+    }
+}
+
+function openDeleteModal(listId) {
+    console.log('delete list modal open');
+    modalDeleteList.modal('open');
+    btnDeleteList.click(function () {
+        deleteList(listId);
+    });
+}
+
+function deleteList(listId) {
+
+}
+
+function unboundOnClick() {
+    btnDeleteList.off('click').off('keyup');
+}
+
 function addListBody(data, listId) {
     console.log(data);
     var timeout = 0;
+    listContainer.empty();
     $.each(data, function (i) {
         setTimeout(function () {
             var posterPath = "";
@@ -110,7 +169,7 @@ function addListBody(data, listId) {
             var movieId = movie['MovieId'];
             var cardId = 'card_' + movieId;
 
-            listContent.append(
+            listContainer.append(
                 $.parseHTML(
                     '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
                     '<div class="card horizontal z-depth-0">' +
@@ -133,7 +192,7 @@ function addListBody(data, listId) {
                     '</div>'
                 )
             );
-        }, timeout += 25);
+        }, timeout += 0);
     });
 }
 

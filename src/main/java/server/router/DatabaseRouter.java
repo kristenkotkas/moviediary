@@ -78,6 +78,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String REMOVE_FROM_LIST = "database_remove_from_list";
     private static final String GET_IN_LIST = "database_get_in_list";
     private static final String GET_LIST_ENTRIES = "database_get_list_entries";
+    private static final String CHANGE_LIST_NAME = "database_change_list_name";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -127,6 +128,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(REMOVE_FROM_LIST, reply(database::removeFromList));
         listen(GET_IN_LIST, reply(database::getInLists));
         listen(GET_LIST_ENTRIES, reply(database::getListEntries));
+        listen(CHANGE_LIST_NAME, reply(database::changeListName));
     }
 
     @Override

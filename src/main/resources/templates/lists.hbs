@@ -37,8 +37,7 @@
                                         <td>
                                             <!-- Modal Trigger -->
                                             <a class="blue-text text-darken-2 home-link lighten-2 z-depth-0"
-                                               href="#modalList">Create
-                                                new list</a>
+                                               href="#modalList">Create new list</a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -53,14 +52,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col s12 m7 l8 xl9" id="list-content"> <!-- Listi sisu peale avamist -->
+                <div class="col s12 m7 l8 xl9"> <!-- Listi sisu peale avamist -->
+                    <div id="list-title-holder"></div>
+                    <div id="list-container"></div>
                 </div>
             </div>
 
-            <!-- Modal Structure -->
+            <!-- New List modal -->
             <div id="modalList" class="modal z-depth-0">
                 <div class="modal-content">
-                    <div class=" col s12 m12 l12">
+                    <div class="col s12 m12 l12">
                         <h5>Create new list</h5>
                         <div class="row"></div>
                         <div class="input-field">
@@ -76,6 +77,20 @@
                     <a class="modal-action waves-effect waves-green btn-flat"
                        id="create-list" onclick="createNewList()">Create</a>
                     <a class="modal-action modal-close waves-effect waves-red btn-flat" id="cancel-new-list">Cancel</a>
+                </div>
+            </div>
+
+            <!-- Delete list modal -->
+            <div id="modal-delete-list" class="modal z-depth-0 col m6 offset-m3 l4 offset-l4">
+                <div class="modal-content">
+                    <div class="col s12 m12 l12">
+                        <h5 class="center">You are about to delete your list.<br> Are you sure you want to delete it?</h5>
+                        <div class="row"></div>
+                        <div class="modal-footer">
+                            <a class="modal-action waves-effect waves-green btn-flat" id="delete-list">Delete</a>
+                            <a class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -253,6 +253,18 @@ span.badge.new:after {
     height: 420px;
 }
 
+.custom-input-field[type="text"] {
+    font-size: xx-large;
+}
+
+.custom-input {
+    margin: 0;
+}
+
+.list-title {
+    font-size: xx-large;
+}
+
 .not-found {
     margin: 15px;
     font-size: xx-large;
