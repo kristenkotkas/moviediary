@@ -178,10 +178,10 @@ function fillResultSeries(seriesData, page, lang) {
                                     '<div class="col s9 m10 l11">' +
                                         '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +
                                         '<span class="season-add-info grey-text text-darken-2">' +
+                                        '<span class="description hide-on-med-and-down grey-text text-darken-4" >' + seasonData['overview'] + '</span>' +
                                             getYear(seasonData['air_date'])  +
                                             seasonData['episodes'].length + episode +
                                         '</span><br>' +
-                                        '<span class="description hide-on-med-and-down grey-text text-darken-4" >' + seasonData['overview'] + '</span>' +
                                     '</div>' +
                                 '</div>' +
                             '</div>' +

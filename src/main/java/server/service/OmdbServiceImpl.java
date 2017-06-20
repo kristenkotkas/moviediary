@@ -1,9 +1,11 @@
 package server.service;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import server.entity.Retryable;
 
@@ -50,14 +52,17 @@ public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements O
         client.get(HTTPS, ENDPOINT, apikey + uri)
                 .timeout(5000L)
                 .as(jsonObject())
-                .send(ar -> check(ar.succeeded(),
-                        () -> check(ar.result().statusCode() == OK,
-                                () -> future.complete(cache.set(ar.result().body())),
-                                () -> future.fail("OMDB API returned code: " + ar.result().statusCode() +
-                                        "; message: " + ar.result().statusMessage())),
-                        () -> retryable.retry(
-                                () -> vertx.setTimer(DEFAULT_DELAY, timer -> get(uri, cache, future, retryable)),
-                                () -> future.fail("Too many failures."))));
+                .send((AsyncResult<HttpResponse<JsonObject>> ar) -> {
+                    System.out.println("STATUSCODE ------------ " + ar.cause());
+                    check(ar.succeeded(),
+                            () -> check(ar.result().statusCode() == OK,
+                                    () -> future.complete(cache.set(ar.result().body())),
+                                    () -> future.fail("OMDB API returned code: " + ar.result().statusCode() +
+                                            "; message: " + ar.result().statusMessage())),
+                            () -> retryable.retry(
+                                    () -> vertx.setTimer(DEFAULT_DELAY, timer -> get(uri, cache, future, retryable)),
+                                    () -> future.fail("Too many failures.")));
+                });
     }
 
     public enum Cache {

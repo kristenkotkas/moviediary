@@ -53,6 +53,7 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_STATISTICS = "/private/statistics";
     public static final String UI_WISHLIST = "/private/wishlist";
     public static final String UI_DISCOVER = "/private/discover";
+    public static final String UI_LISTS = "/private/lists";
     public static final String UI_LOGIN = "/login";
     public static final String UI_FORM_LOGIN = "/formlogin";
     public static final String UI_FORM_REGISTER = "/formregister";
@@ -68,6 +69,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
     private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
     private static final String TEMPL_DISCOVER = "templates/discover.hbs";
+    private static final String TEMPL_LISTS = "templates/lists.hbs";
     private static final String TEMPL_LOGIN = "templates/login.hbs";
     private static final String TEMPL_FORM_LOGIN = "templates/formlogin.hbs";
     private static final String TEMPL_FORM_REGISTER = "templates/formregister.hbs";
@@ -104,6 +106,7 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_STATISTICS).handler(this::handleStatistics);
         router.get(UI_WISHLIST).handler(this::handleWishlist);
         router.get(UI_DISCOVER).handler(this::handleDiscover);
+        router.get(UI_LISTS).handler(this::handleLists);
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
         router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
 
@@ -173,6 +176,10 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleDiscover(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_DISCOVER, DiscoverTemplate.class), endHandler(ctx));
+    }
+
+    private void handleLists(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_LISTS, ListsTemplate.class), endHandler(ctx));
     }
 
     /**
@@ -286,6 +293,7 @@ public class UiRouter extends EventBusRoutable {
         base.setStatisticsPage(UI_STATISTICS);
         base.setWishlistPage(UI_WISHLIST);
         base.setDiscoverPage(UI_DISCOVER);
+        base.setListsPage(UI_LISTS);
         CommonProfile profile = getProfile(ctx, securityConfig);
         if (profile != null) {
             base.setUserName(profile.getFirstName() + " " + profile.getFamilyName());

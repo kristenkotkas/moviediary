@@ -25,9 +25,16 @@ var eventbus = new EventBus("/eventbus");
 var oscarContainer = $('#oscar-container');
 var isStarWars = false;
 var modal = $('#modal1');
+var showEndTime = $('#show-end-time');
+var showEndTimeText = $('#show-end-time-text');
+var interval;
+var actors = $('#actors');
+var director = $('#director');
+var writers = $('#writer');
+var listsTable = $('#lists-table');
+var lang;
 eventbus.onopen = function () {
 
-    var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
         enableParameterMovieLoading(eventbus, lang);
@@ -48,9 +55,12 @@ eventbus.onopen = function () {
             $('#add-wishlist').removeClass('scale-in').addClass('scale-out');
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
+            $('#crew-box').removeClass('scale-in').addClass('scale-out');
+            showEndTime.removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             $("#awards").empty();
             oscarContainer.empty();
+            clearCrew();
 
             setTimeout(function () {
                 eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
@@ -113,6 +123,26 @@ eventbus.onopen = function () {
     });
 };
 
+function openShowEndtime(length) {
+    if (length !== 0) {
+        showEndTime.removeClass('scale-out').addClass('scale-in');
+        showEndTimeClick(length);
+        interval = setInterval(function () {
+            showEndTimeClick(length);
+        }, 1000);
+    }
+}
+
+function showEndTimeClick(length) {
+    var endtime = plusMins(new Date(), length);
+    showEndTimeText.empty().append(
+        $.parseHTML(
+            getDualTime(endtime.getHours()) + ':' +
+            getDualTime(endtime.getMinutes())
+        )
+    );
+}
+
 var enableParameterMovieLoading = function (eventbus, lang) {
     var loadMovie = function (eventbus, lang) {
         var query = getUrlParam("id");
@@ -132,12 +162,20 @@ function startAwardLoading() {
     );
 }
 
+function startLoadingCrew() {
+    actors.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    director.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    writers.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+}
+
 var searchMovie = function (eventbus, movieId, lang) {
     //console.log("LANG: " + JSON.stringify(lang));
     $('#add-btn').off('click').off('keyup');
     console.log(movieId);
     eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
+        clearInterval(interval);
         startAwardLoading();
+        startLoadingCrew();
         var startDate = $("#watchStartDay");
         var startTime = $("#watchStartTime");
         var startNow = $("#watchStartNow");
@@ -234,7 +272,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             posterPath = 'https://image.tmdb.org/t/p/w500' + data['poster_path'];
         }
 
-        document.title = lang['NAVBAR_MOVIES'] + ' - ' + data.title;
+        document.title = 'Movie Diary | ' + data.title;
         console.log(data);
 
         $("#search-result").empty().hide();
@@ -254,7 +292,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             backgroundPath = 'https://image.tmdb.org/t/p/w1920' + data['backdrop_path'];
         }
 
-        getOmdb(data['imdb_id']);
+        getOmdb(data['imdb_id'], lang);
 
         getMovieViews(eventbus, movieId, lang);
 
@@ -279,18 +317,9 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-watch').removeClass('scale-out').addClass('scale-in');
         $('#plot').removeClass('scale-out').addClass('scale-in');
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
-
-        inWishlist(eventbus, movieId, lang);
-
-        $("#add-wishlist").click(function () {
-            addToWishlist(eventbus, movieId, lang);
-        });
-
-        $("#add-wishlist").keyup(function (e) {
-            if (e.keyCode === 13) {
-                $("#add-wishlist").click();
-            }
-        });
+        $('#crew-box').removeClass('scale-out').addClass('scale-in');
+        openShowEndtime(data['runtime']);
+        getLists(movieId);
 
         if (data['overview'] != null) {
             $('#plot-text').empty().append(data['overview']);
@@ -310,14 +339,42 @@ function removeStarWars() {
     $("#add-watch").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
 }
 
-function getOmdb(imdbId) {
+function getOmdb(imdbId, lang) {
     eventbus.send("api_get_awards", imdbId, function (error, reply) {
         console.log('OMDB', reply);
         if (reply.body != 'Failure: Too many failures.') {
             parseAwards(reply.body['Awards']);
             $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
+            fillCrew(reply.body, lang);
         }
     });
+}
+
+function fillCrew(omdb, lang) {
+    console.log('crewOmdb', omdb);
+    actors.empty().append(OMDBArrayToString(omdb['Actors'], lang));
+    director.empty().append(OMDBArrayToString(omdb['Director'], lang));
+    writers.empty().append(OMDBArrayToString(omdb['Writer'], lang));
+}
+
+function clearCrew() {
+    actors.empty();
+    director.empty();
+    writers.empty();
+}
+
+function OMDBArrayToString(value, lang) {
+    if (value === 'N/A') {
+        return lang['MOVIES_JS_UNKNOWN'];
+    } else {
+        var dataParts = value.split(',');
+        var result = '';
+        $.each(dataParts, function (i) {
+            result += dataParts[i] + '<br>'
+        });
+
+        return result;
+    }
 }
 
 function parseAwards(awardString) {
@@ -412,13 +469,13 @@ var getMovieViews = function (eventbus, movieId, lang) {
                 $('#movie-views-table').append(
                     $.parseHTML(
                         '<tr>' +
-                        '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
-                        '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
-                        '<td>' +
-                        '<a class="grey-text" id="' + ('remove_view_' + viewId) + '">' +
-                            lang['HISTORY_REMOVE'] +
-                        '</a>' +
-                        '</td>' +
+                            '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
+                            '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
+                            '<td>' +
+                                '<a class="grey-text" id="' + ('remove_view_' + viewId) + '">' +
+                                    lang['HISTORY_REMOVE'] +
+                                '</a>' +
+                            '</td>' +
                         '</tr>'
                     )
                 );
@@ -578,3 +635,85 @@ var toNormalRevenue = function (revenue, lang) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else return revenue.toLocaleString() + ' $';
 };
+
+function getLists(movieId) {
+    eventbus.send('database_get_lists', {}, function (error, reply) {
+        fillLists(reply.body['results'], movieId);
+        getInList(movieId);
+    });
+}
+
+function getInList(movieId) {
+    eventbus.send('database_get_in_list', movieId, function (error, reply) {
+        var data = reply.body['results'];
+        $.each(data, function (i) {
+            decorateInList(data[i][0]);
+        });
+    });
+}
+
+function fillLists(lists, movieId) {
+    listsTable.empty();
+    if (lists.length > 0) {
+        $.each(lists, function (i) {
+            listsTable.append($.parseHTML(
+                '<tr>' +
+                    '<td class="content-key grey-text">' +
+                        safe_tags_replace(lists[i][1]) +
+                    '</td>' +
+                    '<td>' +
+                        '<span id="list-' + lists[i][0] + '" class="home-link cursor grey-text" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
+                            'Add' +
+                        '</span>' +
+                    '</td>' +
+                '</tr>'
+            ));
+        });
+    } else {
+        /*listsDropdown.append($.parseHTML(
+            '<li>No lists</li>'
+        ));*/
+    }
+}
+
+function listAddOnClick(movieId, listId) {
+    // <i class="green-text fa fa-check new" aria-hidden="true"></i>
+    var button = $(document.getElementById('list-' + listId));
+    if (button.text() === 'Add') {
+        insertIntoList(movieId, listId);
+    } else if (button.text() === 'Remove') {
+        removeFromList(movieId, listId);
+    }
+}
+
+function insertIntoList(movieId, listId) {
+    eventbus.send('database_insert_into_lists',
+        {
+            'listId': listId.toString(),
+            'movieId': movieId.toString()
+        }, function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                decorateInList(listId);
+            }
+        });
+}
+
+function removeFromList(movieId, listId) {
+    eventbus.send('database_remove_from_list',
+        {
+            'listId': listId.toString(),
+            'movieId': movieId.toString()
+        }, function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                decorateNotInList(listId);
+            }
+        });
+}
+
+function decorateInList(listId) {
+    $(document.getElementById('list-' + listId)).empty().append('Remove');
+}
+
+function decorateNotInList(listId) {
+    $(document.getElementById('list-' + listId)).empty().append('Add');
+}

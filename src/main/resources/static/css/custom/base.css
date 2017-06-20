@@ -227,6 +227,12 @@ body {
     margin: 16px 0;
 }
 
+.end-time {
+    font-size: x-large;
+    font-weight: bold;
+    color: #e57373;
+}
+
 .content-key {
     font-weight: bold;
 }
@@ -281,11 +287,6 @@ span.badge.new:after {
     margin-left: 5%;
     font-size: larger;
     font-weight: bold;
-}
-
-.add-wishlist:hover {
-    background: #dbded9;
-    cursor: pointer;
 }
 
 .star-wars-add-wishlist:hover {
