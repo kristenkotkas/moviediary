@@ -41,7 +41,7 @@ function createNewList() {
 function getLists() {
     eventbus.send('database_get_lists', {}, function (error, reply) {
         fillLists(reply.body['results']);
-    })
+    });
 }
 
 function fillLists(lists) {
@@ -54,7 +54,7 @@ function fillLists(lists) {
                         '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
                     '</td>' +
                     '<td>' +
-                        '<span class="content-key grey-text text-darken-1">' + lists[i][1] + '</span>' +
+                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
                     '</td>' +
                 '</tr>'
             ));

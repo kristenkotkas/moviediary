@@ -289,11 +289,6 @@ span.badge.new:after {
     font-weight: bold;
 }
 
-.add-wishlist:hover {
-    background: #dbded9;
-    cursor: pointer;
-}
-
 .star-wars-add-wishlist:hover {
     background: #dbded9;
     cursor: url(/static/img/lightsaber_red.gif), auto;

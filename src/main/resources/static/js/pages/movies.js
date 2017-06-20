@@ -31,9 +31,10 @@ var interval;
 var actors = $('#actors');
 var director = $('#director');
 var writers = $('#writer');
+var listsTable = $('#lists-table');
+var lang;
 eventbus.onopen = function () {
 
-    var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
         enableParameterMovieLoading(eventbus, lang);
@@ -318,18 +319,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
         $('#crew-box').removeClass('scale-out').addClass('scale-in');
         openShowEndtime(data['runtime']);
-
-        inWishlist(eventbus, movieId, lang);
-
-        $("#add-wishlist").click(function () {
-            addToWishlist(eventbus, movieId, lang);
-        });
-
-        $("#add-wishlist").keyup(function (e) {
-            if (e.keyCode === 13) {
-                $("#add-wishlist").click();
-            }
-        });
+        getLists(movieId);
 
         if (data['overview'] != null) {
             $('#plot-text').empty().append(data['overview']);
@@ -479,13 +469,13 @@ var getMovieViews = function (eventbus, movieId, lang) {
                 $('#movie-views-table').append(
                     $.parseHTML(
                         '<tr>' +
-                        '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
-                        '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
-                        '<td>' +
-                        '<a class="grey-text" id="' + ('remove_view_' + viewId) + '">' +
-                            lang['HISTORY_REMOVE'] +
-                        '</a>' +
-                        '</td>' +
+                            '<td class="content-key grey-text">' + getMonth(data[i]['Start'], lang) + '</td>' +
+                            '<td class="grey-text"><i class="green-text ' + data[i]['WasCinema'] + '" aria-hidden="true"></i></td>' +
+                            '<td>' +
+                                '<a class="grey-text" id="' + ('remove_view_' + viewId) + '">' +
+                                    lang['HISTORY_REMOVE'] +
+                                '</a>' +
+                            '</td>' +
                         '</tr>'
                     )
                 );
@@ -645,3 +635,85 @@ var toNormalRevenue = function (revenue, lang) {
         return lang['MOVIES_JS_UNKNOWN'];
     } else return revenue.toLocaleString() + ' $';
 };
+
+function getLists(movieId) {
+    eventbus.send('database_get_lists', {}, function (error, reply) {
+        fillLists(reply.body['results'], movieId);
+        getInList(movieId);
+    });
+}
+
+function getInList(movieId) {
+    eventbus.send('database_get_in_list', movieId, function (error, reply) {
+        var data = reply.body['results'];
+        $.each(data, function (i) {
+            decorateInList(data[i][0]);
+        });
+    });
+}
+
+function fillLists(lists, movieId) {
+    listsTable.empty();
+    if (lists.length > 0) {
+        $.each(lists, function (i) {
+            listsTable.append($.parseHTML(
+                '<tr>' +
+                    '<td class="content-key grey-text">' +
+                        safe_tags_replace(lists[i][1]) +
+                    '</td>' +
+                    '<td>' +
+                        '<span id="list-' + lists[i][0] + '" class="home-link cursor grey-text" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
+                            'Add' +
+                        '</span>' +
+                    '</td>' +
+                '</tr>'
+            ));
+        });
+    } else {
+        /*listsDropdown.append($.parseHTML(
+            '<li>No lists</li>'
+        ));*/
+    }
+}
+
+function listAddOnClick(movieId, listId) {
+    // <i class="green-text fa fa-check new" aria-hidden="true"></i>
+    var button = $(document.getElementById('list-' + listId));
+    if (button.text() === 'Add') {
+        insertIntoList(movieId, listId);
+    } else if (button.text() === 'Remove') {
+        removeFromList(movieId, listId);
+    }
+}
+
+function insertIntoList(movieId, listId) {
+    eventbus.send('database_insert_into_lists',
+        {
+            'listId': listId.toString(),
+            'movieId': movieId.toString()
+        }, function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                decorateInList(listId);
+            }
+        });
+}
+
+function removeFromList(movieId, listId) {
+    eventbus.send('database_remove_from_list',
+        {
+            'listId': listId.toString(),
+            'movieId': movieId.toString()
+        }, function (error, reply) {
+            if (reply['body']['updated'] != null) {
+                decorateNotInList(listId);
+            }
+        });
+}
+
+function decorateInList(listId) {
+    $(document.getElementById('list-' + listId)).empty().append('Remove');
+}
+
+function decorateNotInList(listId) {
+    $(document.getElementById('list-' + listId)).empty().append('Add');
+}

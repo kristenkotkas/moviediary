@@ -141,6 +141,12 @@ public class DatabaseServiceImpl implements DatabaseService {
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
             "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ?;";
+    private static final String SQL_INSERT_INTO_LIST =
+            "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
+    private static final String SQL_REMOVE_FROM_LIST =
+            "DELETE FROM ListEntries WHERE Username = ? && ListId = ? && MovieId = ?;";
+    private static final String SQL_GET_IN_LISTS =
+            "SELECT ListId FROM ListEntries WHERE Username = ? && MovieId = ?;";
 
     private final JDBCClient client;
 
@@ -518,7 +524,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> insertList(String username, String listName) {
-        // INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);
         return updateOrInsert(SQL_INSERT_NEW_LIST, new JsonArray()
                 .add(username)
                 .add(listName)
@@ -533,6 +538,30 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getLists(String username) {
         return query(SQL_GET_LISTS, new JsonArray().add(username));
+    }
+
+    @Override
+    public Future<JsonObject> insertIntoList(String username, String jsonParam) {
+        return updateOrInsert(SQL_INSERT_INTO_LIST, new JsonArray()
+                .add(username)
+                .add(new JsonObject(jsonParam).getString("listId"))
+                .add(new JsonObject(jsonParam).getString("movieId"))
+                .add(currentTimeMillis()));
+    }
+
+    @Override
+    public Future<JsonObject> removeFromList(String username, String jsonParam) {
+        return updateOrInsert(SQL_REMOVE_FROM_LIST, new JsonArray()
+                .add(username)
+                .add(new JsonObject(jsonParam).getString("listId"))
+                .add(new JsonObject(jsonParam).getString("movieId")));
+    }
+
+    @Override
+    public Future<JsonObject> getInLists(String username, String movieId) {
+        return query(SQL_GET_IN_LISTS, new JsonArray()
+                .add(username)
+                .add(movieId));
     }
 
     /**
