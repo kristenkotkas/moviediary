@@ -140,19 +140,21 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
-            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ?;";
+            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND Active;";
     private static final String SQL_INSERT_INTO_LIST =
             "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
     private static final String SQL_REMOVE_FROM_LIST =
-            "DELETE FROM ListEntries WHERE Username = ? && ListId = ? && MovieId = ?;";
+            "DELETE FROM ListEntries WHERE Username = ? AND ListId = ? && MovieId = ?;";
     private static final String SQL_GET_IN_LISTS =
-            "SELECT ListId FROM ListEntries WHERE Username = ? && MovieId = ?;";
+            "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
             "SELECT MovieId, Title, Year, Image, Time FROM ListEntries " +
                     "JOIN Movies On ListEntries.MovieId = Movies.Id " +
-                    "WHERE Username = ? && ListId = ? ORDER BY Time DESC;";
+                    "WHERE Username = ? AND ListId = ? ORDER BY Time DESC;";
     private static final String SQL_CHANGE_LIST_NAME =
-            "UPDATE ListsInfo SET ListName = ? WHERE Username = ? && Id = ?;";
+            "UPDATE ListsInfo SET ListName = ? WHERE Username = ? AND Id = ?;";
+    private static final String SQL_DELETE_LIST =
+            "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
 
     private final JDBCClient client;
 
@@ -579,13 +581,19 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> changeListName(String username, String param) {
-        // param -> listName, listId
-        // "UPDATE ListsInfo SET ListName = ? WHERE Username = ? && Id = ?;";
         return updateOrInsert(SQL_CHANGE_LIST_NAME, new JsonArray()
                 .add(new JsonObject(param).getString("listName"))
                 .add(username)
                 .add(new JsonObject(param).getString("listId")));
 
+    }
+
+    @Override
+    public Future<JsonObject> deleteList(String username, String listId) {
+        // "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
+        return updateOrInsert(SQL_DELETE_LIST, new JsonArray()
+                .add(username)
+                .add(listId));
     }
 
     /**

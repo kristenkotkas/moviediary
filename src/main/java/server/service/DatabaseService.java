@@ -163,6 +163,8 @@ public interface DatabaseService {
 
     Future<JsonObject> changeListName(String username, String param);
 
+    Future<JsonObject> deleteList(String username, String listId);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

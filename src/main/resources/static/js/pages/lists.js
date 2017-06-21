@@ -145,7 +145,15 @@ function openDeleteModal(listId) {
 }
 
 function deleteList(listId) {
-
+    eventbus.send('database_delete_list', listId, function (error, reply) {
+        if (reply['body']['updated'] != null) {
+            console.log('deleted list', listId);
+            modalDeleteList.modal('close');
+            listTitleHolder.empty();
+            listContainer.empty();
+            getLists();
+        }
+    });
 }
 
 function unboundOnClick() {
