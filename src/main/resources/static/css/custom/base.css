@@ -306,6 +306,11 @@ span.badge.new:after {
     cursor: url(/static/img/lightsaber_red.gif), auto;
 }
 
+.add-wishlist:hover {
+    background: #dbded9;
+    cursor: pointer;
+}
+
 .container {
     width: 90%;
     margin-left: 2%;
