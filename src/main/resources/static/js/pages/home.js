@@ -59,7 +59,6 @@ function fillLastMovies(lang) {
         if (data.length > 0) {
             $.each(data, function (i) {
                 var movie = data[i];
-                console.log(movie);
                 lastMovies.append(
                     $.parseHTML(
                         '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
@@ -140,18 +139,20 @@ function fillTotalStat(lang) {
 }
 
 function fillWishlist(lang) {
-    eventbus.send("database_get_home_wishlist", {}, function (error, reply) {
+    eventbus.send("database_get_last_lists_home", {}, function (error, reply) {
         wishlist.empty();
         var data = reply['body']['rows'];
         if (data.length > 0) {
             $.each(data, function (i) {
                 var movie = data[i];
+                console.log(movie);
                 wishlist.append(
                     $.parseHTML(
                         '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
                         '<td>' +
                         '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
-                        '<span class="grey-text">' +  movie['Year'] + '</span>' +
+                        '<span class="grey-text content-key">' +  movie['Year'] + '</span><br>' +
+                        '<i class="grey-text">' +  movie['ListName'] + '</i>' +
                         '</td>' +
                         '</tr>'
                     )
