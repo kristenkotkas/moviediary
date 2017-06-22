@@ -151,7 +151,7 @@ function fillWishlist(lang) {
                         '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
                         '<td>' +
                         '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
-                        '<span class="grey-text content-key">' +  movie['Year'] + '</span><br>' +
+                        '<span class="grey-text content-key">' +  yearNullCheck(movie['Year'], lang) + '</span><br>' +
                         '<i class="grey-text">' +  movie['ListName'] + '</i>' +
                         '</td>' +
                         '</tr>'

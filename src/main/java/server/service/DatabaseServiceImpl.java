@@ -172,6 +172,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
                     "WHERE ListEntries.Username = ? AND ACTIVE " +
                     "ORDER BY Time DESC LIMIT 5";
+    private static final String SQL_GET_DELETED_LISTS =
+            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated DESC;";
+    private static final String SQL_RESTORE_DELETED_LIST =
+            "UPDATE ListsInfo SET Active = 1 WHERE Username = ? AND Id = ?;";
 
     private final JDBCClient client;
 
@@ -566,6 +570,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
+    public Future<JsonObject> getDeletedLists(String username) {
+        return query(SQL_GET_DELETED_LISTS, new JsonArray().add(username));
+    }
+
+    @Override
     public Future<JsonObject> insertIntoList(String username, String jsonParam) {
         return updateOrInsert(SQL_INSERT_INTO_LIST, new JsonArray()
                 .add(username)
@@ -631,6 +640,13 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> getLastListsHome(String username) {
         return query(SQL_GET_LAST_LISTS_HOME, new JsonArray()
                 .add(username));
+    }
+
+    @Override
+    public Future<JsonObject> restoreDeletedList(String username, String listId) {
+        return updateOrInsert(SQL_RESTORE_DELETED_LIST, new JsonArray()
+                .add(username)
+                .add(listId));
     }
 
     /**

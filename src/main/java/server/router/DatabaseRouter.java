@@ -83,6 +83,8 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String GET_LIST_SEEN_MOVIES = "database_get_list_seen_movies";
     private static final String GET_LIST_NAME = "database_get_list_name";
     private static final String GET_LAST_LISTS_HOME = "database_get_last_lists_home";
+    private static final String GET_DELETED_LISTS = "database_get_deleted_lists";
+    private static final String RESTORE_DELETED_LIST = "database_restore_deleted_list";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -137,6 +139,8 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_LIST_SEEN_MOVIES, reply(database::getListSeenMovies));
         listen(GET_LIST_NAME, reply(database::getListName));
         listen(GET_LAST_LISTS_HOME, reply((user, param) -> database.getLastListsHome(user)));
+        listen(GET_DELETED_LISTS, reply((user, param) -> database.getDeletedLists(user)));
+        listen(RESTORE_DELETED_LIST, reply(database::restoreDeletedList));
     }
 
     @Override
