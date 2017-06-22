@@ -343,9 +343,13 @@ function getOmdb(imdbId, lang) {
     eventbus.send("api_get_awards", imdbId, function (error, reply) {
         console.log('OMDB', reply);
         if (reply.body != 'Failure: Too many failures.') {
-            parseAwards(reply.body['Awards']);
-            $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
-            fillCrew(reply.body, lang);
+            if (reply.body['Response'] !== 'False') {
+                parseAwards(reply.body['Awards']);
+                $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
+                fillCrew(reply.body, lang);
+            }
+        } else {
+
         }
     });
 }

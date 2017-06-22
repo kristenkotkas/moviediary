@@ -529,7 +529,13 @@ function fillDaysData(data, distr) {
 }
 
 function fillYearsData(data, years, distr) {
-    var smallestYear = data[data.length - 1]['Year'];
+    console.log(data);
+    var smallestYear;
+    if (data[data.length - 1]['Year'] > 0) {
+        smallestYear = data[data.length - 1]['Year'];
+    } else {
+        smallestYear = data[data.length - 2]['Year'];
+    }
     var greatestYear = data[0]['Year'];
 
     var i = 0;

@@ -219,3 +219,9 @@ function replaceUrlParameter(param, value) {
         window.history.pushState('', '', url);
     }
 }
+
+function yearNullCheck(year, lang) {
+    if (year == 0) {
+        return lang['YEAR_MISSING'];
+    } else return year;
+}

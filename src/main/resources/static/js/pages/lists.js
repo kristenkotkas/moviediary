@@ -14,6 +14,8 @@ var listTitleHolder = $('#list-title-holder');
 var listContainer = $('#list-container');
 var btnDeleteList = $('#delete-list');
 var modalDeleteList = $('#modal-delete-list');
+var deletedListsContainer = $('#deleted-lists-table');
+var deletedListsContainer = $('#deleted-lists-table');
 var lang;
 
 inputNewListName.keyup(function (e) {
@@ -26,6 +28,7 @@ eventbus.onopen = function () {
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
         getLists();
+        getDeletedLists();
     });
 };
 
@@ -196,7 +199,47 @@ function deleteList(listId) {
             listTitleHolder.empty();
             listContainer.empty();
             getLists();
+            getDeletedLists();
         }
+    });
+}
+
+function getDeletedLists() {
+    eventbus.send('database_get_deleted_lists', {}, function (error, reply) {
+        fillDeletedLists(reply.body['results']);
+    });
+}
+
+function fillDeletedLists(lists) {
+    deletedListsContainer.empty();
+    if (lists.length > 0) {
+        $.each(lists, function (i) {
+            deletedListsContainer.append($.parseHTML(
+                '<tr>' +
+                    '<td>' +
+                        '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
+                    '</td>' +
+                    '<td>' +
+                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
+                    '</td>' +
+                    '<td>' +
+                        '<span class="home-link cursor grey-text text-darken-1" ' +
+                            'onclick="restoreDeletedList(' + lists[i][0] + ')">' + lang['LISTS_RESTORE'] + '</span>' +
+                    '</td>' +
+                '</tr>'
+            ));
+        });
+    } else {
+        deletedListsContainer.append($.parseHTML(
+            '<h5>' + lang['MOVIES_NO_LISTS'] + '</h5>'
+        ));
+    }
+}
+
+function restoreDeletedList(listId) {
+    eventbus.send('database_restore_deleted_list', listId.toString(), function (error, reply) {
+        getLists();
+        getDeletedLists();
     });
 }
 
@@ -233,7 +276,7 @@ function addListBody(data, listId) {
                 '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
                 movie['Title'] +
                 '</a>' +
-                '<span>' + movie['Year'] + '</span>' +
+                '<span>' + yearNullCheck(movie['Year'], lang) + '</span>' +
                 '</div>' +
                 '<div class="card-action" id="movie-card-content-' + movieId + '">' +
                 '<a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +

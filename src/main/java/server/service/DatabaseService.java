@@ -171,6 +171,10 @@ public interface DatabaseService {
 
     Future<JsonObject> getLastListsHome(String username);
 
+    Future<JsonObject> getDeletedLists(String username);
+
+    Future<JsonObject> restoreDeletedList(String username, String listId);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.
