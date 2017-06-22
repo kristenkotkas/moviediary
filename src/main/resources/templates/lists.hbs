@@ -22,7 +22,7 @@
 </div>
 {{> templates/navbar.hbs}}
 <main>
-    <h3 class="light grey-text text-lighten-1 page-heading">Lists</h3>
+    <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "NAVBAR_LISTS" locale=lang}}</h3>
     <div class="row"></div>
     <div class="row">
         <div class="col s12 m12 m12">
@@ -37,7 +37,7 @@
                                         <td>
                                             <!-- Modal Trigger -->
                                             <a class="blue-text text-darken-2 home-link lighten-2 z-depth-0"
-                                               href="#modalList">Create new list</a>
+                                               href="#modalList">{{i18n "LISTS_CREATE_NEW_LIST" locale=lang}}</a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -62,21 +62,21 @@
             <div id="modalList" class="modal z-depth-0">
                 <div class="modal-content">
                     <div class="col s12 m12 l12">
-                        <h5>Create new list</h5>
+                        <h5>{{i18n "LISTS_CREATE_NEW_LIST" locale=lang}}</h5>
                         <div class="row"></div>
                         <div class="input-field">
                             <input id="createListName" type="text" data-length="50">
-                            <label for="createListName">
-                                List name
-                            </label>
+                            <label for="createListName">{{i18n "LIST_NAME" locale=lang}}</label>
                         </div>
                     </div>
                 </div>
                 <div class="row"></div>
                 <div class="modal-footer">
                     <a class="modal-action waves-effect waves-green btn-flat"
-                       id="create-list" onclick="createNewList()">Create</a>
-                    <a class="modal-action modal-close waves-effect waves-red btn-flat" id="cancel-new-list">Cancel</a>
+                       id="create-list" onclick="createNewList()">{{i18n "LISTS_CREATE" locale=lang}}</a>
+                    <a class="modal-action modal-close waves-effect waves-red btn-flat" id="cancel-new-list">
+                        {{i18n "MOVIES_CANCEL" locale=lang}}
+                    </a>
                 </div>
             </div>
 
@@ -84,11 +84,13 @@
             <div id="modal-delete-list" class="modal z-depth-0 col m6 offset-m3 l4 offset-l4">
                 <div class="modal-content">
                     <div class="col s12 m12 l12">
-                        <h5 class="center">You are about to delete your list.<br> Are you sure you want to delete it?</h5>
+                        <h5 class="center">{{i18n "LISTS_DELETE_WARNING" locale=lang}}</h5>
                         <div class="row"></div>
                         <div class="modal-footer">
-                            <a class="modal-action waves-effect waves-green btn-flat" id="delete-list">Delete</a>
-                            <a class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+                            <a class="modal-action waves-effect waves-green btn-flat" id="delete-list">{{i18n "LISTS_DELETE" locale=lang}}</a>
+                            <a class="modal-action modal-close waves-effect waves-red btn-flat">
+                                {{i18n "MOVIES_CANCEL" locale=lang}}
+                            </a>
                         </div>
                     </div>
                 </div>

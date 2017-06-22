@@ -16,6 +16,12 @@ var btnDeleteList = $('#delete-list');
 var modalDeleteList = $('#modal-delete-list');
 var lang;
 
+inputNewListName.keyup(function (e) {
+    if (e.keyCode === 13) {
+        createNewList();
+    }
+});
+
 eventbus.onopen = function () {
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
@@ -54,7 +60,7 @@ function fillLists(lists) {
     if (lists.length > 0) {
         $.each(lists, function (i) {
             listsTable.append($.parseHTML(
-                '<tr class="cursor" onclick="openList('+ lists[i][0] + ',\'' + lists[i][1] +'\')">' +
+                '<tr class="cursor" onclick="openList('+ lists[i][0] + ')">' +
                     '<td>' +
                         '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
                     '</td>' +
@@ -66,22 +72,50 @@ function fillLists(lists) {
         });
     } else {
         listsTable.append($.parseHTML(
-            '<h5>No lists</h5>'
+            '<h5>' + lang['MOVIES_NO_LISTS'] + '</h5>'
         ));
     }
 }
 
-function openList(listId, listName) {
-    eventbus.send('database_get_list_entries', listId, function (error, reply) {
+function openList(listId) {
+    eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
         console.log('opened list', listId);
         unboundOnClick();
-        fillMovies(reply.body['rows'], listName, listId);
+        console.log(reply);
+        var listData = reply.body['rows'];
+        if (listData.length > 0) {
+            fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
+        } else {
+            eventbus.send('database_get_list_name', listId.toString(), function (error, reply) {
+                fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
+            });
+        }
     });
 }
 
 function fillMovies(resultRows, listName, listId) {
     addListTitle(listName, listId);
-    addListBody(resultRows, listId);
+    if (resultRows.length > 0) {
+        addListBody(resultRows, listId);
+        getSeenMoviesInList(listId);
+    } else {
+        addEmptyListBody();
+    }
+}
+
+function addEmptyListBody() {
+    listContainer.empty();
+    listContainer.append(
+        $.parseHTML(
+            '<div class="card z-depth-0">' +
+                '<div class="card-content">' +
+                    '<div class="card-title">' +
+                        '<span class="light grey-text text-darken-2 list-title">' + lang['LISTS_NO_MOVIES'] + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        )
+    );
 }
 
 function addListTitle(title, listId) {
@@ -95,8 +129,10 @@ function addListTitle(title, listId) {
                         '</span>' +
                     '</div>' +
                     '<a class="home-link cursor blue-text text-darken-2" ' +
-                        'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">Muuda nimekirja nime</a><br>' +
-                    '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">Kustuta nimekiri</a>' +
+                        'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">'
+                        + lang['LISTS_CHANGE_TITLE'] + '</a><br>' +
+                    '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">'
+                        + lang['LISTS_DELETE_LIST'] + '</a>' +
                 '</div>' +
             '</div>' +
         '</div>'
@@ -108,15 +144,23 @@ function changeNameOnClick(listId, title) {
     element.empty().append(
         $.parseHTML(
             '<div class="input-field custom-input">' +
-                '<input class="custom-input-field grey-text" id="changeNameInput" type="text" value="' + title + '" data-length="50">' +
+                '<input class="custom-input-field grey-text" id="changeNameInput" type="text" value="' + title + '" ' +
+                'data-length="50">' +
             '</div>' +
-            '<a class="btn z-depth-0 red lighten-2" onclick="addListTitle(\'' + title + '\',' + listId +')">Cancel</a>' +
+            '<a class="btn z-depth-0 red lighten-2" onclick="addListTitle(\'' + title + '\',' + listId +')">'
+                + lang['MOVIES_CANCEL'] + '</a>' +
             '<a> </a>' +
-            '<a class="btn z-depth-0 green lighten-2" id="save-name-' + listId + '">Save</a>'
+            '<a class="btn z-depth-0 green lighten-2" id="save-name-' + listId + '">' + lang['LISTS_SAVE'] + '</a>'
         )
     );
     $(document.getElementById('save-name-' + listId)).click(function () {
         changeListName($('#changeNameInput').val(), listId);
+    });
+
+    $('#changeNameInput').keyup(function (e) {
+        if (e.keyCode === 13) {
+            changeListName($('#changeNameInput').val(), listId);
+        }
     });
 }
 
@@ -145,7 +189,7 @@ function openDeleteModal(listId) {
 }
 
 function deleteList(listId) {
-    eventbus.send('database_delete_list', listId, function (error, reply) {
+    eventbus.send('database_delete_list', listId.toString(), function (error, reply) {
         if (reply['body']['updated'] != null) {
             console.log('deleted list', listId);
             modalDeleteList.modal('close');
@@ -179,7 +223,7 @@ function addListBody(data, listId) {
         listContainer.append(
             $.parseHTML(
                 '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
-                '<div class="card horizontal z-depth-0">' +
+                '<div class="card horizontal z-depth-0" id="inner-' + cardId + '">' +
                 '<div class="card-image">' +
                 '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
                 movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
@@ -191,12 +235,29 @@ function addListBody(data, listId) {
                 '</a>' +
                 '<span>' + movie['Year'] + '</span>' +
                 '</div>' +
-                '<div class="card-action">' +
+                '<div class="card-action" id="movie-card-content-' + movieId + '">' +
                 '<a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
                 '</div>' +
                 '</div>' +
                 '</div>' +
                 '</div>'
+            )
+        );
+    });
+}
+
+function getSeenMoviesInList(listId) {
+    eventbus.send('database_get_list_seen_movies', listId.toString(), function (error, reply) {
+        decorateSeenMovieCard(reply.body['results']);
+    });
+}
+
+function decorateSeenMovieCard(resultRows) {
+    $.each(resultRows, function (i) {
+        $(document.getElementById('inner-card_' + resultRows[i])).addClass('green').addClass('lighten-4');
+        $(document.getElementById('movie-card-content-' + resultRows[i])).append(
+            $.parseHTML(
+                '<i class="fa fa-check right fa-lg white-text" aria-hidden="true"></i>'
             )
         );
     });

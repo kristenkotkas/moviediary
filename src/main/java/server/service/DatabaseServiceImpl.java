@@ -51,7 +51,8 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     private static final String SQL_GET_ALL_TIME_META =
-            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
+            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count, " +
+                    "SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
@@ -148,13 +149,23 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_IN_LISTS =
             "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
-            "SELECT MovieId, Title, Year, Image, Time FROM ListEntries " +
+            "SELECT MovieId, Title, ListName, Year, Image, Time FROM ListEntries " +
                     "JOIN Movies On ListEntries.MovieId = Movies.Id " +
-                    "WHERE Username = ? AND ListId = ? ORDER BY Time DESC;";
+                    "JOIN ListsInfo On ListsInfo.Id = ListEntries.ListId " +
+                    "WHERE ListEntries.Username = ? AND ListId = ? ORDER BY Time DESC;";
     private static final String SQL_CHANGE_LIST_NAME =
             "UPDATE ListsInfo SET ListName = ? WHERE Username = ? AND Id = ?;";
     private static final String SQL_DELETE_LIST =
             "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
+    private static final String SQL_GET_LIST_SEEN_MOVIES =
+            "SELECT DISTINCT Views.MovieId FROM ListEntries " +
+                    "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
+                    "WHERE " +
+                    "Views.Username = ? AND " +
+                    "ListEntries.Username = ? AND " +
+                    "ListId = ?;";
+    private static final String SQL_GET_LIST_NAME =
+            "SELECT ListName FROM ListsInfo WHERE Username = ? AND Id = ?;";
 
     private final JDBCClient client;
 
@@ -590,8 +601,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> deleteList(String username, String listId) {
-        // "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
         return updateOrInsert(SQL_DELETE_LIST, new JsonArray()
+                .add(username)
+                .add(listId));
+    }
+
+    @Override
+    public Future<JsonObject> getListSeenMovies(String username, String listId) {
+        return query(SQL_GET_LIST_SEEN_MOVIES, new JsonArray()
+                .add(username)
+                .add(username)
+                .add(listId));
+    }
+
+    @Override
+    public Future<JsonObject> getListName(String username, String listId) {
+        return query(SQL_GET_LIST_NAME, new JsonArray()
                 .add(username)
                 .add(listId));
     }
