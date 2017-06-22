@@ -3,9 +3,9 @@
         <div id="nav-bar">
             <!--<img class="sidebar-collapse" src="/static/img/logo.svg" width="140">-->
             <ul class="hide-nav-bar">
-                <li>
+                <!--<li>
                     <a href="{{userPage}}" tabindex="1" class="navbar-text" id="navbar-user">{{i18n "NAVBAR_ME" locale=lang}}</a>
-                </li>
+                </li>-->
                 <li>
                     <a href="{{homePage}}" tabindex="2" class="navbar-text" id="navbar-home">{{i18n "NAVBAR_HOME" locale=lang}}</a>
                 </li>
@@ -21,9 +21,9 @@
                 <li>
                     <a href="{{statisticsPage}}" tabindex="6" class="navbar-text" id="navbar-statistics">{{i18n "NAVBAR_STATISTICS" locale=lang}}</a>
                 </li>
-                <li>
+                <!--<li>
                     <a href="{{wishlistPage}}" tabindex="7" class="navbar-text" id="navbar-wishlist">{{i18n "NAVBAR_WISHLIST" locale=lang}}</a>
-                </li>
+                </li>-->
                 <!--<li>
                     <a href="{{discoverPage}}" tabindex="8"
                        class="opacity-object-full btn white z-depth-0 tooltipped"
@@ -41,11 +41,11 @@
 </header>
 <aside id="left-sidebar-nav">
     <ul id="slide-out" class="side-nav leftside-navigation">
-        <li>
+        <!--<li>
             <a href="{{userPage}}" tabindex="1" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-user left grey-text darken-3"></i>{{userName}}
             </a>
-        </li>
+        </li>-->
         <li>
             <a href="{{homePage}}" tabindex="2" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-home left grey-text darken-3"></i>{{i18n "NAVBAR_HOME" locale=lang}}
@@ -71,11 +71,11 @@
                 <i class="fa fa-bar-chart left grey-text darken-3"></i>{{i18n "NAVBAR_STATISTICS" locale=lang}}
             </a>
         </li>
-        <li class="bold">
+        <!--<li class="bold">
             <a href="{{wishlistPage}}" tabindex="7" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-list-ol left grey-text darken-3"></i>{{i18n "NAVBAR_WISHLIST" locale=lang}}
             </a>
-        </li>
+        </li>-->
         <li class="bold">
             <a href="{{listsPage}}" tabindex="7" class="waves-effect waves-cyan grey-text darken-3">
                 <i class="fa fa-list-ol left grey-text darken-3"></i>{{i18n "NAVBAR_LISTS" locale=lang}}
@@ -86,6 +86,11 @@
                 <i class="fa fa-search left grey-text darken-3"></i>Discover
             </a>
         </li>-->
+        <li class="bold">
+            <a href="{{logoutUrl}}" tabindex="8" class="waves-effect waves-cyan grey-text darken-3">
+                <i class="fa fa-sign-out  left grey-text darken-3"></i>{{i18n "USER_LOGOUT" locale=lang}}
+            </a>
+        </li>
     </ul>
     <a href="#" data-activates="slide-out"
        class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-menu-button cyan">

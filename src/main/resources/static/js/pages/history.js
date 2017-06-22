@@ -139,8 +139,11 @@ var fillDropDown = function (lang) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
+            console.log(data);
             var start = new Date(data[0]['Start']).getFullYear();
-            makeDropList(start, lang, 'history', startDateField, endDateField);
+            if (data[0]['Start'] != null) {
+                makeDropList(start, lang, 'history', startDateField, endDateField);
+            }
         });
 };
 

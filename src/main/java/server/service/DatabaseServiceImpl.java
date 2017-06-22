@@ -141,7 +141,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
-            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND Active;";
+            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated DESC;";
     private static final String SQL_INSERT_INTO_LIST =
             "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
     private static final String SQL_REMOVE_FROM_LIST =
@@ -166,6 +166,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "ListId = ?;";
     private static final String SQL_GET_LIST_NAME =
             "SELECT ListName FROM ListsInfo WHERE Username = ? AND Id = ?;";
+    private static final String SQL_GET_LAST_LISTS_HOME =
+            "SELECT ListId, ListName, MovieId, Title, Year FROM ListEntries " +
+                    "JOIN Movies ON Movies.Id = ListEntries.MovieId " +
+                    "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
+                    "WHERE ListEntries.Username = ? " +
+                    "ORDER BY Time DESC LIMIT 5";
 
     private final JDBCClient client;
 
@@ -619,6 +625,12 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_GET_LIST_NAME, new JsonArray()
                 .add(username)
                 .add(listId));
+    }
+
+    @Override
+    public Future<JsonObject> getLastListsHome(String username) {
+        return query(SQL_GET_LAST_LISTS_HOME, new JsonArray()
+                .add(username));
     }
 
     /**
