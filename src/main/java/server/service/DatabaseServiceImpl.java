@@ -170,7 +170,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT ListId, ListName, MovieId, Title, Year FROM ListEntries " +
                     "JOIN Movies ON Movies.Id = ListEntries.MovieId " +
                     "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
-                    "WHERE ListEntries.Username = ? " +
+                    "WHERE ListEntries.Username = ? AND ACTIVE " +
                     "ORDER BY Time DESC LIMIT 5";
 
     private final JDBCClient client;
