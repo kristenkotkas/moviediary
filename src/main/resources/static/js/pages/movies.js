@@ -319,7 +319,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
         $('#crew-box').removeClass('scale-out').addClass('scale-in');
         openShowEndtime(data['runtime']);
-        getLists(movieId);
+        getLists(movieId, lang);
 
         if (data['overview'] != null) {
             $('#plot-text').empty().append(data['overview']);
@@ -636,9 +636,9 @@ var toNormalRevenue = function (revenue, lang) {
     } else return revenue.toLocaleString() + ' $';
 };
 
-function getLists(movieId) {
+function getLists(movieId, lang) {
     eventbus.send('database_get_lists', {}, function (error, reply) {
-        fillLists(reply.body['results'], movieId);
+        fillLists(reply.body['results'], movieId, lang);
         getInList(movieId);
     });
 }
@@ -652,7 +652,7 @@ function getInList(movieId) {
     });
 }
 
-function fillLists(lists, movieId) {
+function fillLists(lists, movieId, lang) {
     listsTable.empty();
     if (lists.length > 0) {
         $.each(lists, function (i) {
@@ -663,7 +663,7 @@ function fillLists(lists, movieId) {
                     '</td>' +
                     '<td>' +
                         '<span id="list-' + lists[i][0] + '" class="home-link cursor" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
-                            'Add' +
+                            lang['MOVIES_ADD'] +
                         '</span>' +
                     '</td>' +
                 '</tr>'
@@ -671,17 +671,16 @@ function fillLists(lists, movieId) {
         });
     } else {
         listsTable.append($.parseHTML(
-            '<span>No lists</span>'
+            '<span>' + lang['MOVIES_NO_LISTS'] + '</span>'
         ));
     }
 }
 
 function listAddOnClick(movieId, listId) {
-    // <i class="green-text fa fa-check new" aria-hidden="true"></i>
     var button = $(document.getElementById('list-' + listId));
-    if (button.text() === 'Add') {
+    if (button.text() === lang['MOVIES_ADD']) {
         insertIntoList(movieId, listId);
-    } else if (button.text() === 'Remove') {
+    } else if (button.text() === lang['HISTORY_REMOVE']) {
         removeFromList(movieId, listId);
     }
 }
@@ -713,13 +712,13 @@ function removeFromList(movieId, listId) {
 function decorateInList(listId) {
     var button = $(document.getElementById('list-' + listId));
     var row = $(document.getElementById('list-row-' + listId));
-    button.empty().append('Remove');
+    button.empty().append(lang['HISTORY_REMOVE']);
     row.addClass('text-darken-4');
 }
 
 function decorateNotInList(listId) {
     var button = $(document.getElementById('list-' + listId));
     var row = $(document.getElementById('list-row-' + listId));
-    button.empty().append('Add');
+    button.empty().append(lang['MOVIES_ADD']);
     row.removeClass('text-darken-4');
 }

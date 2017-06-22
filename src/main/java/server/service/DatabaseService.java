@@ -167,6 +167,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getListSeenMovies(String username, String listId);
 
+    Future<JsonObject> getListName(String username, String listId);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

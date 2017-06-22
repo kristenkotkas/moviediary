@@ -164,6 +164,8 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "Views.Username = ? AND " +
                     "ListEntries.Username = ? AND " +
                     "ListId = ?;";
+    private static final String SQL_GET_LIST_NAME =
+            "SELECT ListName FROM ListsInfo WHERE Username = ? AND Id = ?;";
 
     private final JDBCClient client;
 
@@ -608,6 +610,13 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> getListSeenMovies(String username, String listId) {
         return query(SQL_GET_LIST_SEEN_MOVIES, new JsonArray()
                 .add(username)
+                .add(username)
+                .add(listId));
+    }
+
+    @Override
+    public Future<JsonObject> getListName(String username, String listId) {
+        return query(SQL_GET_LIST_NAME, new JsonArray()
                 .add(username)
                 .add(listId));
     }
