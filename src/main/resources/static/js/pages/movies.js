@@ -670,9 +670,9 @@ function fillLists(lists, movieId) {
             ));
         });
     } else {
-        /*listsDropdown.append($.parseHTML(
-            '<li>No lists</li>'
-        ));*/
+        listsTable.append($.parseHTML(
+            '<span>No lists</span>'
+        ));
     }
 }
 

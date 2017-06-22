@@ -60,7 +60,7 @@ function fillLists(lists) {
     if (lists.length > 0) {
         $.each(lists, function (i) {
             listsTable.append($.parseHTML(
-                '<tr class="cursor" onclick="openList('+ lists[i][0] + ',\'' + lists[i][1] +'\')">' +
+                '<tr class="cursor" onclick="openList('+ lists[i][0] + ')">' +
                     '<td>' +
                         '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
                     '</td>' +
@@ -77,11 +77,12 @@ function fillLists(lists) {
     }
 }
 
-function openList(listId, listName) {
+function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
         console.log('opened list', listId);
         unboundOnClick();
-        fillMovies(reply.body['rows'], listName, listId);
+        console.log(reply);
+        fillMovies(reply.body['rows'], reply.body['rows'][0]['ListName'], listId);
     });
 }
 
