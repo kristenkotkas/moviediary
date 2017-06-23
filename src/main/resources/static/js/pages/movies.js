@@ -374,11 +374,21 @@ function OMDBArrayToString(value, lang) {
         var dataParts = value.split(',');
         var result = '';
         $.each(dataParts, function (i) {
-            result += dataParts[i] + '<br>'
+            result += '<a class="home-link grey-text" href="' + getGoogleQueryURL(dataParts[i]) + '" target="_blank">'
+                + dataParts[i] + '</a>' + '<br>'
         });
-
         return result;
     }
+}
+
+function getGoogleQueryURL(query) {
+    query = query.replace(new RegExp('[(][a-z ]*[)]'), ' ');
+    var googleURL = 'http://www.google.com/search?q=';
+    var strings = query.split(' ');
+    $.each(strings, function (i) {
+        googleURL += strings[i] + '+';
+    });
+    return googleURL.substring(0, googleURL.length - 1);
 }
 
 function parseAwards(awardString) {
