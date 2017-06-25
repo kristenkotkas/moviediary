@@ -168,7 +168,7 @@ function fillResultSeries(seriesData, page, lang) {
                 //console.log(seasonData);
                 seriesDataContainer.append(
                     $.parseHTML(
-                        '<li>' +
+                        '<li class="z-depth-0">' +
                             '<div class="opacity-object collapsible-header collapsible-header-tv history-object grey-text">' +
                                 '<div class="row last-row">' +
                                     '<div class="col s3 m2 l1">' +
@@ -178,10 +178,11 @@ function fillResultSeries(seriesData, page, lang) {
                                     '<div class="col s9 m10 l11">' +
                                         '<span class="tv-season-title grey-text text-darken-3">' + seasonData['name'] + '</span>' +
                                         '<span class="season-add-info grey-text text-darken-2">' +
-                                        '<span class="description hide-on-med-and-down grey-text text-darken-4" >' + seasonData['overview'] + '</span>' +
                                             getYear(seasonData['air_date'])  +
                                             seasonData['episodes'].length + episode +
                                         '</span><br>' +
+                                        '<span class="description hide-on-med-and-down grey-text text-darken-4" >' + seasonData['overview'] + '</span>' +
+                                        '<br>' +
                                     '</div>' +
                                 '</div>' +
                             '</div>' +
@@ -285,7 +286,7 @@ function getEpisodes(episodes, seasonNumber, seriesData, lang) {
         var ep = lang['SERIES_EPISODE_SHORT'] + ': ';
         var episodeCard = $.parseHTML(
             '<div class="col s12 m12 l6 xl3 grey-text">' +
-                '<div class="card cursor episode-card" id="' + id + '">' +
+                '<div class="card z-depth-0 cursor episode-card" id="' + id + '">' +
                     '<div class="card-content">' +
                         '<div class="content-key truncate">' + episodeData['name'] + '</div>' +
                             '<span class="badge" id="' + (id + '_check') + '"></span>' +
