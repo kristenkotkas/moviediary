@@ -17,16 +17,8 @@ var modalDeleteList = $('#modal-delete-list');
 var deletedListsContainer = $('#deleted-lists-table');
 var lang;
 var listData;
-var sorterTitles = {
-    titleSort123: 'Pealkiri',
-    yearSort123: 'Aasta',
-    addedSort123: 'Date added'
-};
-
-var sorterType = {
-    123: 'kasvavalt',
-    321: 'kahanevalt'
-};
+var sorterTitles;
+var sorterType;
 
 inputNewListName.keyup(function (e) {
     if (e.keyCode === 13) {
@@ -37,10 +29,23 @@ inputNewListName.keyup(function (e) {
 eventbus.onopen = function () {
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
+        fillSorterJSONs(lang);
         getLists();
         getDeletedLists();
     });
 };
+
+function fillSorterJSONs(lang) {
+    sorterTitles = {
+        titleSort123: lang['LISTS_TITLE'],
+        yearSort123: lang['LISTS_YEAR'],
+        addedSort123: lang['LISTS_DATE_ADDED']
+    };
+    sorterType = {
+        123: lang['LIST_ASC'],
+        321: lang['LIST_DESC']
+    };
+}
 
 function modalClose() {
     console.log('modal closed');
@@ -123,15 +128,11 @@ function openList(listId) {
 - year
 - title
  */
-function fillSortedList(sorter, type, listId) {
-    $(document.getElementById('sort-dropdown')).empty().append('Sorteeri | ' + sorterTitles[sorter.name] + ' ' + sorterType[type]);
-    if (listData.length > 0) {
-        addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
-    } else {
-        eventbus.send('database_get_list_name', listId.toString(), function (error, reply) {
-            addListBody(listData, listId);
-        });
-    }
+function fillSortedList(sorter, type) {
+    $(document.getElementById('sort-dropdown')).empty()
+        .append(lang['LISTS_SORT'] + ' | ' + sorterTitles[sorter.name] + ' ' + sorterType[type]);
+    addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
+    getSeenMoviesInList(listData[0]['ListId']);
 }
 
 function getSorted(data, sorter, type) {
@@ -198,14 +199,23 @@ function addListTitle(title, listId) {
                         + lang['LISTS_CHANGE_TITLE'] + '</a><br>' +
                     '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">'
                         + lang['LISTS_DELETE_LIST'] + '</a><br>' +
-                    '<a class="dropdown-button home-link cursor" data-activates="sortDropdown" href="#" id="sort-dropdown">Sorteeri</a>' +
+                    '<a class="dropdown-button home-link cursor" data-activates="sortDropdown" href="#" id="sort-dropdown">' +
+                        lang['LISTS_SORT'] + '</a>' +
                     '<ul id="sortDropdown" class="dropdown-content">' +
-                        '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a>Pealkiri kasvavalt</a></li>' +
-                        '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a>Pealkiri kahanevalt</a></li>' +
-                        '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a>Aasta kasvavalt</a></li>' +
-                        '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a>Aasta kahanevalt</a></li>' +
-                        '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a>Date added kasvavalt</a></li>' +
-                        '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a>Date added kahanevalt</a></li>' +
+                        '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_TITLE'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+                        '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_TITLE'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+                        '<li class="divider"></li>' +
+                        '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_YEAR'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+                        '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_YEAR'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+                        '<li class="divider"></li>' +
+                        '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+                        '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+                            lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
                     '</ul>' +
                 '</div>' +
             '</div>' +
@@ -298,9 +308,6 @@ function fillDeletedLists(lists) {
         $.each(lists, function (i) {
             deletedListsContainer.append($.parseHTML(
                 '<tr>' +
-                    '<td>' +
-                        '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
-                    '</td>' +
                     '<td>' +
                         '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
                     '</td>' +
