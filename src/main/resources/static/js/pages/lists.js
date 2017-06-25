@@ -62,7 +62,6 @@ function fillLists(lists) {
     listsTable.empty();
     if (lists.length > 0) {
         $.each(lists, function (i) {
-            console.log(lists[i]);
             listsTable.append($.parseHTML(
                 '<tr class="cursor" onclick="openList('+ lists[i]['Id'] + ')">' +
                     '<td>' +
@@ -85,7 +84,6 @@ function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
         console.log('opened list', listId);
         unboundOnClick();
-        console.log(reply);
         var listData = reply.body['rows'];
         if (listData.length > 0) {
             fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
@@ -249,7 +247,6 @@ function unboundOnClick() {
 }
 
 function addListBody(data, listId) {
-    console.log(data);
     listContainer.empty();
     $.each(data, function (i) {
 
@@ -279,8 +276,9 @@ function addListBody(data, listId) {
                 '</a>' +
                 '<span>' + yearNullCheck(movie['Year'], lang) + '</span>' +
                 '</div>' +
-                '<div class="card-action" id="movie-card-content-' + movieId + '">' +
-                '<a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a>' +
+                '<div class="card-action">' +
+                '<span><a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a></span>' +
+                '<span id="movie-card-content-' + movieId + '"></span>' +
                 '</div>' +
                 '</div>' +
                 '</div>' +
@@ -299,7 +297,7 @@ function getSeenMoviesInList(listId) {
 function decorateSeenMovieCard(resultRows) {
     $.each(resultRows, function (i) {
         $(document.getElementById('inner-card_' + resultRows[i])).addClass('green').addClass('lighten-4');
-        $(document.getElementById('movie-card-content-' + resultRows[i])).append(
+        $(document.getElementById('movie-card-content-' + resultRows[i])).empty().append(
             $.parseHTML(
                 '<i class="fa fa-check right fa-lg white-text" aria-hidden="true"></i>'
             )
