@@ -126,7 +126,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
-            "SELECT Id, ListName, TimeCreated, COUNT(ListId) AS Size FROM ListsInfo " +
+            "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated DESC;";
+    private static final String SQL_GET_LISTS_SIZE =
+            "SELECT Id, COUNT(ListId) AS Size FROM ListsInfo " +
                     "JOIN ListEntries ON ListsInfo.Id = ListEntries.ListId " +
                     "WHERE ListsInfo.Username = ? AND ListEntries.Username = ? " +
                     "AND Active GROUP BY ListId ORDER BY TimeCreated DESC;";
@@ -524,7 +526,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getLists(String username) {
         return query(SQL_GET_LISTS, new JsonArray()
-                .add(username)
                 .add(username));
     }
 
@@ -606,6 +607,13 @@ public class DatabaseServiceImpl implements DatabaseService {
         return updateOrInsert(SQL_RESTORE_DELETED_LIST, new JsonArray()
                 .add(username)
                 .add(listId));
+    }
+
+    @Override
+    public Future<JsonObject> getListsSize(String username) {
+        return query(SQL_GET_LISTS_SIZE, new JsonArray()
+                .add(username)
+                .add(username));
     }
 
     /**

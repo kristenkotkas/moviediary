@@ -610,7 +610,7 @@ var toNormalRevenue = function (revenue, lang) {
 
 function getLists(movieId, lang) {
     eventbus.send('database_get_lists', {}, function (error, reply) {
-        fillLists(reply.body['results'], movieId, lang);
+        fillLists(reply.body['rows'], movieId, lang);
         getInList(movieId);
     });
 }
@@ -629,12 +629,12 @@ function fillLists(lists, movieId, lang) {
     if (lists.length > 0) {
         $.each(lists, function (i) {
             listsTable.append($.parseHTML(
-                '<tr id="list-row-' + lists[i][0] + '" class="grey-text">' +
+                '<tr id="list-row-' + lists[i]['Id'] + '" class="grey-text">' +
                     '<td class="content-key">' +
-                        safe_tags_replace(lists[i][1]) +
+                        safe_tags_replace(lists[i]['ListName']) +
                     '</td>' +
                     '<td>' +
-                        '<span id="list-' + lists[i][0] + '" class="home-link cursor" onclick="listAddOnClick(' + movieId + ',' +  lists[i][0] + ')">' +
+                        '<span id="list-' + lists[i]['Id'] + '" class="home-link cursor" onclick="listAddOnClick(' + movieId + ',' +  lists[i]['Id'] + ')">' +
                             lang['MOVIES_ADD'] +
                         '</span>' +
                     '</td>' +

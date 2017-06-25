@@ -80,6 +80,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String GET_LAST_LISTS_HOME = "database_get_last_lists_home";
     private static final String GET_DELETED_LISTS = "database_get_deleted_lists";
     private static final String RESTORE_DELETED_LIST = "database_restore_deleted_list";
+    private static final String GET_LISTS_SIZE = "database_get_lists_size";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -131,6 +132,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_LAST_LISTS_HOME, reply((user, param) -> database.getLastListsHome(user)));
         listen(GET_DELETED_LISTS, reply((user, param) -> database.getDeletedLists(user)));
         listen(RESTORE_DELETED_LIST, reply(database::restoreDeletedList));
+        listen(GET_LISTS_SIZE, reply((user, reply) -> database.getListsSize(user)));
     }
 
     @Override

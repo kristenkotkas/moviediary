@@ -15,7 +15,6 @@ var listContainer = $('#list-container');
 var btnDeleteList = $('#delete-list');
 var modalDeleteList = $('#modal-delete-list');
 var deletedListsContainer = $('#deleted-lists-table');
-var deletedListsContainer = $('#deleted-lists-table');
 var lang;
 
 inputNewListName.keyup(function (e) {
@@ -68,16 +67,30 @@ function fillLists(lists) {
                         '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
                     '</td>' +
                     '<td>' +
-                        '<span class="content-key grey-text text-darken-1">' + lists[i]['Size'] + '</span>' +
+                        '<span class="content-key grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0</span>' +
                     '</td>' +
                 '</tr>'
             ));
         });
+        getListsSize();
     } else {
         listsTable.append($.parseHTML(
             '<h5>' + lang['MOVIES_NO_LISTS'] + '</h5>'
         ));
     }
+}
+
+function getListsSize() {
+    eventbus.send('database_get_lists_size', {}, function (error, reply) {
+        fillListsSize(reply.body['rows']);
+    });
+}
+
+function fillListsSize(rows) {
+    $.each(rows, function (i) {
+        console.log(rows[i]);
+        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(rows[i]['Size']);
+    });
 }
 
 function openList(listId) {
@@ -319,7 +332,7 @@ function removeFromList(movieId, listId) {
                 var id = 'card_' + movieId;
                 console.log('REMOVED', id);
                 $(document.getElementById(id)).remove();
-                getLists();
+                getListsSize();
             }
         });
 }
