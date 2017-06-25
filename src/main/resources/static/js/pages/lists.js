@@ -16,6 +16,17 @@ var btnDeleteList = $('#delete-list');
 var modalDeleteList = $('#modal-delete-list');
 var deletedListsContainer = $('#deleted-lists-table');
 var lang;
+var listData;
+var sorterTitles = {
+    titleSort123: 'Pealkiri',
+    yearSort123: 'Aasta',
+    addedSort123: 'Date added'
+};
+
+var sorterType = {
+    123: 'kasvavalt',
+    321: 'kahanevalt'
+};
 
 inputNewListName.keyup(function (e) {
     if (e.keyCode === 13) {
@@ -88,24 +99,63 @@ function getListsSize() {
 
 function fillListsSize(rows) {
     $.each(rows, function (i) {
-        console.log(rows[i]);
         $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(rows[i]['Size']);
     });
 }
 
 function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
-        console.log('opened list', listId);
         unboundOnClick();
-        var listData = reply.body['rows'];
+        listData = reply.body['rows'];
+        console.log(listData);
         if (listData.length > 0) {
-            fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
+            fillMovies(listData, listData[0]['ListName'], listId);
         } else {
             eventbus.send('database_get_list_name', listId.toString(), function (error, reply) {
                 fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
             });
         }
     });
+}
+
+/*
+- date added
+- year
+- title
+ */
+function fillSortedList(sorter, type, listId) {
+    $(document.getElementById('sort-dropdown')).empty().append('Sorteeri | ' + sorterTitles[sorter.name] + ' ' + sorterType[type]);
+    if (listData.length > 0) {
+        addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
+    } else {
+        eventbus.send('database_get_list_name', listId.toString(), function (error, reply) {
+            addListBody(listData, listId);
+        });
+    }
+}
+
+function getSorted(data, sorter, type) {
+    // reply.body['rows'];
+    if (type === 123) {
+        return data.sort(sorter);
+    } else if (type === 321) {
+        return data.sort(sorter).reverse();
+    }
+}
+
+function yearSort123(a,b) {
+    return ((a['Year'] == b['Year']) ? 0 :
+        ((a['Year'] > b['Year']) ? 1 : -1 ));
+}
+
+function titleSort123(a,b) {
+    return ((a['Title'] == b['Title']) ? 0 :
+        ((a['Title'] > b['Title']) ? 1 : -1 ));
+}
+
+function addedSort123(a,b) {
+    return ((a['Time'] == b['Time']) ? 0 :
+        ((a['Time'] > b['Time']) ? 1 : -1 ));
 }
 
 function fillMovies(resultRows, listName, listId) {
@@ -147,11 +197,31 @@ function addListTitle(title, listId) {
                         'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">'
                         + lang['LISTS_CHANGE_TITLE'] + '</a><br>' +
                     '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">'
-                        + lang['LISTS_DELETE_LIST'] + '</a>' +
+                        + lang['LISTS_DELETE_LIST'] + '</a><br>' +
+                    '<a class="dropdown-button home-link cursor" data-activates="sortDropdown" href="#" id="sort-dropdown">Sorteeri</a>' +
+                    '<ul id="sortDropdown" class="dropdown-content">' +
+                        '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a>Pealkiri kasvavalt</a></li>' +
+                        '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a>Pealkiri kahanevalt</a></li>' +
+                        '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a>Aasta kasvavalt</a></li>' +
+                        '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a>Aasta kahanevalt</a></li>' +
+                        '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a>Date added kasvavalt</a></li>' +
+                        '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a>Date added kahanevalt</a></li>' +
+                    '</ul>' +
                 '</div>' +
             '</div>' +
         '</div>'
     ));
+    $('.dropdown-button').dropdown({
+            inDuration: 300,
+            outDuration: 225,
+            constrainWidth: false, // Does not change width of dropdown to that of the activator
+            hover: false, // Activate on hover
+            gutter: 0, // Spacing from edge
+            belowOrigin: false, // Displays dropdown below the button
+            alignment: 'left', // Displays dropdown with edge aligned to the left of button
+            stopPropagation: false // Stops event propagation
+        }
+    );
 }
 
 function changeNameOnClick(listId, title) {

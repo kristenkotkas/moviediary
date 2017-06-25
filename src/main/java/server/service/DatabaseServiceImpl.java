@@ -139,7 +139,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_IN_LISTS =
             "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
-            "SELECT MovieId, Title, ListName, Year, Image, Time FROM ListEntries " +
+            "SELECT MovieId, Title, ListName, Year, Image, Time, ListId FROM ListEntries " +
                     "JOIN Movies On ListEntries.MovieId = Movies.Id " +
                     "JOIN ListsInfo On ListsInfo.Id = ListEntries.ListId " +
                     "WHERE ListEntries.Username = ? AND ListId = ? ORDER BY Time DESC;";
