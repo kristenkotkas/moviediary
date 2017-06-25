@@ -1,5 +1,6 @@
 package server.security;
 
+import database.rxjava.DatabaseService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
@@ -10,7 +11,6 @@ import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.Google2Client;
 import org.pac4j.vertx.auth.Pac4jAuthProvider;
 import org.pac4j.vertx.context.session.VertxSessionStore;
-import server.service.rxjava.DatabaseService;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static server.security.SecurityConfig.AuthClient.getCallback;
 import static server.security.SecurityConfig.AuthClient.values;
-import static server.util.NetworkUtils.isServer;
+import static util.NetworkUtils.isServer;
 
 /**
  * Contains login clients used for user authentication.
@@ -47,7 +47,7 @@ public class SecurityConfig {
   /**
    * Initializes Pac4j security engine with authentication clients and database authorizer.
    */
-  public SecurityConfig(Vertx vertx, JsonObject config, server.service.DatabaseService database) {
+  public SecurityConfig(Vertx vertx, JsonObject config, database.DatabaseService database) {
     this.sessionStore = LocalSessionStore.create(vertx);
     this.vertxSessionStore = new VertxSessionStore(sessionStore.getDelegate());
     this.pac4jConfig = new Config(getCallback(config), Arrays.stream(values())

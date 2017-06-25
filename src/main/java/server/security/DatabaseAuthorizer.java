@@ -1,5 +1,6 @@
 package server.security;
 
+import database.rxjava.DatabaseService;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.pac4j.core.authorization.authorizer.ProfileAuthorizer;
@@ -10,7 +11,6 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.oauth.profile.facebook.FacebookProfile;
 import org.pac4j.oauth.profile.google2.Google2Profile;
 import server.entity.TriFunction;
-import server.service.rxjava.DatabaseService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,9 +20,9 @@ import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.router.UiRouter.UI_LOGIN;
-import static server.util.CommonUtils.getRows;
-import static server.util.StringUtils.genString;
-import static server.util.StringUtils.hash;
+import static util.JsonUtils.getRows;
+import static util.StringUtils.genString;
+import static util.StringUtils.hash;
 
 /**
  * Authorizer that checks against database whether authenticated user is allowed to access resources.
@@ -33,7 +33,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
 
   private final DatabaseService database;
 
-  public DatabaseAuthorizer(server.service.DatabaseService database) {
+  public DatabaseAuthorizer(database.DatabaseService database) {
     this.database = new DatabaseService(database);
   }
 

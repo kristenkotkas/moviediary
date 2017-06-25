@@ -10,11 +10,11 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static entity.Language.getString;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
-import static server.entity.Language.getString;
 import static server.util.Utils.*;
 
 @RunWith(VertxUnitRunner.class)

@@ -1,11 +1,11 @@
 package server.security;
 
-import io.vertx.core.json.JsonObject;
+import database.rxjava.DatabaseService;
+import entity.JsonObj;
 import org.pac4j.core.profile.CommonProfile;
-import server.service.rxjava.DatabaseService;
 
 import static server.security.SecurityConfig.*;
-import static server.util.CommonUtils.getRows;
+import static util.JsonUtils.getRows;
 
 /**
  * Profile for form client.
@@ -18,7 +18,7 @@ public class FormProfile extends CommonProfile {
     addAttribute(PAC4J_EMAIL, email);
     addAttribute(PAC4J_PASSWORD, password);
     getRows(database.rxGetUser(email).toBlocking().value()).stream()
-        .map(obj -> (JsonObject) obj)
+        .map(JsonObj::fromParent)
         .filter(json -> email.equals(json.getString("Username")))
         .findAny()
         .ifPresent(json -> {

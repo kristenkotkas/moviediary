@@ -11,10 +11,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.List;
 
+import static entity.Language.getString;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
-import static server.entity.Language.getString;
 import static server.util.Utils.assertGoToPage;
 import static server.util.Utils.formLogin;
 

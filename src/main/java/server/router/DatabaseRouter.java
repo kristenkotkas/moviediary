@@ -1,21 +1,22 @@
 package server.router;
 
+import database.rxjava.DatabaseService;
+import entity.JsonObj;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Cookie;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import server.entity.JsonObj;
+import mail.rxjava.MailService;
 import server.security.SecurityConfig;
-import server.service.rxjava.DatabaseService;
-import server.service.rxjava.MailService;
-import server.util.CommonUtils;
+import util.JsonUtils;
 
 import java.util.function.BiFunction;
 
+import static entity.Language.LANGUAGE;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
-import static server.entity.Language.getLanguage;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
 import static server.router.MailRouter.userVerified;
@@ -23,9 +24,13 @@ import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
 import static server.security.FormClient.*;
 import static server.security.SecurityConfig.CSRF_TOKEN;
-import static server.util.CommonUtils.*;
-import static server.util.NetworkUtils.isServer;
+import static server.util.CommonUtils.check;
+import static server.util.CommonUtils.getUsername;
 import static server.util.StringUtils.*;
+import static util.ConditionUtils.contains;
+import static util.ConditionUtils.nonNull;
+import static util.JsonUtils.getRows;
+import static util.NetworkUtils.isServer;
 
 /**
  * Contains routes that interact with database.
@@ -70,7 +75,7 @@ public class DatabaseRouter extends EventBusRoutable {
   private final MailService mail;
 
   public DatabaseRouter(Vertx vertx, JsonObject config, SecurityConfig securityConfig,
-                        server.service.DatabaseService db, server.service.MailService mail) {
+                        database.DatabaseService db, mail.MailService mail) {
     super(vertx);
     this.config = config;
     this.securityConfig = securityConfig;
@@ -224,9 +229,10 @@ public class DatabaseRouter extends EventBusRoutable {
       serviceUnavailable(ctx, new Throwable("Csrf check failed."));
       return;
     }
+    Cookie langCookie = ctx.getCookie(LANGUAGE);
     // TODO: 20.06.2017 test
     database.rxGetUser(username)
-        .map(CommonUtils::getRows)
+        .map(JsonUtils::getRows)
         .map(JsonArray::stream)
         .map(stream -> stream.map(JsonObj::fromParent))
         .map(stream -> stream.noneMatch(json -> json.getString("Username").equals(username)))
@@ -234,7 +240,7 @@ public class DatabaseRouter extends EventBusRoutable {
         .doOnError(err -> redirect(ctx, userExists()))
         .flatMap(b -> database.rxInsertFormUser(username, password, firstname, lastname, isServer(config) ? "0" : "1"))
         .flatMap(json -> check(isServer(config),
-            () -> mail.rxSendVerificationEmail(getLanguage(ctx), username),
+            () -> mail.rxSendVerificationEmail(langCookie != null ? langCookie.getValue() : null, username),
             () -> redirect(ctx, userVerified())))
         .subscribe(obj -> redirect(ctx, verifyEmail()), ctx::fail);
 

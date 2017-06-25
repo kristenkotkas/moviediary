@@ -25,8 +25,8 @@ import java.util.stream.Stream;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static java.lang.String.valueOf;
-import static server.util.CommonUtils.ifPresent;
-import static server.util.CommonUtils.ifTrue;
+import static util.ConditionUtils.ifPresent;
+import static util.ConditionUtils.ifTrue;
 
 /**
  * Generic class that contains routes.

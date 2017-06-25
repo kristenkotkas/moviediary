@@ -3,10 +3,10 @@ package server.router;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import server.service.rxjava.TmdbService;
+import tmdb.rxjava.TmdbService;
 
 import static server.entity.Status.badRequest;
-import static server.util.HandlerUtils.parseParam;
+import static util.StringUtils.parseParam;
 
 /**
  * Contains routes that handle TheMovieDatabase services.
@@ -29,7 +29,7 @@ public class TmdbRouter extends EventBusRoutable {
 
   private final TmdbService tmdb;
 
-  public TmdbRouter(Vertx vertx, server.service.TmdbService tmdbDelegate) {
+  public TmdbRouter(Vertx vertx, tmdb.TmdbService tmdbDelegate) {
     super(vertx);
     this.tmdb = new TmdbService(tmdbDelegate);
     // TODO: 18/06/2017 service proxies instead of listeners

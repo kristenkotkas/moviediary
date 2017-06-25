@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':common')
+    compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
+}

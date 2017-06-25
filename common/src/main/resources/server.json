@@ -1,0 +1,37 @@
+{
+  "tmdb_key": "fbe0eec213cc4dd1dbb4a8c222273a3e",
+  "omdb_key": "351afbd2",
+  "mysql": {
+    "url": "jdbc:mysql://kyngas.eu:3366/MovieDiary?characterEncoding=UTF-8&verifyServerCertificate=false&useSSL=true&requireSSL=true&autoReconnect=true",
+    "driver_class": "com.mysql.cj.jdbc.Driver",
+    "user": "moviediary",
+    "password": "dixHYT7yQTdIButPyfZaA6o8MrGXJp",
+    "max_pool_size": 30
+  },
+  "oauth": {
+    "localCallback": "http://localhost:8081/callback",
+    "callback": "https://movies.kyngas.eu/callback",
+    "facebook": {
+      "key": "409712932694519",
+      "secret": "1037f0ae816c753d09bf3962feb53dee"
+    },
+    "google": {
+      "key": "211754454554-22n0sc4stbv42t97iqnbv62t3c5t2tgb.apps.googleusercontent.com",
+      "secret": "3grIVn6NOn4bLfNZk9T71p5k"
+    }
+  },
+  "unit_test": {
+    "form_user": {
+      "username": "unittest@kyngas.eu",
+      "password": "0kRJVhz2I1AmNDW0MIONXUEi9vhTzFRD",
+      "firstname": "Form",
+      "lastname": "Tester"
+    },
+    "facebook_user": {
+      "username": "facebook_ekubamn_tester@tfbnw.net",
+      "password": "kXxjL57qGR6vLNkFdTlETJrxIa5MZmUj",
+      "firstname": "Facebook",
+      "lastname": "Tester"
+    }
+  }
+}

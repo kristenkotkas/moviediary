@@ -1,5 +1,6 @@
 package server.router;
 
+import entity.Language;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.auth.AuthProvider;
@@ -9,14 +10,13 @@ import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.handler.UserSessionHandler;
 import org.pac4j.vertx.handler.impl.*;
-import server.entity.Language;
 import server.security.SecurityConfig;
 
 import static server.router.UiRouter.UI_HOME;
 import static server.security.SecurityConfig.AUTHORIZER;
 import static server.security.SecurityConfig.AuthClient.getClientNames;
-import static server.util.NetworkUtils.MAX_BODY_SIZE;
-import static server.util.NetworkUtils.isServer;
+import static util.NetworkUtils.MAX_BODY_SIZE;
+import static util.NetworkUtils.isServer;
 
 /**
  * Contains routes that require authentication and authorization.

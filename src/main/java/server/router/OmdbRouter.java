@@ -3,10 +3,10 @@ package server.router;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import server.service.rxjava.OmdbService;
+import omdb.rxjava.OmdbService;
 
 import static server.entity.Status.badRequest;
-import static server.util.HandlerUtils.parseParam;
+import static util.StringUtils.parseParam;
 
 /**
  * Contains routes that handle The Open Movie Database services.
@@ -17,7 +17,7 @@ public class OmdbRouter extends EventBusRoutable {
 
   private final OmdbService omdb;
 
-  public OmdbRouter(Vertx vertx, server.service.OmdbService omdbDelegate) {
+  public OmdbRouter(Vertx vertx, omdb.OmdbService omdbDelegate) {
     super(vertx);
     this.omdb = new OmdbService(omdbDelegate);
     // TODO: 18/06/2017 service proxies instead of listeners

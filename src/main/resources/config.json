@@ -1,6 +1,0 @@
-{
-  "http_port": 8081,
-  "http_address": "127.0.0.1",
-  "production_host": "kyngas.eu",
-  "use_pangalink": true
-}

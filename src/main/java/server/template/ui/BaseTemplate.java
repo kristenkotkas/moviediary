@@ -9,8 +9,6 @@ public interface BaseTemplate extends TypeSafeTemplate {
 
   void setLoginPage(String loginPage);
 
-  void setUserPage(String userPage);
-
   void setHomePage(String homePage);
 
   void setMoviesPage(String moviesPage);
@@ -20,8 +18,6 @@ public interface BaseTemplate extends TypeSafeTemplate {
   void setHistoryPage(String historyPage);
 
   void setStatisticsPage(String statisticsPage);
-
-  void setWishlistPage(String wishlistPage);
 
   void setDiscoverPage(String wishlistPage);
 

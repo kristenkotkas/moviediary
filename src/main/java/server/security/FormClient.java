@@ -1,5 +1,6 @@
 package server.security;
 
+import database.rxjava.DatabaseService;
 import io.vertx.core.json.JsonObject;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.Cookie;
@@ -7,13 +8,12 @@ import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
-import server.service.rxjava.DatabaseService;
 
 import static org.pac4j.core.util.CommonHelper.isBlank;
 import static server.router.UiRouter.UI_FORM_LOGIN;
 import static server.security.SecurityConfig.CSRF_TOKEN;
-import static server.util.CommonUtils.nonNull;
-import static server.util.NetworkUtils.isServer;
+import static util.ConditionUtils.nonNull;
+import static util.NetworkUtils.isServer;
 
 /**
  * Indirect client for form login.

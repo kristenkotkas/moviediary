@@ -7,9 +7,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
+import static entity.Language.getString;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.tagName;
-import static server.entity.Language.getString;
 import static server.util.Utils.assertGoToPage;
 
 @RunWith(VertxUnitRunner.class)
