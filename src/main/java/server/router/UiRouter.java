@@ -21,7 +21,6 @@ import static org.pac4j.core.util.CommonHelper.addParameter;
 import static server.entity.Language.*;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
-import static server.router.BankLinkRouter.*;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
 import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.UNAUTHORIZED;
@@ -45,13 +44,11 @@ public class UiRouter extends EventBusRoutable {
             "into-the-wild", "truman-show"};
 
     public static final String UI_INDEX = "/";
-    public static final String UI_USER = "/private/user";
     public static final String UI_HOME = "/private/home";
     public static final String UI_MOVIES = "/private/movies";
     public static final String UI_SERIES = "/private/series";
     public static final String UI_HISTORY = "/private/history";
     public static final String UI_STATISTICS = "/private/statistics";
-    public static final String UI_WISHLIST = "/private/wishlist";
     public static final String UI_DISCOVER = "/private/discover";
     public static final String UI_LISTS = "/private/lists";
     public static final String UI_LOGIN = "/login";
@@ -61,13 +58,11 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_DONATE_SUCCESS = "/private/success";
     public static final String UI_DONATE_FAILURE = "/private/failure";
 
-    private static final String TEMPL_USER = "templates/user.hbs";
     private static final String TEMPL_HOME = "templates/home.hbs";
     private static final String TEMPL_MOVIES = "templates/movies.hbs";
     private static final String TEMPL_SERIES = "templates/series.hbs";
     private static final String TEMPL_HISTORY = "templates/history.hbs";
     private static final String TEMPL_STATISTICS = "templates/statistics.hbs";
-    private static final String TEMPL_WISHLIST = "templates/wishlist.hbs";
     private static final String TEMPL_DISCOVER = "templates/discover.hbs";
     private static final String TEMPL_LISTS = "templates/lists.hbs";
     private static final String TEMPL_LOGIN = "templates/login.hbs";
@@ -99,12 +94,10 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_FORM_LOGIN).handler(this::handleFormLogin);
         router.get(UI_FORM_REGISTER).handler(this::handleFormRegister);
         router.get(UI_IDCARDLOGIN).handler(this::handleIdCardLogin);
-        router.get(UI_USER).handler(this::handleUser);
         router.get(UI_MOVIES).handler(this::handleMovies);
         router.get(UI_SERIES).handler(this::handleSeries);
         router.get(UI_HISTORY).handler(this::handleHistory);
         router.get(UI_STATISTICS).handler(this::handleStatistics);
-        router.get(UI_WISHLIST).handler(this::handleWishlist);
         router.get(UI_DISCOVER).handler(this::handleDiscover);
         router.get(UI_LISTS).handler(this::handleLists);
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
@@ -119,26 +112,6 @@ public class UiRouter extends EventBusRoutable {
         router.route("/fail").handler(ctx -> ctx.fail(555)); // TODO: 20.05.2017 remove
         router.route().failureHandler(this::handleFailure);
         router.get().last().handler(this::handleNotFound);
-    }
-
-    private void handleUser(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_USER, UserTemplate.class)
-                .setVK_SERVICE(vk_service)
-                .setVK_VERSION(vk_version)
-                .setVK_SND_ID(vk_snd_id)
-                .setVK_STAMP(vk_stamp)
-                .setVK_AMOUNT(vk_amount)
-                .setVK_CURR(vk_curr)
-                .setVK_ACC(vk_acc)
-                .setVK_NAME(vk_name)
-                .setVK_REF(vk_ref)
-                .setVK_LANG(vk_lang)
-                .setVK_MSG(vk_msg)
-                .setVK_RETURN(vk_return)
-                .setVK_CANCEL(vk_cancel)
-                .setVK_ENCODING(vk_encoding)
-                .setVK_MAC(createMac())
-                .setVK_DATETIME(vk_datetime), endHandler(ctx));
     }
 
     /**
@@ -168,10 +141,6 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleStatistics(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_STATISTICS, StatisticsTemplate.class), endHandler(ctx));
-    }
-
-    private void handleWishlist(RoutingContext ctx) {
-        engine.render(getSafe(ctx, TEMPL_WISHLIST, WhislistTemplate.class), endHandler(ctx));
     }
 
     private void handleDiscover(RoutingContext ctx) {
@@ -285,13 +254,11 @@ public class UiRouter extends EventBusRoutable {
                 ENGLISH.getLocale().getLanguage());
         base.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
         base.setLoginPage(UI_LOGIN);
-        base.setUserPage(UI_USER);
         base.setHomePage(UI_HOME);
         base.setMoviesPage(UI_MOVIES);
         base.setSeriesPage(UI_SERIES);
         base.setHistoryPage(UI_HISTORY);
         base.setStatisticsPage(UI_STATISTICS);
-        base.setWishlistPage(UI_WISHLIST);
         base.setDiscoverPage(UI_DISCOVER);
         base.setListsPage(UI_LISTS);
         CommonProfile profile = getProfile(ctx, securityConfig);

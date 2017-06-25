@@ -77,13 +77,7 @@ public interface DatabaseService {
 
     Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath);
 
-    Future<JsonObject> insertWishlist(String username, int movieId);
-
     Future<JsonObject> insertView(String user, String jsonParam);
-
-    Future<JsonObject> isInWishlist(String username, int movieId);
-
-    Future<JsonObject> getWishlist(String username);
 
     Future<JsonObject> getSettings(String username);
 
@@ -123,11 +117,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getWatchingSeries(String username);
 
-    Future<JsonObject> removeFromWishlist(String username, String movieId);
-
     Future<JsonObject> getLastMoviesHome(String username);
-
-    Future<JsonObject> getLastWishlistHome(String username);
 
     Future<JsonObject> getTopMoviesHome(String username);
 

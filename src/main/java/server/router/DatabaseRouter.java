@@ -46,9 +46,6 @@ public class DatabaseRouter extends EventBusRoutable {
 
     private static final String GET_HISTORY = "database_get_history";
     private static final String GET_MOVIE_HISTORY = "database_get_movie_history";
-    private static final String INSERT_WISHLIST = "database_insert_wishlist";
-    private static final String IS_IN_WISHLIST = "database_get_in_wishlist";
-    private static final String GET_WISHLIST = "database_get_wishlist";
     private static final String INSERT_VIEW = "database_insert_view";
     private static final String GET_YEARS_DIST = "database_get_years_dist";
     private static final String GET_WEEKDAYS_DIST = "database_get_weekdays_dist";
@@ -60,9 +57,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String GET_SEEN_EPISODES = "database_get_seen_episodes";
     private static final String REMOVE_EPISODE = "database_remove_episode";
     private static final String GET_WATCHING_SERIES = "database_get_watching_series";
-    private static final String REMOVE_WISHLIST = "database_remove_wishlist";
     private static final String GET_LAST_VIEWS = "database_get_last_views";
-    private static final String GET_HOME_WISHLIST = "database_get_home_wishlist";
     private static final String GET_TOP_MOVIES = "database_get_top_movies";
     private static final String GET_TOTAL_MOVIE_COUNT = "database_get_total_movie_count";
     private static final String GET_NEW_MOVIE_COUNT = "database_get_new_movie_count";
@@ -100,8 +95,6 @@ public class DatabaseRouter extends EventBusRoutable {
         this.mail = mail;
         listen(GET_HISTORY, reply(database::getViews, transformDatabaseHistory()));
         listen(GET_MOVIE_HISTORY, reply(database::getMovieViews, getDatabaseMovieHistory()));
-        listen(IS_IN_WISHLIST, reply((user, param) -> database.isInWishlist(user, parseInt(param))));
-        listen(GET_WISHLIST, reply((user, param) -> database.getWishlist(user)));
         listen(INSERT_VIEW, reply(database::insertView));
         listen(GET_YEARS_DIST, reply(database::getYearsDistribution));
         listen(GET_WEEKDAYS_DIST, reply(database::getWeekdaysDistribution));
@@ -116,10 +109,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_SEEN_EPISODES,
                 reply((user, param) -> database.getSeenEpisodes(user, parseInt(param)), getSeenEpisodes()));
         listen(GET_WATCHING_SERIES, reply((user, param) -> database.getWatchingSeries(user)));
-        listen(INSERT_WISHLIST, reply((user, param) -> database.insertWishlist(user, parseInt(param))));
-        listen(REMOVE_WISHLIST, reply(database::removeFromWishlist));
         listen(GET_LAST_VIEWS, reply((user, param) -> database.getLastMoviesHome(user), getDatabaseHomeViews()));
-        listen(GET_HOME_WISHLIST, reply((user, param) -> database.getLastWishlistHome(user)));
         listen(GET_TOP_MOVIES, reply((user, param) -> database.getTopMoviesHome(user)));
         listen(GET_TOTAL_MOVIE_COUNT, reply((user, param) -> database.getTotalMovieCount(user)));
         listen(GET_NEW_MOVIE_COUNT, reply((user, param) -> database.getNewMovieCount(user)));

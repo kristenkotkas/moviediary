@@ -25,16 +25,8 @@ import static server.util.StringUtils.*;
  * Database service implementation.
  */
 public class DatabaseServiceImpl implements DatabaseService {
-    private static final String SQL_INSERT_WISHLIST =
-            "INSERT IGNORE INTO Wishlist (Username, MovieId, Time) VALUES (?, ?, ?)";
     private static final String SQL_INSERT_EPISODE =
             "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
-    private static final String SQL_IS_IN_WISHLIST =
-            "SELECT MovieId FROM Wishlist WHERE Username = ? AND MovieId = ?";
-    private static final String SQL_GET_WISHLIST =
-            "SELECT Title, Time, Year, Image, MovieId FROM Wishlist " +
-                    "JOIN Movies ON Wishlist.MovieId = Movies.Id " +
-                    "WHERE Username =  ? ORDER BY Time DESC";
     private static final String SQL_GET_YEARS_DIST =
             "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
@@ -101,18 +93,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE Username = ? " +
                     "GROUP BY Title, Image, SeriesId " +
                     "ORDER BY Title";
-    private static final String SQL_REMOVE_WISHLIST =
-            "DELETE FROM Wishlist WHERE Username = ? AND MovieId = ?";
     private static final String SQL_GET_LAST_VIEWS =
             "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day', WasCinema FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";
-    private static final String SQL_GET_HOME_WISHLIST =
-            "SELECT Title, Time, Year, MovieId FROM Wishlist " +
-                    "JOIN Movies ON Movies.Id = Wishlist.MovieId " +
-                    "WHERE Username = ? " +
-                    "ORDER BY Time DESC LIMIT 5";
     private static final String SQL_GET_TOP_MOVIES =
             "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
@@ -255,17 +240,6 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(posterPath));
     }
 
-    /**
-     * Inserts an entry to wishlist table.
-     */
-    @Override
-    public Future<JsonObject> insertWishlist(String username, int movieId) {
-        return updateOrInsert(SQL_INSERT_WISHLIST, new JsonArray()
-                .add(username)
-                .add(movieId)
-                .add(currentTimeMillis()));
-    }
-
     @Override
     public Future<JsonObject> insertEpisodeView(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
@@ -280,16 +254,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getSeenEpisodes(String username, int seriesId) {
         return query(SQL_GET_SEEN_EPISODES, new JsonArray().add(username).add(seriesId));
-    }
-
-    @Override
-    public Future<JsonObject> isInWishlist(String username, int movieId) {
-        return query(SQL_IS_IN_WISHLIST, new JsonArray().add(username).add(movieId));
-    }
-
-    @Override
-    public Future<JsonObject> getWishlist(String username) {
-        return query(SQL_GET_WISHLIST, new JsonArray().add(username));
     }
 
     /**
@@ -490,18 +454,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> removeFromWishlist(String username, String movieId) {
-        return updateOrInsert(SQL_REMOVE_WISHLIST, new JsonArray().add(username).add(movieId));
-    }
-
-    @Override
     public Future<JsonObject> getLastMoviesHome(String username) {
         return query(SQL_GET_LAST_VIEWS, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> getLastWishlistHome(String username) {
-        return query(SQL_GET_HOME_WISHLIST, new JsonArray().add(username));
     }
 
     @Override

@@ -425,64 +425,6 @@ function fillOscars(oscarCount) {
 
 }
 
-function addToWishlist(eventbus, movieId, lang) {
-    if (!$("#wishlist-text").hasClass('content-key')) {
-        removeFromWishlist(eventbus, movieId, lang);
-    } else {
-        eventbus.send("database_insert_wishlist", movieId, function (error, reply) {
-            if (reply['body']['updated'] != null) {
-                console.log(movieId + ' added to wishlist.');
-                decorateInWishlist(lang);
-            }
-        });
-    }
-}
-
-function removeFromWishlist(eventbus, movieId, lang) {
-    eventbus.send("database_remove_wishlist", movieId, function (error, reply) {
-        console.log(movieId + ' remove from wishlist.');
-        if (reply['body']['updated'] != null) {
-            decorateNotInWIshlist(lang);
-        }
-    });
-}
-
-function decorateInWishlist(lang) {
-    if (isStarWars) {
-        $("#add-wishlist").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
-    } else {
-        $("#add-wishlist").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
-    }
-    $("#wishlist-text").empty().append(
-        $.parseHTML(
-            '<i class="fa fa-check left" aria-hidden="true"></i>' +
-            lang['MOVIES_IN_WISHLIST']
-        )
-    ).removeClass('content-key');
-}
-
-function decorateNotInWIshlist(lang) {
-    if (isStarWars) {
-        $("#add-wishlist").removeClass('add-wishlist').addClass('star-wars-add-wishlist');
-    } else {
-        $("#add-wishlist").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
-    }
-    $("#wishlist-text").empty().append(
-        $.parseHTML(lang['MOVIES_ADD_WISHLIST'])
-    ).addClass('content-key');
-}
-
-function inWishlist(eventbus, movieId, lang) {
-    eventbus.send("database_get_in_wishlist", movieId, function (error, reply) {
-        console.log('In wishlist: ' + reply.body['rows'].length);
-        if (reply.body['rows'].length !== 0) {
-            decorateInWishlist(lang);
-        } else {
-            decorateNotInWIshlist(lang);
-        }
-    });
-}
-
 var getMovieViews = function (eventbus, movieId, lang) {
     eventbus.send("database_get_movie_history", movieId.toString(), function (error, reply) {
         var data = reply.body['rows'];
