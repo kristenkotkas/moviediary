@@ -54,7 +54,7 @@ function createNewList() {
 
 function getLists() {
     eventbus.send('database_get_lists', {}, function (error, reply) {
-        fillLists(reply.body['results']);
+        fillLists(reply.body['rows']);
     });
 }
 
@@ -62,13 +62,14 @@ function fillLists(lists) {
     listsTable.empty();
     if (lists.length > 0) {
         $.each(lists, function (i) {
+            console.log(lists[i]);
             listsTable.append($.parseHTML(
-                '<tr class="cursor" onclick="openList('+ lists[i][0] + ')">' +
+                '<tr class="cursor" onclick="openList('+ lists[i]['Id'] + ')">' +
                     '<td>' +
-                        '<span class=" grey-text text-darken-1">' + (i + 1) + '</span>' +
+                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
                     '</td>' +
                     '<td>' +
-                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
+                        '<span class="content-key grey-text text-darken-1">' + lists[i]['Size'] + '</span>' +
                     '</td>' +
                 '</tr>'
             ));
@@ -320,6 +321,7 @@ function removeFromList(movieId, listId) {
                 var id = 'card_' + movieId;
                 console.log('REMOVED', id);
                 $(document.getElementById(id)).remove();
+                getLists();
             }
         });
 }

@@ -277,7 +277,12 @@ var searchMovie = function (eventbus, movieId, lang) {
 
         $("#search-result").empty().hide();
         $('#movie-views-table').empty();
-        $('#movie-title').text(data['original_title']).addClass('movies-heading');
+        $('#movie-title').empty();
+        $('#movie-title').append(
+            '<a class="title-link" href="' + getGoogleQueryURL(removeParens(data['original_title'])) + '" target="_blank">'
+            + data['original_title'] + '</a>'
+        );
+        $('#movie-title').addClass('movies-heading');
         //$('#navbar-background').addClass('transparent');
         $("#movie-poster-card").empty().append(
             $.parseHTML(
@@ -345,13 +350,21 @@ function getOmdb(imdbId, lang) {
         if (reply.body != 'Failure: Too many failures.') {
             if (reply.body['Response'] !== 'False') {
                 parseAwards(reply.body['Awards']);
-                $("#awards").empty().append(reply.body['Awards'].replace('.', '.<br>'));
+                $("#awards").empty().append(
+                    '<a class="home-link grey-text cursor" href="' + getIMDbAwardsURL(imdbId) + '" target="_blank">' +
+                    reply.body['Awards'].replace('.', '.<br>') + '</a>'
+                );
                 fillCrew(reply.body, lang);
             }
         } else {
 
         }
     });
+}
+
+
+function getIMDbAwardsURL(imdbId) {
+    return 'http://www.imdb.com/title/' + imdbId + '/awards';
 }
 
 function fillCrew(omdb, lang) {
@@ -374,15 +387,18 @@ function OMDBArrayToString(value, lang) {
         var dataParts = value.split(',');
         var result = '';
         $.each(dataParts, function (i) {
-            result += '<a class="home-link grey-text" href="' + getGoogleQueryURL(dataParts[i]) + '" target="_blank">'
+            result += '<a class="home-link grey-text" href="' + getGoogleQueryURL(removeParens(dataParts[i])) + '" target="_blank">'
                 + dataParts[i] + '</a>' + '<br>'
         });
         return result;
     }
 }
 
+function removeParens(string) {
+    return string.replace(new RegExp('[(][a-zA-Z -.,_:;]*[)]'), '');
+}
+
 function getGoogleQueryURL(query) {
-    query = query.replace(new RegExp('[(][a-z ]*[)]'), ' ');
     var googleURL = 'http://www.google.com/search?q=';
     var strings = query.split(' ');
     $.each(strings, function (i) {

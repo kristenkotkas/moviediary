@@ -241,6 +241,14 @@ span.badge.new:after {
     content: "";
 }
 
+.title-link {
+    color: #9e9e9e;
+}
+
+.title-link:hover {
+    color: black;
+}
+
 .card .card-image img {
     display: block;
     border-radius: 2px 2px 0 0;

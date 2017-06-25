@@ -579,7 +579,7 @@ function makeYChart(chart, years, distr) {
 }
 
 function addTableHead(data, lang) {
-    fillTopMovies();
+    fillTopMovies(lang);
     if (data[0]['Count'] > 0) {
         viewsTitle.empty();
         totalViews.empty().append(data[0]['Count']);
@@ -593,7 +593,7 @@ function addTableHead(data, lang) {
     }
 }
 
-function fillTopMovies() {
+function fillTopMovies(lang) {
     eventbus.send("database_get_top_movies_stat",
         {
             'is-first': $("#seenFirst-stat").is(':checked'),
@@ -620,7 +620,7 @@ function fillTopMovies() {
             } else {
                 topMovies.append(
                     $.parseHTML(
-                        '<span class="card-title center grey-text text-darken-1">No movies</span>'
+                        '<span class="card-title center grey-text text-darken-1">' + lang['HOME_NO_VIEWS'] + '</span>'
                     )
                 );
             }
