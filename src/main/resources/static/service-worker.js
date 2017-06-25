@@ -1,39 +1,29 @@
 var log = console.log.bind(console);
-var version = "0.0.5";
+var version = "0.0.6";
 var cacheName = "moviediary";
 var cache = cacheName + "-" + version;
 var filesToCache = [
     '/',
-    'css/custom/loader.min.css',
-    'css/font-awesome/css/font-awesome.min.css',
-    'css/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0',
-    'css/custom/materialize.min.css',
-    'css/fonts/roboto/Roboto-Regular.woff2',
-    'css/fonts/roboto/Roboto-Medium.woff2',
-    'css/fonts/roboto/Roboto-Light.woff2',
     'css/custom/base.css',
-    'js/custom/loader.js',
+    'css/custom/loader.min.css',
     'css/custom/page-center.css',
     'css/clockpicker.css',
     'img/eng.svg',
     'img/est.svg',
-    'img/ger.svg',
     'img/nanPosterBig.jpg',
     'img/nanPosterSmall.jpg',
+    'js/custom/loader.js',
     'js/custom/clockpicker.js',
-    'js/custom/materialize.min.js',
     'js/custom/vertx-eventbus.js',
+    'js/pages/apiUtils.js',
+    'js/pages/discover.js',
     'js/pages/history.js',
     'js/pages/home.js',
+    'js/pages/lists.js',
     'js/pages/login.js',
     'js/pages/movies.js',
-    'js/pages/stats.js',
-    'js/pages/user.js',
-    'js/pages/wishlist.js',
-    'js/chart.min.js',
-    'js/jquery.min.js',
-    'js/jquery-matchHeight.min.js',
-    'js/sockjs.min.js'
+    'js/pages/series.js',
+    'js/pages/stats.js'
 ];
 
 self.addEventListener('install', function (event) {
