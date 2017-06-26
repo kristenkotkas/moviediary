@@ -22,6 +22,11 @@ body {
     cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
 }*/
 
+.list-group {
+    padding: 0.2em 1em 0.2em 0.8em;
+    font-size: x-large;
+}
+
 .not-found-image {
     width: 100%;
 }

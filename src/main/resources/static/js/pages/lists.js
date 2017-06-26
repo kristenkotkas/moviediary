@@ -112,7 +112,6 @@ function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
         unboundOnClick();
         listData = reply.body['rows'];
-        console.log(listData);
         if (listData.length > 0) {
             fillMovies(listData, listData[0]['ListName'], listId);
         } else {
@@ -123,25 +122,94 @@ function openList(listId) {
     });
 }
 
+function addGroupedListBody(dataRows, type, listId) {
+    listContainer.empty();
+    $.each(dataRows, function (key, value) {
+        addGroupTitle(key);
+        $.each(value, function (i) {
+            var data = value;
+
+            var posterPath = "";
+            var movie = data[i];
+            if (movie['Image'] !== "") {
+                posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
+            } else {
+                posterPath = '/static/img/nanPosterBig.jpg'
+            }
+
+            var movieId = movie['MovieId'];
+            var cardId = 'card_' + movieId;
+
+            listContainer.append(
+                $.parseHTML(
+                    '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
+                    '<div class="card horizontal z-depth-0" id="inner-' + cardId + '">' +
+                    '<div class="card-image">' +
+                    '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
+                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
+                    '</div>' +
+                    '<div class="card-stacked truncate">' +
+                    '<div class="card-content">' +
+                    '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
+                    movie['Title'] +
+                    '</a>' +
+                    '<span>' + yearNullCheck(movie['Year'], lang) + '</span>' +
+                    '</div>' +
+                    '<div class="card-action">' +
+                    '<span><a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a></span>' +
+                    '<span id="movie-card-content-' + movieId + '"></span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                )
+            );
+        });
+    });
+}
+
+function addGroupTitle(groupName) {
+    listContainer.append(
+        $.parseHTML(
+            '<div class="row">' +
+                '<div class="col s12 m12 l12">' +
+                    '<span class="grey-text text-darken-2 list-group white">' + groupName + '</span>' +
+                '</div>' +
+            '</div>'
+        )
+    );
+}
+
 /*
 - date added
 - year
 - title
  */
-function fillSortedList(sorter, type) {
+function fillSortedList(sorter, type, listId) {
     $(document.getElementById('sort-dropdown')).empty()
         .append(lang['LISTS_SORT'] + ' | ' + sorterTitles[sorter.name] + ' ' + sorterType[type]);
-    addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
+    if (sorter.name === 'addedSort123') {
+        addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
+    } else addGroupedListBody(getSorted(listData, sorter, type), type, listId);
     getSeenMoviesInList(listData[0]['ListId']);
 }
 
 function getSorted(data, sorter, type) {
     // reply.body['rows'];
+    // yearSort123
+    // titleSort123
+    var sortedData;
     if (type === 123) {
-        return data.sort(sorter);
+        sortedData = data.sort(sorter);
     } else if (type === 321) {
-        return data.sort(sorter).reverse();
+        sortedData = data.sort(sorter).reverse();
     }
+    if (sorter.name === 'yearSort123') {
+        return getYearsGrouped(sortedData);
+    } else if (sorter.name === 'titleSort123') {
+        return getTitleGrouped(sortedData);
+    }
+    return sortedData;
 }
 
 function yearSort123(a,b) {
@@ -150,8 +218,8 @@ function yearSort123(a,b) {
 }
 
 function titleSort123(a,b) {
-    return ((a['Title'] == b['Title']) ? 0 :
-        ((a['Title'] > b['Title']) ? 1 : -1 ));
+    return ((getClean(a['Title']) == getClean(b['Title'])) ? 0 :
+        ((getClean(a['Title']) > getClean(b['Title'])) ? 1 : -1 ));
 }
 
 function addedSort123(a,b) {
@@ -167,6 +235,46 @@ function fillMovies(resultRows, listName, listId) {
     } else {
         addEmptyListBody();
     }
+}
+
+function getYearsGrouped(resultRows) {
+    var resultArray = {};
+    $.each(resultRows, function (i) {
+        var movie = resultRows[i];
+        if (resultArray[movie['Year']] == null) {
+            resultArray[movie['Year']] = [];
+            resultArray[movie['Year']].push(movie);
+        } else {
+            resultArray[movie['Year']].push(movie);
+        }
+    });
+    return resultArray;
+}
+
+function getTitleGrouped(resultRows) {
+    var resultArray = {};
+    $.each(resultRows, function (i) {
+        var movie = resultRows[i];
+        var firstLetter = getClean(movie['Title']).substring(0,1);
+        if (firstLetter.match('^[0-9]+')) {
+            if (resultArray['#'] == null) {
+                resultArray['#'] = [];
+                resultArray['#'].push(movie);
+            } else {
+                resultArray['#'].push(movie);
+            }
+        } else if (resultArray[firstLetter] == null) {
+            resultArray[firstLetter] = [];
+            resultArray[firstLetter].push(movie);
+        } else {
+            resultArray[firstLetter].push(movie);
+        }
+    });
+    return resultArray;
+}
+
+function getClean(title) {
+    return title.replace(new RegExp('(The +)|(An +)|(A +)'), '');
 }
 
 function addEmptyListBody() {
