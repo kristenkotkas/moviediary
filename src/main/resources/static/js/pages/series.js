@@ -21,9 +21,11 @@ var seriesDataContainer = $("#series-data-container");
 var seenEpisodes;
 var seenSeriesHeader = $("#seen-series-header");
 var isMobile = false;
+var lang;
+var inactiveSeriesHeader = $('#inactive-series-header');
+var inactiveSeriesContainer = $('#inactive-series-container');
 
 eventbus.onopen = function () {
-    var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         if ($( window ).width() <= 600) {
             isMobile = true;
@@ -35,6 +37,7 @@ eventbus.onopen = function () {
             var seenSeries = reply.body['rows'];
             //console.log('seenSeries', data);
             fillSeenSeries(seenSeries, lang);
+            getInactiveSeries();
             openSeenSeries();
 
             searchBar.keyup(function (e) {
@@ -45,15 +48,17 @@ eventbus.onopen = function () {
             searchButton.click(function () {
                 getSeriesSearch(lang);
             });
-
-            seenSeriesHeader.click(function () {
-                eventbus.send("database_get_watching_series", {},  function (error, reply) {
-                    fillSeenSeries(reply.body['rows'], lang);
-                });
-            })
         });
     });
 };
+
+function getWatchingSeries() {
+    eventbus.send('database_get_watching_series', {},  function (error, reply) {
+        var seenSeries = reply.body['rows'];
+        fillSeenSeries(seenSeries, lang);
+        getInactiveSeries();
+    });
+}
 
 function startLoading() {
     if (loaderContainer.empty()) {
@@ -69,7 +74,7 @@ var enableParameterSeriesLoading = function (eventbus, lang) {
     var loadSeries = function (eventbus, lang) {
         var query = getUrlParam("id");
         if (query !== null && isNormalInteger(query)) {
-            openSeries(parseInt(query), 1, lang);
+            openSeries(parseInt(query), 1);
         }
     };
     window.onpopstate = function () { //try to load series on back/forward page movement
@@ -115,34 +120,40 @@ function getSeriesSearch(lang) {
 
             resultCard.click(function () {
                 console.log(resultCardId + ' clicked');
-                openSeries(searchedTvSeries['id'], 1, lang);
+                openSeries(searchedTvSeries['id'], 1);
                 startLoading();
             })
         })
     });
 }
 
-function openSeries(seriesId, page, lang) {
+function openSeries(seriesId, page) {
     //seriesDataContainer.empty();
     //closeSeenSeries();
+    startLoading();
     eventbus.send('api_get_tv',
         {
             seriesId: seriesId,
             page: page
         }
     , function (error, reply) {
-        if (isMobile) {
-            closeSeenSeries();
-        }
-        searchResultContainer.empty();
+            eventbus.send('database_insert_user_series_info', seriesId.toString(), function (insertError, insertReply) {
+                if (insertReply['body']['updated'] != null) {
+                    if (isMobile) {
+                        closeSeenSeries();
+                    }
+                    searchResultContainer.empty();
 
-        var seriesData = reply['body'];
+                    var seriesData = reply['body'];
 
-        //console.log('seriesData', seriesData);
-        changeDesign(seriesData);
-        fillResultSeries(seriesData, page, lang);
-            replaceUrlParameter("id", seriesId);
-            endLoading();
+                    //console.log('seriesData', seriesData);
+                    changeDesign(seriesData);
+                    fillResultSeries(seriesData, page, lang);
+                    replaceUrlParameter("id", seriesId);
+                    endLoading();
+                }
+            });
+
     });
     //page = 1;
 }
@@ -267,7 +278,7 @@ function addPagins(seriesData, page, lang, type) {
             );
 
             $(document.getElementById(id)).click(function () {
-                openSeries(seriesData['id'], pages + 1, lang);
+                openSeries(seriesData['id'], pages + 1);
                 startLoading();
             });
             $(document.getElementById('series-page_' + type + '_' + page)).addClass('active');
@@ -362,6 +373,7 @@ function addEpisodeToView(episodeData, seriesData, seasonData, card, element, la
                 changeToActive(card, element, episodeData);
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
                     fillSeenSeries(reply.body['rows'], lang);
+                    getInactiveSeries();
                 });
             }
         });
@@ -378,6 +390,7 @@ function removeEpisode(card, element, episodeData, lang) {
                 changeToInActive(card, element, episodeData);
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
                     fillSeenSeries(reply.body['rows'], lang);
+                    getInactiveSeries();
                 });
             }
         });
@@ -395,6 +408,7 @@ function addSeasonToWatch(event) {
             if (reply['body']['updated'] != null) {
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
                     fillSeenSeries(reply.body['rows'], event.data.lang);
+                    getInactiveSeries();
                     var episodesContainer = event.data.container;
                     var timeout = 0;
                     $.each(data['episodes'], function (i) {
@@ -422,6 +436,7 @@ function removeSeasonFromWatch(event) {
         if (reply['body']['updated'] != null) {
             eventbus.send("database_get_watching_series", {},  function (error, reply) {
                 fillSeenSeries(reply.body['rows'], event.data.lang);
+                getInactiveSeries();
                 var episodesContainer = event.data.container;
                 var timeout = 0;
                 $.each(data['episodes'], function (i) {
@@ -436,6 +451,13 @@ function removeSeasonFromWatch(event) {
                 })
             });
         }
+    });
+}
+
+function getInactiveSeries() {
+    eventbus.send('database_get_inactive_series', {}, function (inactiveError, inactiveReply) {
+        console.log(inactiveReply.body['rows']);
+        fillInactiveSeries(inactiveReply.body['rows']);
     });
 }
 
@@ -460,46 +482,149 @@ function changeDesign(seriesData) {
 }
 
 function fillSeenSeries(seriesData, lang) {
+    console.log(seriesData);
     seenSeriesContainer.empty();
-    $.each(seriesData, function (i) {
-       //console.log('series', seriesData[i]);
-       var info = seriesData[i];
-       var cardId = 'img_' + info['SeriesId'];
-       var cardIdTitle = 'title_' + info['SeriesId'];
-       var cardIdEpisodes = 'episodes_' + info['SeriesId'];
-       var resultCardId = 'result_' + info['SeriesId'];
-       seenSeriesContainer.append(
-           $.parseHTML(
-                '<div class="col s12 m12 l12">' +
-                    '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
-                        '<div class="card-image">' +
-                            '<img id="' + cardId + '" class="series-poster" alt="Poster for series: ' + seriesData[i]['Title'] + '">' +
+    fillActiveSeriesTitle(seriesData.length);
+    if (seriesData.length > 0) {
+        $.each(seriesData, function (i) {
+            var info = seriesData[i];
+            seenSeriesContainer.append(
+                $.parseHTML(
+                    '<div class="col s12 m12 l12">' +
+                        '<div class="card horizontal z-depth-0">' +
+                            '<div class="card-image">' +
+                                '<img class="series-poster search-object-series" alt="Poster for series: ' + info['Title'] + '"' +
+                                ' onclick="openSeries(' + info['SeriesId'] + ',' + '1' + ')"' +
+                                ' id="img-card-' + info['SeriesId'] + '">' +
+                            '</div>' +
+                            '<div class="card-stacked truncate">' +
+                                '<div class="card-content">' +
+                                    '<span class="truncate content-key cursor home-link" ' +
+                                        'onclick="openSeries(' + info['SeriesId'] + ',' + '1' + ')">' +
+                                        info['Title'] +
+                                    '</span>' +
+                                    '<a class="home-link cursor truncate" onclick="changeSeriesToInactive(' + info['SeriesId'] + ')">' +
+                                        lang['SERIES_TO_INACTIVE'] +
+                                    '</a>' +
+                                '</div>' +
+                                '<div class="card-action">' +
+                                    '<span class="truncate">' + getEpisodeCount(info['Count']) + '</span>' +
+                                '</div>' +
+                            '</div>' +
                         '</div>' +
-                        '<div class="card-stacked truncate">' +
-                            '<div class="card-content">' +
-                                '<span class="truncate content-key" id="' + cardIdTitle + '"></span>' +
-                                //info['SeriesId'] +
-                            '</div>' +
-                            '<div class="card-action">' +
-                                '<span class="truncate" id="' + cardIdEpisodes + '"></span>' +
-                            '</div>' +
+                    '</div>'
+                )
+            );
+            decorateSeriesCard(info);
+        });
+    } else {
+        seenSeriesContainer.append(
+            $.parseHTML(
+                getNoSeries()
+            )
+        );
+    }
+}
+
+function fillActiveSeriesTitle(count) {
+    $('#seen-series-title').empty().append(
+        lang['SERIES_SEEN_SERIES'] + ' | ' + count + ' ' + getSeriesString(count)
+    );
+}
+
+function fillInactiveSeriesTitle(count) {
+    $('#inactive-series-title').empty().append(
+        lang['SERIES_INACTIVE_SERIES'] + ' | ' + count + ' ' + getSeriesString(count)
+    );
+}
+
+function getSeriesString(count) {
+    return count === 1 ? lang['SERIES_SING'] : lang['SERIES_PLUR'];
+}
+
+function getNoSeries() {
+    return '<div class="col s12 m12 l12">' +
+                '<div class="card z-depth-0">' +
+                    '<div class="card-content">' +
+                        '<div class="card-title">' +
+                            lang['SERIES_NO_SERIES'] +
                         '</div>' +
                     '</div>' +
-                '</div>'
-           )
-       );
-       var imgCard = $(document.getElementById(cardId));
-       var titleCard = $(document.getElementById(cardIdTitle));
-       var episodesCard = $(document.getElementById(cardIdEpisodes));
-       var resultCard = $(document.getElementById(resultCardId));
+                '</div>' +
+            '</div>';
+}
 
-        resultCard.click(function () {
-            openSeries(info['SeriesId'], 1, lang);
-            startLoading();
+function fillInactiveSeries(rows) {
+    inactiveSeriesContainer.empty();
+    fillInactiveSeriesTitle(rows.length);
+    if (rows.length > 0) {
+        $.each(rows, function (i) {
+            var info = rows[i];
+            inactiveSeriesContainer.append(
+                $.parseHTML(
+                    '<div class="col s12 m12 l12">' +
+                        '<div class="card horizontal z-depth-0">' +
+                            '<div class="card-image">' +
+                                '<img class="series-poster search-object-series" alt="Poster for series: ' + info['Title'] + '"' +
+                                ' onclick="openSeries(' + info['SeriesId'] + ',' + '1' + ')"' +
+                                ' id="img-card-' + info['SeriesId'] + '">' +
+                            '</div>' +
+                            '<div class="card-stacked truncate">' +
+                                '<div class="card-content">' +
+                                    '<span class="truncate content-key cursor home-link" ' +
+                                        'onclick="openSeries(' + info['SeriesId'] + ',' + '1' + ')">' +
+                                        info['Title'] +
+                                    '</span>' +
+                                    '<a class="home-link cursor truncate" onclick="changeSeriesToActive(' + info['SeriesId'] + ')">' +
+                                        lang['SERIES_TO_ACTIVE'] +
+                                    '</a>' +
+                                '</div>' +
+                                '<div class="card-action">' +
+                                    '<span class="truncate">' + getEpisodeCount(info['Count']) + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>'
+                )
+            );
+            decorateSeriesCard(info);
         });
+    } else {
+        inactiveSeriesContainer.append(
+            $.parseHTML(
+                getNoSeries()
+            )
+        );
+    }
+}
 
-       decorateSeriesCard(imgCard, titleCard, episodesCard, info, lang);
+function changeSeriesToInactive(seriesId) {
+    console.log(seriesId);
+    eventbus.send('database_change_series_inactive', seriesId.toString(), function (error, reply) {
+        if (reply['body']['updated'] != null) {
+            getWatchingSeries();
+        }
     });
+}
+
+function changeSeriesToActive(seriesId) {
+    console.log(seriesId);
+    eventbus.send('database_change_series_active', seriesId.toString(), function (error, reply) {
+        if (reply['body']['updated'] != null) {
+            getWatchingSeries();
+        }
+    });
+}
+
+function getEpisodeCount(count) {
+    var episodeSeen = '';
+    if (count > 1) {
+        episodeSeen = lang['SERIES_EPISODE_SEEN_PLURAL'];
+    } else {
+        episodeSeen = lang['SERIES_EPISODE_SEEN_SINGULAR'];
+    }
+
+    return '<span class="episodes-count">' + count + '</span>' + '<span class="episodes-seen">' + episodeSeen + '</span>';
 }
 
 function getYear(airDate) {
@@ -540,25 +665,14 @@ function closeSeenSeries() {
     seenSeriesColl.collapsible('close', 0);
 }
 
-function decorateSeriesCard(card, titleCard, episodeCard, info, lang) {
+function decorateSeriesCard(info) {
+    var card = $(document.getElementById('img-card-' + info['SeriesId']));
     if (info['Image'] !== '') {
         var path = 'https://image.tmdb.org/t/p/w300' + info['Image'];
         card.attr('src', path);
     } else {
         card.attr('src', '/static/img/nanPosterBig.jpg')
     }
-    titleCard.append(info['Title']);
-    var episodeSeen = '';
-    if (info['Count'] > 1) {
-        episodeSeen = lang['SERIES_EPISODE_SEEN_PLURAL'];
-    } else {
-        episodeSeen = lang['SERIES_EPISODE_SEEN_SINGULAR'];
-    }
-    episodeCard.append(
-        $.parseHTML(
-            '<span class="episodes-count">' +  info['Count'] + '</span>' + '<span class="episodes-seen">' + episodeSeen + '</span>'
-        )
-    );
 }
 
 function getNormalDate (date, lang) {

@@ -45,18 +45,34 @@
                 </div>
                 <div class="row">
                     <div class="col s12 m5 l4 xl3">
-                        <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
-                            <li class="z-depth-0">
-                                <div class="collapsible-header collapsible-header-tv history-object" id="seen-series-header">
-                                    <span>{{i18n "SERIES_SEEN_SERIES" locale=lang}}</span>
-                                </div>
-                                <div class="collapsible-body collapsible-body-tv">
-                                    <div class="row" id="seen-series-container">
-                                        <!-- Siia tuleb seen series sisu -->
+                        <div class="col s12 m12 l12">
+                            <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
+                                <li class="z-depth-0">
+                                    <div class="collapsible-header collapsible-header-tv history-object" id="seen-series-header">
+                                        <span id="seen-series-title">{{i18n "SERIES_SEEN_SERIES" locale=lang}}</span>
                                     </div>
-                                </div>
-                            </li>
-                        </ul>
+                                    <div class="collapsible-body collapsible-body-tv">
+                                        <div class="row" id="seen-series-container">
+                                            <!-- Siia tuleb seen series sisu -->
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col s12 m12 l12">
+                            <ul class="collapsible z-depth-0" data-collapsible="accordion" id="seen-series-coll">
+                                <li class="z-depth-0">
+                                    <div class="collapsible-header collapsible-header-tv history-object" id="inactive-series-header">
+                                        <span id="inactive-series-title">{{i18n "SERIES_INACTIVE_SERIES" locale=lang}}</span>
+                                    </div>
+                                    <div class="collapsible-body collapsible-body-tv">
+                                        <div class="row" id="inactive-series-container">
+                                            <!-- Siia tuleb seen series sisu -->
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="col s12 m7 l8 xl9">
                         <div id="tv-search-result-container">

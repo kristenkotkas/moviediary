@@ -81,6 +81,10 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String GET_DELETED_LISTS = "database_get_deleted_lists";
     private static final String RESTORE_DELETED_LIST = "database_restore_deleted_list";
     private static final String GET_LISTS_SIZE = "database_get_lists_size";
+    private static final String INSERT_USER_SERIES_INFO = "database_insert_user_series_info";
+    private static final String CHANGE_SERIES_INACTIVE = "database_change_series_inactive";
+    private static final String GET_INACTIVE_SERIES = "database_get_inactive_series";
+    private static final String CHANGE_SERIES_ACTIVE = "database_change_series_active";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -132,7 +136,11 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(GET_LAST_LISTS_HOME, reply((user, param) -> database.getLastListsHome(user)));
         listen(GET_DELETED_LISTS, reply((user, param) -> database.getDeletedLists(user)));
         listen(RESTORE_DELETED_LIST, reply(database::restoreDeletedList));
-        listen(GET_LISTS_SIZE, reply((user, reply) -> database.getListsSize(user)));
+        listen(GET_LISTS_SIZE, reply((user, param) -> database.getListsSize(user)));
+        listen(INSERT_USER_SERIES_INFO, reply(database::insertUserSeriesInfo));
+        listen(CHANGE_SERIES_INACTIVE, reply(database::changeSeriesToInactive));
+        listen(GET_INACTIVE_SERIES, reply((user, param) -> database.getInactiveSeries(user)));
+        listen(CHANGE_SERIES_ACTIVE, reply(database::changeSeriesToActive));
     }
 
     @Override

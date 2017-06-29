@@ -167,6 +167,14 @@ public interface DatabaseService {
 
     Future<JsonObject> getListsSize(String username);
 
+    Future<JsonObject> insertUserSeriesInfo(String username, String seriesId);
+
+    Future<JsonObject> changeSeriesToInactive(String username, String seriesId);
+
+    Future<JsonObject> getInactiveSeries(String username);
+
+    Future<JsonObject> changeSeriesToActive(String username, String seriesId);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

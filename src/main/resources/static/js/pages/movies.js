@@ -395,7 +395,7 @@ function OMDBArrayToString(value, lang) {
 }
 
 function removeParens(string) {
-    return string.replace(new RegExp('[(][a-zA-Z -.,_:;]*[)]'), '');
+    return string.replace(new RegExp('[(][a-zA-Z -.,_:;"?]*[)]'), '');
 }
 
 function getGoogleQueryURL(query) {

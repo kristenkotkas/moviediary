@@ -88,11 +88,12 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_SEEN_EPISODES = "SELECT EpisodeId FROM Series " +
             "WHERE Username = ? AND SeriesId = ?";
     private static final String SQL_GET_WATCHING_SERIES =
-            "SELECT Title, Image, SeriesId, COUNT(SeriesId) AS Count FROM Series " +
+            "SELECT Title, Image, Series.SeriesId, COUNT(Series.SeriesId) AS Count, Active FROM Series " +
                     "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
-                    "WHERE Username = ? " +
-                    "GROUP BY Title, Image, SeriesId " +
-                    "ORDER BY Title";
+                    "JOIN UserSeriesInfo ON Series.SeriesId = UserSeriesInfo.SeriesId " +
+                    "WHERE Series.Username = ? AND UserSeriesInfo.Username = ? AND Active " +
+                    "GROUP BY Series.SeriesId, Active " +
+                    "ORDER BY Title;";
     private static final String SQL_GET_LAST_VIEWS =
             "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day', WasCinema FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
@@ -150,8 +151,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_LIST_SEEN_MOVIES =
             "SELECT DISTINCT Views.MovieId FROM ListEntries " +
                     "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
-                    "WHERE " +
-                    "Views.Username = ? AND " +
+                    "WHERE Views.Username = ? AND " +
                     "ListEntries.Username = ? AND " +
                     "ListId = ?;";
     private static final String SQL_GET_LIST_NAME =
@@ -166,6 +166,19 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated DESC;";
     private static final String SQL_RESTORE_DELETED_LIST =
             "UPDATE ListsInfo SET Active = 1 WHERE Username = ? AND Id = ?;";
+    private static final String SQL_INSERT_USER_SERIES_INFO =
+            "INSERT IGNORE INTO UserSeriesInfo (Username, SeriesId) VALUES (?, ?);";
+    private static final String SQL_SET_SERIES_INACTIVE =
+            "UPDATE UserSeriesInfo SET Active = 0 WHERE Username = ? AND SeriesId = ?;";
+    private static final String SQL_GET_INACTIVE_SERIES =
+            "SELECT Title, Image, Series.SeriesId, COUNT(Series.SeriesId) AS Count, Active FROM Series " +
+                    "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
+                    "JOIN UserSeriesInfo ON Series.SeriesId = UserSeriesInfo.SeriesId " +
+                    "WHERE Series.Username = ? AND UserSeriesInfo.Username = ? AND NOT Active " +
+                    "GROUP BY Series.SeriesId, Active " +
+                    "ORDER BY Title;";
+    private static final String SQL_SET_SERIES_ACTIVE =
+            "UPDATE UserSeriesInfo SET Active = 1 WHERE Username = ? AND SeriesId = ?;";
 
     private final JDBCClient client;
 
@@ -452,7 +465,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getWatchingSeries(String username) {
-        return query(SQL_GET_WATCHING_SERIES, new JsonArray().add(username));
+        return query(SQL_GET_WATCHING_SERIES, new JsonArray()
+                .add(username)
+                .add(username));
     }
 
     @Override
@@ -614,6 +629,34 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_GET_LISTS_SIZE, new JsonArray()
                 .add(username)
                 .add(username));
+    }
+
+    @Override
+    public Future<JsonObject> insertUserSeriesInfo(String username, String seriesId) {
+        return updateOrInsert(SQL_INSERT_USER_SERIES_INFO, new JsonArray()
+                .add(username)
+                .add(seriesId));
+    }
+
+    @Override
+    public Future<JsonObject> changeSeriesToInactive(String username, String seriesId) {
+        return updateOrInsert(SQL_SET_SERIES_INACTIVE, new JsonArray()
+                .add(username)
+                .add(seriesId));
+    }
+
+    @Override
+    public Future<JsonObject> getInactiveSeries(String username) {
+        return query(SQL_GET_INACTIVE_SERIES, new JsonArray()
+                .add(username)
+                .add(username));
+    }
+
+    @Override
+    public Future<JsonObject> changeSeriesToActive(String username, String seriesId) {
+        return updateOrInsert(SQL_SET_SERIES_ACTIVE, new JsonArray()
+                .add(username)
+                .add(seriesId));
     }
 
     /**

@@ -124,6 +124,7 @@ function openList(listId) {
 
 function addGroupedListBody(dataRows, type, listId) {
     listContainer.empty();
+    console.log(dataRows);
     $.each(dataRows, function (key, value) {
         addGroupTitle(key);
         $.each(value, function (i) {
@@ -241,12 +242,11 @@ function getYearsGrouped(resultRows) {
     var resultArray = {};
     $.each(resultRows, function (i) {
         var movie = resultRows[i];
+        resultArray[movie]
         if (resultArray[movie['Year']] == null) {
             resultArray[movie['Year']] = [];
-            resultArray[movie['Year']].push(movie);
-        } else {
-            resultArray[movie['Year']].push(movie);
         }
+        resultArray[movie['Year']].push(movie);
     });
     return resultArray;
 }
@@ -255,20 +255,16 @@ function getTitleGrouped(resultRows) {
     var resultArray = {};
     $.each(resultRows, function (i) {
         var movie = resultRows[i];
-        var firstLetter = getClean(movie['Title']).substring(0,1);
+        var firstLetter = getClean(movie['Title']).substring(0, 1);
         if (firstLetter.match('^[0-9]+')) {
             if (resultArray['#'] == null) {
                 resultArray['#'] = [];
-                resultArray['#'].push(movie);
-            } else {
-                resultArray['#'].push(movie);
             }
+            resultArray['#'].push(movie);
         } else if (resultArray[firstLetter] == null) {
             resultArray[firstLetter] = [];
-            resultArray[firstLetter].push(movie);
-        } else {
-            resultArray[firstLetter].push(movie);
         }
+        resultArray[firstLetter].push(movie);
     });
     return resultArray;
 }
