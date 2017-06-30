@@ -20,7 +20,7 @@ eventbus.onopen = function () {
         fillLastMovies(lang);
         fillTotalStat(lang);
         fillTopMovies(lang);
-        fillWishlist(lang);
+        //fillWishlist(lang);
     });
 };
 

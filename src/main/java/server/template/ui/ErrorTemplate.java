@@ -1,9 +1,9 @@
 package server.template.ui;
 
 public interface ErrorTemplate extends BaseTemplate {
-    ErrorTemplate setPosterFileName(String fileName);
+  ErrorTemplate setPosterFileName(String fileName);
 
-    ErrorTemplate setErrorMessage(String message);
+  ErrorTemplate setErrorMessage(String message);
 
-    ErrorTemplate setErrorCode(int statusCode);
+  ErrorTemplate setErrorCode(int statusCode);
 }

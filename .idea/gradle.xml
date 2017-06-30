@@ -10,6 +10,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/database" />
+            <option value="$PROJECT_DIR$/gateway" />
+            <option value="$PROJECT_DIR$/mail" />
+            <option value="$PROJECT_DIR$/omdb" />
+            <option value="$PROJECT_DIR$/tmdb" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

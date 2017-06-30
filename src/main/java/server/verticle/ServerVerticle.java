@@ -1,19 +1,22 @@
 package server.verticle;
 
+import database.DatabaseService;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.ext.web.Router;
+import mail.MailService;
+import omdb.OmdbService;
 import server.router.*;
 import server.security.SecurityConfig;
-import server.service.*;
+import tmdb.TmdbService;
 
 import java.util.Arrays;
 
 import static server.router.EventBusRoutable.closeEventbus;
 import static server.router.EventBusRoutable.startEventbus;
-import static server.util.CommonUtils.createIfMissing;
-import static server.util.NetworkUtils.*;
+import static util.ConditionUtils.createIfMissing;
+import static util.NetworkUtils.*;
 
 /**
  * Main server logic.
@@ -24,7 +27,6 @@ public class ServerVerticle extends AbstractVerticle {
   private DatabaseService database;
   private TmdbService tmdb;
   private OmdbService omdb;
-  private BankLinkService bankLink;
   private MailService mail;
   private SecurityConfig securityConfig;
 
@@ -58,20 +60,19 @@ public class ServerVerticle extends AbstractVerticle {
   @Override
   public void start(Future<Void> future) throws Exception {
     Router router = Router.router(vertx);
-    database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
-    tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx.getDelegate(), config(), database));
-    omdb = createIfMissing(omdb, () -> OmdbService.create(vertx.getDelegate(), config()));
-    bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
-    mail = createIfMissing(mail, () -> MailService.create(vertx, database));
+    database = createIfMissing(database, () -> DatabaseService.createProxy(vertx.getDelegate(), DatabaseService.SERVICE_ADDRESS));
+    tmdb = createIfMissing(tmdb, () -> TmdbService.createProxy(vertx.getDelegate(), TmdbService.SERVICE_ADDRESS));
+    omdb = createIfMissing(omdb, () -> OmdbService.createProxy(vertx.getDelegate(), OmdbService.SERVICE_ADDRESS));
+    mail = createIfMissing(mail, () -> MailService.createProxy(vertx.getDelegate(), MailService.SERVICE_ADDRESS));
     securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(vertx, config(), database));
     Arrays.asList(
         new AuthRouter(vertx, config(), securityConfig),
         new TmdbRouter(vertx, tmdb),
         new OmdbRouter(vertx, omdb),
-        new BankLinkRouter(vertx, bankLink),
         new DatabaseRouter(vertx, config(), securityConfig, database, mail),
         new MailRouter(vertx, mail),
-        new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));
+        new UiRouter(vertx, securityConfig))
+        .forEach(routable -> routable.route(router));
     startEventbus(router, vertx);
     vertx.createHttpServer(new HttpServerOptions()
         .setCompressionSupported(true)

@@ -1,4 +1,4 @@
 package server.template.ui;
 
-public interface DiscoverTemplate extends BaseTemplate{
+public interface DiscoverTemplate extends BaseTemplate {
 }

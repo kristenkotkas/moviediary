@@ -1,4 +1,4 @@
 package server.template.ui;
 
-public interface SeriesTemplate extends BaseTemplate{
+public interface SeriesTemplate extends BaseTemplate {
 }

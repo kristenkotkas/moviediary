@@ -1,1 +1,9 @@
 rootProject.name = 'moviediary'
+
+include 'database'
+include 'gateway'
+include 'common'
+include 'mail'
+include 'tmdb'
+include 'omdb'
+

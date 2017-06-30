@@ -1,2 +1,7 @@
-/src/main/resources/server.json
 /src/main/generated/
+/database/src/main/generated/
+/mail/src/main/generated/
+/tmdb/src/main/generated/
+/misc/id_rsa
+/common/src/main/resources/server.json
+/omdb/src/main/generated/

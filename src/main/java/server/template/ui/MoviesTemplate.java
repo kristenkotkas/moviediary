@@ -1,4 +1,4 @@
 package server.template.ui;
 
-public interface MoviesTemplate extends BaseTemplate{
+public interface MoviesTemplate extends BaseTemplate {
 }

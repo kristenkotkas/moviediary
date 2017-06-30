@@ -1,6 +1,4 @@
 plugins {
-    id 'java'
-    id 'idea'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'org.hidetake.ssh' version '2.9.0'
@@ -8,90 +6,111 @@ plugins {
 
 mainClassName = 'server.Launcher'
 
-ext {
-    vertxVersion = '3.4.1'
-}
-
-repositories {
-    mavenCentral()
-}
-
 shadowJar {
     baseName = 'moviediary'
     classifier = ''
 }
 
-task cleanGenerated(type: Delete) {
-    delete 'src/main/generated'
-}
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-task vertxApiGeneration(type: JavaCompile) {
-    dependsOn cleanGenerated
-    source = sourceSets.main.java
-    classpath = configurations.compile + configurations.compileOnly
-    destinationDir = project.file('src/main/generated')
-    options.compilerArgs = [
-            "-proc:only",
-            "-processor", "io.vertx.codegen.CodeGenProcessor",
-            "-Acodegen.output=${project.projectDir}/src/main"
-    ]
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs += 'src/main/generated'
-        }
+    ext {
+        vertxVersion = '3.4.2'
+        mysqlVersion = '6.0.6'
+        mariaDbVersion = '2.2.3'
+        logbackVersion = '1.2.3'
+        junitVersion = '4.12'
+        handlebarsVersion = '4.0.6'
+        vertxPac4jVersion = '3.0.0'
+        pac4jOAuthVersion = '2.0.0'
+        awaitilityVersion = '3.0.0'
+        seleniumVersion = '3.4.0'
+        xmlApisVersion = '1.4.01'
     }
-}
 
-compileJava {
-    options.encoding = 'UTF-8'
+    repositories {
+        mavenCentral()
+    }
+
     targetCompatibility = 1.8
     sourceCompatibility = 1.8
-    dependsOn vertxApiGeneration
+
+    dependencies {
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
+
+        compile group: 'io.vertx', name: 'vertx-core', version: "${vertxVersion}"
+        compile group: 'io.vertx', name: 'vertx-rx-java', version: "${vertxVersion}"
+        compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${vertxVersion}"
+
+        compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${vertxVersion}"
+
+        testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+        testCompile group: 'io.vertx', name: 'vertx-unit', version: "${vertxVersion}"
+        testCompile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${vertxVersion}"
+        testCompile group: 'mysql', name: 'mysql-connector-java', version: "${mysqlVersion}"
+        testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: "${mariaDbVersion}"
+        testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${seleniumVersion}"
+        testCompile group: 'xml-apis', name: 'xml-apis', version: "${xmlApisVersion}"
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
+        }
+    }
+
+    task cleanGenerated(type: Delete) {
+        delete 'src/main/generated'
+    }
+
+    task vertxApiGeneration(type: JavaCompile) {
+        dependsOn cleanGenerated
+        source = sourceSets.main.java
+        classpath = configurations.compile + configurations.compileOnly
+        destinationDir = project.file('src/main/generated')
+        options.compilerArgs = [
+                "-proc:only",
+                "-processor", "io.vertx.codegen.CodeGenProcessor",
+                "-Acodegen.output=${project.projectDir}/src/main"
+        ]
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs += 'src/main/generated'
+            }
+        }
+    }
+
+    compileJava {
+        options.encoding = 'UTF-8'
+        targetCompatibility = 1.8
+        sourceCompatibility = 1.8
+        dependsOn vertxApiGeneration
+    }
 }
 
 dependencies {
+    compile project(':common')
+    compile project(':database')
+    compile project(':mail')
+    compile project(':tmdb')
+    compile project(':omdb')
     compile files('/libs/templ-handlebars.jar')
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile group: 'com.github.jknack', name: 'handlebars', version: '4.0.6'
-    compile group: 'io.vertx', name: 'vertx-core', version: "${vertxVersion}"
+    compile group: 'com.github.jknack', name: 'handlebars', version: "${handlebarsVersion}"
     compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
-    compile group: 'io.vertx', name: 'vertx-rx-java', version: "${vertxVersion}"
-    compile group: 'io.vertx', name: 'vertx-mail-client', version: "${vertxVersion}"
-    compile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${vertxVersion}"
-    compile group: 'io.vertx', name: 'vertx-web-client', version: "${vertxVersion}"
-    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
-    compile group: 'org.pac4j', name: 'vertx-pac4j', version: '3.0.0'
-    compile group: 'org.pac4j', name: 'pac4j-oauth', version: '2.0.0'
-
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.8.8'
-    compile 'org.codehaus.woodstox:woodstox-core-asl:4.4.1'
-
-    compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${vertxVersion}"
-    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${vertxVersion}"
-
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'io.vertx', name: 'vertx-unit', version: "${vertxVersion}"
-    testCompile group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
-    testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: '2.2.3'
-    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.4.0'
-    testCompile group: 'xml-apis', name: 'xml-apis', version: '1.4.01'
-}
-
-configurations.all {
-    resolutionStrategy {
-        force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
-    }
+    compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
+    compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
 }
 
 remotes {
     master {
         role 'master'
         host = 'kyngas.eu'
-        user = 'kristjan'
-        identity = file('C:\\grapes\\keys\\kristjan\\id_rsa')
+        user = 'moviediary'
+        identity = file('misc/id_rsa')
     }
 }
 
@@ -103,7 +122,8 @@ task deployMovieDiary(dependsOn: shadowJar) {
     doLast {
         ssh.run {
             session(remotes.master) {
-                put from: 'build/libs/moviediary.jar', into: '/home/kristjan/Downloads/'
+                put from: 'build/libs/moviediary.jar', into: '/home/moviediary/'
+                execute './run-moviediary.sh'
             }
         }
         println ':deploy:done'

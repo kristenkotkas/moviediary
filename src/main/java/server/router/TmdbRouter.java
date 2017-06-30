@@ -1,14 +1,12 @@
 package server.router;
 
-import io.vertx.core.json.JsonObject;
-import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import server.service.rxjava.TmdbService;
+import tmdb.rxjava.TmdbService;
 
 import static server.entity.Status.badRequest;
-import static server.util.HandlerUtils.parseParam;
+import static util.StringUtils.parseParam;
 
 /**
  * Contains routes that handle TheMovieDatabase services.
@@ -31,18 +29,16 @@ public class TmdbRouter extends EventBusRoutable {
 
   private final TmdbService tmdb;
 
-  public TmdbRouter(Vertx vertx, server.service.TmdbService tmdb) {
+  public TmdbRouter(Vertx vertx, tmdb.TmdbService tmdbDelegate) {
     super(vertx);
-    this.tmdb = new TmdbService(tmdb);
+    this.tmdb = new TmdbService(tmdbDelegate);
     // TODO: 18/06/2017 service proxies instead of listeners
-    listen(API_GET_SEARCH, reply(name -> Future.<JsonObject>future(fut -> tmdb.getMovieByName(name, fut.completer()))));
-    listen(API_GET_MOVIE, reply(id -> Future.<JsonObject>future(fut -> tmdb.getMovieById(id, fut.completer()))));
-    listen(API_GET_TV_SEARCH, reply(name -> Future.<JsonObject>future(fut -> tmdb.getTVByName(name, fut.completer()))));
-    listen(API_GET_TV, reply(id -> Future.<JsonObject>future(fut -> tmdb.getTVById(id, fut.completer()))));
-    listen(API_GET_RECOMMENDATIONS, reply(
-        id -> Future.<JsonObject>future(fut -> tmdb.getMovieRecommendation(id, fut.completer()))));
-    listen(INSERT_SEASON_VIEWS, reply(
-        (user, json) -> Future.<JsonObject>future(fut -> tmdb.insertSeasonViews(user, json, fut.completer()))));
+    listen(API_GET_SEARCH, reply(tmdb::rxGetMovieByName));
+    listen(API_GET_MOVIE, reply(tmdb::rxGetMovieById));
+    listen(API_GET_TV_SEARCH, reply(tmdb::rxGetTVByName));
+    listen(API_GET_TV, reply(tmdb::rxGetTVById));
+    listen(API_GET_RECOMMENDATIONS, reply(tmdb::rxGetMovieRecommendation));
+    listen(INSERT_SEASON_VIEWS, reply(tmdb::rxInsertSeasonViews));
   }
 
   @Override
