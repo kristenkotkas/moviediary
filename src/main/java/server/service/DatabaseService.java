@@ -175,6 +175,8 @@ public interface DatabaseService {
 
     Future<JsonObject> changeSeriesToActive(String username, String seriesId);
 
+    Future<JsonObject> getTodayInHistory(String username);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

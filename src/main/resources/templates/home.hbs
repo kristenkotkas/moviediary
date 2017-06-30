@@ -60,6 +60,24 @@
                         </li>
                     </ul>
                 </div>
+                <!-- Today in hisotry -->
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="today-history-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="plot-title">
+                                    <a class="grey-text text-darken-3 home-link" href="{{historyPage}}">{{i18n "HOME_TODAY_HISTORY" locale=lang}}</a>
+                                </h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered highlight">
+                                    <tbody id="today-history-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
             <div class="col s12 m6 l6">
                 <!-- Total stats -->

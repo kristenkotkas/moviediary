@@ -13,6 +13,7 @@ var totalRuntime = $("#total-runtime");
 var totalDifferentMovies = $("#total-different-movies");
 var totalCinema = $("#total-cinema-visits");
 var averageRuntime = $("#average-runtime");
+var todayHistoryTable = $('#today-history-tbody');
 eventbus.onopen = function () {
     var lang;
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -21,6 +22,7 @@ eventbus.onopen = function () {
         fillTotalStat(lang);
         fillTopMovies(lang);
         fillWishlist(lang);
+        fillTodayInHistory(lang);
     });
 };
 
@@ -145,7 +147,6 @@ function fillWishlist(lang) {
         if (data.length > 0) {
             $.each(data, function (i) {
                 var movie = data[i];
-                console.log(movie);
                 wishlist.append(
                     $.parseHTML(
                         '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
@@ -166,6 +167,38 @@ function fillWishlist(lang) {
             );
         }
         $("#wishlist-header").collapsible('open', 0);
+    });
+}
+
+function fillTodayInHistory(lang) {
+    eventbus.send('database_get_today_in_history', {}, function (error, reply) {
+        var data = reply.body['rows'];
+        todayHistoryTable.empty();
+        if (data.length > 0) {
+            $.each(data, function (i) {
+                var movie = data[i];
+                todayHistoryTable.append(
+                    $.parseHTML(
+                        '<tr onclick="openMovie(' + movie['MovieId'] + ')" class="cursor">' +
+                        '<td>' +
+                        '<span class="content-key grey-text text-darken-1">' + movie['Title'] + '</span><br>' +
+                        '<span class="grey-text">' + movie['Year'] + '</span>' +
+                        '</td>' +
+                        '<td>' +
+                        getWasCinema(movie['WasCinema']) +
+                        '</td>' +
+                        '</tr>'
+                    )
+                );
+            })
+        } else {
+            todayHistoryTable.append(
+                $.parseHTML(
+                    '<span class="card-title center grey-text text-darken-1">' + lang['HOME_NO_MOVIES'] + '</span>'
+                )
+            );
+        }
+        $("#today-history-header").collapsible('open', 0);
     });
 }
 

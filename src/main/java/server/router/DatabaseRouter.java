@@ -85,6 +85,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String CHANGE_SERIES_INACTIVE = "database_change_series_inactive";
     private static final String GET_INACTIVE_SERIES = "database_get_inactive_series";
     private static final String CHANGE_SERIES_ACTIVE = "database_change_series_active";
+    private static final String GET_TODAY_IN_HISTORY = "database_get_today_in_history";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -141,6 +142,8 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(CHANGE_SERIES_INACTIVE, reply(database::changeSeriesToInactive));
         listen(GET_INACTIVE_SERIES, reply((user, param) -> database.getInactiveSeries(user)));
         listen(CHANGE_SERIES_ACTIVE, reply(database::changeSeriesToActive));
+        listen(GET_TODAY_IN_HISTORY, reply((user, param) -> database.getTodayInHistory(user)));
+
     }
 
     @Override

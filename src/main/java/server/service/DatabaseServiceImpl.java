@@ -179,6 +179,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "ORDER BY Title;";
     private static final String SQL_SET_SERIES_ACTIVE =
             "UPDATE UserSeriesInfo SET Active = 1 WHERE Username = ? AND SeriesId = ?;";
+    private static final String SQL_GET_TODAY_IN_HISTORY =
+            "SELECT MovieId, Title, Year(Start) AS Year, WasCinema FROM Views " +
+                    "JOIN Movies ON Movies.Id = Views.MovieId " +
+                    "WHERE Username = ? AND " +
+                    "DAYOFMONTH(Start) = DAYOFMONTH(DATE(NOW())) AND " +
+                    "MONTH(Start) = MONTH(DATE(NOW()));";
 
     private final JDBCClient client;
 
@@ -657,6 +663,12 @@ public class DatabaseServiceImpl implements DatabaseService {
         return updateOrInsert(SQL_SET_SERIES_ACTIVE, new JsonArray()
                 .add(username)
                 .add(seriesId));
+    }
+
+    @Override
+    public Future<JsonObject> getTodayInHistory(String username) {
+        return query(SQL_GET_TODAY_IN_HISTORY, new JsonArray()
+                .add(username));
     }
 
     /**
