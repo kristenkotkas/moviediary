@@ -1,53 +1,9 @@
-.login-body {
-    display: table-cell;
-    vertical-align: middle;
-}
-
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-}
-
-main {
-    flex: 1 0 auto;
-}
-
-body {
-    background-size: cover;
-    background-attachment: fixed;
-}
-
-/*.btn:hover {
-    cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
-}*/
-
-.not-found-image {
-    width: 100%;
-}
-
-.wrap {
-    margin: auto;
-    text-align: center;
-    position: relative;
-}
-
-.text_over_image {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 10%;
-    color: #fff;
-    font-weight: 200;
-    font-size: 5vw;
-}
-
 .star-wars {
-    cursor: url(/static/img/lightsaber.gif), auto;
+    cursor: url(../images/Estonia_flag.jpg), auto;
 }
 
 .star-wars-link:hover {
-    cursor: url(/static/img/lightsaber_red.gif), auto;
+    cursor: url(../images/Estonia_flag.jpg), auto;
     text-decoration: underline;
 }
 

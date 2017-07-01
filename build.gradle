@@ -143,8 +143,7 @@ dependencies {
     compile project(':mail')
     compile project(':tmdb')
     compile project(':omdb')
-    compile files('/libs/templ-handlebars.jar')
-    compile group: 'com.github.jknack', name: 'handlebars', version: "${handlebarsVersion}"
+    compile project(':templ-handlebars')
     compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"

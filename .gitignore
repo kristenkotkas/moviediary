@@ -8,3 +8,5 @@
 /common/src/main/generated/
 /gateway/src/main/generated/
 /.vertx/
+/src/main/resources/server.json
+/templ-handlebars/src/main/generated/

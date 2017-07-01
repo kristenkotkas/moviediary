@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/gateway" />
             <option value="$PROJECT_DIR$/mail" />
             <option value="$PROJECT_DIR$/omdb" />
+            <option value="$PROJECT_DIR$/templ-handlebars" />
             <option value="$PROJECT_DIR$/tmdb" />
           </set>
         </option>

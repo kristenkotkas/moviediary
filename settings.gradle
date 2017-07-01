@@ -6,4 +6,5 @@ include 'common'
 include 'mail'
 include 'tmdb'
 include 'omdb'
+include 'templ-handlebars'
 

@@ -1,6 +1,6 @@
 package server.template.ui;
 
-import eu.kyngas.template.engine.TypeSafeTemplate;
+import template.TypeSafeTemplate;
 
 public interface BaseTemplate extends TypeSafeTemplate {
   void setLang(String lang);

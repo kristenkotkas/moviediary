@@ -1,6 +1,5 @@
 package server.router;
 
-import eu.kyngas.template.engine.HandlebarsTemplateEngine;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -14,6 +13,7 @@ import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.template.ui.*;
+import template.HandlebarsTemplateEngine;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
