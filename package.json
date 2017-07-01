@@ -1,0 +1,36 @@
+{
+  "name": "moviediary",
+  "version": "0.1.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.9.1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-livereload": "^3.8.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-uglify": "^3.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kristenkotkas/moviediary.git"
+  },
+  "keywords": [
+    "abc"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kristenkotkas/moviediary/issues"
+  },
+  "homepage": "https://github.com/kristenkotkas/moviediary#readme"
+}

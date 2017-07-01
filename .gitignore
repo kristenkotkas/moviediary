@@ -10,3 +10,4 @@
 /.vertx/
 /src/main/resources/server.json
 /templ-handlebars/src/main/generated/
+/node_modules/

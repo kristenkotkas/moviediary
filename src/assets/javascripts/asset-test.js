@@ -36,7 +36,6 @@
 
     function makeUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (a, b) => {
-            var logo = asset_url('Estonia_flag.jpg');
             return b = Math.random() * 16, (a === 'y' ? b & 3 | 8 : b | 0).toString(16);
         });
     }
