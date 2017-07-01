@@ -3,3 +3,7 @@ dependencies {
     compile project(':database')
     compile group: 'io.vertx', name: 'vertx-mail-client', version: "${vertxVersion}"
 }
+
+assets {
+    from 'src/main/generated/mail-js'
+}

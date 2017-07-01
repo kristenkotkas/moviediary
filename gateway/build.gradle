@@ -1,0 +1,8 @@
+dependencies {
+    compile project(':common')
+    compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
+}
+
+assets {
+    from 'src/main/generated/gateway-js'
+}

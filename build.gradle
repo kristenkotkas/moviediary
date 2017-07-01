@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
+    }
+}
+
 plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
@@ -14,6 +25,7 @@ shadowJar {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'com.bertramlabs.asset-pipeline'
 
     ext {
         vertxVersion = '3.4.2'
@@ -33,9 +45,6 @@ allprojects {
         mavenCentral()
     }
 
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
-
     dependencies {
         compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
 
@@ -54,18 +63,34 @@ allprojects {
         testCompile group: 'xml-apis', name: 'xml-apis', version: "${xmlApisVersion}"
     }
 
+    configurations {
+        webjar
+    }
+
     configurations.all {
+        //noinspection GroovyAssignabilityCheck
         resolutionStrategy {
             force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
         }
     }
 
-    task cleanGenerated(type: Delete) {
-        delete 'src/main/generated'
+    assets {
+        minifyJs true
+        minifyCss true
+        enableDigests = false
+        enableSourceMaps = true
+        enableGzip = false
+        developmentRuntime = false
+        configOptions = [:]
+        minifyOptions = [
+                languageMode     : 'ES6',
+                targetLanguage   : 'ES5',
+                optimizationLevel: 'SIMPLE' //todo advanced (removes unused code etc)
+        ]
+        excludes = ['**/*.less']
     }
 
     task vertxApiGeneration(type: JavaCompile) {
-        dependsOn cleanGenerated
         source = sourceSets.main.java
         classpath = configurations.compile + configurations.compileOnly
         destinationDir = project.file('src/main/generated')
@@ -84,11 +109,31 @@ allprojects {
         }
     }
 
+    task extractWebJarAssets() {
+        doLast {
+            configurations.webjar.each { file ->
+                copy {
+                    from zipTree(file)
+                    include 'META-INF/resources/webjars/**'
+                    into "${buildDir}/assets"
+                    eachFile { f ->
+                        f.path = f.path.replaceFirst('META-INF/resources/webjars', '')
+                        f.path = f.path.replaceFirst('/[-0-9.a-z]+/', '/')
+                        //todo extract all files to /assets? (no subfolders)
+                    }
+                    excludes = ['**/webjars-requirejs.js', '**/*.gz', '**/README.md']
+                    includeEmptyDirs false
+                }
+            }
+        }
+    }
+
     compileJava {
         options.encoding = 'UTF-8'
         targetCompatibility = 1.8
         sourceCompatibility = 1.8
         dependsOn vertxApiGeneration
+        dependsOn extractWebJarAssets
     }
 }
 
@@ -103,6 +148,8 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
+
+    webjar 'org.webjars:materializecss:0.98.2'
 }
 
 remotes {
@@ -128,4 +175,10 @@ task deployMovieDiary(dependsOn: shadowJar) {
         }
         println ':deploy:done'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
+    //noinspection UnnecessaryQualifiedReference
+    distributionType = Wrapper.DistributionType.ALL
 }

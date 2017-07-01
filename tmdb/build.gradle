@@ -3,3 +3,7 @@ dependencies {
     compile project(':database')
     compile group: 'io.vertx', name: 'vertx-web-client', version: "${vertxVersion}"
 }
+
+assets {
+    from 'src/main/generated/tmdb-js'
+}

@@ -5,3 +5,6 @@
 /misc/id_rsa
 /common/src/main/resources/server.json
 /omdb/src/main/generated/
+/common/src/main/generated/
+/gateway/src/main/generated/
+/.vertx/

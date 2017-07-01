@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E3F2FD">
+    <title>{{i18n "NAVBAR_HOME" locale=lang}}</title>
+    <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
+    <noscript>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css"
+              type="text/css" rel="stylesheet" media="screen">
+        <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+    </noscript>
+</head>
+<body class="blue lighten-5">
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+{{> templates/navbar.hbs}}
+<main>
+    <h3 class="light grey-text text-lighten-1 page-heading">{{i18n "HOME_HELLO" locale=lang}} {{userFirstName}}</h3>
+    <div class="row"></div>
+    <div class="row">
+        <div class="col s12 m12 l10 offset-l1 xl8 offset-xl2">
+            <div class="col s12 m6 l6">
+                <!-- Top 5 movies -->
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="top-movies-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="grey-text text-darken-3 plot-title">{{i18n "HOME_TOP_MOVIES"
+                                    locale=lang}}</h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <span class="grey-text" id="times-seen"
+                                      hidden>{{i18n "HOME_TIMES_SEEN" locale=lang}}</span>
+                                <table class="bordered highlight">
+                                    <tbody id="top-movies-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Last 5 movies kaart -->
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="last-views-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="plot-title"><a class="grey-text grey-text text-darken-3 home-link"
+                                                          href="{{historyPage}}">{{i18n "HOME_LAST_VIEWS"
+                                    locale=lang}}</a></h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered highlight">
+                                    <tbody id="last-movies-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col s12 m6 l6">
+                <!-- Total stats -->
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="stats-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="grey-text text-darken-3 plot-title">
+                                    <a class="grey-text text-darken-3 home-link" href="{{statisticsPage}}">{{i18n
+                                        "HOME_TOTAL_STATISTICS" locale=lang}}</a>
+                                </h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered">
+                                    <tbody id="total-stats-tbody">
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_TOTAL_VIEWS" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-views"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_TOTAL_NEW_MOVIES" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-new-movies"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_TOTAL_DIFFERENT_MOVIES" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-different-movies"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_TOTAL_CINEMA" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-cinema-visits"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_TOTAL_RUNTIME" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="total-runtime"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-text">{{i18n "HOME_AVERAGE_RUNTIME" locale=lang}}</td>
+                                        <td class="content-key grey-text text-darken-1">
+                                            <span id="average-runtime"></span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Wishlist -->
+                <div class="col s12 m12 l12 grey-text text-darken-2 card z-depth-0">
+                    <ul class="collapsible z-depth-0" data-collapsible="accordion" id="wishlist-header">
+                        <li>
+                            <div class="collapsible-header">
+                                <h5 class="plot-title">
+                                    <a class="grey-text text-darken-3 home-link" href="{{wishlistPage}}">{{i18n
+                                        "HOME_LATEST_WISHLIST" locale=lang}}</a>
+                                </h5>
+                            </div>
+                            <div class="home-content-card collapsible-body white">
+                                <table class="bordered highlight">
+                                    <tbody id="wishlist-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{{> templates/footer.hbs}}
+<asset:javascript src="asset-test.js"></asset:javascript>
+<script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
+<script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+<script defer type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script defer type="text/javascript" src="/static/js/custom/vertx-eventbus.js"></script>
+<script defer type="text/javascript" src="/static/js/pages/home.js"></script>
+</body>
+</html>
