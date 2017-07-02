@@ -24,6 +24,7 @@ var isMobile = false;
 var lang;
 var inactiveSeriesHeader = $('#inactive-series-header');
 var inactiveSeriesContainer = $('#inactive-series-container');
+var inactivateSeriesColl = $('#inactive-series-coll')
 
 eventbus.onopen = function () {
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -663,6 +664,7 @@ function openSeenSeries() {
 
 function closeSeenSeries() {
     seenSeriesColl.collapsible('close', 0);
+    inactivateSeriesColl.collapsible('close', 0);
 }
 
 function decorateSeriesCard(info) {

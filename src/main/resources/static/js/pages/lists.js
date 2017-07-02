@@ -15,10 +15,13 @@ var listContainer = $('#list-container');
 var btnDeleteList = $('#delete-list');
 var modalDeleteList = $('#modal-delete-list');
 var deletedListsContainer = $('#deleted-lists-table');
+var listCollapsible = $('#lists-coll');
+var deletedCollapsible = $('#deleted-coll');
 var lang;
 var listData;
 var sorterTitles;
 var sorterType;
+var isMobile = false;
 
 inputNewListName.keyup(function (e) {
     if (e.keyCode === 13) {
@@ -32,8 +35,25 @@ eventbus.onopen = function () {
         fillSorterJSONs(lang);
         getLists();
         getDeletedLists();
+
+        if ($( window ).width() > 600) {
+            openCollapsible();
+        } else {
+            listCollapsible.collapsible('open', 0);
+            isMobile = true;
+        }
     });
 };
+
+function openCollapsible() {
+    listCollapsible.collapsible('open', 0);
+    deletedCollapsible.collapsible('open', 0);
+}
+
+function closeCollabsible() {
+    listCollapsible.collapsible('close', 0);
+    deletedCollapsible.collapsible('close', 0);
+}
 
 function fillSorterJSONs(lang) {
     sorterTitles = {
@@ -79,12 +99,12 @@ function fillLists(lists) {
         $.each(lists, function (i) {
             listsTable.append($.parseHTML(
                 '<tr class="cursor" onclick="openList('+ lists[i]['Id'] + ')">' +
-                    '<td>' +
-                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
-                    '</td>' +
-                    '<td>' +
-                        '<span class="content-key grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0</span>' +
-                    '</td>' +
+                '<td>' +
+                '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
+                '</td>' +
+                '<td class="right">' +
+                '<span class="content-key grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0</span>' +
+                '</td>' +
                 '</tr>'
             ));
         });
@@ -111,6 +131,9 @@ function fillListsSize(rows) {
 function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
         unboundOnClick();
+        if (isMobile) {
+            closeCollabsible();
+        }
         listData = reply.body['rows'];
         if (listData.length > 0) {
             fillMovies(listData, listData[0]['ListName'], listId);
@@ -122,95 +145,24 @@ function openList(listId) {
     });
 }
 
-function addGroupedListBody(dataRows, type, listId) {
-    listContainer.empty();
-    console.log(dataRows);
-    $.each(dataRows, function (key, value) {
-        addGroupTitle(key);
-        $.each(value, function (i) {
-            var data = value;
-
-            var posterPath = "";
-            var movie = data[i];
-            if (movie['Image'] !== "") {
-                posterPath = 'https://image.tmdb.org/t/p/w342' + movie['Image'];
-            } else {
-                posterPath = '/static/img/nanPosterBig.jpg'
-            }
-
-            var movieId = movie['MovieId'];
-            var cardId = 'card_' + movieId;
-
-            listContainer.append(
-                $.parseHTML(
-                    '<div class="col s12 m12 l6 xl4" id="' + cardId + '">' +
-                    '<div class="card horizontal z-depth-0" id="inner-' + cardId + '">' +
-                    '<div class="card-image">' +
-                    '<img class="series-poster search-object-series" src="' + posterPath + '" alt="Poster for movie: ' +
-                    movie['Title'] + '" onclick="openMovie(' + movieId + ')">' +
-                    '</div>' +
-                    '<div class="card-stacked truncate">' +
-                    '<div class="card-content">' +
-                    '<a class="truncate content-key search-object-series black-text home-link" onclick="openMovie(' + movieId + ')">' +
-                    movie['Title'] +
-                    '</a>' +
-                    '<span>' + yearNullCheck(movie['Year'], lang) + '</span>' +
-                    '</div>' +
-                    '<div class="card-action">' +
-                    '<span><a class="search-object-series red-text home-link" onclick="removeFromList(' + movieId + ',' + listId + ')">' + lang['HISTORY_REMOVE'] + '</a></span>' +
-                    '<span id="movie-card-content-' + movieId + '"></span>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>'
-                )
-            );
-        });
-    });
-}
-
-function addGroupTitle(groupName) {
-    listContainer.append(
-        $.parseHTML(
-            '<div class="row">' +
-                '<div class="col s12 m12 l12">' +
-                    '<span class="grey-text text-darken-2 list-group white">' + groupName + '</span>' +
-                '</div>' +
-            '</div>'
-        )
-    );
-}
-
 /*
-- date added
-- year
-- title
+ - date added
+ - year
+ - title
  */
-function fillSortedList(sorter, type, listId) {
+function fillSortedList(sorter, type) {
     $(document.getElementById('sort-dropdown')).empty()
         .append(lang['LISTS_SORT'] + ' | ' + sorterTitles[sorter.name] + ' ' + sorterType[type]);
-    if (sorter.name === 'addedSort123') {
-        addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
-    } else addGroupedListBody(getSorted(listData, sorter, type), type, listId);
-    getSeenMoviesInList(listData[0]['ListId']);
+    addListBody(getSorted(listData, sorter, type), listData[0]['ListId']);
 }
 
 function getSorted(data, sorter, type) {
     // reply.body['rows'];
-    // yearSort123
-    // titleSort123
-    var sortedData;
     if (type === 123) {
-        sortedData = data.sort(sorter);
+        return data.sort(sorter);
     } else if (type === 321) {
-        sortedData = data.sort(sorter).reverse();
+        return data.sort(sorter).reverse();
     }
-    if (sorter.name === 'yearSort123') {
-        return getYearsGrouped(sortedData);
-    } else if (sorter.name === 'titleSort123') {
-        return getTitleGrouped(sortedData);
-    }
-    return sortedData;
 }
 
 function yearSort123(a,b) {
@@ -219,8 +171,8 @@ function yearSort123(a,b) {
 }
 
 function titleSort123(a,b) {
-    return ((getClean(a['Title']) == getClean(b['Title'])) ? 0 :
-        ((getClean(a['Title']) > getClean(b['Title'])) ? 1 : -1 ));
+    return ((a['Title'] == b['Title']) ? 0 :
+        ((a['Title'] > b['Title']) ? 1 : -1 ));
 }
 
 function addedSort123(a,b) {
@@ -232,45 +184,9 @@ function fillMovies(resultRows, listName, listId) {
     addListTitle(listName, listId);
     if (resultRows.length > 0) {
         addListBody(resultRows, listId);
-        getSeenMoviesInList(listId);
     } else {
         addEmptyListBody();
     }
-}
-
-function getYearsGrouped(resultRows) {
-    var resultArray = {};
-    $.each(resultRows, function (i) {
-        var movie = resultRows[i];
-        resultArray[movie]
-        if (resultArray[movie['Year']] == null) {
-            resultArray[movie['Year']] = [];
-        }
-        resultArray[movie['Year']].push(movie);
-    });
-    return resultArray;
-}
-
-function getTitleGrouped(resultRows) {
-    var resultArray = {};
-    $.each(resultRows, function (i) {
-        var movie = resultRows[i];
-        var firstLetter = getClean(movie['Title']).substring(0, 1);
-        if (firstLetter.match('^[0-9]+')) {
-            if (resultArray['#'] == null) {
-                resultArray['#'] = [];
-            }
-            resultArray['#'].push(movie);
-        } else if (resultArray[firstLetter] == null) {
-            resultArray[firstLetter] = [];
-        }
-        resultArray[firstLetter].push(movie);
-    });
-    return resultArray;
-}
-
-function getClean(title) {
-    return title.replace(new RegExp('(The +)|(An +)|(A +)'), '');
 }
 
 function addEmptyListBody() {
@@ -278,11 +194,11 @@ function addEmptyListBody() {
     listContainer.append(
         $.parseHTML(
             '<div class="card z-depth-0">' +
-                '<div class="card-content">' +
-                    '<div class="card-title">' +
-                        '<span class="light grey-text text-darken-2 list-title">' + lang['LISTS_NO_MOVIES'] + '</span>' +
-                    '</div>' +
-                '</div>' +
+            '<div class="card-content">' +
+            '<div class="card-title">' +
+            '<span class="light grey-text text-darken-2 list-title">' + lang['LISTS_NO_MOVIES'] + '</span>' +
+            '</div>' +
+            '</div>' +
             '</div>'
         )
     );
@@ -290,39 +206,39 @@ function addEmptyListBody() {
 
 function addListTitle(title, listId) {
     listTitleHolder.empty().append($.parseHTML(
-        '<div class="row">' +
-            '<div class="card z-depth-0">' +
-                '<div class="card-content">' +
-                    '<div class="card-title">' +
-                        '<span class="light grey-text text-darken-2 list-title" id="list-title">' +
-                            '<div onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">' + title + '</div>' +
-                        '</span>' +
-                    '</div>' +
-                    '<a class="home-link cursor blue-text text-darken-2" ' +
-                        'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">'
-                        + lang['LISTS_CHANGE_TITLE'] + '</a><br>' +
-                    '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">'
-                        + lang['LISTS_DELETE_LIST'] + '</a><br>' +
-                    '<a class="dropdown-button home-link cursor" data-activates="sortDropdown" href="#" id="sort-dropdown">' +
-                        lang['LISTS_SORT'] + '</a>' +
-                    '<ul id="sortDropdown" class="dropdown-content">' +
-                        '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_TITLE'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
-                        '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_TITLE'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
-                        '<li class="divider"></li>' +
-                        '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_YEAR'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
-                        '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_YEAR'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
-                        '<li class="divider"></li>' +
-                        '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
-                        '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-                            lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
-                    '</ul>' +
-                '</div>' +
-            '</div>' +
+        '<div class="last-row">' +
+        '<div class="card z-depth-0">' +
+        '<div class="card-content">' +
+        '<div class="card-title">' +
+        '<span class="light grey-text text-darken-2 list-title" id="list-title">' +
+        '<div onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">' + title + '</div>' +
+        '</span>' +
+        '</div>' +
+        '<a class="home-link cursor blue-text text-darken-2" ' +
+        'onclick="changeNameOnClick(' + listId + ',' + '\'' + title + '\'' + ')">'
+        + lang['LISTS_CHANGE_TITLE'] + '</a><br>' +
+        '<a class="home-link cursor red-text" onclick="openDeleteModal(' + listId + ')">'
+        + lang['LISTS_DELETE_LIST'] + '</a><br>' +
+        '<a class="dropdown-button home-link cursor" data-activates="sortDropdown" href="#" id="sort-dropdown">' +
+        lang['LISTS_SORT'] + '</a>' +
+        '<ul id="sortDropdown" class="dropdown-content">' +
+        '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_TITLE'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_TITLE'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        '<li class="divider"></li>' +
+        '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_YEAR'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_YEAR'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        '<li class="divider"></li>' +
+        '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
+        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        '</ul>' +
+        '</div>' +
+        '</div>' +
         '</div>'
     ));
     $('.dropdown-button').dropdown({
@@ -343,11 +259,11 @@ function changeNameOnClick(listId, title) {
     element.empty().append(
         $.parseHTML(
             '<div class="input-field custom-input">' +
-                '<input class="custom-input-field grey-text" id="changeNameInput" type="text" value="' + title + '" ' +
-                'data-length="50">' +
+            '<input class="custom-input-field grey-text" id="changeNameInput" type="text" value="' + title + '" ' +
+            'data-length="50">' +
             '</div>' +
             '<a class="btn z-depth-0 red lighten-2" onclick="addListTitle(\'' + title + '\',' + listId +')">'
-                + lang['MOVIES_CANCEL'] + '</a>' +
+            + lang['MOVIES_CANCEL'] + '</a>' +
             '<a> </a>' +
             '<a class="btn z-depth-0 green lighten-2" id="save-name-' + listId + '">' + lang['LISTS_SAVE'] + '</a>'
         )
@@ -412,13 +328,13 @@ function fillDeletedLists(lists) {
         $.each(lists, function (i) {
             deletedListsContainer.append($.parseHTML(
                 '<tr>' +
-                    '<td>' +
-                        '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
-                    '</td>' +
-                    '<td>' +
-                        '<span class="home-link cursor grey-text text-darken-1" ' +
-                            'onclick="restoreDeletedList(' + lists[i][0] + ')">' + lang['LISTS_RESTORE'] + '</span>' +
-                    '</td>' +
+                '<td class="left">' +
+                '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i][1]) + '</span>' +
+                '</td>' +
+                '<td class="right">' +
+                '<span class="home-link cursor grey-text text-darken-1" ' +
+                'onclick="restoreDeletedList(' + lists[i][0] + ')">' + lang['LISTS_RESTORE'] + '</span>' +
+                '</td>' +
                 '</tr>'
             ));
         });
@@ -479,24 +395,19 @@ function addListBody(data, listId) {
                 '</div>'
             )
         );
+        if (movie['Seen'] === 1) {
+            decorateSeenMovieCard(movieId);
+        }
     });
 }
 
-function getSeenMoviesInList(listId) {
-    eventbus.send('database_get_list_seen_movies', listId.toString(), function (error, reply) {
-        decorateSeenMovieCard(reply.body['results']);
-    });
-}
-
-function decorateSeenMovieCard(resultRows) {
-    $.each(resultRows, function (i) {
-        $(document.getElementById('inner-card_' + resultRows[i])).addClass('green').addClass('lighten-4');
-        $(document.getElementById('movie-card-content-' + resultRows[i])).empty().append(
-            $.parseHTML(
-                '<i class="fa fa-check right fa-lg white-text" aria-hidden="true"></i>'
-            )
-        );
-    });
+function decorateSeenMovieCard(movieId) {
+    $(document.getElementById('inner-card_' + movieId)).addClass('green').addClass('lighten-4');
+    $(document.getElementById('movie-card-content-' + movieId)).empty().append(
+        $.parseHTML(
+            '<i class="fa fa-check right fa-lg white-text" aria-hidden="true"></i>'
+        )
+    );
 }
 
 function openMovie(movieId) {

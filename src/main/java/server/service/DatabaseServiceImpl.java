@@ -127,7 +127,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
-            "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated DESC;";
+            "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
     private static final String SQL_GET_LISTS_SIZE =
             "SELECT Id, COUNT(ListId) AS Size FROM ListsInfo " +
                     "JOIN ListEntries ON ListsInfo.Id = ListEntries.ListId " +
@@ -140,10 +140,16 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_IN_LISTS =
             "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
-            "SELECT MovieId, Title, ListName, Year, Image, Time, ListId FROM ListEntries " +
-                    "JOIN Movies On ListEntries.MovieId = Movies.Id " +
-                    "JOIN ListsInfo On ListsInfo.Id = ListEntries.ListId " +
-                    "WHERE ListEntries.Username = ? AND ListId = ? ORDER BY Time DESC;";
+            "SELECT MovieId, Title, ListName, Year, Image, Time, ListId, " +
+                    "MovieId IN (SELECT DISTINCT Views.MovieId " +
+                    "FROM ListEntries " +
+                    "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
+                    "WHERE Views.Username = ? AND ListEntries.Username = ? AND " +
+                    "ListId = ?) AS Seen FROM ListEntries " +
+                    "JOIN Movies ON ListEntries.MovieId = Movies.Id " +
+                    "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
+                    "WHERE ListEntries.Username = ? AND ListId = ? " +
+                    "ORDER BY Time DESC;";
     private static final String SQL_CHANGE_LIST_NAME =
             "UPDATE ListsInfo SET ListName = ? WHERE Username = ? AND Id = ?;";
     private static final String SQL_DELETE_LIST =
@@ -163,7 +169,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "WHERE ListEntries.Username = ? AND ACTIVE " +
                     "ORDER BY Time DESC LIMIT 5";
     private static final String SQL_GET_DELETED_LISTS =
-            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated DESC;";
+            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated ASC;";
     private static final String SQL_RESTORE_DELETED_LIST =
             "UPDATE ListsInfo SET Active = 1 WHERE Username = ? AND Id = ?;";
     private static final String SQL_INSERT_USER_SERIES_INFO =
@@ -582,6 +588,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getListEntries(String username, String listId) {
         return query(SQL_GET_LIST_ENTRIES, new JsonArray()
+                .add(username)
+                .add(username)
+                .add(listId)
                 .add(username)
                 .add(listId));
     }
