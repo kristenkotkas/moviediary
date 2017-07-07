@@ -1,18 +1,8 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.13.1"
-    }
-}
-
 plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'org.hidetake.ssh' version '2.9.0'
+    id "com.moowork.node" version "1.2.0"
 }
 
 mainClassName = 'server.Launcher'
@@ -22,10 +12,33 @@ shadowJar {
     classifier = ''
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs += 'src/main/dist'
+        }
+    }
+}
+
+task unzipVertxDependencies(type: Copy) {
+    from zipTree(file('lib/vertx-js-dependencies.zip'))
+    into "${buildDir}/dependencies"
+}
+processResources.dependsOn unzipVertxDependencies
+
+task webpack(type: NodeTask, dependsOn: npmInstall) {
+    def cmd = System.getProperty("os.name").toLowerCase().contains("windows") ?
+            'node_modules/webpack/bin/webpack.js' :
+            'node_modules/.bin/webpack'
+    script = project.file(cmd)
+    args = ['--config', 'webpack.prod.js']
+}
+processResources.dependsOn webpack
+//todo cleaning of dist folder
+
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'com.bertramlabs.asset-pipeline'
 
     ext {
         vertxVersion = '3.4.2'
@@ -63,10 +76,6 @@ allprojects {
         testCompile group: 'xml-apis', name: 'xml-apis', version: "${xmlApisVersion}"
     }
 
-    configurations {
-        webjar
-    }
-
     configurations.all {
         //noinspection GroovyAssignabilityCheck
         resolutionStrategy {
@@ -74,26 +83,11 @@ allprojects {
         }
     }
 
-    assets {
-        minifyJs true
-        minifyCss true
-        enableDigests = false
-        enableSourceMaps = true
-        enableGzip = false
-        developmentRuntime = false
-        configOptions = [:]
-        minifyOptions = [
-                languageMode     : 'ES6',
-                targetLanguage   : 'ES5',
-                optimizationLevel: 'SIMPLE' //todo advanced (removes unused code etc)
-        ]
-        excludes = ['**/*.less']
-    }
-
+    //todo cleaning of gen folder
     task vertxApiGeneration(type: JavaCompile) {
         source = sourceSets.main.java
         classpath = configurations.compile + configurations.compileOnly
-        destinationDir = project.file('src/main/generated')
+        destinationDir = project.file('src/main/gen')
         options.compilerArgs = [
                 "-proc:only",
                 "-processor", "io.vertx.codegen.CodeGenProcessor",
@@ -104,26 +98,7 @@ allprojects {
     sourceSets {
         main {
             java {
-                srcDirs += 'src/main/generated'
-            }
-        }
-    }
-
-    task extractWebJarAssets() {
-        doLast {
-            configurations.webjar.each { file ->
-                copy {
-                    from zipTree(file)
-                    include 'META-INF/resources/webjars/**'
-                    into "${buildDir}/assets"
-                    eachFile { f ->
-                        f.path = f.path.replaceFirst('META-INF/resources/webjars', '')
-                        f.path = f.path.replaceFirst('/[-0-9.a-z]+/', '/')
-                        //todo extract all files to /assets? (no subfolders)
-                    }
-                    excludes = ['**/webjars-requirejs.js', '**/*.gz', '**/README.md']
-                    includeEmptyDirs false
-                }
+                srcDirs += 'src/main/gen'
             }
         }
     }
@@ -133,7 +108,6 @@ allprojects {
         targetCompatibility = 1.8
         sourceCompatibility = 1.8
         dependsOn vertxApiGeneration
-        dependsOn extractWebJarAssets
     }
 }
 
@@ -147,8 +121,6 @@ dependencies {
     compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
-
-    webjar 'org.webjars:materializecss:0.98.2'
 }
 
 remotes {

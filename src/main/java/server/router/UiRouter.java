@@ -7,7 +7,6 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Cookie;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import io.vertx.rxjava.ext.web.handler.StaticHandler;
 import org.pac4j.core.profile.CommonProfile;
 import server.security.FormClient;
 import server.security.IdCardClient;
@@ -15,7 +14,6 @@ import server.security.SecurityConfig;
 import server.template.ui.*;
 import template.HandlebarsTemplateEngine;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -32,6 +30,7 @@ import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
 import static server.security.SecurityConfig.AuthClient.*;
 import static server.security.SecurityConfig.*;
+import static server.util.CommonUtils.createStaticHandler;
 import static server.util.CommonUtils.getProfile;
 import static server.util.StringUtils.RANDOM;
 import static util.ConditionUtils.check;
@@ -53,9 +52,6 @@ public class UiRouter extends EventBusRoutable {
   public static final String UI_FORM_LOGIN = "/formlogin";
   public static final String UI_FORM_REGISTER = "/formregister";
   public static final String UI_IDCARDLOGIN = "/idcardlogin";
-  private static final Path RESOURCES = Paths.get("src/main/resources");
-  private static final String STATIC_PATH = "/static/*";
-  private static final String STATIC_FOLDER = "static";
   private static final String[] POSTERS = {"alien", "forrest-gump", "pulp-fiction", "titanic", "avatar",
       "into-the-wild", "truman-show"};
   private static final String TEMPL_HOME = "templates/home.hbs";
@@ -75,7 +71,7 @@ public class UiRouter extends EventBusRoutable {
 
   public UiRouter(Vertx vertx, SecurityConfig securityConfig) throws Exception {
     super(vertx);
-    this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : RESOURCES);
+    this.engine = HandlebarsTemplateEngine.create(isRunningFromJar() ? null : Paths.get("src/main/resources"));
     this.securityConfig = securityConfig;
   }
 
@@ -97,9 +93,21 @@ public class UiRouter extends EventBusRoutable {
     router.get(UI_STATISTICS).handler(this::handleStatistics);
     router.get(UI_DISCOVER).handler(this::handleDiscover);
 
-    router.get(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
-        STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
+    router.get("/css/*").handler(createStaticHandler("src/main/resources", "css")
         .setCachingEnabled(true)
+        .setDirectoryListing(true)
+        .setMaxAgeSeconds(DAYS.toSeconds(7))
+        .setIncludeHidden(false));
+
+    router.get("/img/*").handler(createStaticHandler("src/main/resources", "img")
+        .setCachingEnabled(true)
+        .setDirectoryListing(true)
+        .setMaxAgeSeconds(DAYS.toSeconds(7))
+        .setIncludeHidden(false));
+
+    router.get("/static/*").handler(createStaticHandler("src/main/dist", "static")
+        .setCachingEnabled(true)
+        .setDirectoryListing(true)
         .setMaxAgeSeconds(DAYS.toSeconds(7))
         .setIncludeHidden(false));
 

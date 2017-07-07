@@ -6,7 +6,3 @@ dependencies {
     testCompile project (path: ':common', configuration: 'testArchives')
     testCompile group: 'org.awaitility', name: 'awaitility', version: "${awaitilityVersion}"
 }
-
-assets {
-    from 'src/main/generated/database-js'
-}

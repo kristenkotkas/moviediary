@@ -30,15 +30,9 @@ public class ServerVerticle extends AbstractVerticle {
   private MailService mail;
   private SecurityConfig securityConfig;
 
-  // TODO: 1.06.2017 separate services
-  // TODO: 1.06.2017 each service will get verticle for communicating with their purpose -> etc mysql
-  // TODO: 1.06.2017 each service will get verticle for communicating with each other -> other services, clients
-  // TODO: 1.06.2017 service/api impl
-
-  // TODO: 1.06.2017 baseverticle for all -> service discovery, http rest / eventbus methods
-  // TODO: 1.06.2017 all in separate modules
-
   // TODO: 1.06.2017 metrics
+
+  // TODO: 07/07/2017 disable inspections/indexing on generated files
 
   /**
    * Creates service for interacting with database.

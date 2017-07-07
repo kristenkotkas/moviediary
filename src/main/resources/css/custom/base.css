@@ -43,11 +43,11 @@ body {
 }
 
 .star-wars {
-    cursor: url(/static/img/lightsaber.gif), auto;
+    cursor: url(/img/lightsaber.gif), auto;
 }
 
 .star-wars-link:hover {
-    cursor: url(/static/img/lightsaber_red.gif), auto;
+    cursor: url(/img/lightsaber_red.gif), auto;
     text-decoration: underline;
 }
 
@@ -290,7 +290,7 @@ span.badge.new:after {
 
 .star-wars-add-wishlist:hover {
     background: #dbded9;
-    cursor: url(/static/img/lightsaber_red.gif), auto;
+    cursor: url(/img/lightsaber_red.gif), auto;
 }
 
 .container {

@@ -9,13 +9,13 @@
     {{else}}
         <title>{{i18n "NOTFOUND_TITLE" locale=lang}}</title>
     {{/if}}
-    <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
     <noscript>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
               type="text/css" rel="stylesheet" media="screen">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css"
               type="text/css" rel="stylesheet" media="screen">
-        <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+        <link href="/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
     </noscript>
 </head>
 <body class="grey lighten-3">
@@ -31,7 +31,9 @@
             {{else}}
                 <h3 class="center grey-text">{{i18n "NOTFOUND_TITLE" locale=lang}}</h3>
             {{/if}}
-            <h4 class="center grey-text"><a href="{{homePage}}" class="home-link">{{i18n "NOTFOUND_RETURN" locale=lang}}</a></h4>
+            <h4 class="center grey-text">
+                <a href="{{homePage}}" class="home-link">{{i18n "NOTFOUND_RETURN" locale=lang}}</a>
+            </h4>
             <div class="row">
                 <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3">
                     <div class="wrap">
@@ -43,9 +45,5 @@
         </div>
     </div>
 </main>
-<script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
-<script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script defer type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
 </body>
 </html>

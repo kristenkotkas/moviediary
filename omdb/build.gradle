@@ -2,7 +2,3 @@ dependencies {
     compile project(':common')
     compile group: 'io.vertx', name: 'vertx-web-client', version: "${vertxVersion}"
 }
-
-assets {
-    from 'src/main/generated/omdb-js'
-}
