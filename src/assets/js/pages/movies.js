@@ -1,7 +1,7 @@
-import "jquery";
-import "materialize-css/dist/js/materialize.min";
-import EventBus from "vertx3-eventbus-client";
-import {asyncLoadCSS, getCookie, getMonth, getUrlParam, isNormalInteger, replaceUrlParameter} from "../custom/loader";
+import $ from 'jquery';
+import 'materialize-css/dist/js/materialize.min';
+import EventBus from 'vertx3-eventbus-client';
+import {asyncLoadCSS, getCookie, getMonth, getUrlParam, isNormalInteger, replaceUrlParameter} from '../custom/loader';
 
 asyncLoadCSS('/css/clockpicker.css');
 $('#navbar-movies').addClass('navbar-text-active');

@@ -1,6 +1,3 @@
-import $ from "jquery";
-
-const log = console.log.bind(console);
 let loadingCounter = 0;
 const types = {
   today: 1,
@@ -110,28 +107,6 @@ function getYear(year) {
   return result;
 }
 
-function searchYear(year, lang, startDateField, endDateField) {
-  const dates = getYear(year);
-  const monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
-  console.log(dates);
-  startDateField.pickadate('picker').set('select', dates['start']);
-  endDateField.pickadate('picker').set('select', dates['end']);
-  makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex); //fixme
-}
-
-function makeDropList(start, lang, type, startDateField, endDateField) {
-  const array = [];
-  for (let year = start; year <= new Date().getFullYear(); year++) {
-    array.push(year);
-  }
-  $.each(array, i => {
-    //fixme
-    yearDropdown.append($.parseHTML('<li id="' + type + '-drop-' + array[i] + '"><a>' + array[i] + '</a></li>'));
-    const yearButton = document.getElementById(type + '-drop-' + array[i]);
-    yearButton.onclick = () => searchYear(array[i], lang, startDateField, endDateField);
-  });
-}
-
 function minutesToString(minutes, lang) {
   const seconds = minutes * 60;
   const daysString = lang['LOADER_DAY'];
@@ -173,6 +148,6 @@ function replaceUrlParameter(param, value) {
 }
 
 export {
-  replaceUrlParameter, minutesToString, makeDropList, searchYear, getYear, getThisYear, getThisMonth,
+  replaceUrlParameter, minutesToString, getYear, getThisYear, getThisMonth,
   getThisWeek, isNormalInteger, getUrlParam, getMonth, getCookie, safeTagsReplace, asyncLoadCSS
 };

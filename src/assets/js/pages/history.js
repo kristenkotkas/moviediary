@@ -1,16 +1,15 @@
-import "jquery";
-import "materialize-css/dist/js/materialize.min";
-import EventBus from "vertx3-eventbus-client";
+import $ from 'jquery';
+import 'materialize-css/dist/js/materialize.min';
+import EventBus from 'vertx3-eventbus-client';
 import {
   getCookie,
   getMonth,
   getThisMonth,
   getThisWeek,
-  makeDropList,
   minutesToString,
   safeTagsReplace,
-  searchYear
-} from "../custom/loader";
+  getYear
+} from '../custom/loader';
 
 const navbarButton = $('#navbar-history');
 navbarButton.addClass('navbar-text-active');
@@ -110,7 +109,7 @@ eventbus.onopen = () => {
       endDateField.pickadate('picker').set('select', dates['end']);
       makeHistory(eventbus, lang, startDateField.val(), endDateField.val());
     });
-    searchYear(new Date().getFullYear(), lang, startDateField, endDateField);
+    searchYear(eventbus, new Date().getFullYear(), lang, startDateField, endDateField);
   });
 };
 
@@ -354,5 +353,26 @@ function addHistory(data, lang) {
       onOpen: el => $(el.find('i.fa')[0]).removeClass('fa-angle-down').addClass('fa-angle-up'),
       onClose: el => $(el.find('i.fa')[0]).removeClass('fa-angle-up').addClass('fa-angle-down')
     });
+  });
+}
+
+function searchYear(eventbus, year, lang, startDateField, endDateField) {
+  const dates = getYear(year);
+  const monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
+  console.log(dates);
+  startDateField.pickadate('picker').set('select', dates['start']);
+  endDateField.pickadate('picker').set('select', dates['end']);
+  makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
+}
+
+function makeDropList(start, lang, type, startDateField, endDateField) {
+  const array = [];
+  for (let year = start; year <= new Date().getFullYear(); year++) {
+    array.push(year);
+  }
+  $.each(array, i => {
+    yearDropdown.append($.parseHTML('<li id="' + type + '-drop-' + array[i] + '"><a>' + array[i] + '</a></li>'));
+    const yearButton = document.getElementById(type + '-drop-' + array[i]);
+    yearButton.onclick = () => searchYear(array[i], lang, startDateField, endDateField);
   });
 }

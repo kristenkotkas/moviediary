@@ -1,8 +1,8 @@
-import "jquery";
-import "materialize-css/dist/js/materialize.min";
-import EventBus from "vertx3-eventbus-client";
-import Chart from "chart.js";
-import {getCookie, getThisMonth, getThisWeek, makeDropList, minutesToString} from "../custom/loader";
+import $ from 'jquery';
+import 'materialize-css/dist/js/materialize.min';
+import EventBus from 'vertx3-eventbus-client';
+import Chart from 'chart.js';
+import {getCookie, getThisMonth, getThisWeek, minutesToString, getYear} from '../custom/loader';
 
 $('#navbar-statistics').addClass('navbar-text-active');
 $(() => {
@@ -345,7 +345,7 @@ function makeHistory(eventbus, lang, start, end, monthInd) {
 }
 
 function makeAllTime(eventbus, lang) {
-  eventbus.send('databxase_get_all_time_meta', {
+  eventbus.send('database_get_all_time_meta', {
     'is-first': $('#seenFirst-stat').is(':checked'),
     'is-cinema': $('#wasCinema-stat').is(':checked')
   }, (error, reply) => {
@@ -588,4 +588,25 @@ function addNotFound(lang) {
 
 function openMovie(movieId) {
   location.href = 'movies/?id=' + movieId;
+}
+
+function makeDropList(start, lang, type, startDateField, endDateField) {
+  const array = [];
+  for (let year = start; year <= new Date().getFullYear(); year++) {
+    array.push(year);
+  }
+  $.each(array, i => {
+    yearDropdown.append($.parseHTML('<li id="' + type + '-drop-' + array[i] + '"><a>' + array[i] + '</a></li>'));
+    const yearButton = document.getElementById(type + '-drop-' + array[i]);
+    yearButton.onclick = () => searchYear(eventbus, array[i], lang, startDateField, endDateField);
+  });
+}
+
+function searchYear(eventbus, year, lang, startDateField, endDateField) {
+  const dates = getYear(year);
+  const monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
+  console.log(dates);
+  startDateField.pickadate('picker').set('select', dates['start']);
+  endDateField.pickadate('picker').set('select', dates['end']);
+  makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);
 }

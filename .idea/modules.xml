@@ -20,7 +20,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb.iml" group="omdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb_main.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb_main.iml" group="omdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb_test.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb_test.iml" group="omdb" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars.iml" group="templ-handlebars" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars.iml" group="templ-handlebars" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_main.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_main.iml" group="templ-handlebars" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_test.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_test.iml" group="templ-handlebars" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmdb/tmdb.iml" filepath="$PROJECT_DIR$/.idea/modules/tmdb/tmdb.iml" group="tmdb" />

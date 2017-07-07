@@ -1,7 +1,7 @@
-import "jquery";
-import "materialize-css/dist/js/materialize.min";
-import EventBus from "vertx3-eventbus-client";
-import {getCookie, getMonth, minutesToString} from "../custom/loader";
+import $ from 'jquery';
+import 'materialize-css/dist/js/materialize.min';
+import EventBus from 'vertx3-eventbus-client';
+import {getCookie, getMonth, minutesToString} from '../custom/loader';
 
 $('#navbar-home').addClass('navbar-text-active');
 $(() => $('.sidebar-collapse').sideNav()); //sidebar initialization

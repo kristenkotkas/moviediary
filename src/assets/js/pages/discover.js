@@ -1,7 +1,7 @@
-import $ from "jquery";
-import "materialize-css/dist/js/materialize.min";
-import EventBus from "vertx3-eventbus-client";
-import {getCookie} from "../custom/loader";
+import $ from 'jquery';
+import 'materialize-css/dist/js/materialize.min';
+import EventBus from 'vertx3-eventbus-client';
+import {getCookie} from '../custom/loader';
 
 $(() => {
   $('.tooltipped').tooltip({ //tooltips initialization
