@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="file://$PROJECT_DIR$/src/main" libraries="{Chart, Node.js Core, jquery, jquery-clockpicker, materialize.clockpicker}" />
-    <file url="PROJECT" libraries="{jquery-3.2.1, materialize, sockjs}" />
+    <file url="file://$PROJECT_DIR$/src/main" libraries="{HTML, chart.js-DefinitelyTyped, jquery-DefinitelyTyped, materialize-css-DefinitelyTyped, vertx3-eventbus-client-DefinitelyTyped}" />
+    <file url="PROJECT" libraries="{chart.js-DefinitelyTyped, jquery-DefinitelyTyped, materialize-css-DefinitelyTyped, vertx3-eventbus-client-DefinitelyTyped}" />
+    <includedPredefinedLibrary name="Node.js Core" />
+    <excludedPredefinedLibrary name="moviediary/node_modules" />
   </component>
 </project>

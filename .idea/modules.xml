@@ -2,25 +2,28 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common.iml" filepath="$PROJECT_DIR$/.idea/modules/common.iml" group="common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/common.iml" filepath="$PROJECT_DIR$/.idea/modules/common/common.iml" group="common" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/common_main.iml" filepath="$PROJECT_DIR$/.idea/modules/common/common_main.iml" group="common" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/common_test.iml" filepath="$PROJECT_DIR$/.idea/modules/common/common_test.iml" group="common" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/database.iml" filepath="$PROJECT_DIR$/.idea/modules/database.iml" group="database" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/database/database.iml" filepath="$PROJECT_DIR$/.idea/modules/database/database.iml" group="database" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/database/database_main.iml" filepath="$PROJECT_DIR$/.idea/modules/database/database_main.iml" group="database" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/database/database_test.iml" filepath="$PROJECT_DIR$/.idea/modules/database/database_test.iml" group="database" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway.iml" group="gateway" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway/gateway.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway/gateway.iml" group="gateway" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway/gateway_main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway/gateway_main.iml" group="gateway" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway/gateway_test.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway/gateway_test.iml" group="gateway" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mail.iml" filepath="$PROJECT_DIR$/.idea/modules/mail.iml" group="mail" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mail/mail.iml" filepath="$PROJECT_DIR$/.idea/modules/mail/mail.iml" group="mail" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/mail/mail_main.iml" filepath="$PROJECT_DIR$/.idea/modules/mail/mail_main.iml" group="mail" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/mail/mail_test.iml" filepath="$PROJECT_DIR$/.idea/modules/mail/mail_test.iml" group="mail" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary_main.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary_main.iml" group="moviediary" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary_test.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary_test.iml" group="moviediary" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb.iml" group="omdb" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb.iml" group="omdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb_main.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb_main.iml" group="omdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omdb/omdb_test.iml" filepath="$PROJECT_DIR$/.idea/modules/omdb/omdb_test.iml" group="omdb" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmdb.iml" filepath="$PROJECT_DIR$/.idea/modules/tmdb.iml" group="tmdb" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars.iml" group="templ-handlebars" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_main.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_main.iml" group="templ-handlebars" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_test.iml" filepath="$PROJECT_DIR$/.idea/modules/templ-handlebars/templ-handlebars_test.iml" group="templ-handlebars" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmdb/tmdb.iml" filepath="$PROJECT_DIR$/.idea/modules/tmdb/tmdb.iml" group="tmdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmdb/tmdb_main.iml" filepath="$PROJECT_DIR$/.idea/modules/tmdb/tmdb_main.iml" group="tmdb" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmdb/tmdb_test.iml" filepath="$PROJECT_DIR$/.idea/modules/tmdb/tmdb_test.iml" group="tmdb" />
     </modules>

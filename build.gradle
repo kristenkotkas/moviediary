@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'org.hidetake.ssh' version '2.9.0'
+    id "com.moowork.node" version "1.2.0"
 }
 
 mainClassName = 'server.Launcher'
@@ -10,6 +11,30 @@ shadowJar {
     baseName = 'moviediary'
     classifier = ''
 }
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += 'src/main/dist'
+        }
+    }
+}
+
+task unzipVertxDependencies(type: Copy) {
+    from zipTree(file('lib/vertx-js-dependencies.zip'))
+    into "${buildDir}/dependencies"
+}
+processResources.dependsOn unzipVertxDependencies
+
+task webpack(type: NodeTask, dependsOn: npmInstall) {
+    def cmd = System.getProperty("os.name").toLowerCase().contains("windows") ?
+            'node_modules/webpack/bin/webpack.js' :
+            'node_modules/.bin/webpack'
+    script = project.file(cmd)
+    args = ['--config', 'webpack.prod.js']
+}
+processResources.dependsOn webpack
+//todo cleaning of dist folder
 
 allprojects {
     apply plugin: 'java'
@@ -33,9 +58,6 @@ allprojects {
         mavenCentral()
     }
 
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
-
     dependencies {
         compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
 
@@ -55,20 +77,17 @@ allprojects {
     }
 
     configurations.all {
+        //noinspection GroovyAssignabilityCheck
         resolutionStrategy {
             force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
         }
     }
 
-    task cleanGenerated(type: Delete) {
-        delete 'src/main/generated'
-    }
-
+    //todo cleaning of gen folder
     task vertxApiGeneration(type: JavaCompile) {
-        dependsOn cleanGenerated
         source = sourceSets.main.java
         classpath = configurations.compile + configurations.compileOnly
-        destinationDir = project.file('src/main/generated')
+        destinationDir = project.file('src/main/gen')
         options.compilerArgs = [
                 "-proc:only",
                 "-processor", "io.vertx.codegen.CodeGenProcessor",
@@ -79,7 +98,7 @@ allprojects {
     sourceSets {
         main {
             java {
-                srcDirs += 'src/main/generated'
+                srcDirs += 'src/main/gen'
             }
         }
     }
@@ -98,8 +117,7 @@ dependencies {
     compile project(':mail')
     compile project(':tmdb')
     compile project(':omdb')
-    compile files('/libs/templ-handlebars.jar')
-    compile group: 'com.github.jknack', name: 'handlebars', version: "${handlebarsVersion}"
+    compile project(':templ-handlebars')
     compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
     compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
     compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
@@ -128,4 +146,10 @@ task deployMovieDiary(dependsOn: shadowJar) {
         }
         println ':deploy:done'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
+    //noinspection UnnecessaryQualifiedReference
+    distributionType = Wrapper.DistributionType.ALL
 }

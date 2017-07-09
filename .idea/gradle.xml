@@ -4,7 +4,7 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="createEmptyContentRootDirectories" value="true" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="distributionType" value="WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="C:/Program Files/gradle-3.0" />
         <option name="modules">
@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/gateway" />
             <option value="$PROJECT_DIR$/mail" />
             <option value="$PROJECT_DIR$/omdb" />
+            <option value="$PROJECT_DIR$/templ-handlebars" />
             <option value="$PROJECT_DIR$/tmdb" />
           </set>
         </option>

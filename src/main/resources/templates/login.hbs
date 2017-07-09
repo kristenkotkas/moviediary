@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00bcd4">
     <title>{{i18n "LOGIN_TITLE" locale=lang}}</title>
-    <link href="/static/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
+    <link href="/css/custom/loader.min.css" type="text/css" rel="stylesheet" media="screen">
     <noscript>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
               type="text/css" rel="stylesheet" media="screen">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css"
               type="text/css" rel="stylesheet" media="screen">
-        <link href="/static/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
-        <link href="/static/css/custom/page-center.css" type="text/css" rel="stylesheet" media="screen">
+        <link href="/css/custom/base.css" type="text/css" rel="stylesheet" media="screen">
+        <link href="/css/custom/page-center.css" type="text/css" rel="stylesheet" media="screen">
     </noscript>
 </head>
 <body class="cyan login-body" id="login-body">
@@ -67,19 +67,19 @@
                     <div class="row">
                         <div class="input-field col s4">
                             <a href="{{loginPage}}?lang=en">
-                                <img id="lang-eng" class="flag" alt="Choose English" src="/static/img/eng.svg"
+                                <img id="lang-eng" class="flag" alt="Choose English" src="/img/eng.svg"
                                      width="50" height="50">
                             </a>
                         </div>
                         <div class="input-field col s4">
                             <a href="{{loginPage}}?lang=et">
-                                <img id="lang-est" class="flag" alt="Choose Estonian" src="/static/img/est.svg"
+                                <img id="lang-est" class="flag" alt="Choose Estonian" src="/img/est.svg"
                                      width="50" height="50">
                             </a>
                         </div>
                         <div class="input-field col s4">
                             <a href="{{loginPage}}?lang=de">
-                                <img id="lang-ger" class="flag" alt="Choose German" src="/static/img/ger.svg"
+                                <img id="lang-ger" class="flag" alt="Choose German" src="/img/ger.svg"
                                      width="50" height="50">
                             </a>
                         </div>
@@ -89,7 +89,6 @@
         </form>
     </div>
 </div>
-<script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
-<script defer type="text/javascript" src="/static/js/pages/login.js"></script>
+<script defer type="text/javascript" src="/static/login.js"></script>
 </body>
 </html>

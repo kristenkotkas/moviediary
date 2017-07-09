@@ -30,6 +30,8 @@
       <module name="omdb-microservice_test" target="1.8" />
       <module name="omdb_main" target="1.8" />
       <module name="omdb_test" target="1.8" />
+      <module name="templ-handlebars_main" target="1.8" />
+      <module name="templ-handlebars_test" target="1.8" />
       <module name="tmdb-microservice_main" target="1.8" />
       <module name="tmdb-microservice_test" target="1.8" />
       <module name="tmdb_main" target="1.8" />

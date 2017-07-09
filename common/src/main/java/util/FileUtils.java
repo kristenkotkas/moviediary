@@ -13,6 +13,7 @@ public class FileUtils {
   private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
   private static final String SECRET = "/server.json";
   private static final String CONFIG = "/config.json";
+  private static final boolean IS_RUNNING_FROM_JAR = getJarName().contains(".jar");
 
   /**
    * Loads config from classpath.
@@ -98,6 +99,6 @@ public class FileUtils {
   }
 
   public static boolean isRunningFromJar() {
-    return getJarName().contains(".jar");
+    return IS_RUNNING_FROM_JAR;
   }
 }
