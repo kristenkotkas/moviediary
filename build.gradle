@@ -1,155 +1,157 @@
 plugins {
-    id 'application'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
-    id 'org.hidetake.ssh' version '2.9.0'
-    id "com.moowork.node" version "1.2.0"
+  id 'application'
+  id 'com.github.johnrengelman.shadow' version '1.2.4'
+  id 'org.hidetake.ssh' version '2.9.0'
+  id 'com.moowork.node' version '1.2.0'
+  id 'io.franzbecker.gradle-lombok' version '1.8' apply false
 }
 
 mainClassName = 'server.Launcher'
 
 shadowJar {
-    baseName = 'moviediary'
-    classifier = ''
+  baseName = 'moviediary'
+  classifier = ''
 }
 
 sourceSets {
-    main {
-        resources {
-            srcDirs += 'src/main/dist'
-        }
+  main {
+    resources {
+      srcDirs += 'src/main/dist'
     }
+  }
 }
 
 task unzipVertxDependencies(type: Copy) {
-    from zipTree(file('lib/vertx-js-dependencies.zip'))
-    into "${buildDir}/dependencies"
+  from zipTree(file('lib/vertx-js-dependencies.zip'))
+  into "${buildDir}/dependencies"
 }
 processResources.dependsOn unzipVertxDependencies
 
 task webpack(type: NodeTask, dependsOn: npmInstall) {
-    def cmd = System.getProperty("os.name").toLowerCase().contains("windows") ?
-            'node_modules/webpack/bin/webpack.js' :
-            'node_modules/.bin/webpack'
-    script = project.file(cmd)
-    args = ['--config', 'webpack.prod.js']
+  def cmd = System.getProperty('os.name').toLowerCase().contains('windows') ?
+      'node_modules/webpack/bin/webpack.js' :
+      'node_modules/.bin/webpack'
+  script = project.file(cmd)
+  args = ['--config', 'webpack.prod.js']
 }
 processResources.dependsOn webpack
 //todo cleaning of dist folder
 
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'idea'
+  apply plugin: 'java'
+  apply plugin: 'idea'
+  apply plugin: 'io.franzbecker.gradle-lombok'
 
-    ext {
-        vertxVersion = '3.4.2'
-        mysqlVersion = '6.0.6'
-        mariaDbVersion = '2.2.3'
-        logbackVersion = '1.2.3'
-        junitVersion = '4.12'
-        handlebarsVersion = '4.0.6'
-        vertxPac4jVersion = '3.0.0'
-        pac4jOAuthVersion = '2.0.0'
-        awaitilityVersion = '3.0.0'
-        seleniumVersion = '3.4.0'
-        xmlApisVersion = '1.4.01'
+  ext {
+    vertxVersion = '3.4.2'
+    mysqlVersion = '6.0.6'
+    mariaDbVersion = '2.2.3'
+    logbackVersion = '1.2.3'
+    junitVersion = '4.12'
+    handlebarsVersion = '4.0.6'
+    vertxPac4jVersion = '3.0.0'
+    pac4jOAuthVersion = '2.0.0'
+    awaitilityVersion = '3.0.0'
+    seleniumVersion = '3.4.0'
+    xmlApisVersion = '1.4.01'
+  }
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
+
+    compile group: 'io.vertx', name: 'vertx-core', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-rx-java', version: "${vertxVersion}"
+    compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${vertxVersion}"
+
+    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${vertxVersion}"
+
+    testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
+    testCompile group: 'io.vertx', name: 'vertx-unit', version: "${vertxVersion}"
+    testCompile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${vertxVersion}"
+    testCompile group: 'mysql', name: 'mysql-connector-java', version: "${mysqlVersion}"
+    testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: "${mariaDbVersion}"
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${seleniumVersion}"
+    testCompile group: 'xml-apis', name: 'xml-apis', version: "${xmlApisVersion}"
+  }
+
+  configurations.all {
+    //noinspection GroovyAssignabilityCheck
+    resolutionStrategy {
+      force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
     }
+  }
 
-    repositories {
-        mavenCentral()
+  //todo cleaning of gen folder
+  task vertxApiGeneration(type: JavaCompile) {
+    source = sourceSets.main.java
+    classpath = configurations.compile + configurations.compileOnly
+    destinationDir = project.file('src/main/gen')
+    options.compilerArgs = [
+        '-proc:only',
+        '-processor', 'io.vertx.codegen.CodeGenProcessor',
+        '-Acodegen.output=${project.projectDir}/src/main'
+    ]
+  }
+
+  sourceSets {
+    main {
+      java {
+        srcDirs += 'src/main/gen'
+      }
     }
+  }
 
-    dependencies {
-        compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
-
-        compile group: 'io.vertx', name: 'vertx-core', version: "${vertxVersion}"
-        compile group: 'io.vertx', name: 'vertx-rx-java', version: "${vertxVersion}"
-        compile group: 'io.vertx', name: 'vertx-service-proxy', version: "${vertxVersion}"
-
-        compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${vertxVersion}"
-
-        testCompile group: 'junit', name: 'junit', version: "${junitVersion}"
-        testCompile group: 'io.vertx', name: 'vertx-unit', version: "${vertxVersion}"
-        testCompile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${vertxVersion}"
-        testCompile group: 'mysql', name: 'mysql-connector-java', version: "${mysqlVersion}"
-        testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: "${mariaDbVersion}"
-        testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${seleniumVersion}"
-        testCompile group: 'xml-apis', name: 'xml-apis', version: "${xmlApisVersion}"
-    }
-
-    configurations.all {
-        //noinspection GroovyAssignabilityCheck
-        resolutionStrategy {
-            force 'xml-apis:xml-apis:1.4.01' //selenium dependency fix
-        }
-    }
-
-    //todo cleaning of gen folder
-    task vertxApiGeneration(type: JavaCompile) {
-        source = sourceSets.main.java
-        classpath = configurations.compile + configurations.compileOnly
-        destinationDir = project.file('src/main/gen')
-        options.compilerArgs = [
-                "-proc:only",
-                "-processor", "io.vertx.codegen.CodeGenProcessor",
-                "-Acodegen.output=${project.projectDir}/src/main"
-        ]
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += 'src/main/gen'
-            }
-        }
-    }
-
-    compileJava {
-        options.encoding = 'UTF-8'
-        targetCompatibility = 1.8
-        sourceCompatibility = 1.8
-        dependsOn vertxApiGeneration
-    }
+  compileJava {
+    options.encoding = 'UTF-8'
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
+    dependsOn vertxApiGeneration
+  }
 }
 
 dependencies {
-    compile project(':common')
-    compile project(':database')
-    compile project(':mail')
-    compile project(':tmdb')
-    compile project(':omdb')
-    compile project(':templ-handlebars')
-    compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
-    compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
-    compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
+  compile project(':common')
+  compile project(':database')
+  compile project(':mail')
+  compile project(':tmdb')
+  compile project(':omdb')
+  compile project(':templ-handlebars')
+  compile group: 'io.vertx', name: 'vertx-web', version: "${vertxVersion}"
+  compile group: 'org.pac4j', name: 'vertx-pac4j', version: "${vertxPac4jVersion}"
+  compile group: 'org.pac4j', name: 'pac4j-oauth', version: "${pac4jOAuthVersion}"
 }
 
 remotes {
-    master {
-        role 'master'
-        host = 'kyngas.eu'
-        user = 'moviediary'
-        identity = file('misc/id_rsa')
-    }
+  master {
+    role 'master'
+    host = 'kyngas.eu'
+    user = 'moviediary'
+    identity = file('misc/id_rsa')
+  }
 }
 
 ssh.settings {
-    knownHosts = file('/misc/known_hosts')
+  knownHosts = file('/misc/known_hosts')
 }
 
 task deployMovieDiary(dependsOn: shadowJar) {
-    doLast {
-        ssh.run {
-            session(remotes.master) {
-                put from: 'build/libs/moviediary.jar', into: '/home/moviediary/'
-                execute './run-moviediary.sh'
-            }
-        }
-        println ':deploy:done'
+  doLast {
+    ssh.run {
+      session(remotes.master) {
+        put from: 'build/libs/moviediary.jar', into: '/home/moviediary/'
+        execute './run-moviediary.sh'
+      }
     }
+    println ':deploy:done'
+  }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0'
-    //noinspection UnnecessaryQualifiedReference
-    distributionType = Wrapper.DistributionType.ALL
+  gradleVersion = '4.0'
+  //noinspection UnnecessaryQualifiedReference
+  distributionType = Wrapper.DistributionType.ALL
 }

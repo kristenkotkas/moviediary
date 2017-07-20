@@ -6,13 +6,18 @@ module.exports = new Merge(CommonConfig, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify('production')
+        NODE_ENV: '"production"'
       }
     }),
-    /*new webpack.optimize.UglifyJsPlugin({
-     sourceMap: true,
-     beautify: true,
-     compress: true
-     })*/
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      beautify: true,
+      compress: {
+        warnings: false
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
   ]
 });

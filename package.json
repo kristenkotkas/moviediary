@@ -2,32 +2,41 @@
   "name": "moviediary",
   "version": "0.0.1",
   "description": "",
-  "main": "",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kristenkotkas/moviediary"
+  },
+  "scripts": {
+    "prod": "webpack --config webpack.prod.js --display-error-details",
+    "dev": "webpack-dev-server --config webpack.dev.js --open --hot"
+  },
   "dependencies": {
-    "chart.js": "^2.6.0",
-    "jquery": "^3.2.1",
-    "materialize-css": "^0.99.0",
-    "vertx3-eventbus-client": "^3.4.2"
+    "font-awesome": "^4.7.0",
+    "vertx3-eventbus-client": "^3.4.2",
+    "vue": "^2.3.4",
+    "vuetify": "^0.14.5"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
-    "babel-preset-env": "^1.5.2",
+    "babel-preset-latest": "^6.0.0",
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
+    "handlebars": "^4.0.10",
+    "handlebars-loader": "^1.5.0",
+    "html-webpack-plugin": "^2.29.0",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.6",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
     "url-loader": "^0.5.9",
-    "webpack": "^3.1.0",
+    "vue-loader": "^12.2.2",
+    "vue-template-compiler": "^2.4.1",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.5.1",
     "webpack-merge": "^4.1.0"
-  },
-  "scripts": {
-    "prod": "webpack --config webpack.prod.js --display-error-details",
-    "dev": "webpack --watch --progress --config webpack.dev.js --display-error-details"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kristenkotkas/moviediary"
   }
 }
