@@ -395,7 +395,7 @@ function OMDBArrayToString(value, lang) {
 }
 
 function removeParens(string) {
-    return string.replace(new RegExp('[(][a-zA-Z -.,_:;"?]*[)]'), '');
+    return string.replace(new RegExp('[(][a-zA-Z -.,_:;"?0-9]*[)]'), '');
 }
 
 function getGoogleQueryURL(query) {
@@ -631,10 +631,11 @@ function fillLists(lists, movieId, lang) {
             listsTable.append($.parseHTML(
                 '<tr id="list-row-' + lists[i]['Id'] + '" class="grey-text">' +
                     '<td class="content-key">' +
-                        safe_tags_replace(lists[i]['ListName']) +
+                        '<span class="cursor home-link">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
                     '</td>' +
                     '<td>' +
-                        '<span id="list-' + lists[i]['Id'] + '" class="home-link cursor" onclick="listAddOnClick(' + movieId + ',' +  lists[i]['Id'] + ')">' +
+                        '<span id="list-' + lists[i]['Id'] + '" class="home-link cursor right" ' +
+                            'onclick="listAddOnClick(' + movieId + ',' +  lists[i]['Id'] + ')">' +
                             lang['MOVIES_ADD'] +
                         '</span>' +
                     '</td>' +

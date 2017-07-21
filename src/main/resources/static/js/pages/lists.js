@@ -32,6 +32,7 @@ inputNewListName.keyup(function (e) {
 eventbus.onopen = function () {
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
         lang = reply.body;
+        enableParameterListsLoading(eventbus, lang);
         fillSorterJSONs(lang);
         getLists();
         getDeletedLists();
@@ -47,7 +48,6 @@ eventbus.onopen = function () {
 
 function openCollapsible() {
     listCollapsible.collapsible('open', 0);
-    deletedCollapsible.collapsible('open', 0);
 }
 
 function closeCollabsible() {
@@ -100,10 +100,8 @@ function fillLists(lists) {
             listsTable.append($.parseHTML(
                 '<tr class="cursor" onclick="openList('+ lists[i]['Id'] + ')">' +
                 '<td>' +
-                '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
-                '</td>' +
-                '<td class="right">' +
-                '<span class="content-key grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0</span>' +
+                '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span><br>' +
+                '<span class="grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0 movies</span>' +
                 '</td>' +
                 '</tr>'
             ));
@@ -124,7 +122,7 @@ function getListsSize() {
 
 function fillListsSize(rows) {
     $.each(rows, function (i) {
-        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(rows[i]['Size']);
+        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(rows[i]['Size'] + ' movies');
     });
 }
 
@@ -142,6 +140,7 @@ function openList(listId) {
                 fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
             });
         }
+        replaceUrlParameter("id", listId);
     });
 }
 
@@ -223,19 +222,19 @@ function addListTitle(title, listId) {
         lang['LISTS_SORT'] + '</a>' +
         '<ul id="sortDropdown" class="dropdown-content">' +
         '<li onclick="fillSortedList(titleSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_TITLE'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        lang['LISTS_TITLE'] + ' ' + lang['LIST_ASC'] + '<i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></a></li>' +
         '<li onclick="fillSortedList(titleSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_TITLE'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        lang['LISTS_TITLE'] + ' ' + lang['LIST_DESC'] + '<i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></a></li>' +
         '<li class="divider"></li>' +
         '<li onclick="fillSortedList(yearSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_YEAR'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        lang['LISTS_YEAR'] + ' ' + lang['LIST_ASC'] + '<i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></a></li>' +
         '<li onclick="fillSortedList(yearSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_YEAR'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        lang['LISTS_YEAR'] + ' ' + lang['LIST_DESC'] + '<i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></a></li>' +
         '<li class="divider"></li>' +
         '<li onclick="fillSortedList(addedSort123, 123, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_ASC'] + '</a></li>' +
+        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_ASC'] + '<i class="fa fa-sort-amount-asc" aria-hidden="true"></i></a></li>' +
         '<li onclick="fillSortedList(addedSort123, 321, ' + listId + ')"><a class="grey-text text-darken-2">' +
-        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_DESC'] + '</a></li>' +
+        lang['LISTS_DATE_ADDED'] + ' ' + lang['LIST_DESC'] + '<i class="fa fa-sort-amount-desc" aria-hidden="true"></i></a></li>' +
         '</ul>' +
         '</div>' +
         '</div>' +
@@ -428,3 +427,16 @@ function removeFromList(movieId, listId) {
             }
         });
 }
+
+var enableParameterListsLoading = function (eventbus, lang) {
+    var loadList = function (eventbus, lang) {
+        var query = getUrlParam("id");
+        if (query !== null && isNormalInteger(query)) {
+            openList(parseInt(query));
+        }
+    };
+    window.onpopstate = function () { //try to load series on back/forward page movement
+        loadList(eventbus, lang);
+    };
+    loadList(eventbus, lang); //load series if url has param
+};

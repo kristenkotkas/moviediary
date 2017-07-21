@@ -177,6 +177,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getTodayInHistory(String username);
 
+    Future<JsonObject> getHomeStatistics(String username);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

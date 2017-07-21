@@ -217,7 +217,6 @@ eventbus.onopen = function () {
         }
 
         lang = reply.body;
-        console.log(lang);
         var labels = [
             lang['STATISTICS_MON'],
             lang['STATISTICS_TUE'],
@@ -529,7 +528,6 @@ function fillDaysData(data, distr) {
 }
 
 function fillYearsData(data, years, distr) {
-    console.log(data);
     var smallestYear;
     if (data[data.length - 1]['Year'] > 0) {
         smallestYear = data[data.length - 1]['Year'];
@@ -604,7 +602,6 @@ function fillTopMovies(lang) {
         , function (error, reply) {
             topMovies.empty();
             var data = reply['body']['rows'];
-            console.log(data);
             if (data.length > 0) {
                 $.each(data, function (i) {
                     var movie = data[i];

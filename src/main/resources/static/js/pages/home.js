@@ -116,28 +116,16 @@ function getSingPlur(singularString, pluralString, count) {
 }
 
 function fillTotalStat(lang) {
-    eventbus.send("database_get_total_movie_count", {}, function (error, reply) {
-        var data = reply['body']['rows'];
-        totalViews.append(data[0]['total_movies'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data[0]['total_movies']));
-        totalRuntime.append(minutesToString(data[0]['Runtime'], lang));
-        averageRuntime.append(minutesToString(data[0]['Runtime']/data[0]['total_movies'], lang));
+    eventbus.send('database_get_home_statistics', {}, function (error, reply) {
+        var data = reply['body']['rows'][0];
+        totalViews.append(data['total_views'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data['total_views']));
+        totalRuntime.append(minutesToString(data['total_runtime'], lang));
+        averageRuntime.append(minutesToString(data['total_runtime'] / data['total_views'], lang));
+        totalNewViews.append(data['first_view'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data['first_view']));
+        totalCinema.append(data['total_cinema'] + ' ' + getSingPlur(lang['HOME_VISIT'], lang['HOME_VISITS'], data['total_cinema']));
+        totalDifferentMovies.append(data['unique_movies'] + ' ' + getSingPlur(lang['HOME_MOVIE'], lang['HOME_MOVIES'], data['unique_movies']));
+        $("#stats-header").collapsible('open', 0);
     });
-
-    eventbus.send("database_get_new_movie_count", {}, function (error, reply) {
-        var data = reply['body']['rows'];
-        totalNewViews.append(data[0]['new_movies'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data[0]['new_movies']));
-    });
-
-    eventbus.send("database_get_total_cinema_count", {}, function (error, reply) {
-        var data = reply['body']['rows'];
-        totalCinema.append(data[0]['total_cinema'] + ' ' + getSingPlur(lang['HOME_VISIT'], lang['HOME_VISITS'], data[0]['total_cinema']));
-    });
-
-    eventbus.send("database_get_distinct_movie_count", {}, function (error, reply) {
-        var data = reply['body']['rows'];
-        totalDifferentMovies.append(data[0]['unique_movies'] + ' ' + getSingPlur(lang['HOME_MOVIE'], lang['HOME_MOVIES'], data[0]['unique_movies']));
-    });
-    $("#stats-header").collapsible('open', 0);
 }
 
 function fillWishlist(lang) {

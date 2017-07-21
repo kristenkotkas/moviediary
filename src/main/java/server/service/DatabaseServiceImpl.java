@@ -190,7 +190,19 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? AND " +
                     "DAYOFMONTH(Start) = DAYOFMONTH(DATE(NOW())) AND " +
-                    "MONTH(Start) = MONTH(DATE(NOW()));";
+                    "MONTH(Start) = MONTH(DATE(NOW())) ORDER BY YEAR DESC;";
+    private static final String SQL_GET_HOME_STATISTICS =
+            "SELECT " +
+                    "(SELECT COUNT(*) FROM Views WHERE Username = ?) " +
+                    "AS 'total_views', " +
+                    "(SELECT COUNT(WasFirst) FROM Views WHERE Username = ? AND WasFirst = 1) " +
+                    "AS 'first_view', " +
+                    "(SELECT COUNT(DISTINCT MovieId) FROM Views WHERE Username = ?) " +
+                    "AS 'unique_movies', " +
+                    "(SELECT COUNT(*) FROM Views WHERE Username = ? AND WasCinema = 1) " +
+                    "AS 'total_cinema', " +
+                    "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
+                    "AS 'total_runtime';";
 
     private final JDBCClient client;
 
@@ -689,5 +701,15 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .map(DatabaseService::getRows)
                 .map(array -> array.getJsonObject(0))
                 .subscribe(fut::complete, fut::fail));
+    }
+
+    @Override
+    public Future<JsonObject> getHomeStatistics(String username) {
+        return query(SQL_GET_HOME_STATISTICS, new JsonArray()
+                .add(username)
+                .add(username)
+                .add(username)
+                .add(username)
+                .add(username));
     }
 }

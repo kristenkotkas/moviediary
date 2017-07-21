@@ -171,9 +171,9 @@ function fillResultSeries(seriesData, page, lang) {
                 var seasonData = seriesData[season];
                 var episode = ' ';
                 if (seasonData['episodes'].length > 1) {
-                    episode += lang['SERIES_EPISODE_SINGULAR'];
-                } else {
                     episode += lang['SERIES_EPISODE_PLURAL'];
+                } else {
+                    episode += lang['SERIES_EPISODE_SINGULAR'];
                 }
                 seasonData['series_id'] = seriesData['id'];
                 //console.log(seasonData);
