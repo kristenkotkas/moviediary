@@ -57,7 +57,8 @@
                              id="show-end-time">
                             <div class="card-content">
                                 <a>
-                                    <div class="center grey-text text-darken-1">{{i18n "MOVIES_END_TIME_TEXT" locale=lang}}
+                                    <div class="center grey-text text-darken-1">{{i18n "MOVIES_END_TIME_TEXT"
+                                                                                       locale=lang}}
                                     </div>
                                     <div id="show-end-time-text" class="end-time center"></div>
                                 </a>
@@ -135,7 +136,11 @@
                     </div>
                 </div>
                 <div class="col s12 m5 l4">
-                    <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="add-info-box">
+                    <div class="col s12 m12 l12 z-depth-0 scale-transition scale-out" id="trailer-box">
+                        <iframe id="movie-trailer" class="trailer-container" allowfullscreen frameborder="0">
+                        </iframe>
+                    </div>
+                    <div class="card col s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="add-info-box">
                         <div class="card-content">
                             <h5>{{i18n "MOVIES_ADDITIONAL_INFO" locale=lang}}</h5>
                             <table class="bordered">
@@ -182,7 +187,7 @@
                     </div>
 
                     <!-- Modal Trigger -->
-                    <div class="card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist"
+                    <div class="card col s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-wishlist"
                          tabindex="8" id="add-watch">
                         <div class="card-content">
                             <a class="grey-text content-key">
@@ -320,9 +325,12 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object" id="add-wishlist">
+                    <div class="col card s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object"
+                         id="add-wishlist">
                         <div class="card-content">
-                            <h5><a class="home-link cursor black-text" href="{{listsPage}}">{{i18n "NAVBAR_LISTS" locale=lang}}</a></h5>
+                            <h5><a class="home-link cursor black-text" href="{{listsPage}}">{{i18n "NAVBAR_LISTS"
+                                                                                                   locale=lang}}</a>
+                            </h5>
                             <table class="bordered">
                                 <tbody id="lists-table">
                                 </tbody>

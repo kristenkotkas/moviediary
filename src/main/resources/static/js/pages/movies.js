@@ -19,6 +19,9 @@ $(document).ready(function () {
     });
     $('.modal').modal(); //movies modal initialization
     $(".sidebar-collapse").sideNav(); //sidebar initialization
+    $(document).ready(function(){
+        $('.materialboxed').materialbox();
+    });
 });
 
 var eventbus = new EventBus("/eventbus");
@@ -33,6 +36,8 @@ var director = $('#director');
 var writers = $('#writer');
 var listsTable = $('#lists-table');
 var lang;
+var trailer = $('#movie-trailer');
+var trailerBox = $('#trailer-box');
 eventbus.onopen = function () {
 
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -56,6 +61,7 @@ eventbus.onopen = function () {
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
             $('#crew-box').removeClass('scale-in').addClass('scale-out');
+            trailerBox.removeClass('scale-in').addClass('scale-out');
             showEndTime.removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             $("#awards").empty();
@@ -331,8 +337,19 @@ var searchMovie = function (eventbus, movieId, lang) {
         }
 
         replaceUrlParameter("id", movieId);
+        addTrailer(data['videos']);
+        trailerBox.removeClass('scale-out').addClass('scale-in');
     });
 };
+
+function addTrailer(videos) {
+    if (videos['results'].length > 0) {
+        var key = videos['results'][0]['key'];
+        trailer.attr('src', 'https://www.youtube.com/embed/' + key);
+    } else {
+        trailer.attr('src', '');
+    }
+}
 
 function decorateStarWars() {
     $("#body").addClass('star-wars');
@@ -631,7 +648,9 @@ function fillLists(lists, movieId, lang) {
             listsTable.append($.parseHTML(
                 '<tr id="list-row-' + lists[i]['Id'] + '" class="grey-text">' +
                     '<td class="content-key">' +
-                        '<span class="cursor home-link">' + safe_tags_replace(lists[i]['ListName']) + '</span>' +
+                        '<span class="cursor home-link" onclick="openList(' + lists[i]['Id'] + ')">' +
+                            safe_tags_replace(lists[i]['ListName']) +
+                        '</span>' +
                     '</td>' +
                     '<td>' +
                         '<span id="list-' + lists[i]['Id'] + '" class="home-link cursor right" ' +
@@ -647,6 +666,10 @@ function fillLists(lists, movieId, lang) {
             '<span>' + lang['MOVIES_NO_LISTS'] + '</span>'
         ));
     }
+}
+
+function openList(listId) {
+    location.href = '/private/lists/?id=' + listId;
 }
 
 function listAddOnClick(movieId, listId) {

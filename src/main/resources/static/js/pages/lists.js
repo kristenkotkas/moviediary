@@ -128,6 +128,7 @@ function fillListsSize(rows) {
 
 function openList(listId) {
     eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
+        console.log(reply);
         unboundOnClick();
         if (isMobile) {
             closeCollabsible();
@@ -410,7 +411,7 @@ function decorateSeenMovieCard(movieId) {
 }
 
 function openMovie(movieId) {
-    location.href = 'movies/?id=' + movieId;
+    location.href = '/private/movies/?id=' + movieId;
 }
 
 function removeFromList(movieId, listId) {
