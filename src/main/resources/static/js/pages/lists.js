@@ -121,8 +121,15 @@ function getListsSize() {
 }
 
 function fillListsSize(rows) {
+    console.log(rows);
     $.each(rows, function (i) {
-        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(rows[i]['Size'] + ' movies');
+        var percent =  Math.round(rows[i]['Seen'] / rows[i]['Size'] * 100);
+        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(
+            $.parseHTML(
+                '<div style="background: lightblue; height: 1em; width: ' + percent + '%"></div>' +
+                '<span>' + rows[i]['Size'] + ' movies | ' + rows[i]['Seen'] + ' seen</span><br>'
+            )
+        );
     });
 }
 
