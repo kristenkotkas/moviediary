@@ -1,22 +1,22 @@
 const Merge = require('webpack-merge');
 const CommonConfig = require('./webpack.common');
-const webpack = require('webpack');
+const WebPack = require('webpack');
 
 module.exports = new Merge(CommonConfig, {
   plugins: [
-    new webpack.DefinePlugin({
+    new WebPack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
       }
     }),
-    new webpack.optimize.UglifyJsPlugin({
+    new WebPack.optimize.UglifyJsPlugin({
       sourceMap: true,
       beautify: true,
       compress: {
         warnings: false
       }
     }),
-    new webpack.LoaderOptionsPlugin({
+    new WebPack.LoaderOptionsPlugin({
       minimize: true
     })
   ]

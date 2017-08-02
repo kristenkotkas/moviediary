@@ -5,6 +5,8 @@ const webpack = require('webpack');
 module.exports = new Merge(CommonConfig, {
   devtool: 'cheap-eval-source-map',
   devServer: {
-    historyApiFallback: true
+    historyApiFallback: true,
+    contentBase: './src/main/assets',
+    publicPath: '/'
   }
 });
