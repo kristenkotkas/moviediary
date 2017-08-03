@@ -15,14 +15,17 @@
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
+    "history": "^4.6.3",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.5",
+    "react-router": "^4.1.2",
     "redux": "^3.5.2",
     "redux-devtools-extension": "^2.13.2",
     "redux-logger": "^3.0.6",
     "redux-promise-middleware": "^4.3.0",
     "redux-thunk": "^2.1.0",
+    "semantic-ui-react": "^0.71.3",
     "vertx3-eventbus-client": "^3.4.2"
   },
   "devDependencies": {
