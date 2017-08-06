@@ -129,10 +129,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_LISTS =
             "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
     private static final String SQL_GET_LISTS_SIZE =
-            "SELECT Id, COUNT(MovieId) AS Size, SUM(MovieId IN (SELECT DISTINCT MovieId " +
-                    "FROM Views WHERE Username = ?)) AS Seen FROM ListsInfo JOIN ListEntries " +
-                    "ON ListsInfo.Id = ListEntries.ListId WHERE ListsInfo.Username = ? AND " +
-                    "ListEntries.Username = ? AND Active GROUP BY Id ORDER BY TimeCreated DESC;";
+            "SELECT ListsInfo.Id as id, IFNULL((SELECT COUNT(ListId) FROM ListEntries " +
+                    "WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id GROUP BY ListId), 0) AS count, " +
+                    "IFNULL((SELECT SUM(MovieId IN (SELECT DISTINCT MovieId FROM Views WHERE Username = ?)) AS seen  " +
+                    "FROM ListEntries WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id " +
+                    "GROUP BY ListId), 0) AS seen FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
     private static final String SQL_INSERT_INTO_LIST =
             "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
     private static final String SQL_REMOVE_FROM_LIST =
@@ -654,6 +655,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getListsSize(String username) {
         return query(SQL_GET_LISTS_SIZE, new JsonArray()
+                .add(username)
                 .add(username)
                 .add(username)
                 .add(username));

@@ -101,7 +101,7 @@ function fillLists(lists) {
                 '<tr class="cursor" onclick="openList('+ lists[i]['Id'] + ')">' +
                 '<td>' +
                 '<span class="content-key grey-text text-darken-1">' + safe_tags_replace(lists[i]['ListName']) + '</span><br>' +
-                '<span class="grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0 movies</span>' +
+                '<span class="grey-text text-darken-1" id="list-size-' + lists[i]['Id'] + '">0 ' + lang['HOME_MOVIES'] + '</span>' +
                 '</td>' +
                 '</tr>'
             ));
@@ -123,11 +123,14 @@ function getListsSize() {
 function fillListsSize(rows) {
     console.log(rows);
     $.each(rows, function (i) {
-        var percent =  Math.round(rows[i]['Seen'] / rows[i]['Size'] * 100);
-        $(document.getElementById('list-size-' + rows[i]['Id'])).empty().append(
+        var percent =  Math.round(rows[i]['seen'] / rows[i]['count'] * 100);
+        $(document.getElementById('list-size-' + rows[i]['id'])).empty().append(
             $.parseHTML(
-                '<div style="background: lightblue; height: 1em; width: ' + percent + '%"></div>' +
-                '<span>' + rows[i]['Size'] + ' movies | ' + rows[i]['Seen'] + ' seen</span><br>'
+                //'<div style="background: lightblue; height: 1em; width: ' + percent + '%"></div>' +
+                '<span>' + rows[i]['count'] + ' ' +
+                    getSingPlur(lang['HOME_MOVIE'], lang['HOME_MOVIES'], rows[i]['count'])
+                    + ' | ' + rows[i]['seen'] + ' ' + lang['LISTS_SEEN'] +
+                '</span><br>'
             )
         );
     });
@@ -431,7 +434,7 @@ function removeFromList(movieId, listId) {
                 var id = 'card_' + movieId;
                 console.log('REMOVED', id);
                 $(document.getElementById(id)).remove();
-                getListsSize();
+                getLists();
             }
         });
 }
@@ -448,3 +451,12 @@ var enableParameterListsLoading = function (eventbus, lang) {
     };
     loadList(eventbus, lang); //load series if url has param
 };
+
+
+function getSingPlur(singularString, pluralString, count) {
+    if (count === 1) {
+        return singularString
+    } else {
+        return pluralString;
+    }
+}
