@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prod": "webpack --config webpack.prod.js --display-error-details",
-    "dev": "webpack-dev-server --config webpack.dev.js --open --hot"
+    "dev": "npm install && webpack-dev-server --config webpack.dev.js --open --hot"
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
