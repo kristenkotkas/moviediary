@@ -34,6 +34,7 @@ var interval;
 var actors = $('#actors');
 var director = $('#director');
 var writers = $('#writer');
+var crew = $('#crew');
 var listsTable = $('#lists-table');
 var lang;
 var trailer = $('#movie-trailer');
@@ -169,9 +170,9 @@ function startAwardLoading() {
 }
 
 function startLoadingCrew() {
-    actors.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
-    director.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
-    writers.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    //actors.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    //director.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
+    //writers.append($.parseHTML('<i class="fa fa-circle-o-notch grey-text fa-spin fa-fw"></i>'))
 }
 
 var searchMovie = function (eventbus, movieId, lang) {
@@ -305,7 +306,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         }
 
         getOmdb(data['imdb_id'], lang);
-
+        fillTmdbCredits(data['credits'], lang);
         getMovieViews(eventbus, movieId, lang);
 
         oscarContainer.empty();
@@ -346,7 +347,6 @@ var searchMovie = function (eventbus, movieId, lang) {
 function getRandomBackdrop(backdrops) {
     do {
         var backDrop = backdrops[Math.floor(Math.random()*backdrops.length)];
-        console.log('WIDTH', backDrop['width']);
     } while (backDrop['width'] < 1920);
     return backDrop['file_path'];
 }
@@ -395,7 +395,7 @@ function getOmdb(imdbId, lang) {
                     '<a class="home-link grey-text cursor" href="' + getIMDbAwardsURL(imdbId) + '" target="_blank">' +
                     reply.body['Awards'].replace('.', '.<br>') + '</a>'
                 );
-                fillCrew(reply.body, lang);
+                //fillCrew(reply.body, lang);
             }
         } else {
 
@@ -408,17 +408,94 @@ function getIMDbAwardsURL(imdbId) {
     return 'http://www.imdb.com/title/' + imdbId + '/awards';
 }
 
-function fillCrew(omdb, lang) {
-    console.log('crewOmdb', omdb);
-    actors.empty().append(OMDBArrayToString(omdb['Actors'], lang));
-    director.empty().append(OMDBArrayToString(omdb['Director'], lang));
-    writers.empty().append(OMDBArrayToString(omdb['Writer'], lang));
-}
-
 function clearCrew() {
     actors.empty();
-    director.empty();
-    writers.empty();
+    crew.empty();
+    /*director.empty();
+    writers.empty();*/
+}
+
+function fillTmdbCredits(credits, lang) {
+    fillCast(credits['cast'], lang);
+    fillCrew(credits['crew']);
+}
+
+function fillCast(castJson, lang) {
+    var credit = '<span class="content-key">' + lang['MOVIES_ACTORS'] + '</span><br><table><tbody>';
+    $.each(castJson, function (i) {
+        var castMember = castJson[i];
+        if (i < 10) {
+            var character = castMember['character'];
+            var name = castMember['name'];
+            credit += '<a class="home-link grey-text text-darken-2 cast-left-margin content-key" href="' + getGoogleQueryURL(name) + '" target="_blank">'
+                + name + '</a>' + ' --- ' + '<span class="grey-text">' + character + '</span>' + '<br>'
+            /*credit +=
+                '<tr class="cast-left-margin">' +
+                    '<td class="cast-td content-key">' + '<a class="home-link grey-text text-darken-2 cast-left-margin" href="' + getGoogleQueryURL(name) + '" target="_blank">'
+                + name + '</a>' + '</td>' +
+                    '<td class="cast-td">' + castMember['character']+ '</td>' +
+                '</tr>'*/
+        } else if (i >= 10) {
+            return false;
+        }
+    });
+    credit += '</tbody></table>';
+    actors.empty().append(credit);
+}
+
+function fillCrew(crewJson) {
+    var directors = [];
+    var dirOfPhoto = [];
+    var composer = [];
+    var screenW = [];
+    var novelW = [];
+    var producers = [];
+    $.each(crewJson, function (i) {
+        var crewM = crewJson[i];
+        switch(crewM['job']) {
+            case 'Director':
+                directors.push(crewM);
+                break;
+            case 'Director of Photography':
+            case 'Cinematography':
+                dirOfPhoto.push(crewM);
+                break;
+            case 'Original Music Composer':
+                composer.push(crewM);
+                break;
+            case 'Screenplay':
+                screenW.push(crewM);
+                break;
+            case 'Novel':
+                novelW.push(crewM);
+                break;
+            case 'Producer':
+                producers.push(crewM);
+                break;
+        }
+    });
+    crew.empty();
+    addArrayData('Director', directors);
+    addArrayData('Cinematography', dirOfPhoto);
+    addArrayData('Composer', composer);
+    addArrayData('Screenplay', screenW);
+    addArrayData('Novel', novelW);
+    addArrayData('Producer', producers);
+}
+
+function addArrayData(arrayName, array) {
+    if (array.length > 0) {
+        crew.append('<span class="content-key">' + arrayName + '</span><br>');
+        $.each(array, function (i) {
+            var member = array[i];
+            var name = member['name'];
+            crew.append(
+                '<a class="home-link grey-text text-darken-2 content-key cast-left-margin" href="' + getGoogleQueryURL(name) + '" target="_blank">'
+                + name + '</a><br>'
+            );
+        });
+        crew.append('<br>');
+    }
 }
 
 function OMDBArrayToString(value, lang) {

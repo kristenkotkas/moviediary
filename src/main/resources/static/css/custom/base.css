@@ -520,6 +520,14 @@ span.badge.new:after {
     transform: rotate(360deg);
 }
 
+.cast-td {
+    padding: 1px 0;
+}
+
+.cast-left-margin {
+    padding-left: 15px; !important;
+}
+
 @media only screen and (min-width: 1071px) {
     #forgot-password {
         padding-left: 0;
