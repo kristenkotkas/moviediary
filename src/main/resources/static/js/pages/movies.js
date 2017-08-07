@@ -417,7 +417,7 @@ function clearCrew() {
 
 function fillTmdbCredits(credits, lang) {
     fillCast(credits['cast'], lang);
-    fillCrew(credits['crew']);
+    fillCrew(credits['crew'], lang);
 }
 
 function fillCast(castJson, lang) {
@@ -443,7 +443,7 @@ function fillCast(castJson, lang) {
     actors.empty().append(credit);
 }
 
-function fillCrew(crewJson) {
+function fillCrew(crewJson, lang) {
     var directors = [];
     var dirOfPhoto = [];
     var composer = [];
@@ -464,6 +464,7 @@ function fillCrew(crewJson) {
                 composer.push(crewM);
                 break;
             case 'Screenplay':
+            case 'Writer':
                 screenW.push(crewM);
                 break;
             case 'Novel':
@@ -475,12 +476,12 @@ function fillCrew(crewJson) {
         }
     });
     crew.empty();
-    addArrayData('Director', directors);
-    addArrayData('Cinematography', dirOfPhoto);
-    addArrayData('Composer', composer);
-    addArrayData('Screenplay', screenW);
-    addArrayData('Novel', novelW);
-    addArrayData('Producer', producers);
+    addArrayData(lang['MOVIES_DIRECTOR'], directors);
+    addArrayData(lang['MOVIES_CINEMATOGRAPHY'], dirOfPhoto);
+    addArrayData(lang['MOVIES_COMPOSER'], composer);
+    addArrayData(lang['MOVIES_SCREENPLAY'], screenW);
+    addArrayData(lang['MOVIES_NOVEL'], novelW);
+    addArrayData(lang['MOVIES_PRODUCER'], producers);
 }
 
 function addArrayData(arrayName, array) {
