@@ -61,7 +61,7 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
 
     @Override
     public Future<JsonObject> getMovieById(String id) { //pärib tmdb-st filmi
-        return future(fut -> get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)), APPEND_TO_RESPONSE + "videos").setHandler(ar -> {
+        return future(fut -> get(MOVIE_ID + id + APIKEY_PREFIX2, getCached(MOVIE.get(id)), APPEND_TO_RESPONSE + "videos,images").setHandler(ar -> {
             if (ar.succeeded()) {
                 JsonObject json = ar.result();
                 fut.complete(json);

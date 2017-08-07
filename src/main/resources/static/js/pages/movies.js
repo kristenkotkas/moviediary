@@ -297,10 +297,11 @@ var searchMovie = function (eventbus, movieId, lang) {
         );
 
         var backgroundPath = "";
-        if (data['backdrop_path'] === null) {
+
+        if (data['images']['backdrops'].length === 0) {
             backgroundPath = "";
         } else {
-            backgroundPath = 'https://image.tmdb.org/t/p/w1920' + data['backdrop_path'];
+            backgroundPath = 'https://image.tmdb.org/t/p/w1920' + getRandomBackdrop(data['images']['backdrops']);
         }
 
         getOmdb(data['imdb_id'], lang);
@@ -342,9 +343,32 @@ var searchMovie = function (eventbus, movieId, lang) {
     });
 };
 
+function getRandomBackdrop(backdrops) {
+    do {
+        var backDrop = backdrops[Math.floor(Math.random()*backdrops.length)];
+        console.log('WIDTH', backDrop['width']);
+    } while (backDrop['width'] < 1920);
+    return backDrop['file_path'];
+}
+
 function addTrailer(videos) {
-    if (videos['results'].length > 0) {
-        var key = videos['results'][0]['key'];
+    var videoResults = [];
+    $.each(videos['results'], function (i) {
+        var video = videos['results'][i];
+        if (video['type'] === 'Trailer') {
+            videoResults.push(video);
+        }
+    });
+    if (videoResults.length === 0) {
+        $.each(videos['results'], function (i) {
+            var video = videos['results'][i];
+            if (video['type'] === 'Teaser') {
+                videoResults.push(video);
+            }
+        });
+    }
+    if (videoResults.length > 0) {
+        var key = videoResults[0]['key'];
         trailer.attr('src', 'https://www.youtube.com/embed/' + key);
     } else {
         trailer.attr('src', '');
