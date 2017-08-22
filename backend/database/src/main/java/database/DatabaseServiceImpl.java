@@ -2,29 +2,24 @@ package database;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.rxjava.ext.jdbc.JDBCClient;
-import rx.Single;
+import util.rx.DbRxWrapper;
 import static io.vertx.rx.java.RxHelper.toSubscriber;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
-public class DatabaseServiceImpl implements DatabaseService {
-  private final JDBCClient jdbcClient;
+public class DatabaseServiceImpl extends DbRxWrapper implements DatabaseService {
 
-  public DatabaseServiceImpl(io.vertx.ext.jdbc.JDBCClient jdbcClient) {
-    this.jdbcClient = new JDBCClient(jdbcClient);
+  public DatabaseServiceImpl(Vertx vertx, JsonObject config) {
+    super(vertx, config);
   }
 
   @Override
-  public DatabaseService getAllUsers(Handler<AsyncResult<JsonObject>> handler) {
-    jdbcClient.rxGetConnection()
-              .flatMap(conn -> Single.just(conn).doOnUnsubscribe(conn::close))
-              .flatMap(conn -> conn.rxQuery("SELECT * FROM Users"))
-              .map(ResultSet::toJson)
-              .subscribe(toSubscriber(handler));
+  public DatabaseService getAllUsers(Handler<AsyncResult<JsonArray>> handler) {
+    query("SELECT * FROM USERS").subscribe(toSubscriber(handler));
     return this;
   }
 }

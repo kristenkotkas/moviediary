@@ -6,8 +6,8 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.jdbc.JDBCClient;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -17,8 +17,8 @@ import io.vertx.ext.jdbc.JDBCClient;
 public interface DatabaseService {
   String ADDRESS = "backend.database";
 
-  static DatabaseService create(JDBCClient jdbcClient) {
-    return new DatabaseServiceImpl(jdbcClient);
+  static DatabaseService create(Vertx vertx, JsonObject config) {
+    return new DatabaseServiceImpl(vertx, config);
   }
 
   static DatabaseService createProxy(Vertx vertx) {
@@ -26,5 +26,5 @@ public interface DatabaseService {
   }
 
   @Fluent
-  DatabaseService getAllUsers(Handler<AsyncResult<JsonObject>> handler);
+  DatabaseService getAllUsers(Handler<AsyncResult<JsonArray>> handler);
 }
