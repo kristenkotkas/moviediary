@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 @Slf4j
-public enum Verticle {
+public enum Deployer {
   BACKEND_AUTH,
   BACKEND_DATABASE,
   FRONTEND_UI,
