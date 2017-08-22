@@ -60,6 +60,11 @@ allprojects {
     options.encoding = 'UTF-8'
     dependsOn apiGen
   }
+  task apiClean(type: Delete) {
+    //noinspection GroovyAssignabilityCheck
+    delete 'src/main/gen'
+  }
+  clean.dependsOn apiClean
 }
 
 task wrapper(type: Wrapper) {

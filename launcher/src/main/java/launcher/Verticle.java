@@ -35,7 +35,7 @@ public enum Verticle {
         single = single.flatMap(s -> vertx.rxDeployVerticle(name, dOptions));
       }
       single.doOnError(err -> log.error("Verticle deployment failed: " + err))
-            .subscribe(s -> log.info("Verticle deployment succeeded. Server started."));
+            .subscribe(s -> log.info("Verticle deployment succeeded."));
     }
   }
 

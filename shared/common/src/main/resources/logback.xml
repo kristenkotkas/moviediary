@@ -19,7 +19,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{35}\(%file:%line\)) - %msg %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-1level) %cyan(%logger{35}\(%file:%line\)) - %msg %n</pattern>
         </encoder>
     </appender>
 
