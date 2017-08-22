@@ -8,18 +8,23 @@
       <w>clockpicker</w>
       <w>deauthenticated</w>
       <w>deauthentication</w>
+      <w>devtool</w>
       <w>firstname</w>
       <w>formregister</w>
       <w>gump</w>
       <w>idcardlogin</w>
       <w>imdb</w>
       <w>lastname</w>
+      <w>materializecss</w>
+      <w>microservice</w>
       <w>notfound</w>
       <w>omdb</w>
+      <w>onpopstate</w>
       <w>pangalink</w>
       <w>thiz</w>
       <w>tmdb</w>
       <w>tooltipped</w>
+      <w>transpiling</w>
       <w>wishlist</w>
       <w>xssprotection</w>
     </words>

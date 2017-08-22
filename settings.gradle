@@ -1,1 +1,18 @@
 rootProject.name = 'moviediary'
+
+include 'launcher'
+
+//shared
+include 'shared/common'
+include 'shared/frontend'
+include 'shared/backend'
+
+//frontend
+include 'frontend/gateway'
+include 'frontend/ui'
+include 'frontend/native'
+
+//backend
+include 'backend/auth'
+include 'backend/server'
+include 'backend/database'

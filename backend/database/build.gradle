@@ -1,0 +1,4 @@
+dependencies {
+  compile project(':shared/backend')
+  compile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${cfg.ver.vertx}"
+}

@@ -1,0 +1,17 @@
+apply plugin: 'application'
+apply plugin: "com.github.johnrengelman.shadow"
+
+mainClassName = 'launcher.Launcher'
+
+shadowJar {
+  baseName = 'moviediary'
+  classifier = 'v2'
+}
+
+dependencies {
+  compile project(':shared/common')
+  compile project(':backend/auth')
+  compile project(':backend/database')
+  compile project(':frontend/gateway')
+  compile project(':frontend/ui')
+}

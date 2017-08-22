@@ -1,3 +1,19 @@
+syntax: glob
+
+/.gradle/
+/gradle/
+gradlew
+gradlew.bat
+
+/.idea/modules/
+/.idea/libraries/
+/.idea/uiDesigner.xml
+
+/.vertx/
+*gen/
+
+*server.json
+
 /src/main/resources/server.json
 /misc/id_rsa
 /common/src/main/resources/server.json

@@ -1,0 +1,14 @@
+plugins {
+  id "com.github.hauner.jarTest" version "1.0.1"
+}
+
+dependencies {
+  compile group: 'ch.qos.logback', name: 'logback-classic', version: "${cfg.ver.logback}"
+  compile group: 'io.vertx', name: 'vertx-core', version: "${cfg.ver.vertx}"
+  compile group: 'io.vertx', name: 'vertx-rx-java', version: "${cfg.ver.vertx}"
+
+  compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}" //todo refactor from common to?
+  compile group: 'io.vertx', name: 'vertx-service-discovery', version: "${cfg.ver.vertx}"
+
+  testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
+}

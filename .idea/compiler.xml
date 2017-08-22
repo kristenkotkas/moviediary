@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
+      <module name="backend_auth_main" target="1.8" />
+      <module name="backend_auth_test" target="1.8" />
+      <module name="backend_database_main" target="1.8" />
+      <module name="backend_database_test" target="1.8" />
+      <module name="backend_server_main" target="1.8" />
+      <module name="backend_server_test" target="1.8" />
+      <module name="frontend_gateway_main" target="1.8" />
+      <module name="frontend_gateway_test" target="1.8" />
+      <module name="frontend_native_main" target="1.8" />
+      <module name="frontend_native_test" target="1.8" />
+      <module name="frontend_ui_main" target="1.8" />
+      <module name="frontend_ui_test" target="1.8" />
+      <module name="launcher_main" target="1.8" />
+      <module name="launcher_test" target="1.8" />
       <module name="moviediary_main" target="1.8" />
       <module name="moviediary_test" target="1.8" />
+      <module name="shared_backend_main" target="1.8" />
+      <module name="shared_backend_test" target="1.8" />
+      <module name="shared_common_main" target="1.8" />
+      <module name="shared_common_test" target="1.8" />
+      <module name="shared_frontend_main" target="1.8" />
+      <module name="shared_frontend_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
