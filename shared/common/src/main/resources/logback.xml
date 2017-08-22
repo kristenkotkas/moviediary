@@ -1,6 +1,7 @@
 <configuration>
     <logger name="io.netty" level="INFO"/>
     <logger name="com.mchange" level="INFO"/>
+    <logger name="com.mchange.v2" level="WARN"/>
     <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <append>true</append>
         <file>logback.log</file>
@@ -18,7 +19,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{35}) - %msg %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{35}\(%file:%line\)) - %msg %n</pattern>
         </encoder>
     </appender>
 

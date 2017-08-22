@@ -2,39 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" group="backend/auth" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth_main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth_main.iml" group="backend/auth" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth_test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth_test.iml" group="backend/auth" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" group="backend/database" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/database/backend_database_main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/database/backend_database_main.iml" group="backend/database" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/database/backend_database_test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/database/backend_database_test.iml" group="backend/database" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" group="backend/server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/server/backend_server_main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/server/backend_server_main.iml" group="backend/server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/server/backend_server_test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/server/backend_server_test.iml" group="backend/server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" group="frontend/gateway" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway_main.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway_main.iml" group="frontend/gateway" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway_test.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway_test.iml" group="frontend/gateway" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" group="frontend/native" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native_main.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native_main.iml" group="frontend/native" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native_test.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native_test.iml" group="frontend/native" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" group="frontend/ui" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui_main.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui_main.iml" group="frontend/ui" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui_test.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui_test.iml" group="frontend/ui" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" group="launcher" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/launcher_main.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/launcher_main.iml" group="launcher" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/launcher_test.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/launcher_test.iml" group="launcher" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary_main.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary_main.iml" group="moviediary" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary_test.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary_test.iml" group="moviediary" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" group="shared/backend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend_main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend_main.iml" group="shared/backend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend_test.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend_test.iml" group="shared/backend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" group="shared/common" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/common/shared_common_main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/common/shared_common_main.iml" group="shared/common" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/common/shared_common_test.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/common/shared_common_test.iml" group="shared/common" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" group="shared/frontend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend_main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend_main.iml" group="shared/frontend" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend_test.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend_test.iml" group="shared/frontend" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" />
     </modules>
   </component>
 </project>
