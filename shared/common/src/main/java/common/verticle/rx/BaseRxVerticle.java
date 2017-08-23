@@ -1,7 +1,10 @@
 package common.verticle.rx;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.rx.java.RxHelper;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.Record;
@@ -13,6 +16,7 @@ import io.vertx.servicediscovery.types.MessageSource;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Single;
+import rx.Subscriber;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,9 +26,8 @@ import java.util.Set;
 @Slf4j
 public abstract class BaseRxVerticle extends AbstractVerticle {
   private static final String ADDRESS_LOG_EVENT = "events.log"; // TODO: 22.08.2017 to config
-
-  protected ServiceDiscovery discovery;
   protected final Set<Record> records = new HashSet<>();
+  protected ServiceDiscovery discovery;
 
   @Override
   public void start() throws Exception {
@@ -48,6 +51,12 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
     return publish(EventBusService.createRecord(name, address, serviceClass));
   }
 
+  protected Single<Void> publishApiGateway(String host, int port) {
+    return publish(HttpEndpoint
+        .createRecord("api-gateway", false, host, port, "/", null)
+        .setType("api-gateway"));
+  }
+
   private Single<Void> publish(Record record) {
     return discovery.rxPublish(record)
                     .doOnSuccess(this::storeAndLogPublished)
@@ -59,10 +68,12 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
     log.info("Service <" + record.getName() + "> published.");
   }
 
-  protected final void publishLogEvent(String type, JsonObject data) {
+  protected final Single<Void> publishLogEvent(String type, JsonObject data) {
+    log.info("Event <Type: " + type + "; data: " + data.encode() + ">");
     vertx.eventBus().publish(ADDRESS_LOG_EVENT, new JsonObject()
         .put("type", type)
         .put("message", data));
+    return Single.just(null);
   }
 
   @Override
@@ -70,6 +81,10 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
     Observable.from(records)
               .flatMap(record -> discovery.rxUnpublish(record.getRegistration()).toObservable())
               .reduce((Void) null, (a, b) -> null)
-              .subscribe(future::complete, future::fail);
+              .subscribe(toSubscriber(future));
+  }
+
+  protected final <T> Subscriber<T> toSubscriber(Handler<AsyncResult<T>> handler) {
+    return RxHelper.toSubscriber(handler);
   }
 }
