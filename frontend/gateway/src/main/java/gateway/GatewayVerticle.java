@@ -9,6 +9,7 @@ import io.vertx.rxjava.core.http.HttpClientRequest;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
+import io.vertx.rxjava.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import rx.Single;
@@ -59,6 +60,7 @@ public class GatewayVerticle extends RestApiRxVerticle {
     // TODO: 23.08.2017 route requests to other modules
     int offset = "/api/".length();
 
+    // TODO: 24.08.2017 also route http to eventbus?
     getAllHttpEndpoints()
         .doOnError(err -> Status.badGateway(ctx, err))
         .doOnSuccess(list -> {
@@ -77,26 +79,27 @@ public class GatewayVerticle extends RestApiRxVerticle {
             Status.notFound(ctx);
             return;
           }
-          doDispatch(ctx, apiPath, discovery.getReference(client.get()).get());
+          doDispatch(ctx, apiPath, discovery.getReference(client.get()));
         });
   }
 
-  private void doDispatch(RoutingContext ctx, String path, HttpClient client) {
-    HttpClientRequest serviceRequest = client.request(ctx.request().method(), path, res -> res.bodyHandler(body -> {
+  private void doDispatch(RoutingContext ctx, String path, ServiceReference ref) {
+    HttpClientRequest req = ref.<HttpClient>get().request(ctx.request().method(), path, res -> res.bodyHandler(body -> {
       if (res.statusCode() >= 500) {
         Status.serviceUnavailable(ctx, res.statusMessage());
-        return;
+      } else {
+        ctx.response().headers().addAll(res.headers());
+        ctx.response().setStatusCode(res.statusCode()).end(body);
       }
-      ctx.response().headers().addAll(res.headers());
-      ctx.response().setStatusCode(res.statusCode()).end(body);
+      discovery.release(ref);
     }));
-    serviceRequest.headers().addAll(ctx.request().headers());
+    req.headers().addAll(ctx.request().headers());
     // TODO: 24.08.2017 pass user auth data to service?, (in header)
     if (ctx.getBody() != null) {
-      serviceRequest.end(ctx.getBody());
+      req.end(ctx.getBody());
       return;
     }
-    serviceRequest.end();
+    req.end();
   }
 
   private void apiVersion(RoutingContext ctx) {
