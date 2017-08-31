@@ -14,4 +14,7 @@ dependencies {
   compile project(':backend/database')
   compile project(':frontend/gateway')
   compile project(':frontend/ui')
+
+  testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
+
 }

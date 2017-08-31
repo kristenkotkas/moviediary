@@ -1,14 +1,17 @@
 package launcher;
 
-import common.util.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
+@Slf4j
 public class Launcher {
 
-  public static void main(String[] args) {
-    CommonUtils.setLoggingToSLF4J();
-    Deployer.deployVerticles(args);
+  public static void main(String[] args) throws IOException {
+    Deployer.deployVerticles()
+            .doOnError(err -> log.error("Verticle deployment failed: " + err))
+            .subscribe(s -> log.info("Verticle deployment succeeded."));
   }
 }
