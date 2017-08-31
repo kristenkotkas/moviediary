@@ -48,6 +48,8 @@
     "url-loader": "^0.5.9",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.5.1",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "io.vertx:vertx-lang-js": "3.5.0.Beta1",
+    "io.vertx:vertx-web": "3.5.0.Beta1"
   }
 }
