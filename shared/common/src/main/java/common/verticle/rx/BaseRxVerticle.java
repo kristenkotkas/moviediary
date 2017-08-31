@@ -1,10 +1,7 @@
 package common.verticle.rx;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.rx.java.RxHelper;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.Record;
@@ -16,9 +13,10 @@ import io.vertx.servicediscovery.types.MessageSource;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Single;
-import rx.Subscriber;
 import java.util.HashSet;
 import java.util.Set;
+import static common.util.rx.RxUtils.single;
+import static common.util.rx.RxUtils.toSubscriber;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -73,7 +71,7 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
     vertx.eventBus().publish(ADDRESS_LOG_EVENT, new JsonObject()
         .put("type", type)
         .put("message", data));
-    return Single.just(null);
+    return single();
   }
 
   @Override
@@ -82,9 +80,5 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
               .flatMap(record -> discovery.rxUnpublish(record.getRegistration()).toObservable())
               .reduce((Void) null, (a, b) -> null)
               .subscribe(toSubscriber(future));
-  }
-
-  protected final <T> Subscriber<T> toSubscriber(Handler<AsyncResult<T>> handler) {
-    return RxHelper.toSubscriber(handler);
   }
 }

@@ -3,7 +3,12 @@ package common.util;
 import common.entity.JsonObj;
 import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
 
@@ -12,8 +17,8 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 public class FileUtils {
-  private static final String COMMON = "/server.json";
-  private static final boolean IS_RUNNING_FROM_JAR = getJarName().contains(".jar");
+  private static final String CONFIG = "/config.json";
+  private static final boolean IS_RUNNING_FROM_JAR = getLocation().toString().endsWith(".jar");
 
   /**
    * Loads config from classpath.
@@ -32,9 +37,9 @@ public class FileUtils {
   public static JsonObject getConfig(String[] args) {
     JsonObject config = new JsonObj();
     try {
-      config.mergeIn(new JsonObj(readToString(COMMON)));
+      config.mergeIn(new JsonObj(readToString(CONFIG)));
     } catch (IOException e) {
-      log.error(COMMON + " not found.");
+      log.error(CONFIG + " not found.");
     }
     return config.mergeIn(parseArguments(args));
   }
@@ -79,18 +84,18 @@ public class FileUtils {
    * @return jsonObj
    */
   private static JsonObj parseArguments(String... args) {
-    return new JsonObj(stream(args)
+    return args == null ? new JsonObj() : new JsonObj(stream(args)
         .filter(s -> s.startsWith("-"))
         .map(s -> s.replaceFirst("-", "").split("="))
         .collect(toMap(s -> s[0], s -> s[1])));
   }
 
-  private static String getJarName() {
-    return new File(FileUtils.class.getProtectionDomain()
-                                   .getCodeSource()
-                                   .getLocation()
-                                   .getPath())
-        .getName();
+  public static Path getLocation() {
+    return Paths.get(FileUtils.class.getProtectionDomain()
+                                    .getCodeSource()
+                                    .getLocation()
+                                    .getPath()
+                                    .substring(1));
   }
 
   public static boolean isRunningFromJar() {

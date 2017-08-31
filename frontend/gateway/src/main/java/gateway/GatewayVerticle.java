@@ -15,6 +15,7 @@ import io.vertx.servicediscovery.types.HttpEndpoint;
 import rx.Single;
 import java.util.List;
 import java.util.Optional;
+import static common.util.rx.RxUtils.toSubscriber;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>

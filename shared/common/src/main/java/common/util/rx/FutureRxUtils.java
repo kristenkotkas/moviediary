@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FuncUtils {
+public class FutureRxUtils {
 
   // FIXME: 22.08.2017 breaks apiGen
 

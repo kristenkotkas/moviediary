@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FuncUtils {
+public class FutureUtils {
 
   public static <T> Future<List<T>> reduce(List<Future<T>> futures) {
     return CompositeFutureImpl.all(futures.toArray(new Future[futures.size()]))
