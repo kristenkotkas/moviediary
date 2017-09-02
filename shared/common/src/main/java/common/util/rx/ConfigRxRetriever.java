@@ -31,14 +31,12 @@ public class ConfigRxRetriever {
   // TODO: 31.08.2017 listen for config updates
 
   public ConfigRxRetriever withEnvVars() {
-    options.addStore(new ConfigStoreOptions()
-        .setType("env"));
+    options.addStore(new ConfigStoreOptions().setType("env"));
     return this;
   }
 
   public ConfigRxRetriever withSysParams() {
-    options.addStore(new ConfigStoreOptions()
-        .setType("sys"));
+    options.addStore(new ConfigStoreOptions().setType("sys"));
     return this;
   }
 
@@ -83,38 +81,36 @@ public class ConfigRxRetriever {
     return this;
   }
 
-  public ConfigRxRetriever withDirectory(String moduleName) {
+  public ConfigRxRetriever withDirectory(String dirPath) {
     options.addStore(new ConfigStoreOptions()
         .setType("directory")
         .setConfig(new JsonObject()
-            .put("path", moduleName + "/src/config")
+            .put("path", dirPath)
             .put("filesets", new JsonArray()
                 .add(new JsonObject().put("pattern", "*.json"))
                 .add(new JsonObject().put("pattern", "*.properties").put("format", "properties")))));
     return this;
   }
 
-  public ConfigRxRetriever withJsonFile(String name) {
+  public ConfigRxRetriever withJsonFile(String path) {
     options.addStore(new ConfigStoreOptions()
         .setType("file")
         .setConfig(new JsonObject()
-            .put("path", "")));
+            .put("path", path.endsWith(".json") ? path : path.concat(".json"))));
     return this;
   }
 
-  public ConfigRxRetriever withPropertyFile(String name) {
+  public ConfigRxRetriever withPropertyFile(String path) {
     options.addStore(new ConfigStoreOptions()
         .setType("file")
         .setFormat("properties")
         .setConfig(new JsonObject()
-            .put("path", "")));
+            .put("path", path.endsWith(".properties") ? path : path.concat(".properties"))));
     return this;
   }
 
   public ConfigRxRetriever withJson(JsonObject json) {
-    options.addStore(new ConfigStoreOptions()
-        .setType("json")
-        .setConfig(json.copy()));
+    options.addStore(new ConfigStoreOptions().setType("json").setConfig(json.copy()));
     return this;
   }
 

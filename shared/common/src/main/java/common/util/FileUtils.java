@@ -26,7 +26,7 @@ public class FileUtils {
    * @return server.json config
    */
   public static JsonObject getConfig() {
-    return getConfig(null);
+    return getLocalConfig(CONFIG);
   }
 
   /**
@@ -34,14 +34,17 @@ public class FileUtils {
    *
    * @return server.json config
    */
-  public static JsonObject getConfig(String[] args) {
-    JsonObject config = new JsonObj();
+  public static JsonObject getLocalConfigWith(String[] args) {
+    return getLocalConfig(CONFIG).mergeIn(parseArguments(args));
+  }
+
+  public static JsonObject getLocalConfig(String location) {
     try {
-      config.mergeIn(new JsonObj(readToString(CONFIG)));
+      return new JsonObj(readToString(location));
     } catch (IOException e) {
-      log.error(CONFIG + " not found.");
+      log.error(location + " not found.");
     }
-    return config.mergeIn(parseArguments(args));
+    return new JsonObj();
   }
 
   /**
@@ -84,7 +87,7 @@ public class FileUtils {
    * @return jsonObj
    */
   private static JsonObj parseArguments(String... args) {
-    return args == null ? new JsonObj() : new JsonObj(stream(args)
+    return args == null || args.length == 0 ? new JsonObj() : new JsonObj(stream(args)
         .filter(s -> s.startsWith("-"))
         .map(s -> s.replaceFirst("-", "").split("="))
         .collect(toMap(s -> s[0], s -> s[1])));

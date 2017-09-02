@@ -11,7 +11,7 @@ public class Launcher {
 
   public static void main(String[] args) throws IOException {
     Deployer.deployVerticles()
-            .doOnError(err -> log.error("Verticle deployment failed: " + err))
+            .doOnError(err -> log.error("Verticle deployment failed.", err))
             .subscribe(s -> log.info("Verticle deployment succeeded."));
   }
 }

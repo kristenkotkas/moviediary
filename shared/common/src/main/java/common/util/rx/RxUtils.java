@@ -27,8 +27,8 @@ public class RxUtils {
     return Observable.just(null);
   }
 
-  public static <T> Single<T> singleForEach(Collection<T> collection, Function<T, Single<T>> function) {
-    Mutable<Single<T>> single = Mutable.of(single());
+  public static <T, S> Single<S> singleForEach(Collection<T> collection, Function<T, Single<S>> function) {
+    Mutable<Single<S>> single = Mutable.of(single());
     collection.forEach(s -> single.setIt(single.getIt().flatMap(t -> function.apply(s))));
     return single.getIt();
   }

@@ -16,6 +16,6 @@ gradlew.bat
 
 /launcher/src/main/java/Todo.java
 
-/src/main/resources/server.json
 /misc/id_rsa
 /shared/common/src/main/resources/config.json
+/launcher/src/main/resources/local.json

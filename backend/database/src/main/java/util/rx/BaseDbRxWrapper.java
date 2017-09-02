@@ -20,7 +20,7 @@ public class BaseDbRxWrapper {
 
   public BaseDbRxWrapper(Vertx vertx, JsonObject config) {
     this.client = JDBCClient
-        .createNonShared(new io.vertx.rxjava.core.Vertx(vertx), config.getJsonObject("mysql", config));
+        .createNonShared(new io.vertx.rxjava.core.Vertx(vertx), config.getJsonObject("jdbc", config));
     // TODO: 23.08.2017 get keys from (global?) .properties
   }
 

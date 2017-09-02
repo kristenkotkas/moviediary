@@ -18,7 +18,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
-    jdbcClient = JDBCClient.createNonShared(vertx.getDelegate(), config().getJsonObject("mysql"));
+    jdbcClient = JDBCClient.createNonShared(vertx.getDelegate(), config().getJsonObject("jdbc"));
     DatabaseService database = DatabaseService.create(vertx.getDelegate(), config());
     consumer = registerService(DatabaseService.class, vertx.getDelegate(), database, ADDRESS);
   }

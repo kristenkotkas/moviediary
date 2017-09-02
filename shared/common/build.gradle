@@ -9,7 +9,7 @@ dependencies {
 
   compile group: 'io.vertx', name: 'vertx-web', version: "${cfg.ver.vertx}" //todo refactor from common to?
   compile group: 'io.vertx', name: 'vertx-service-discovery', version: "${cfg.ver.vertx}"
-  compile group: 'io.vertx', name: 'vertx-config', version: '3.5.0.Beta1'
+  compile group: 'io.vertx', name: 'vertx-config', version: "${cfg.ver.vertx}"
 
   testCompile group: 'junit', name: 'junit', version: "${cfg.ver.junit}"
 }
