@@ -37,6 +37,10 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
         new JsonObject().put("api.name", config().getString("api.name", ""))));
   }
 
+  protected Single<Void> publishHttpEndpoint(int port) {
+    return publishHttpEndpoint(config().getString("api.name", ""), "localhost", port);
+  }
+
   protected Single<Void> publishMessageSource(String name, String address) {
     return publish(MessageSource.createRecord(name, address));
   }
@@ -49,6 +53,11 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
     return publish(EventBusService.createRecord(name, address, serviceClass));
   }
 
+  protected Single<Void> publishEventBusService(Class serviceClass) {
+    String apiName = config().getString("api.name", "");
+    return publish(EventBusService.createRecord(apiName, apiName, serviceClass));
+  }
+
   protected Single<Void> publishApiGateway(String host, int port) {
     return publish(HttpEndpoint
         .createRecord("api-gateway", false, host, port, "/", null)
@@ -56,9 +65,7 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
   }
 
   private Single<Void> publish(Record record) {
-    return discovery.rxPublish(record)
-                    .doOnSuccess(this::storeAndLogPublished)
-                    .map(rec -> null);
+    return discovery.rxPublish(record).doOnSuccess(this::storeAndLogPublished).map(rec -> null);
   }
 
   private void storeAndLogPublished(Record record) {

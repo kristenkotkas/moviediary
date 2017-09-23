@@ -11,4 +11,8 @@ public class MappingUtils {
   public static JsonArray getRows(JsonObject json) {
     return json.getJsonArray("rows", new JsonArray());
   }
+
+  public static JsonObject toRowsJson(JsonObject json) {
+    return new JsonObject().put("rows", getRows(json));
+  }
 }

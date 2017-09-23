@@ -1,4 +1,5 @@
 dependencies {
   compile project(':shared/backend')
   compile group: 'io.vertx', name: 'vertx-jdbc-client', version: "${cfg.ver.vertx}"
+  compile group: 'mysql', name: 'mysql-connector-java', version: "${cfg.ver.mysql}"
 }

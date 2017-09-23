@@ -26,5 +26,9 @@ public interface DatabaseService {
   }
 
   @Fluent
-  DatabaseService getAllUsers(Handler<AsyncResult<JsonArray>> handler);
+  DatabaseService getAllUsers(Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DatabaseService getTestUsers(String input, int test, JsonObject in2, JsonArray in3,
+                               Handler<AsyncResult<JsonObject>> handler);
 }

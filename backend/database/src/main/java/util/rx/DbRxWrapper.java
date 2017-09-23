@@ -5,6 +5,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import rx.Single;
+import util.MappingUtils;
 import java.util.Optional;
 
 /**
@@ -18,8 +19,8 @@ public class DbRxWrapper extends BaseDbRxWrapper {
 
   protected <T> Single<Optional<T>> queryFirstChecked(String sql, JsonArray params, Class<T> clazz) {
     return query(sql, params)
+        .map(MappingUtils::getRows)
         .map(array -> array.size() > 0 ? array.getValue(0) : null)
         .map(obj -> Optional.ofNullable(ClassUtils.checkedCast(obj, clazz)));
-
   }
 }

@@ -31,11 +31,17 @@ public final class Status {
   public static final String CONTENT_TYPE = "content-type";
   public static final String JSON = "application/json";
 
-  public static void ok(RoutingContext ctx, Throwable ex) {
+  public static void ok(RoutingContext ctx) {
+    ctx.response()
+       .setStatusCode(OK)
+       .end();
+  }
+
+  public static void ok(RoutingContext ctx, JsonObject json) {
     ctx.response()
        .setStatusCode(OK)
        .putHeader(CONTENT_TYPE, JSON)
-       .end();
+       .end(json.encodePrettily());
   }
 
   public static void badRequest(RoutingContext ctx, Throwable ex) {
