@@ -1,12 +1,15 @@
 package common.verticle.rx;
 
+import common.entity.JsonObj;
 import common.util.Status;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.CookieHandler;
@@ -112,16 +115,14 @@ public abstract class RestApiRxVerticle extends BaseRxVerticle {
     }
 
     private void mapRequestToEventbus(RoutingContext ctx) {
-      String[] split = ctx.request().uri().split("/");
-      Optional<String> action = mapToServiceAction(split[1]);
+      Optional<String> action = mapToServiceAction(ctx.request().path().split("/")[1]);
       if (!action.isPresent()) {
         Status.notFound(ctx);
         return;
       }
-      // TODO: 24.09.2017 merge request params into body json
-      DeliveryOptions options = new DeliveryOptions().addHeader("action", action.get());
       ctx.request().bodyHandler(body -> vertx.eventBus()
-          .<JsonObject>rxSend(address, body.length() > 0 ? body.toJsonObject() : new JsonObject(), options)
+          .<JsonObject>rxSend(address, mergeParamsToBody(body, ctx.request().params()),
+              new DeliveryOptions().addHeader("action", action.get()))
           .doOnError(err -> Status.serviceUnavailable(ctx, err))
           .subscribe(msg -> Status.ok(ctx, msg.body())));
     }
@@ -130,6 +131,12 @@ public abstract class RestApiRxVerticle extends BaseRxVerticle {
       return serviceMethods.stream()
                            .filter(s -> s.toLowerCase(Locale.ENGLISH).equals(reqAction))
                            .findAny();
+    }
+
+    private JsonObject mergeParamsToBody(Buffer body, MultiMap params) {
+      JsonObj json = body.length() > 0 ? JsonObj.fromParent(body.toJsonObject()) : new JsonObj();
+      params.getDelegate().entries().forEach(e -> json.putParse(e.getKey(), e.getValue()));
+      return json;
     }
 
     private Set<String> findServiceMethods(Class clazz) {

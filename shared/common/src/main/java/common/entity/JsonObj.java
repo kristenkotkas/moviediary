@@ -1,14 +1,15 @@
 package common.entity;
 
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import static common.util.ConditionUtils.ifMissing;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 /**
@@ -18,6 +19,17 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
  */
 public class JsonObj extends JsonObject {
+  private static final Map<Class, Function<String, Object>> PARSER_MAP = new HashMap<>();
+
+  static {
+    PARSER_MAP.put(Integer.class, input -> safe(() -> Integer.parseInt(input)));
+    PARSER_MAP.put(Long.class, input -> safe(() -> Long.parseLong(input)));
+    PARSER_MAP.put(Double.class, input -> safe(() -> Double.parseDouble(input)));
+    PARSER_MAP.put(Float.class, input -> safe(() -> Float.parseFloat(input)));
+    PARSER_MAP.put(JsonObj.class, input -> safe(() -> Json.decodeValue(input, Map.class))); // {"key":"value"}
+    PARSER_MAP.put(JsonArray.class, input -> safe(() -> new JsonArray(Json.decodeValue(input, List.class)))); // [1,2,3]
+    // TODO: 25.09.2017 boolean, doesn't throw exception?
+  }
 
   public JsonObj(String json) {
     super(json);
@@ -296,12 +308,34 @@ public class JsonObj extends JsonObject {
     return this;
   }
 
+  public JsonObj putParse(String key, Object value) {
+    if (key == null) {
+      return this;
+    } else if (value == null) {
+      putNull(key);
+      return this;
+    }
+    Object parsedValue;
+    String stringValue = value.toString();
+    parsedValue = PARSER_MAP.get(Integer.class).apply(stringValue);
+    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Long.class).apply(stringValue));
+    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Float.class).apply(stringValue));
+    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(Double.class).apply(stringValue));
+    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(JsonObj.class).apply(stringValue));
+    parsedValue = ifMissing(parsedValue, () -> PARSER_MAP.get(JsonArray.class).apply(stringValue));
+    // TODO: 25.09.2017 boolean
+    parsedValue = ifMissing(parsedValue, () -> stringValue);
+    put(key, parsedValue);
+    return this;
+  }
+
   /**
    * Copies the JsonObj.
    */
   @Override
   public JsonObject copy() {
-    return new JsonObj(getMap().entrySet().stream()
+    return new JsonObj(getMap().entrySet()
+                               .stream()
                                .collect(Collectors.toMap(Map.Entry::getKey, e -> checkAndCopy(e.getValue()))));
   }
 
@@ -334,5 +368,13 @@ public class JsonObj extends JsonObject {
       throw new IllegalStateException("Illegal type in JsonObject: " + val.getClass());
     }
     return val;
+  }
+
+  private static Object safe(Supplier<Object> parseFunction) {
+    try {
+      return parseFunction.get();
+    } catch (Exception ignored) {
+    }
+    return null;
   }
 }
