@@ -22,7 +22,7 @@ public class DatabaseVerticle extends RestApiRxVerticle {
     jdbcClient = JDBCClient.createNonShared(vertx.getDelegate(), config().getJsonObject("jdbc"));
     DatabaseService database = DatabaseService.create(vertx.getDelegate(), config());
     consumer = registerService(DatabaseService.class, vertx.getDelegate(), database, ADDRESS);
-    startRouter(DatabaseService.ADDRESS, DatabaseService.class, future);
+    startEBRouter(DatabaseService.ADDRESS, DatabaseService.class, future);
     // TODO: 3.09.2017 setup security for public users (getallusers should not be available for everyone)
   }
 

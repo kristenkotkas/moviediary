@@ -13,6 +13,10 @@ import java.util.stream.Stream;
  */
 public class ConditionUtils {
 
+  public static boolean areNull(Objects... objects) {
+    return Arrays.stream(objects).allMatch(Objects::isNull);
+  }
+
   public static boolean nonNull(Object... objects) {
     return Arrays.stream(objects).noneMatch(Objects::isNull);
   }

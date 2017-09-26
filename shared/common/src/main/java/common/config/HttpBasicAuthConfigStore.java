@@ -2,6 +2,7 @@ package common.config;
 
 import io.vertx.config.spi.ConfigStore;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
@@ -26,14 +27,22 @@ public class HttpBasicAuthConfigStore implements ConfigStore {
   private final String password;
 
   private Buffer cache;
+  private boolean firstFetched = false;
 
   @Override
   public void get(Handler<AsyncResult<Buffer>> handler) {
+    // FIXME: 26.09.2017 creating ConfigRetriever triggers config fetching without waiting for result
+    //ignore first fetch for now
+    if (!firstFetched) {
+      firstFetched = true;
+      handler.handle(Future.failedFuture("nope"));
+      return;
+    }
     if (cache != null) {
       handler.handle(succeededFuture(cache));
       return;
     }
-    log.debug("Fetching config from server..."); // FIXME: 3.09.2017 fetching 2x even with cache?
+    log.info("Fetching config from server...");
     client.get(path, res -> res
         .exceptionHandler(err -> handler.handle(failedFuture(err)))
         .bodyHandler(body -> handler.handle(succeededFuture(ifMissing(cache, () -> cache = body)))))

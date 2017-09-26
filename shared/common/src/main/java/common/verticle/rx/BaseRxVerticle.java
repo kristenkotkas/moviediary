@@ -15,8 +15,12 @@ import rx.Observable;
 import rx.Single;
 import java.util.HashSet;
 import java.util.Set;
+import static common.util.ConditionUtils.ifFalse;
+import static common.util.ConditionUtils.ifTrue;
 import static common.util.rx.RxUtils.single;
 import static common.util.rx.RxUtils.toSubscriber;
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -33,8 +37,9 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
   }
 
   protected Single<Void> publishHttpEndpoint(String name, String host, int port) {
-    return publish(HttpEndpoint.createRecord(name, host, port, "/",
-        new JsonObject().put("api.name", config().getString("api.name", ""))));
+    ifTrue(config().getInteger("http.port") == null,
+        () -> log.error(format("Could not find port for http endpoint %s, using host %s, port %s.", name, host, port)));
+    return publish(HttpEndpoint.createRecord(name, host, port, "/", new JsonObject().put("api.name", name)));
   }
 
   protected Single<Void> publishHttpEndpoint(int port) {
@@ -65,16 +70,26 @@ public abstract class BaseRxVerticle extends AbstractVerticle {
   }
 
   private Single<Void> publish(Record record) {
-    return discovery.rxPublish(record).doOnSuccess(this::storeAndLogPublished).map(rec -> null);
+    if (isNull(discovery)) {
+      return Single.error(new Throwable(format("ServiceDiscovery is null, did you forget to call super()?, record: %s",
+          record.getLocation().encode())));
+    }
+    return discovery.rxPublish(record)
+                    .doOnSuccess(this::storeAndLogPublished)
+                    .map(rec -> null);
   }
 
   private void storeAndLogPublished(Record record) {
     records.add(record);
-    log.info("Service <" + record.getName() + "> published.");
+    ifFalse("eventbus-service-proxy".equals(record.getType()),
+        () -> log.info(format("Service <%s> published @ <%s>",
+            record.getName(),
+            record.getLocation().getString("endpoint")))
+    );
   }
 
   protected final Single<Void> publishLogEvent(String type, JsonObject data) {
-    log.info("Event <Type: " + type + "; data: " + data.encode() + ">");
+    log.info(format("Event <Type: %s; data: %s>", type, data.encode()));
     vertx.eventBus().publish(ADDRESS_LOG_EVENT, new JsonObject()
         .put("type", type)
         .put("message", data));

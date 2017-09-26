@@ -10,7 +10,6 @@ import io.vertx.rxjava.core.Vertx;
 import rx.Single;
 import java.util.List;
 import static common.util.ConfigUtils.getDeployerConfig;
-import static common.util.FileUtils.getConfig;
 import static common.util.FileUtils.getLocalConfig;
 import static common.util.LangUtils.capitalize;
 import static common.util.rx.ConfigRxRetriever.createConfigRetriever;
@@ -34,7 +33,7 @@ public enum Deployer implements Nameable {
             .addServer("8.8.8.8")
             .addServer("8.8.4.4")));
     return createConfigRetriever(vertx)
-        .withHttpBasicAuth(getConfig())
+        //.withHttpBasicAuth(getConfig()) // todo for development
         .withJson(getLocalConfig("/local.json"))
         .rxBuildRetriever()
         .flatMap(ConfigRetriever::rxGetConfig)

@@ -10,6 +10,7 @@ import java.io.IOException;
 public class Launcher {
 
   public static void main(String[] args) throws IOException {
+    log.info("Starting...");
     Deployer.deployVerticles()
             .doOnError(err -> log.error("Verticle deployment failed.", err))
             .subscribe(s -> log.info("Verticle deployment succeeded."));

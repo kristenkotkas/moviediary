@@ -18,6 +18,7 @@ import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
 import lombok.extern.slf4j.Slf4j;
 import rx.Single;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -26,9 +27,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static common.util.ConditionUtils.chain;
+import static common.util.ConditionUtils.ifTrue;
 import static common.util.NetworkUtils.getRandomUnboundPort;
 import static common.util.Status.UNAUTHORIZED;
 import static common.util.rx.RxUtils.toSubscriber;
+import static common.verticle.rx.RestApiRxVerticle.RestRouter.create;
+import static common.verticle.rx.RestApiRxVerticle.RestRouter.createMappingToEventbus;
 
 /**
  * @author <a href="https://github.com/kristjanhk">Kristjan Hendrik Küngas</a>
@@ -69,53 +73,68 @@ public abstract class RestApiRxVerticle extends BaseRxVerticle {
   }
 
   @SafeVarargs
-  protected final void startRouter(String address, Class clazz, Future<Void> future, Consumer<EBRouter>... consumers) {
+  protected final void startEBRouter(String address, Class clazz, Future<Void> fut, Consumer<RestRouter>... consumers) {
     chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
-        createHttpServer(chain(EBRouter.create(vertx, address, clazz), consumers).start(), port)
+        createHttpServer(chain(chain(createMappingToEventbus(vertx, address, clazz), consumers).build()), port)
             .flatMap(v -> publishEventBusService(clazz))
+            .flatMap(v -> publishHttpEndpoint(port))
+            .subscribe(toSubscriber(fut.completer())));
+
+  }
+
+  @SafeVarargs
+  protected final void startRestRouter(Future<Void> future, Consumer<RestRouter>... consumers) {
+    chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
+        createHttpServer(chain(create(vertx), consumers).build(), port)
             .flatMap(v -> publishHttpEndpoint(port))
             .subscribe(toSubscriber(future.completer())));
   }
 
-  protected static class EBRouter {
+  protected static class RestRouter {
     private final Router router;
     private final Vertx vertx;
     private final String address;
-    private final Set<String> serviceMethods;
+    private final Set<String> serviceMethods = new HashSet<>();
+    private final boolean mapRequestsToEventbus;
 
-    private EBRouter(Vertx vertx, String serviceAddress, Class serviceClass) {
+    private RestRouter(Vertx vertx, String serviceAddress, Class serviceClass, boolean mapRequestsToEventbus) {
       this.router = Router.router(vertx).exceptionHandler(thr -> log.error("EventbusRouter error", thr));
       this.vertx = vertx;
       this.address = serviceAddress;
-      this.serviceMethods = findServiceMethods(serviceClass);
+      this.mapRequestsToEventbus = mapRequestsToEventbus;
+      ifTrue(mapRequestsToEventbus, () -> serviceMethods.addAll(findServiceMethods(serviceClass)));
     }
 
-    public static EBRouter create(Vertx vertx, String serviceAddress, Class serviceClass) {
-      return new EBRouter(vertx, serviceAddress, serviceClass);
+    public static RestRouter create(Vertx vertx) {
+      return new RestRouter(vertx, null, null, false);
     }
 
-    public EBRouter route(String path, Handler<RoutingContext> requestHandler) {
+    public static RestRouter createMappingToEventbus(Vertx vertx, String serviceAddress, Class serviceClass) {
+      return new RestRouter(vertx, serviceAddress, serviceClass, true);
+    }
+
+    public RestRouter route(String path, Handler<RoutingContext> requestHandler) {
       router.route(path).handler(requestHandler);
       return this;
     }
 
-    public EBRouter get(String path, Handler<RoutingContext> requestHandler) {
+    public RestRouter get(String path, Handler<RoutingContext> requestHandler) {
       router.get(path).handler(requestHandler);
       return this;
     }
 
-    public EBRouter post(String path, Handler<RoutingContext> requestHandler) {
+    public RestRouter post(String path, Handler<RoutingContext> requestHandler) {
       router.post(path).handler(requestHandler);
       return this;
     }
 
-    public Router start() {
-      router.route().last().handler(this::mapRequestToEventbus);
+    public Router build() {
+      ifTrue(mapRequestsToEventbus, () -> router.route().last().handler(this::mapRequestToEventbus));
       return router;
     }
 
     private void mapRequestToEventbus(RoutingContext ctx) {
-      Optional<String> action = mapToServiceAction(ctx.request().path().split("/")[1]);
+      Optional<String> action = mapToServiceAction(ctx.request().path());
       if (!action.isPresent()) {
         Status.notFound(ctx);
         return;
@@ -127,9 +146,13 @@ public abstract class RestApiRxVerticle extends BaseRxVerticle {
           .subscribe(msg -> Status.ok(ctx, msg.body())));
     }
 
-    private Optional<String> mapToServiceAction(String reqAction) {
+    private Optional<String> mapToServiceAction(String path) {
+      String[] split = path.split("/");
+      if (split.length <= 1) {
+        return Optional.empty();
+      }
       return serviceMethods.stream()
-                           .filter(s -> s.toLowerCase(Locale.ENGLISH).equals(reqAction))
+                           .filter(s -> s.toLowerCase(Locale.ENGLISH).equals(split[1]))
                            .findAny();
     }
 

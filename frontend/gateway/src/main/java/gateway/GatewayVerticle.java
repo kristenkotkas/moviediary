@@ -1,5 +1,6 @@
 package gateway;
 
+import common.util.Status;
 import common.verticle.rx.RestApiRxVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -42,19 +43,13 @@ public class GatewayVerticle extends RestApiRxVerticle {
     // TODO: 23.08.2017 login, logout, auth callback, eventbus, etc..
 
     router.route("/api/*").handler(this::dispatchRequests);
-    router.route("/*").handler(this::handleUi);
+    router.route("/*").handler(Status::notFound);
 
     // TODO: 23.08.2017 https? -> only if used without nginx
 
     createHttpServer(router, host, port)
         .flatMap(v -> publishApiGateway(host, port))
-        .flatMap(v -> publishLogEvent("gateway", new JsonObject()
-            .put("info", "API Gateway is running on port " + port)))
         .subscribe(toSubscriber(future));
-  }
-
-  private void handleUi(RoutingContext ctx) {
-    // TODO: 23.08.2017 router to ui module -> serve static content for react
   }
 
   private void dispatchRequests(RoutingContext ctx) {
