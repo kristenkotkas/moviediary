@@ -1,3 +1,4 @@
+// @flow
 const webpack = require('webpack');
 const Merge = require('webpack-merge');
 const CommonConfig = require('./webpack.common');
@@ -12,8 +13,8 @@ module.exports = new Merge(CommonConfig, {
     hotOnly: true,
     historyApiFallback: true,
     overlay: true,
-    /*  contentBase: './src/main/assets',
-      publicPath: '/'*/
+    contentBase: './src/main/assets',
+    publicPath: '/'
   },
   plugins: [
     new webpack.DefinePlugin({

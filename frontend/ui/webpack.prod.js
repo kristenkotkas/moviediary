@@ -1,3 +1,4 @@
+// @flow
 const Merge = require('webpack-merge');
 const CommonConfig = require('./webpack.common');
 const webpack = require('webpack');

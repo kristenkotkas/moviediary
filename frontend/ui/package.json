@@ -26,30 +26,21 @@
     "redux-promise-middleware": "^4.3.0",
     "redux-thunk": "^2.1.0",
     "semantic-ui-react": "^0.71.3",
-    "vertx3-eventbus-client": "^3.4.2",
-    "tslib": "^1.6.1"
+    "vertx3-eventbus-client": "^3.4.2"
   },
   "devDependencies": {
-    "@types/node": "^7.0.14",
-    "@types/react": "^15.0.6",
-    "@types/react-dom": "^15.5.0",
-    "@types/react-hot-loader": "^3.0.1",
-    "@types/webpack": "^2.2.15",
-    "@types/webpack-dev-server": "^1.12.6",
-    "awesome-typescript-loader": "^3.1.3",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
     "css-loader": "^0.28.4",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
-    "html-webpack-plugin": "^2.29.0",
+    "html-webpack-plugin": "^2.30.1",
     "less-loader": "^4.0.5",
     "postcss-loader": "^2.0.6",
-    "react-hot-loader": "^3.0.0-beta.6",
-    "typescript": "^2.3.2",
     "url-loader": "^0.5.9",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.5.1",
-    "webpack-merge": "^4.1.0",
-    "io.vertx:vertx-lang-js": "3.5.0.Beta1",
-    "io.vertx:vertx-web": "3.5.0.Beta1"
+    "webpack-merge": "^4.1.0"
   }
 }

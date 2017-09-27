@@ -1,6 +1,8 @@
+// @flow
 const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PATHS = {
   root: path.resolve(__dirname),
@@ -15,12 +17,7 @@ const PATHS = {
 module.exports = {
   cache: true,
   context: PATHS.root,
-  entry: {
-    app: [
-      'react-hot-loader/patch',
-      './src/main/assets/client.js'
-    ]
-  },
+  entry: PATHS.src + '/client.js',
   output: {
     publicPath: '/',
     path: PATHS.dist
@@ -30,42 +27,38 @@ module.exports = {
       css: PATHS.styles,
       img: PATHS.images
     },
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+    extensions: ['.js', '.jsx', '.json'],
     modules: ['src', 'node_modules']
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: (module) => module.context && module.context.indexOf('node_modules') !== -1,
+      minChunks: (module) => module.context && module.context.indexOf('node_modules') !== -1
     }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
+      name: 'manifest'
     }),
+    new HtmlWebpackPlugin({
+      template: PATHS.src + '/index.html'
+    })
   ],
   module: {
     rules: [
-      // typescript
+      // es6 + flow
       {
-        test: /\.tsx?$/,
-        include: PATHS.src,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: [
-          {loader: 'react-hot-loader/webpack'},
-          {
-            loader: 'awesome-typescript-loader',
-            options: {
-              transpileOnly: true,
-              useTranspileModule: false,
-              sourceMap: true, //todo only on dev
-            },
-          }
-        ]
+        loader: 'babel-loader',
+        query: {
+          presets: ['react', 'es2015', 'stage-0', 'flow'],
+          plugins: ['react-html-attrs', 'transform-class-properties', 'transform-decorators-legacy']
+        }
       },
       // json
       {
         test: /\.json$/,
         include: [PATHS.src],
-        use: {loader: 'json-loader'},
+        use: {loader: 'json-loader'}
       },
       // css
       {
@@ -73,8 +66,8 @@ module.exports = {
         include: [PATHS.styles],
         loader: ExtractTextPlugin.extract([
           'css-loader?{modules: false}',
-          'postcss-loader',
-        ]),
+          'postcss-loader'
+        ])
       },
       // less
       {
@@ -82,8 +75,8 @@ module.exports = {
         include: [PATHS.styles],
         loader: ExtractTextPlugin.extract([
           'css-loader?{modules: false}',
-          'less-loader',
-        ]),
+          'less-loader'
+        ])
       },
       // images
       {
@@ -93,23 +86,23 @@ module.exports = {
           loader: 'url-loader',
           options: {
             name: 'images/[hash].[ext]',
-            limit: 1000, // inline file data until size
-          },
-        },
+            limit: 1000 // inline file data until size
+          }
+        }
       },
       // fonts
       {
         test: /\.(woff|woff2|ttf|eot)$/,
         include: [
-          PATHS.fonts,
+          PATHS.fonts
         ],
         use: {
           loader: 'file-loader',
           options: {
-            name: 'fonts/[name].[hash].[ext]',
-          },
-        },
-      },
+            name: 'fonts/[name].[hash].[ext]'
+          }
+        }
+      }
     ]
   }
 };
