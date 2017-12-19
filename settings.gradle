@@ -1,5 +1,6 @@
 rootProject.name = 'moviediary'
 
+/*
 include 'launcher'
 
 //shared
@@ -15,4 +16,4 @@ include 'frontend/native'
 //backend
 include 'backend/auth'
 include 'backend/server'
-include 'backend/database'
+include 'backend/database'*/
