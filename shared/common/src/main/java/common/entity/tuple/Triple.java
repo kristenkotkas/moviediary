@@ -1,4 +1,4 @@
-package common.entity;
+package common.entity.tuple;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,6 +16,10 @@ public class Triple<T, R, S> {
   private T fst;
   private R snd;
   private S trd;
+
+  public static <T, R, S> Triple<T, R, S> of(T fst, R snd, S trd) {
+    return new Triple<>(fst, snd, trd);
+  }
 
   public Triple<T, R, S> setFst(T fst) {
     this.fst = fst;
