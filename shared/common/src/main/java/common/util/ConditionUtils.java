@@ -1,6 +1,7 @@
 package common.util;
 
 import lombok.NonNull;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -75,7 +76,7 @@ public class ConditionUtils {
   }
 
   @SafeVarargs
-  public static <T> T chain(T input, Consumer<T>... consumers) {
+  public static <T> T chain(T input, Consumer<T>... consumers) { // TODO: 9.10.2017 rename multiconsumer or smth
     return ifPresent(input, in -> Arrays.stream(consumers).forEach(consumer -> consumer.accept(in)));
   }
 

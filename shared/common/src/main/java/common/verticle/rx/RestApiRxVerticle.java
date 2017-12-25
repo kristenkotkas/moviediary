@@ -2,6 +2,7 @@ package common.verticle.rx;
 
 import common.entity.JsonObj;
 import common.util.Status;
+import common.util.chain.SChain;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -17,6 +18,7 @@ import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
 import lombok.extern.slf4j.Slf4j;
 import rx.Single;
+
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Locale;
@@ -26,12 +28,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import static common.util.ConditionUtils.chain;
 import static common.util.ConditionUtils.ifTrue;
 import static common.util.NetworkUtils.getRandomUnboundPort;
 import static common.util.Status.UNAUTHORIZED;
 import static common.util.rx.RxUtils.toSubscriber;
-import static common.verticle.rx.RestApiRxVerticle.RestRouter.create;
 import static common.verticle.rx.RestApiRxVerticle.RestRouter.createMappingToEventbus;
 
 /**
@@ -74,20 +76,34 @@ public abstract class RestApiRxVerticle extends BaseRxVerticle {
 
   @SafeVarargs
   protected final void startEBRouter(String address, Class clazz, Future<Void> fut, Consumer<RestRouter>... consumers) {
-    chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
+    SChain.of(config().getInteger("http.port", getRandomUnboundPort()))
+        .toPChain(createMappingToEventbus(vertx, address, clazz))
+        .mapSnd(restRouter -> chain(restRouter, consumers).build())
+        .mapSnd((port, router) -> createHttpServer(router, port))
+        .mapSnd(single -> single.flatMap(v -> publishEventBusService(clazz)))
+        .mapSChain((port, single) -> single.flatMap(v -> publishHttpEndpoint(port)))
+        .peek(single -> single.subscribe(toSubscriber(fut.completer())));
+
+    /*chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
         createHttpServer(chain(chain(createMappingToEventbus(vertx, address, clazz), consumers).build()), port)
             .flatMap(v -> publishEventBusService(clazz))
             .flatMap(v -> publishHttpEndpoint(port))
-            .subscribe(toSubscriber(fut.completer())));
-
+            .subscribe(toSubscriber(fut.completer())));*/
   }
 
   @SafeVarargs
   protected final void startRestRouter(Future<Void> future, Consumer<RestRouter>... consumers) {
-    chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
-        createHttpServer(chain(create(vertx), consumers).build(), port)
+    SChain.of(config().getInteger("http.port", getRandomUnboundPort()))
+        .toPChain(RestRouter.create(vertx))
+        .mapSnd(restRouter -> chain(restRouter, consumers).build())
+        .mapSnd((port, router) -> createHttpServer(router, port))
+        .mapSChain((port, single) -> single.flatMap(v -> publishHttpEndpoint(port)))
+        .peek(single -> single.subscribe(toSubscriber(future.completer())));
+
+    /*chain(config().getInteger("http.port", getRandomUnboundPort()), port ->
+        createHttpServer(chain(RestRouter.create(vertx), consumers).build(), port)
             .flatMap(v -> publishHttpEndpoint(port))
-            .subscribe(toSubscriber(future.completer())));
+            .subscribe(toSubscriber(future.completer())));*/
   }
 
   protected static class RestRouter {
