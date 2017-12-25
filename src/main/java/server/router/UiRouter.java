@@ -57,6 +57,7 @@ public class UiRouter extends EventBusRoutable {
     public static final String UI_IDCARDLOGIN = "/idcardlogin";
     public static final String UI_DONATE_SUCCESS = "/private/success";
     public static final String UI_DONATE_FAILURE = "/private/failure";
+    public static final String UI_DRAGGABLE_DEMO = "/public/draggable";
 
     private static final String TEMPL_HOME = "templates/home.hbs";
     private static final String TEMPL_MOVIES = "templates/movies.hbs";
@@ -72,6 +73,7 @@ public class UiRouter extends EventBusRoutable {
     private static final String TEMPL_ERROR = "templates/error.hbs";
     private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
     private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
+    private static final String TEMPL_DRAGGABLE_DEMO = "templates/draggableDemo.hbs";
 
     private final HandlebarsTemplateEngine engine;
     private final SecurityConfig securityConfig;
@@ -102,12 +104,15 @@ public class UiRouter extends EventBusRoutable {
         router.get(UI_LISTS).handler(this::handleLists);
         router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
         router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
+        router.get(UI_DRAGGABLE_DEMO).handler(this::handleDraggableDemo);
 
-        router.get(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar() ?
-                STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString())
-                .setCachingEnabled(true)
-                .setMaxAgeSeconds(DAYS.toSeconds(7))
-                .setIncludeHidden(false));
+        router.get(STATIC_PATH).handler(StaticHandler.create(isRunningFromJar()
+            ? STATIC_FOLDER
+            : RESOURCES.resolve(STATIC_FOLDER).toString())
+            .setDirectoryListing(true)
+            .setCachingEnabled(true)
+            .setMaxAgeSeconds(DAYS.toSeconds(7))
+            .setIncludeHidden(false));
 
         router.route("/fail").handler(ctx -> ctx.fail(555)); // TODO: 20.05.2017 remove
         router.route().failureHandler(this::handleFailure);
@@ -219,8 +224,9 @@ public class UiRouter extends EventBusRoutable {
                 () -> ctx.response().setStatusCode(500),
                 () -> ctx.response().setStatusCode(ctx.statusCode()));
         engine.render(getSafe(ctx, TEMPL_ERROR, ErrorTemplate.class)
-                .setErrorMessage(ctx.failure() != null ?
-                        ctx.failure().getMessage() : getString("ERROR_TITLE", ctx))
+            .setErrorMessage(ctx.failure() != null
+                ? ctx.failure().getMessage()
+                : getString("ERROR_TITLE", ctx))
                 .setPosterFileName(POSTERS[RANDOM.nextInt(POSTERS.length)])
                 .setErrorCode(ctx.response().getStatusCode()), endHandler(ctx));
     }
@@ -237,6 +243,10 @@ public class UiRouter extends EventBusRoutable {
 
     private void handleDonateFailure(RoutingContext ctx) {
         engine.render(getSafe(ctx, TEMPL_DONATE_FAILURE, DonateFailureTemplate.class), endHandler(ctx));
+    }
+
+    private void handleDraggableDemo(RoutingContext ctx) {
+        engine.render(getSafe(ctx, TEMPL_DRAGGABLE_DEMO, DraggableTemplate.class), endHandler(ctx));
     }
 
     /**

@@ -19,3 +19,4 @@ gradlew.bat
 /misc/id_rsa
 /shared/common/src/main/resources/config.json
 /launcher/src/main/resources/local.json
+/src/main/resources/templates/draggableDemo.hbs

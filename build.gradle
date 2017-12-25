@@ -59,6 +59,7 @@ allprojects {
   compileJava {
     options.encoding = 'UTF-8'
     dependsOn apiGen
+    //todo dependsOn webpack compilation (npm run prod)
   }
   task apiClean(type: Delete) {
     //noinspection GroovyAssignabilityCheck

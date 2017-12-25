@@ -1,0 +1,81 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    color: #222;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 200;
+    background: linear-gradient(90deg, red 10%, lightgoldenrodyellow 10%, lightgoldenrodyellow 90%, green 90%);
+}
+
+.react-draggable, .cursor {
+    cursor: move;
+}
+
+.no-cursor {
+    cursor: auto;
+}
+
+.cursor-y {
+    cursor: ns-resize;
+}
+
+.cursor-x {
+    cursor: ew-resize;
+}
+
+.react-draggable strong {
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 3px;
+    display: block;
+    margin-bottom: 10px;
+    padding: 3px 5px;
+    text-align: center;
+}
+
+.box {
+    background: #000;
+    /*border: 1px solid #999;*/
+    border-radius: 0;
+    height: 100px;
+    margin: 2px;
+    padding: 0;
+    float: left;
+}
+
+img {
+    height: 100%;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    border-radius: 4px;
+}
+
+.removeMovie {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    color: white;
+}
+
+.removeMovie:hover {
+    color: #ff524d;
+    cursor: pointer;
+
+}
+
+.sidePosterImg {
+    height: 100%;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    border-radius: 4px;
+}
