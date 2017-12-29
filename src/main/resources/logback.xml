@@ -1,11 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <logger name="io.netty" level="INFO"/>
+    <logger name="com.mchange" level="INFO"/>
+    <logger name="com.mchange.v2" level="WARN"/>
+    <logger name="io.vertx.ext.web" level="INFO"/>
+    <logger name="com.github.jknack.handlebars.internal" level="INFO"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-1level) \(%file:%line\):%M -> %msg %n</pattern>
         </encoder>
     </appender>
-    <root level="DEBUG">
+    <root level="ALL">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
