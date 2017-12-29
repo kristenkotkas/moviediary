@@ -124,36 +124,6 @@ public class DatabaseServiceTest {
     }
 
     @Test
-    public void testGetWishlist(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
-        JsonArray wishlist = database.getWishlist("unittest@kyngas.eu").rxSetHandler()
-                .doOnError(ctx::fail)
-                .map(DatabaseService::getRows)
-                .toBlocking()
-                .value();
-        assertThat(wishlist.size(), is(1));
-        JsonObject wish = wishlist.getJsonObject(0);
-        assertThat(wish.getString(TITLE.getName()), is("The Hobbit: An Unexpected Journey"));
-        assertThat(wish.getInteger(YEAR.getName()), is(2012));
-        assertThat(wish.getString(IMAGE.getName()), is("/w29Guo6FX6fxzH86f8iAbEhQEFC.jpg"));
-        assertThat(wish.getInteger(MOVIEID.getName()), is(49051));
-    }
-
-    @Test
-    public void testIsInWishlist(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
-        JsonArray wishlist = database.isInWishlist("unittest@kyngas.eu", 49051).rxSetHandler()
-                .doOnError(ctx::fail)
-                .map(DatabaseService::getRows)
-                .toBlocking()
-                .value();
-        assertThat(wishlist.size(), is(1));
-        JsonObject wish = wishlist.getJsonObject(0);
-        assertThat(wish.getInteger(MOVIEID.getName()), is(49051));
-    }
-
-    @Test
     public void testGetSeenEpisodes(TestContext ctx) throws Exception {
         localDatabase.updateOrInsertBlocking(SQL_INSERT_SERIES_INFO, null);
         localDatabase.updateOrInsertBlocking(SQL_INSERT_SERIES_EPISODE, null);
@@ -182,17 +152,6 @@ public class DatabaseServiceTest {
         assertThat(episode.getInteger("SeriesId"), is(data.getInteger("seriesId")));
         assertThat(episode.getInteger("EpisodeId"), is(data.getInteger("episodeId")));
         assertThat(episode.getString("SeasonId"), is(data.getString("seasonId")));
-    }
-
-    @Test
-    public void testInsertWishlist(TestContext ctx) throws Exception {
-        database.insertWishlist("unittest@kyngas.eu", 49501).rxSetHandler()
-                .doOnError(ctx::fail).toBlocking().value();
-        JsonArray wishlist = localDatabase.queryBlocking("SELECT * FROM Wishlist WHERE Username = ?",
-                new JsonArray().add("unittest@kyngas.eu"));
-        assertThat(wishlist.size(), is(1));
-        JsonObject wish = wishlist.getJsonObject(0);
-        assertThat(wish.getInteger("MovieId"), is(49501));
     }
 
     @Test
@@ -416,16 +375,6 @@ public class DatabaseServiceTest {
     }
 
     @Test
-    public void testGetLastWishlistHome(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_MOVIES_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
-        JsonObject lastWish = getSingleItem(ctx, database.getLastWishlistHome("unittest@kyngas.eu"));
-        assertThat(lastWish.getString("Title"), is("The Hobbit: An Unexpected Journey"));
-        assertThat(lastWish.getInteger("Year"), is(2012));
-        assertThat(lastWish.getInteger("MovieId"), is(49051));
-    }
-
-    @Test
     public void testGetLastMoviesHome(TestContext ctx) throws Exception {
         Map<Integer, JsonObject> data = CommonUtils.<Integer, JsonObject>mapBuilder()
                 .put(49051, new JsonObject()
@@ -472,17 +421,6 @@ public class DatabaseServiceTest {
         assertThat(show.getString("Image"), is("/djUxgzSIdfS5vNP2EHIBDIz9I8A.jpg"));
         assertThat(show.getInteger("SeriesId"), is(42009));
         assertThat(show.getInteger("Count"), is(1));
-    }
-
-    @Test
-    public void testRemoveFromWishlist(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_WISHLIST_HOBBIT, null);
-        JsonObject result = database.removeFromWishlist("unittest@kyngas.eu", "49051").rxSetHandler()
-                .doOnError(ctx::fail)
-                .toBlocking().value();
-        assertThat(result.getInteger("updated"), is(1));
-        JsonArray wishlist = localDatabase.queryBlocking("SELECT * FROM Wishlist", null);
-        assertThat(wishlist.size(), is(0));
     }
 
     @Test
