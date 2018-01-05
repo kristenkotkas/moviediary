@@ -3,6 +3,7 @@ package server.router;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import server.service.RecommendService;
+import server.util.CommonUtils;
 import static server.entity.Status.OK;
 import static server.entity.Status.badRequest;
 import static server.util.HandlerUtils.parseParam;
@@ -27,8 +28,13 @@ public class RecommendRouter implements Routable {
       badRequest(ctx);
       return;
     }
+    String host = ctx.request().remoteAddress().host();
+    CommonUtils.ifTrue(host.equals("127.0.0.1"),
+        () -> ctx.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8080"));
     recommendService.getMoviePredictions(movieId)
         .rxSetHandler()
-        .subscribe(response -> ctx.response().setStatusCode(OK).end(response.encodePrettily()), ctx::fail);
+        .subscribe(response -> ctx.response()
+            .setStatusCode(OK)
+            .end(response.encodePrettily()), ctx::fail);
   }
 }

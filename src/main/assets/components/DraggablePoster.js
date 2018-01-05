@@ -1,6 +1,7 @@
 import React from 'react';
 import '../static/css/App.css';
 import Draggable from 'react-draggable';
+import {getMoviePredictions} from "../utils/AxiosClient";
 
 export default class DraggablePoster extends React.Component {
 
@@ -51,6 +52,11 @@ export default class DraggablePoster extends React.Component {
       state: this.state,
       data: this.props.data
     });
+
+      //todo
+      getMoviePredictions(1234).then(res => {
+          console.log("Response from recommender: ", res)
+      })
   }
 
   render() {

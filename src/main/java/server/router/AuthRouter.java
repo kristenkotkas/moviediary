@@ -8,10 +8,14 @@ import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.handler.UserSessionHandler;
-import org.pac4j.vertx.handler.impl.*;
+import org.pac4j.vertx.handler.impl.CallbackHandler;
+import org.pac4j.vertx.handler.impl.CallbackHandlerOptions;
+import org.pac4j.vertx.handler.impl.LogoutHandler;
+import org.pac4j.vertx.handler.impl.LogoutHandlerOptions;
+import org.pac4j.vertx.handler.impl.SecurityHandler;
+import org.pac4j.vertx.handler.impl.SecurityHandlerOptions;
 import server.entity.Language;
 import server.security.SecurityConfig;
-
 import static server.router.UiRouter.UI_HOME;
 import static server.security.SecurityConfig.AUTHORIZER;
 import static server.security.SecurityConfig.AuthClient.getClientNames;
@@ -26,6 +30,7 @@ public class AuthRouter extends EventBusRoutable {
     public static final String AUTH_LOGOUT = "/logout";
     public static final String CSRF = "csrf";
     private static final String XSS = "xssprotection";
+    private static final String CORS_ALLOW_ALL = "allowAjaxRequests";
     private static final String CALLBACK = "/callback";
     private static final String AUTH_PRIVATE = "/private/*";
 
@@ -70,7 +75,7 @@ public class AuthRouter extends EventBusRoutable {
                 securityConfig.getAuthProvider(),
                 new SecurityHandlerOptions()
                         .setClients(getClientNames())
-                        .setAuthorizers(AUTHORIZER + "," + XSS + "," + CSRF));
+                    .setAuthorizers(AUTHORIZER + "," + XSS + "," + CSRF + "," + CORS_ALLOW_ALL));
         router.route(AUTH_PRIVATE).getDelegate().handler(securityHandler);
         router.route(EVENTBUS_ALL).getDelegate().handler(securityHandler);
 
