@@ -14,7 +14,7 @@ class HttpServer(BaseHTTPRequestHandler):
             return
         movie_id = params['id'][0]
 
-        response = "{\"hello\": \"world\", \"movie_id: \"" + movie_id + "\"}"
+        response = "{\"hello\": \"world\", \"movie_id\": \"" + movie_id + "\"}"
 
         # todo return response json
 

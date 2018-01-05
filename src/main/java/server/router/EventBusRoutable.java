@@ -12,25 +12,25 @@ import io.vertx.rxjava.core.eventbus.Message;
 import io.vertx.rxjava.core.eventbus.MessageConsumer;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.vertx.auth.Pac4jUser;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.vertx.auth.Pac4jUser;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static java.lang.String.valueOf;
-import static server.util.CommonUtils.*;
+import static server.util.CommonUtils.check;
+import static server.util.CommonUtils.ifPresent;
+import static server.util.CommonUtils.ifTrue;
 
 /**
  * Generic class that contains routes.
  */
-public abstract class EventBusRoutable {
+public abstract class EventBusRoutable implements Routable {
     private static final Logger LOG = getLogger(EventBusRoutable.class);
     protected static final Map<String, MessageConsumer> CONSUMERS = new HashMap<>();
     protected static final Map<String, MessageConsumer> GATEWAYS = new HashMap<>();
@@ -94,8 +94,6 @@ public abstract class EventBusRoutable {
                 .filter(Objects::nonNull)
                 .forEach(MessageConsumer::unregister);
     }
-
-    public abstract void route(Router router);
 
     /**
      * Request-response type of messaging.
