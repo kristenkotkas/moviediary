@@ -33,7 +33,7 @@ module.exports = new Merge(CommonConfig, {
         move: [
           {
             source: './src/main/resources/static/dist/index.html',
-            destination: './src/main/resources/templates/draggableDemo.hbs'
+              destination: './src/main/resources/templates/recommender.hbs'
           }
         ]
       }

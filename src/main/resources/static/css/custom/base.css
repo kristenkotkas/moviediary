@@ -713,3 +713,13 @@ header .brand-logo:hover {
     overflow-x: auto;
     overflow-y: auto;
 }*/
+
+/* Login recommender */
+
+.no-padding-bottom {
+    padding-bottom: 0;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0;
+}

@@ -62,13 +62,13 @@
                     </a>
                 </div>
             </div>
-            <div class="row margin">
+            <div class="row no-margin-bottom">
                 <div>
                     <div class="row">
                         <table>
                             <tbody>
                             <tr>
-                                <td class="center">
+                                <td class="center no-padding-bottom">
                                     <div class="input-field right">
                                         <a href="{{loginPage}}?lang=en">
                                             <img id="lang-eng" class="flag" alt="Choose English" src="/static/img/eng.svg"
@@ -76,7 +76,7 @@
                                         </a>
                                     </div>
                                 </td>
-                                <td class="center">
+                                <td class="center no-padding-bottom">
                                     <div class="input-field left">
                                         <a href="{{loginPage}}?lang=et">
                                             <img id="lang-est" class="flag" alt="Choose Estonian" src="/static/img/est.svg"
@@ -91,6 +91,13 @@
                 </div>
             </div>
         </form>
+        <div class="row">
+            <div class="input-field col s12">
+                <a href="{{recommenderUrl}}" class="btn waves-effect waves-light col s12 z-depth-0">
+                    <i class="fa fa-film left"></i>{{i18n "LOGIN_RECOMMENDER" locale=lang}}
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>

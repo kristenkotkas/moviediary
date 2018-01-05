@@ -115,7 +115,7 @@ mainClassName = 'server.Launcher'
 
 shadowJar {
   baseName = 'moviediary'
-  classifier = 'v1'
+  classifier = ''
 }
 
 remotes {

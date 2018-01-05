@@ -9,5 +9,7 @@ public interface LoginTemplate extends BaseTemplate {
 
     LoginTemplate setIdCardUrl(String idCardUrl);
 
+  LoginTemplate setRecommenderUrl(String recommenderUrl);
+
     LoginTemplate setDisplayMessage(String displayMessage);
 }
