@@ -20,3 +20,18 @@ Etapid:
 - [Etapp 5](https://github.com/kristenkotkas/moviediary/wiki/Etapp-5)
 - [Etapp 6](https://github.com/kristenkotkas/moviediary/wiki/Etapp-6)
 - [Etapp 7](https://github.com/kristenkotkas/moviediary/wiki/Etapp-7)
+
+Jooksutamine:
+- Kasuta testkeskkonda: [Testkeskkond](https://movies.kyngas.eu)  
+- Ainult filmisoovitaja kasutamiseks jooksuta projekti kaustas:  
+  - ```npm install``` 
+  - ```npm run prod```
+  - ```gradlew run```
+- Kogu Moviediary jooksutamine:
+  - Loo endale uus andmebaas /misc/MovieDiary_database.sql järgi
+  - Kopeeri /misc/server.json /src/main/resources/ kausta
+  - Täida ära server.json vajalikud seaded (TMDB ja OMDB võtmed, andmebaasi seaded, Facebooki ja Google OAuth andmed)
+  - Jooksuta projekti kaustas:
+    - ```npm install``` 
+    - ```npm run prod```
+    - ```gradlew run```
