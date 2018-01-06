@@ -137,6 +137,9 @@ task deployMovieDiary(dependsOn: shadowJar) {
     ssh.run {
       session(remotes.master) {
         put from: 'build/libs/moviediary.jar', into: '/home/moviediary/'
+        put from: 'recommender-python/Server.py', into: '/home/moviediary/'
+        put from: 'recommender-python/resources/final-new-movies.csv', into: '/home/moviediary/resources/'
+        put from: 'recommender-python/resources/model.npz', into: '/home/moviediary/resources/'
         execute './run-moviediary.sh'
       }
     }

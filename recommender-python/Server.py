@@ -95,7 +95,7 @@ class HttpServer(BaseHTTPRequestHandler):
             return
         movie_id = params['id'][0]
 
-        response = json.dumps(getData(movie_id))
+        response = json.dumps(getData(reversed[int(movie_id)]))
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
