@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# https://alyssaq.github.io/2015/20150426-simple-movie-recommender-using-svd/
 import json
 import numpy as np
 import pandas as pd
@@ -143,7 +143,7 @@ desc_to_genre_model = Doc2Vec.load("resources\DescToGenre")
 
 def getData(movie_id):
     movie_id = int(movie_id)
-    top_indexes = top_cosine_similarity(evecs[:, :25], movie_id, 70)
+    top_indexes = top_cosine_similarity(evecs[:, :25], movie_id, 71)
     return get_similar_movies(movie_data, movie_id, top_indexes)
 
 

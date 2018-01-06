@@ -36,13 +36,27 @@ body {
 }
 
 .box {
-    background: #000;
+    background: #ddd;
     /*border: 1px solid #999;*/
     border-radius: 0;
     height: 100px;
     margin: 2px;
     padding: 0;
     float: left;
+
+    -webkit-transition: 0.5s;
+    -moz-transition: 0.5s;
+    -ms-transition: 0.5s;
+    -o-transition: 0.5s;
+    transition: 0.5s;
+}
+
+.box:active {
+    -webkit-transition: 0s;
+    -moz-transition: 0s;
+    -ms-transition: 0s;
+    -o-transition: 0s;
+    transition: 0s;
 }
 
 img {

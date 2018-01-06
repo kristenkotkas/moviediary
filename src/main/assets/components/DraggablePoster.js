@@ -16,17 +16,24 @@ export default class DraggablePoster extends React.Component {
       moviePosterPath: props.moviePosterPath,
       posterStyle: {
         position: 'absolute',
-        zIndex: this.props.position
+        zIndex: this.props.depth
       }
     };
   }
 
   getRandomPosition(min, max) {
-    const rand1 = Math.random() * (max - min) + min;
-    const rand2 = Math.random() * max;
+    let xPos = Math.random() * (max - min) + min;
+    let yPos = Math.random() * max;
     return {
-      xPos: this.props.screenSize.screenWidth * rand1,
-      yPos: this.props.screenSize.screenHeight * rand2
+      xPos: this.props.screenSize.screenWidth * xPos,
+      yPos: this.props.screenSize.screenHeight * yPos
+    };
+  }
+
+  getPosition(xPos, yPos) {
+    return {
+      xPos: this.props.screenSize.screenWidth * xPos,
+      yPos: this.props.screenSize.screenHeight * yPos
     };
   }
 
@@ -37,7 +44,7 @@ export default class DraggablePoster extends React.Component {
     );
     this.setState({
       imageXPosition: draggableEventHandler.clientX,
-      posterStyle: {...this.state.posterStyle, zIndex: this.props.position}
+      posterStyle: {...this.state.posterStyle, zIndex: this.props.depth}
     }, this.handleMovieLike.bind(this));
   }
 
@@ -52,17 +59,17 @@ export default class DraggablePoster extends React.Component {
       state: this.state,
       data: this.props.data
     });
-
-      //todo
-      getMoviePredictions(1234).then(res => {
-          console.log("Response from recommender: ", res)
-      })
   }
 
   render() {
+    const randomPos = this.getPosition(this.props.position.xPos, this.props.position.yPos);
+    let position = this.props.position.xPos === 0 ?
+        {x: this.state.imageXPosition, y: this.state.imageYPosition} :
+        {x: randomPos.xPos, y: randomPos.yPos};
     return (
         <Draggable
             defaultPosition={{x: this.state.imageXPosition, y: this.state.imageYPosition}}
+            position={position}
             bounds="body"
             onStop={this.handleStop.bind(this)}
             onStart={this.handleStart.bind(this)}

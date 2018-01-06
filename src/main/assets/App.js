@@ -3,6 +3,7 @@ import './static/css/App.css';
 import DraggablePoster from './components/DraggablePoster';
 import {moviesData} from './data/data';
 import SidePoster from './components/SidePoster';
+import {getMoviePredictions} from "./utils/AxiosClient";
 
 export default class App extends React.Component {
 
@@ -13,9 +14,10 @@ export default class App extends React.Component {
       screenHeight: 0,
       likedMovies: [],
       dislikedMovies: [],
-      moviesData: moviesData.slice(0, 100)
+      moviesData: moviesData.slice(0, 100),
+      similarityArray: []
     };
-    console.log('Total movies count', moviesData.length);
+    console.log('Total movies count', moviesData);
   }
 
   componentWillMount() {
@@ -36,12 +38,12 @@ export default class App extends React.Component {
 
   stopHandler(movieData) {
     if (movieData.state.imageXPosition / this.state.screenWidth <= 0.1) {
-      if (this.state.dislikedMovies.length < 6) {
+      if (this.state.dislikedMovies.length < 8) {
         console.log('You don\'t like ' + movieData.data.movieTitle + '.');
         this.addToDislikes(movieData.data);
       }
     } else if (movieData.state.imageXPosition / this.state.screenWidth >= 0.9) {
-      if (this.state.likedMovies.length < 6) {
+      if (this.state.likedMovies.length < 8) {
         console.log('You like ' + movieData.data.movieTitle + '.');
         this.addToLikes(movieData.data);
       }
@@ -52,12 +54,22 @@ export default class App extends React.Component {
     this.setState({
       likedMovies: [...this.state.likedMovies, movieData]
     }, this.removeFromMovies(movieData));
+
+    getMoviePredictions(movieData.movieId).then(res => {
+      console.log("Liked movie response: ", res.data.result);
+      this.updatePosterPositions(res.data.result, 1);
+    });
   }
 
   addToDislikes(movieData) {
     this.setState({
       dislikedMovies: [...this.state.dislikedMovies, movieData]
     }, this.removeFromMovies(movieData));
+
+    getMoviePredictions(movieData.movieId).then(res => {
+      console.log("Not liked movie response: ", res.data.result);
+      this.updatePosterPositions(res.data.result, -1);
+    });
   }
 
   removeFromMovies(movieData) {
@@ -72,6 +84,56 @@ export default class App extends React.Component {
       dislikedMovies: this.state.dislikedMovies.filter(movie => movie.movieId !== movieData.movieId),
       moviesData: [...this.state.moviesData, movieData]
     });
+  }
+
+  getMappedSimilarity(x, a, b, c, d) {
+    return ((x - a) / (b - a) * (d - c)) + c
+  }
+
+  updatePosterPositions(similarityArray, type) {
+    if (this.state.similarityArray.length > 0) {
+      console.log(95);
+      const newSimilarityArray = similarityArray.map(similarity => {
+        let similar = this.state.similarityArray.filter(arrayMovie => arrayMovie['tmdb_id'] === similarity['tmdb_id']);
+        /*console.log(similar[0]['similarity']);
+        console.log(similarity['similarity']);
+        console.log("-----");*/
+        return Object.assign({}, similarity, {
+          similarity: similar[0]['similarity'] + (type * similarity['similarity'])
+        });
+      });
+      this.setState({
+        similarityArray: newSimilarityArray
+      }, this.getNewMovieData);
+    } else {
+      this.setState({
+        similarityArray: similarityArray
+      }, this.getNewMovieData);
+    }
+  }
+
+  getNewMovieData() {
+    const similarityArray = this.state.similarityArray;
+    console.log("similarityArray", similarityArray);
+    const similarities = similarityArray.map(elem => elem['similarity']).sort(function (a, b) {
+      return a - b
+    });
+    console.log("similarities", similarities);
+    const min = similarities[0];
+    const max = similarities[similarities.length - 1];
+    console.log("initial range", min, max);
+
+    const data = this.state.moviesData.map(movieData => {
+      let similar = similarityArray.filter(simMovie => simMovie['tmdb_id'] === movieData.movieId)[0];
+      return Object.assign({}, movieData, {
+        xPos: this.getMappedSimilarity(similar['similarity'], min, max, 0.15, 0.85)
+      })
+    });
+    this.setState({
+      moviesData: data
+    });
+
+    console.log("new movieData", this.state.moviesData);
   }
 
   render() {
@@ -99,7 +161,11 @@ export default class App extends React.Component {
                   screenHeight: this.state.screenHeight
                 }}
                 data={movie}
-                position={key}
+                depth={key}
+                position={{
+                  xPos: movie.xPos,
+                  yPos: movie.yPos
+                }}
             />;
           })}
           {this.state.likedMovies.map((movie, key) => {
