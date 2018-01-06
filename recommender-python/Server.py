@@ -7,6 +7,7 @@ import urllib
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 np.seterr(divide='ignore', invalid='ignore')
+
 lookup = {
     "71": 862,
     "66": 197,
@@ -80,9 +81,7 @@ lookup = {
     "60": 286217,
     "61": 259693,
 }
-
 reversed = dict([(v, k) for k, v in lookup.items()])
-print(reversed)
 
 
 class HttpServer(BaseHTTPRequestHandler):
@@ -95,7 +94,7 @@ class HttpServer(BaseHTTPRequestHandler):
             return
         movie_id = params['id'][0]
 
-        response = json.dumps(getData(movie_id))
+        response = json.dumps(getData(reversed[int(movie_id)]))
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
