@@ -9,8 +9,8 @@
     "max_pool_size": 30
   },
   "oauth": {
-    "localCallback": "",
-    "callback": "",
+    "localCallback": "http://localhost:8081/callback",
+    "callback": "https://movies.kyngas.eu/callback",
     "facebook": {
       "key": "",
       "secret": ""
