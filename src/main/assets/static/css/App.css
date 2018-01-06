@@ -30,3 +30,19 @@
         transform: rotate(360deg);
     }
 }
+
+.resetButton {
+    color: grey;
+    text-align: center;
+    font-weight: bold;
+    font-size: larger;
+    margin-left: 45%;
+    position: center;
+
+}
+
+.resetButton:hover {
+    opacity: 0.85;
+    text-decoration: underline;
+    cursor: pointer;
+}

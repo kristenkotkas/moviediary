@@ -113,9 +113,11 @@ export default class App extends React.Component {
   }
 
   getNewMovieData() {
+    const count = this.state.likedMovies.length + this.state.dislikedMovies.length;
+    console.log("count", count);
     const similarityArray = this.state.similarityArray;
     console.log("similarityArray", similarityArray);
-    const similarities = similarityArray.map(elem => elem['similarity']).sort(function (a, b) {
+    const similarities = similarityArray.map(elem => elem['similarity'] / count).sort(function (a, b) {
       return a - b
     });
     console.log("similarities", similarities);
@@ -126,7 +128,7 @@ export default class App extends React.Component {
     const data = this.state.moviesData.map(movieData => {
       let similar = similarityArray.filter(simMovie => simMovie['tmdb_id'] === movieData.movieId)[0];
       return Object.assign({}, movieData, {
-        xPos: this.getMappedSimilarity(similar['similarity'], min, max, 0.15, 0.85)
+        xPos: this.getMappedSimilarity(similar['similarity'] / count, min, max, 0.15, 0.85)
       })
     });
     this.setState({
@@ -134,6 +136,15 @@ export default class App extends React.Component {
     });
 
     console.log("new movieData", this.state.moviesData);
+  }
+
+  reset() {
+    this.setState({
+      likedMovies: [],
+      dislikedMovies: [],
+      moviesData: moviesData.slice(0, 100),
+      similarityArray: []
+    });
   }
 
   render() {
@@ -150,6 +161,10 @@ export default class App extends React.Component {
                 removeMovie={this.removeMovieFromSide.bind(this)}
             />;
           })}
+          <span
+              className={'resetButton'}
+              onClick={this.reset.bind(this)}
+          >Reset</span>
           {this.state.moviesData.map((movie, key) => {
             return <DraggablePoster
                 key={movie.movieTitle}
