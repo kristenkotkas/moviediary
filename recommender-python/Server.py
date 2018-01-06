@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import urllib
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -111,8 +112,8 @@ class HttpServer(BaseHTTPRequestHandler):
         data = json.loads(post_body)
 
         description = data["description"]
-        # todo pass description to model and return genre predictions
-        response = json.dumps({"result": ["a", "b", "c"]})
+
+        response = json.dumps(get_genre_from_desc(description))
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
@@ -133,10 +134,12 @@ movie_data = pd.io.parsers.read_csv('resources/final-new-movies.csv',
                                     names=['movie_id', 'title', 'genre'],
                                     engine='python', delimiter=';')
 
+
 model = np.load('resources/model.npz')
 evals = model['a']
 evecs = model['b']
 
+desc_to_genre_model = Doc2Vec.load("resources\DescToGenre")
 
 def getData(movie_id):
     movie_id = int(movie_id)
@@ -164,6 +167,22 @@ def get_similar_movies(movie_data, movie_id, top_indexes):
             "title": movie_data[movie_data.movie_id == id].title.values[0]
         })
     return {"result": result}
+
+def get_genre_from_desc(desc):
+
+    document = desc.split()
+
+    inferred_docvec = desc_to_genre_model.infer_vector(document)
+    prediction = desc_to_genre_model.docvecs.most_similar([inferred_docvec], topn=3)
+
+    result = {
+        "best" : prediction[0][0],
+        "second" : prediction[1][0],
+        "third" : prediction[2][0]
+    }
+
+    return result
+
 
 
 run()
