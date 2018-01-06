@@ -102,6 +102,24 @@ class HttpServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(response, "utf8"))
         return
 
+    def do_POST(self):
+        content_len = int(self.headers.get('content-length', 0))
+        if content_len == 0:
+            self.send_response(404)
+            return
+        post_body = self.rfile.read(content_len)
+        data = json.loads(post_body)
+
+        description = data["description"]
+        # todo pass description to model and return genre predictions
+        response = json.dumps({"result": ["a", "b", "c"]})
+
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(bytes(response, "utf8"))
+        return
+
 
 def run():
     print('starting server...')

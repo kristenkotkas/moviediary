@@ -11,4 +11,6 @@ public interface RecommendService {
   }
 
   Future<JsonObject> getMoviePredictions(String movieId);
+
+  Future<JsonObject> getGenrePredictions(JsonObject json);
 }

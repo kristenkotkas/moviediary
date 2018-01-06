@@ -17,6 +17,15 @@ export function get(url) {
     return client.get(url, {});
 }
 
+export function post(url, data) {
+    console.log('AXIOS POST', url, data);
+    return client.post(url, data, {});
+}
+
 export function getMoviePredictions(movieId) {
     return get("/public/api/v1/recommend/" + movieId)
+}
+
+export function getGenrePredictions(movieDescription) {
+    return post("/public/api/v1/genres", movieDescription)
 }
