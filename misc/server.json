@@ -1,0 +1,37 @@
+{
+  "tmdb_key": "",
+  "omdb_key": "",
+  "mysql": {
+    "url": "",
+    "driver_class": "com.mysql.cj.jdbc.Driver",
+    "user": "",
+    "password": "",
+    "max_pool_size": 30
+  },
+  "oauth": {
+    "localCallback": "",
+    "callback": "",
+    "facebook": {
+      "key": "",
+      "secret": ""
+    },
+    "google": {
+      "key": "",
+      "secret": ""
+    }
+  },
+  "unit_test": {
+    "form_user": {
+      "username": "",
+      "password": "",
+      "firstname": "",
+      "lastname": ""
+    },
+    "facebook_user": {
+      "username": "",
+      "password": "",
+      "firstname": "",
+      "lastname": ""
+    }
+  }
+}

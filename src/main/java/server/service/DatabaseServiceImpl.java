@@ -205,10 +205,12 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
                     "AS 'total_runtime';";
 
-    private final JDBCClient client;
+    private JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
+        if (config.containsKey("mysql")) {
+            this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
+        }
     }
 
     private Future<JsonObject> query(String sql, JsonArray params) {

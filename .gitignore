@@ -12,7 +12,6 @@ gradlew.bat
 /.vertx/
 *gen/
 
-*server.json
 
 /launcher/src/main/java/Todo.java
 
@@ -20,3 +19,4 @@ gradlew.bat
 /shared/common/src/main/resources/config.json
 /launcher/src/main/resources/local.json
 /src/main/resources/templates/recommender.hbs
+/src/main/resources/server.json

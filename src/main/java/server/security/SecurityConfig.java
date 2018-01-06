@@ -110,6 +110,9 @@ public class SecurityConfig {
         }
 
         public static String getCallback(JsonObject config) {
+            if (!config.containsKey(OAUTH)) {
+                return null;
+            }
             return config.getJsonObject(OAUTH).getString(isServer(config) ? CALLBACK : LOCAL_CALLBACK);
         }
 
@@ -120,7 +123,9 @@ public class SecurityConfig {
         }
 
         public Client create(JsonObject config) {
-            JsonObject clientConfig = config.getJsonObject(OAUTH).getJsonObject(configKey, new JsonObject());
+            JsonObject clientConfig = config
+                .getJsonObject(OAUTH, new JsonObject())
+                .getJsonObject(configKey, new JsonObject());
             return client.apply(clientConfig.getString(KEY), clientConfig.getString(SECRET));
         }
 
