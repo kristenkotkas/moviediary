@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import urllib
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
 import numpy as np
 import pandas as pd
+import urllib
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 np.seterr(divide='ignore', invalid='ignore')
 lookup = {
@@ -94,9 +95,7 @@ class HttpServer(BaseHTTPRequestHandler):
             return
         movie_id = params['id'][0]
 
-        response = "{\"hello\": \"world\", \"movie_id\": \"" + movie_id + "\"}"
-
-        # todo return response json
+        response = json.dumps(getData(movie_id))
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
@@ -151,5 +150,3 @@ def get_similar_movies(movie_data, movie_id, top_indexes):
 
 
 run()
-
-# example GET http://localhost:9998/?id=1
