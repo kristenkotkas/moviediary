@@ -528,6 +528,10 @@ span.badge.new:after {
     padding-left: 15px; !important;
 }
 
+.modal-footer-info {
+    vertical-align: middle; !important;
+}
+
 @media only screen and (min-width: 1071px) {
     #forgot-password {
         padding-left: 0;

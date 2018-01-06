@@ -8,7 +8,7 @@ export const getApiUrl = () => {
 
 console.log('API', getApiUrl());
 export const client = axios.create({
-    baseURL: 'https://movies.kyngas.eu/',
+    baseURL: getApiUrl(),
     responseType: 'json'
 });
 

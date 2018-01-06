@@ -39,6 +39,7 @@ var listsTable = $('#lists-table');
 var lang;
 var trailer = $('#movie-trailer');
 var trailerBox = $('#trailer-box');
+var modalFooter = $('#add-watch-modal-ft-info');
 eventbus.onopen = function () {
 
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -345,10 +346,17 @@ var searchMovie = function (eventbus, movieId, lang) {
 };
 
 function getRandomBackdrop(backdrops) {
-    do {
-        var backDrop = backdrops[Math.floor(Math.random()*backdrops.length)];
-    } while (backDrop['width'] < 1920);
-    return backDrop['file_path'];
+    var i = 0;
+    if (backdrops.length > 0) {
+        do {
+            var backDrop = backdrops[Math.floor(Math.random()*backdrops.length)];
+            i++;
+            if (i === 10) {
+                return backDrop['file_path'];
+            }
+        } while (backDrop['width'] < 1920);
+        return backDrop['file_path'];
+    }
 }
 
 function addTrailer(videos) {
@@ -450,6 +458,7 @@ function fillCrew(crewJson, lang) {
     var screenW = [];
     var novelW = [];
     var producers = [];
+    var exeProducer = [];
     $.each(crewJson, function (i) {
         var crewM = crewJson[i];
         switch(crewM['job']) {
@@ -461,6 +470,7 @@ function fillCrew(crewJson, lang) {
                 dirOfPhoto.push(crewM);
                 break;
             case 'Original Music Composer':
+            case 'Music':
                 composer.push(crewM);
                 break;
             case 'Screenplay':
@@ -473,6 +483,8 @@ function fillCrew(crewJson, lang) {
             case 'Producer':
                 producers.push(crewM);
                 break;
+            case 'Executive Producer':
+                exeProducer.push(crewM);
         }
     });
     crew.empty();
@@ -482,6 +494,7 @@ function fillCrew(crewJson, lang) {
     addArrayData(lang['MOVIES_SCREENPLAY'], screenW);
     addArrayData(lang['MOVIES_NOVEL'], novelW);
     addArrayData(lang['MOVIES_PRODUCER'], producers);
+    addArrayData('Executive Producer', exeProducer);
 }
 
 function addArrayData(arrayName, array) {
