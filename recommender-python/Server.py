@@ -108,7 +108,7 @@ class HttpServer(BaseHTTPRequestHandler):
         if content_len == 0:
             self.send_response(404)
             return
-        post_body = self.rfile.read(content_len)
+        post_body = self.rfile.read(content_len).decode('utf-8')
         data = json.loads(post_body)
 
         description = data["description"]
@@ -139,7 +139,7 @@ model = np.load('resources/model.npz')
 evals = model['a']
 evecs = model['b']
 
-desc_to_genre_model = Doc2Vec.load("resources\DescToGenre")
+desc_to_genre_model = Doc2Vec.load("resources/DescToGenre")
 
 def getData(movie_id):
     movie_id = int(movie_id)
