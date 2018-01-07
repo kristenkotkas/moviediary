@@ -28,6 +28,7 @@ Jooksutamine:
   - ```npm install``` 
   - ```npm run prod```
   - ```gradlew run```
+  - ```python recommender-python/Server.py```
 - Kogu Moviediary jooksutamine:
   - Loo endale uus andmebaas /misc/MovieDiary_database.sql järgi
   - Kopeeri /misc/server.json /src/main/resources/ kausta
@@ -36,3 +37,4 @@ Jooksutamine:
     - ```npm install``` 
     - ```npm run prod```
     - ```gradlew run```
+    - ```python recommender-python/Server.py```
