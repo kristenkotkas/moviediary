@@ -13,6 +13,7 @@ import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
 import server.template.ui.BaseTemplate;
+import server.template.ui.DescToGenreTemplate;
 import server.template.ui.DiscoverTemplate;
 import server.template.ui.DonateFailureTemplate;
 import server.template.ui.DonateSuccessTemplate;
@@ -81,6 +82,7 @@ public class UiRouter extends EventBusRoutable {
   public static final String UI_DONATE_FAILURE = "/private/failure";
 
   public static final String UI_RECOMMENDER = "/public/recommender";
+  public static final String UI_DESC_TO_GENRE = "/public/descToGenre";
 
   private static final String TEMPL_HOME = "templates/home.hbs";
   private static final String TEMPL_MOVIES = "templates/movies.hbs";
@@ -97,6 +99,7 @@ public class UiRouter extends EventBusRoutable {
   private static final String TEMPL_DONATE_SUCCESS = "templates/donateSuccess.hbs";
   private static final String TEMPL_DONATE_FAILURE = "templates/donateFailure.hbs";
   private static final String TEMPL_RECOMMENDER = "templates/recommender.hbs";
+  private static final String TEMPL_DESC_TO_GENRE = "templates/descToGenre.hbs";
 
   private final HandlebarsTemplateEngine engine;
   private final SecurityConfig securityConfig;
@@ -128,6 +131,7 @@ public class UiRouter extends EventBusRoutable {
     router.post(UI_DONATE_SUCCESS).handler(this::handleDonateSuccess);
     router.post(UI_DONATE_FAILURE).handler(this::handleDonateFailure);
     router.get(UI_RECOMMENDER).handler(this::handleRecommender);
+    router.get(UI_DESC_TO_GENRE).handler(this::handleDescToGenre);
 
     boolean isProductionEnv = isRunningFromJar();
     String staticFilesPath = isProductionEnv ? STATIC_FOLDER : RESOURCES.resolve(STATIC_FOLDER).toString();
@@ -197,7 +201,8 @@ public class UiRouter extends EventBusRoutable {
         .setFacebookUrl(UI_HOME + FACEBOOK.getClientNamePrefixed())
         .setGoogleUrl(UI_HOME + GOOGLE.getClientNamePrefixed())
         .setIdCardUrl(UI_HOME + IDCARD.getClientNamePrefixed())
-        .setRecommenderUrl(UI_RECOMMENDER), endHandler(ctx));
+        .setRecommenderUrl(UI_RECOMMENDER)
+        .setDescToGenreUrl(UI_DESC_TO_GENRE), endHandler(ctx));
   }
 
   private void handleFormLogin(RoutingContext ctx) {
@@ -270,6 +275,10 @@ public class UiRouter extends EventBusRoutable {
 
   private void handleRecommender(RoutingContext ctx) {
     engine.render(getSafe(ctx, TEMPL_RECOMMENDER, RecommenderTemplate.class), endHandler(ctx));
+  }
+
+  private void handleDescToGenre(RoutingContext ctx) {
+    engine.render(getSafe(ctx, TEMPL_DESC_TO_GENRE, DescToGenreTemplate.class), endHandler(ctx));
   }
 
   /**
