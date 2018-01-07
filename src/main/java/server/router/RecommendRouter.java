@@ -4,7 +4,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import server.service.RecommendService;
-import server.util.CommonUtils;
 import static server.entity.Status.OK;
 import static server.entity.Status.badRequest;
 import static server.util.HandlerUtils.parseParam;
@@ -26,9 +25,7 @@ public class RecommendRouter implements Routable {
   }
 
   private void allowCorsForLocalDevelopment(RoutingContext ctx) {
-    String host = ctx.request().remoteAddress().host();
-    CommonUtils.ifTrue(host.equals("127.0.0.1"),
-        () -> ctx.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8080"));
+    ctx.response().putHeader("Access-Control-Allow-Origin", "*");
   }
 
   private void handleGetRecommendations(RoutingContext ctx) {
