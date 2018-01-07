@@ -20,11 +20,41 @@
     <div class="loader-section section-right"></div>
 </div>
 <main>
-    Hello world
+    <h3 class="light grey-text text-lighten-1 page-heading truncate" id="movie-title">
+        Description to Genre
+    </h3>
+    <div class="row">
+        <div class="col s12 m12 l12">
+            <div class="row">
+               <div class="col s12 m6 l4">
+                   <div class="card z-depth-0">
+                       <div class="card-content">
+                           <blockquote>DescToGenre is prototype application for recommending movie genres to its description or short plot.
+                               Just enter the description, press "Get genres" and it will recommend some genres to it.
+                               Description must be in English to work correctly.
+                           </blockquote>
+                           <div class="row"></div>
+                           <div class="input-field col l12 m12 s12">
+                               <textarea id="plot-input-area" class="materialize-textarea"></textarea>
+                               <label for="plot-input-area">Insert description</label>
+                               <br/>
+                               <a class="waves-effect waves-light btn blue z-depth-0" id="get-genres">Get genres</a>
+                           </div>
+                           <div class="row"></div>
+                           <div class="row"></div>
+                           <h5 class="light grey-text text-darken-1">Suitable genres</h5>
+                           <div id="suitable-genres"></div>
+                       </div>
+                   </div>
+               </div>
+            </div>
+        </div>
+    </div>
 </main>
 <script defer type="text/javascript" src="/static/js/custom/loader.js"></script>
 <script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script defer type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+<script defer type="text/javascript" src="/static/js/pages/descToGenre.js"></script>
 </body>
 </html>

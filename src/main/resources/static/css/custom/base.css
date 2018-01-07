@@ -598,6 +598,12 @@ span.badge.new:after {
     top: 20px;
 }
 
+.descToGenreItem {
+    font-weight: 400;
+    color: #636162;
+    font-size: x-large;
+}
+
 header .brand-logo:hover {
     background-color: transparent;
 }
