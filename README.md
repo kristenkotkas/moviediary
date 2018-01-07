@@ -23,7 +23,8 @@ Etapid:
 
 Jooksutamine:
 - Kasuta testkeskkonda: [Testkeskkond](https://movies.kyngas.eu)  
-- Ainult filmisoovitaja kasutamiseks jooksuta projekti kaustas:  
+- Paigalda Java 8, Node.js v8 viimane versioon
+- Ainult Recommender-i / DescToGenre-i kasutamiseks jooksuta projekti kaustas:  
   - ```npm install``` 
   - ```npm run prod```
   - ```gradlew run```
