@@ -1,7 +1,6 @@
 import React from 'react';
 import '../static/css/App.css';
 import Draggable from 'react-draggable';
-import {getMoviePredictions} from "../utils/AxiosClient";
 
 export default class DraggablePoster extends React.Component {
 

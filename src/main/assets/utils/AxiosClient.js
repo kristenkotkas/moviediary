@@ -27,5 +27,5 @@ export function getMoviePredictions(movieId) {
 }
 
 export function getGenrePredictions(movieDescription) {
-    return post("/public/api/v1/genres", movieDescription)
+    return post("/public/api/v1/genres", JSON.stringify({description: movieDescription}))
 }
