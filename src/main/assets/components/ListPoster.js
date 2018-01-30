@@ -7,24 +7,24 @@ export default class ListPoster extends React.Component {
   constructor(props) {
     super(props);
   }
-
+/*
+<span className={'hoverOpen'}>Open</span>*/
   render() {
     return (
-      <div className="listBox" style={{
-        position: 'absolute',
-      }}>
-        <div className={'hoverBackground'}></div>
-        <div className={'hoverRating'}>{this.props.movieRating}</div>
-        <div className={'hoverTitle'}>{this.props.movieTitle}</div>
-        <span className={'hoverOpen'}>Open</span>
-        <FontAwesome
-          className={'posterEye'}
-          name={'eye'}
-          size={'2x'}
-        />
-        <div className={'hoverBorder'}></div>
-        <img src={this.props.moviePosterPath} className={'listPosterImg'} alt=""/>
-      </div>
+        <div className={'boxContainer'}>
+          <div className="listBox">
+            <div className={'hoverBackground'}></div>
+            <div className={'hoverRating'}>{this.props.movieRating}</div>
+            <span className={'hoverTitle'}>{this.props.movieTitle}</span>
+            <div className={'hoverBorder'}></div>
+            <FontAwesome
+                className={'posterEye'}
+                name={'times'}
+                size={'lg'}
+            />
+            <img src={this.props.moviePosterPath} className={'listPosterImg'} alt=""/>
+          </div>
+        </div>
     );
   }
 }

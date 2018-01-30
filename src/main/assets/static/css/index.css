@@ -94,13 +94,19 @@ img {
     border-radius: 4px;
 }
 
+.boxContainer {
+    display: inline-block;
+    margin: 0.3em;
+}
+
 .listBox {
     background: transparent;
     /*border: 1px solid #999;*/
     border-radius: 0;
     height: 15em;
+    width: 10em;
     padding: 0;
-    margin: 1em;
+    position: relative;
     cursor: pointer;
 }
 
@@ -137,20 +143,21 @@ img {
     opacity: 0;
     position: absolute;
     color: white;
-    width: 100%;
+    width: 96%;
     bottom: 0;
-    text-align: center;
     font-family: Lato;
     font-weight: 400;
     font-size: x-large;
+    margin: 0 2%;
+    text-align: center;
 }
 
 .listBox:hover .hoverTitle {
     opacity: 1;
     bottom: 1em;
-    transition: bottom .2s, opacity .2s ease-in-out;
-    -moz-transition: bottom .2s, opacity .2s ease-in-out;
-    -webkit-transition: bottom .2s, opacity .2s ease-in-out;
+    transition: bottom, opacity .2s ease-in-out;
+    -moz-transition: bottom, opacity .2s ease-in-out;
+    -webkit-transition: bottom, opacity .2s ease-in-out;
 }
 
 .hoverRating {
@@ -187,6 +194,11 @@ img {
     transition: margin, margin-top .2s ease-in-out;
     -moz-transition: margin, margin-top .2s ease-in-out;
     -webkit-transition: margin, margin-top .2s ease-in-out;
+}
+
+.posterEye:hover {
+    color: #ffb2a6;
+    cursor: pointer;
 }
 
 .hoverOpen {

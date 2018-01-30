@@ -98,6 +98,7 @@ export default class App extends React.Component {
         /*console.log(similar[0]['similarity']);
         console.log(similarity['similarity']);
         console.log("-----");*/
+        console.log("simData", similar[0]['similarity'], type, similarity['similarity']);
         return Object.assign({}, similarity, {
           similarity: similar[0]['similarity'] + (type * similarity['similarity'])
         });

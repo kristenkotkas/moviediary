@@ -1,5 +1,6 @@
 import React from 'react';
 import ListPoster from "./components/ListPoster";
+import {moviesData} from './data/data';
 
 export default class CompDemo extends React.Component {
 
@@ -7,15 +8,26 @@ export default class CompDemo extends React.Component {
     super(props);
   }
 
+  shortenTitle(title) {
+    //title = title.split(":");
+    //title = title[title.length - 1];
+    return title;
+  }
+
   render() {
     return (
       <div>
         <h1>Comp demo</h1>
-        <ListPoster
-          movieTitle={"Blade Runner 2049"}
-          moviePosterPath={"https://image.tmdb.org/t/p/w640/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg"}
-          movieRating={'5.2'}
-        />
+        {moviesData.map((movie, key) => {
+          return (
+              <ListPoster
+                  movieTitle={this.shortenTitle(movie.movieTitle)}
+                  moviePosterPath={movie.moviePosterPath}
+                  movieRating={movie.movieId}
+                  key={key}
+              />
+          )
+        })}
       </div>
     );
   }
