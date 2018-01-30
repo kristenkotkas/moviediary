@@ -1,6 +1,6 @@
 import React from 'react';
 import ListPoster from "./components/ListPoster";
-import {moviesData} from './data/data';
+import {moviesData} from './data/posterDemoData';
 
 export default class CompDemo extends React.Component {
 
@@ -24,6 +24,10 @@ export default class CompDemo extends React.Component {
     });
   }
 
+  openMovie(movieId) {
+    console.log("Opened", movieId);
+  }
+
   render() {
     return (
       <div>
@@ -33,10 +37,12 @@ export default class CompDemo extends React.Component {
               <ListPoster
                   movieTitle={this.shortenTitle(movie.movieTitle)}
                   moviePosterPath={movie.moviePosterPath}
-                  movieRating={movie.movieId}
+                  movieYear={movie.movieYear}
                   movieId={movie.movieId}
+                  movieRating={movie.movieRating}
                   key={key}
                   removeCallback={this.removeMovie.bind(this)}
+                  openCallback={this.openMovie.bind(this)}
               />
           )
         })}

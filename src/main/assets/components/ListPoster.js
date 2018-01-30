@@ -14,16 +14,21 @@ export default class ListPoster extends React.Component {
     this.props.removeCallback(this.props.movieId);
   }
 
+  openMovie() {
+    this.props.openCallback(this.props.movieId);
+  }
+
   render() {
     return (
         <div className={'boxContainer'}>
-          <div className="listBox">
+          <div className="listBox" onClick={this.openMovie.bind(this)}>
             <div className={'hoverBackground'}></div>
-            <div className={'hoverRating'}>{this.props.movieRating}</div>
+            <span className={'hoverYear'}>{this.props.movieYear}</span>
             <span className={'hoverTitle'}>{this.props.movieTitle}</span>
+            <span className={'hoverRating'}>{this.props.movieRating}</span>
             <div className={'hoverBorder'}></div>
             <FontAwesome
-                className={'posterEye'}
+                className={'posterClose'}
                 name={'times'}
                 size={'lg'}
                 onClick={this.removeMovie.bind(this)}
