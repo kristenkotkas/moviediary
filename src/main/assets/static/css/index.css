@@ -44,7 +44,6 @@ body {
     margin: 2px;
     padding: 0;
     float: left;
-
     -webkit-transition: 0.5s;
     -moz-transition: 0.5s;
     -ms-transition: 0.5s;
@@ -96,7 +95,7 @@ img {
 }
 
 .listBox {
-    background: #ddd;
+    background: transparent;
     /*border: 1px solid #999;*/
     border-radius: 0;
     height: 15em;
@@ -109,7 +108,7 @@ img {
     height: 100%;
     width: 100%;
     position: absolute;
-    border: 4px #00ff00 solid;
+    border: 4px #4aae3a solid;
     border-radius: 4px;
     box-sizing: border-box;
     transition: border .2s ease-in-out;
@@ -122,6 +121,7 @@ img {
     opacity: 0.8;
     height: 100%;
     width: 100%;
+    border-radius: 4px;
     position: absolute;
     transition: background .2s ease-in-out;
     -moz-transition: background .2s ease-in-out;
@@ -176,7 +176,7 @@ img {
 .posterEye {
     opacity: 0;
     position: absolute;
-    color: lightgreen;
+    color: #ff5351;
     right: 0.5em;
 }
 
@@ -191,7 +191,7 @@ img {
 
 .hoverOpen {
     position: absolute;
-    background: #29e320;
+    background: #4aae3a;
     color: white;
     padding: 0.3em 1.4em;
     border-radius: 1.4em;
