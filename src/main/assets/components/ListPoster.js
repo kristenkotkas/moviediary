@@ -9,6 +9,11 @@ export default class ListPoster extends React.Component {
   }
 /*
 <span className={'hoverOpen'}>Open</span>*/
+
+  removeMovie() {
+    this.props.removeCallback(this.props.movieId);
+  }
+
   render() {
     return (
         <div className={'boxContainer'}>
@@ -21,6 +26,7 @@ export default class ListPoster extends React.Component {
                 className={'posterEye'}
                 name={'times'}
                 size={'lg'}
+                onClick={this.removeMovie.bind(this)}
             />
             <img src={this.props.moviePosterPath} className={'listPosterImg'} alt=""/>
           </div>
