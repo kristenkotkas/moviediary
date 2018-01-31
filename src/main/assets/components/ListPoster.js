@@ -26,6 +26,7 @@ export default class ListPoster extends React.Component {
             <span className={'hoverYear'}>{this.props.movieYear}</span>
             <span className={'hoverTitle'}>{this.props.movieTitle}</span>
             <span className={'hoverRating'}>{this.props.movieRating}</span>
+            {this.props.movieSeen ? <span className={'hoverSeen'}></span> : null}
             <div className={'hoverBorder'}></div>
             <FontAwesome
                 className={'posterClose'}

@@ -40,6 +40,7 @@ export default class CompDemo extends React.Component {
                   movieYear={movie.movieYear}
                   movieId={movie.movieId}
                   movieRating={movie.movieRating}
+                  movieSeen={movie.movieSeen}
                   key={key}
                   removeCallback={this.removeMovie.bind(this)}
                   openCallback={this.openMovie.bind(this)}

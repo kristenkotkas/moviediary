@@ -174,17 +174,17 @@ img {
     font-size: x-large;
     margin: 0 2%;
     text-align: center;
-    transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
-    -moz-transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
-    -webkit-transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
 }
 
 .listBox:hover .hoverTitle {
     opacity: 1;
     bottom: 1em;
-    transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
-    -moz-transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
-    -webkit-transition: bottom .2s ease-in-out, opacity .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
 }
 
 .hoverYear {
@@ -196,9 +196,9 @@ img {
     font-family: Lato;
     font-weight: 400;
     font-size: x-large;
-    transition: margin .2s ease-in-out, opacity .2s ease-in-out;
-    -moz-transition: margin .2s ease-in-out, opacity .2s ease-in-out;
-    -webkit-transition: margin .2s ease-in-out, opacity .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
 }
 
 .listBox:hover .hoverYear {
@@ -214,26 +214,26 @@ img {
     color: #ff5351;
     right: 0.5em;
     margin-top: 0.5em;
-    -webkit-transition: all 200ms ease-in;
+    -webkit-transition: all .2s ease-in;
     -webkit-transform: scale(0);
-    -ms-transition: all 200ms ease-in;
+    -ms-transition: all .2s ease-in;
     -ms-transform: scale(0);
-    -moz-transition: all 200ms ease-in;
+    -moz-transition: all .2s ease-in;
     -moz-transform: scale(0);
-    transition: all 200ms ease-in;
+    transition: all .2s ease-in;
     transform: scale(0);
 }
 
 .listBox:hover .posterClose {
     margin-top: 0.5em;
     right: 0.5em;
-    -webkit-transition: all 200ms ease-in;
+    -webkit-transition: all .2s ease-in;
     -webkit-transform: scale(1);
-    -ms-transition: all 200ms ease-in;
+    -ms-transition: all .2s ease-in;
     -ms-transform: scale(1);
-    -moz-transition: all 200ms ease-in;
+    -moz-transition: all .2s ease-in;
     -moz-transform: scale(1);
-    transition: all 200ms ease-in;
+    transition: all .2s ease-in;
     transform: scale(1);
 }
 
@@ -254,30 +254,63 @@ img {
     text-align: center;
     bottom: 0.5em;
     right: 0.5em;
-    box-shadow: 0 0 3em #000000;
-    -webkit-transition: all 200ms ease-in;
-    -webkit-transform: scale(1);
-    -ms-transition: all 200ms ease-in;
-    -ms-transform: scale(1);
-    -moz-transition: all 200ms ease-in;
-    -moz-transform: scale(1);
-    transition: all 200ms ease-in;
-    transform: scale(1);
     line-height: 2.3em;
+    box-shadow: 0 0 3em #000000;
+    -webkit-transition: all .2s ease-in;
+    -webkit-transform: scale(1);
+    -ms-transition: all .2s ease-in;
+    -ms-transform: scale(1);
+    -moz-transition: all .2s ease-in;
+    -moz-transform: scale(1);
+    transition: all .2s ease-in;
+    transform: scale(1);
 
 }
 
 .listBox:hover .hoverRating {
     opacity: 0.5;
-    -webkit-transition: all 200ms ease-in;
+    -webkit-transition: all .2s ease-in;
     -webkit-transform: scale(0);
-    -ms-transition: all 200ms ease-in;
+    -ms-transition: all .2s ease-in;
     -ms-transform: scale(0);
-    -moz-transition: all 200ms ease-in;
+    -moz-transition: all .2s ease-in;
     -moz-transform: scale(0);
-    transition: all 200ms ease-in;
+    transition: all .2s ease-in;
     transform: scale(0);
 }
+
+.hoverSeen {
+    position: absolute;
+    width: 1.2em;
+    height: 1.2em;
+    background: #ed8100;
+    color: transparent;
+    border-radius: 100%;
+    left: 0.3em;
+    top: 0.3em;
+    font-family: Lato;
+    -webkit-transition: all .2s ease-in;
+    -webkit-transform: scale(1);
+    -ms-transition: all .2s ease-in;
+    -ms-transform: scale(1);
+    -moz-transition: all .2s ease-in;
+    -moz-transform: scale(1);
+    transition: all .2s ease-in;
+    transform: scale(1);
+}
+
+.listBox:hover .hoverSeen {
+    -webkit-transition: all .2s ease-in;
+    -webkit-transform: scale(0);
+    -ms-transition: all .2s ease-in;
+    -ms-transform: scale(0);
+    -moz-transition: all .2s ease-in;
+    -moz-transform: scale(0);
+    transition: all .2s ease-in;
+    transform: scale(0);
+}
+
+/* Not used*/
 
 .hoverOpen {
     position: absolute;
