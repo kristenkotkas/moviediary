@@ -30,24 +30,24 @@ export default class CompDemo extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Comp demo</h1>
-        {this.state.moviesData.map((movie, key) => {
-          return (
-              <ListPoster
-                  movieTitle={this.shortenTitle(movie.movieTitle)}
-                  moviePosterPath={movie.moviePosterPath}
-                  movieYear={movie.movieYear}
-                  movieId={movie.movieId}
-                  movieRating={movie.movieRating}
-                  movieSeen={movie.movieSeen}
-                  key={key}
-                  removeCallback={this.removeMovie.bind(this)}
-                  openCallback={this.openMovie.bind(this)}
-              />
-          )
-        })}
-      </div>
+        <div>
+          <h1>Comp demo</h1>
+          {this.state.moviesData.map((movie, key) => {
+            return (
+                <ListPoster
+                    movieTitle={this.shortenTitle(movie.movieTitle)}
+                    moviePosterPath={movie.moviePosterPath}
+                    movieYear={movie.movieYear}
+                    movieId={movie.movieId}
+                    movieRating={movie.movieRating}
+                    movieSeen={movie.movieSeen}
+                    key={key}
+                    removeCallback={this.removeMovie.bind(this)}
+                    openCallback={this.openMovie.bind(this)}
+                />
+            )
+          })}
+        </div>
     );
   }
 }

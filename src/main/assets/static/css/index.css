@@ -107,7 +107,6 @@ img {
     width: 10em;
     padding: 0;
     position: relative;
-    cursor: pointer;
 }
 
 .hoverBorder {
@@ -318,17 +317,34 @@ img {
     color: white;
     padding: 0.3em 1.4em;
     border-radius: 1.4em;
-    margin-top: 60%;
+    top: 25%;
     margin-left: 19%;
     opacity: 0;
     font-family: Lato;
     font-weight: bold;
     font-size: larger;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
+    -webkit-transform: scale(0);
+    -ms-transform: scale(0);
+    -moz-transform: scale(0);
+    transform: scale(0);
+
 }
 
 .listBox:hover .hoverOpen {
     opacity: 1;
-    transition: opacity .2s ease-in-out;
-    -moz-transition: opacity .2s ease-in-out;
-    -webkit-transition: opacity .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    -moz-transform: scale(1);
+    transform: scale();
+}
+
+.hoverOpen:hover {
+    background: #56cb44;
+    cursor: pointer;
 }

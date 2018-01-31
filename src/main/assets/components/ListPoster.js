@@ -21,13 +21,14 @@ export default class ListPoster extends React.Component {
   render() {
     return (
         <div className={'boxContainer'}>
-          <div className="listBox" onClick={this.openMovie.bind(this)}>
+          <div className={'listBox'}>
             <div className={'hoverBackground'}></div>
             <span className={'hoverYear'}>{this.props.movieYear}</span>
             <span className={'hoverTitle'}>{this.props.movieTitle}</span>
             <span className={'hoverRating'}>{this.props.movieRating}</span>
             {this.props.movieSeen ? <span className={'hoverSeen'}></span> : null}
             <div className={'hoverBorder'}></div>
+            <span className={'hoverOpen'} onClick={this.openMovie.bind(this)}>Open</span>
             <FontAwesome
                 className={'posterClose'}
                 name={'times'}
