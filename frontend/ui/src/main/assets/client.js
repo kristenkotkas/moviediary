@@ -3,17 +3,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {Route, Router} from 'react-router';
-import {createBrowserHistory} from 'history';
+import {ConnectedRouter} from 'react-router-redux';
+import createHistory from 'history/createBrowserHistory';
 
 import store from './store';
 import Layout from './components/layout';
+import Movies from "./components/movies/Movies";
+import '../resources/css/Main.css';
 
 const app = document.getElementById('app');
-const browserHistory = createBrowserHistory();
+const history = createHistory();
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router history={browserHistory}>
-      <Route component={Layout}/>
-    </Router>
+    <ConnectedRouter history={history}>
+      <div>
+        <Route exact path={'/'} component={Layout}/>
+        <Route exact path={'/movies'} component={Movies}/>
+      </div>
+    </ConnectedRouter>
   </Provider>, app);

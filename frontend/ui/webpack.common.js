@@ -40,7 +40,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: PATHS.src + '/index.html'
-    })
+    }),
+    new ExtractTextPlugin('[name]/styles.[contenthash].css')
   ],
   module: {
     rules: [
