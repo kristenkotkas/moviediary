@@ -303,7 +303,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         if (data['images']['backdrops'].length === 0) {
             backgroundPath = "";
         } else {
-            backgroundPath = 'https://image.tmdb.org/t/p/w1920' + getRandomBackdrop(data['images']['backdrops']);
+            backgroundPath = 'https://image.tmdb.org/t/p/original' + getRandomBackdrop(data['images']['backdrops']);
         }
 
         getOmdb(data['imdb_id'], lang);
