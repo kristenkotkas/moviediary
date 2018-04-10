@@ -6,20 +6,20 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import server.service.BankLinkService;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-
+import server.service.BankLinkService;
 import static server.entity.Status.badRequest;
 import static server.entity.Status.serviceUnavailable;
 import static server.util.CommonUtils.contains;
 import static server.util.CommonUtils.getDerPrivateKey;
-import static server.util.HandlerUtils.*;
+import static server.util.HandlerUtils.jsonResponse;
+import static server.util.HandlerUtils.parseParam;
+import static server.util.HandlerUtils.resultHandler;
 
 public class BankLinkRouter extends EventBusRoutable {
     private static final Logger LOG = LoggerFactory.getLogger(BankLinkRouter.class);
@@ -35,7 +35,7 @@ public class BankLinkRouter extends EventBusRoutable {
     public static final String vk_amount = "5"; // Makse summa
     public static final String vk_curr = "EUR"; // Makse valuuta
     public static final String vk_acc = "EE371600000123456789"; // Saaja (arendajate) konto nr
-    public static final String vk_name = "MovieDiary MTÜ"; // Saaja (arendajate) nimi
+    public static final String vk_name = "MovieDiary MTU"; // Saaja (arendajate) nimi
     public static final String vk_ref = "1234561"; // Viitenumber
     public static final String vk_lang = "EST"; //tehingu keel
     public static final String vk_msg = "Donation"; // Toode/makse kirjeldus

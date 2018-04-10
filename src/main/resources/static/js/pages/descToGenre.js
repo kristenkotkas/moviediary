@@ -5,7 +5,7 @@ const getApiUrl = function () {
   const localUrl = 'http://localhost:8081/';
   return url.indexOf('localhost') !== -1 ? localUrl : url;
 };
-//https://movies.kyngas.eu/'
+//https://moviediary.eu/'
 console.log('API', getApiUrl());
 
 const suitableGenres = $("#suitable-genres");

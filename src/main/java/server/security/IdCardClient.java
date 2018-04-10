@@ -2,17 +2,15 @@ package server.security;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
 import server.router.UiRouter;
-
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static server.router.UiRouter.UI_IDCARDLOGIN;
 import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
@@ -23,7 +21,7 @@ import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
  */
 public class IdCardClient extends IndirectClient<IdCardCredentials, IdCardProfile> {
     private static final Logger LOG = LoggerFactory.getLogger(UiRouter.class);
-    private static final String URL = "https://id.movies.kyngas.eu" + UI_IDCARDLOGIN;
+    private static final String URL = "https://id.moviediary.eu" + UI_IDCARDLOGIN;
     private static final String CERT_TYPE = "X.509";
     private static final String VERIFIED = "SUCCESS";
 

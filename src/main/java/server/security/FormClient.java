@@ -8,7 +8,6 @@ import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
 import server.service.DatabaseService;
-
 import static org.pac4j.core.util.CommonHelper.isBlank;
 import static server.router.UiRouter.UI_FORM_LOGIN;
 import static server.security.SecurityConfig.CSRF_TOKEN;
@@ -41,7 +40,7 @@ public class FormClient extends IndirectClient<FormCredentials, FormProfile> {
 
     public void enable(DatabaseService database, JsonObject config) {
         // TODO: 17.02.2017 store in config or smth
-        loginUrl = (isServer(config) ? "https://movies.kyngas.eu" :
+        loginUrl = (isServer(config) ? "https://moviediary.eu" :
                 "http://localhost:" + config.getString("http_port")) + UI_FORM_LOGIN;
         setAuthenticator((credentials, context) -> {
             if (credentials == null) {

@@ -3,10 +3,11 @@ package server.util;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NetworkUtils {
     private static final Logger LOG = LoggerFactory.getLogger(NetworkUtils.class);
 

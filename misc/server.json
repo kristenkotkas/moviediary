@@ -10,7 +10,7 @@
   },
   "oauth": {
     "localCallback": "http://localhost:8081/callback",
-    "callback": "https://movies.kyngas.eu/callback",
+    "callback": "https://moviediary.eu/callback",
     "facebook": {
       "key": "",
       "secret": ""

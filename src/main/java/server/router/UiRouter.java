@@ -232,7 +232,7 @@ public class UiRouter extends EventBusRoutable {
   private void handleIdCardLogin(RoutingContext ctx) {
     String state = ctx.request().getHeader(CLIENT_VERIFIED_STATE);
     String cert = ctx.request().getHeader(CLIENT_CERTIFICATE);
-    String url = "https://movies.kyngas.eu" + addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED);
+    String url = "https://moviediary.eu" + addParameter(UI_LOGIN, DISPLAY_MESSAGE, UNAUTHORIZED);
     check("NONE".equals(state) || cert == null,
         () -> redirect(ctx, url),
         () -> engine.render(getSafe(ctx, TEMPL_IDCARDLOGIN, IdCardLoginTemplate.class)

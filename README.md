@@ -8,7 +8,7 @@ Meeskonna liikmed:
 - Alar Leemet
 
 Viited:
-- [Testkeskkond](https://movies.kyngas.eu)  
+- [Testkeskkond](https://moviediary.eu)  
 - [Projektiplaan](https://github.com/kristenkotkas/moviediary/wiki/Projektiplaan)
 - [Prototüüp](https://github.com/kristenkotkas/moviediary/wiki/Protot%C3%BC%C3%BCp)
 
@@ -22,7 +22,7 @@ Etapid:
 - [Etapp 7](https://github.com/kristenkotkas/moviediary/wiki/Etapp-7)
 
 Jooksutamine:
-- Kasuta testkeskkonda: [Testkeskkond](https://movies.kyngas.eu)  
+- Kasuta testkeskkonda: [Testkeskkond](https://moviediary.eu)  
 - Paigalda Java 8, Node.js v8 viimane versioon
 - Ainult Recommender-i / DescToGenre-i kasutamiseks jooksuta projekti kaustas:  
   - ```npm install``` 

@@ -9,11 +9,9 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.mail.MailClient;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import java.util.Map;
 import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
-
-import java.util.Map;
-
 import static io.vertx.rxjava.core.Future.future;
 import static server.entity.Language.getString;
 import static server.router.MailRouter.API_MAIL_VERIFY;
@@ -104,10 +102,10 @@ public class MailServiceImpl implements MailService {
      */
     private String createContent(RoutingContext ctx, String userEmail, String unique) {
         return "<p>" + getString("MAIL_REGISTER_TEXT", ctx) + "</p>" +
-                "<a href=\"https://movies.kyngas.eu" + API_MAIL_VERIFY +
-                "?" + EMAIL + "=" + userEmail +
-                "&" + UNIQUE + "=" + unique + "\">" +
-                getString("MAIL_REGISTER_CLICK_ME", ctx) +
-                "</a>";
+               "<a href=\"https://moviediary.eu" + API_MAIL_VERIFY +
+               "?" + EMAIL + "=" + userEmail +
+               "&" + UNIQUE + "=" + unique + "\">" +
+               getString("MAIL_REGISTER_CLICK_ME", ctx) +
+               "</a>";
     }
 }
