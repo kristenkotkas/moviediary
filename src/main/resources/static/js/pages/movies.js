@@ -63,7 +63,7 @@ eventbus.onopen = function () {
             $('#plot').removeClass('scale-in').addClass('scale-out');
             $('#add-watch').removeClass('scale-in').addClass('scale-out');
             $('#crew-box').removeClass('scale-in').addClass('scale-out');
-            trailerBox.removeClass('scale-in').addClass('scale-out');
+            trailerBox.removeClass('scale-in').removeClass('none-display').addClass('scale-out');
             showEndTime.removeClass('scale-in').addClass('scale-out');
             $('.collapsible').collapsible('close', 0);
             $("#awards").empty();
@@ -360,27 +360,34 @@ function getRandomBackdrop(backdrops) {
 }
 
 function addTrailer(videos) {
+  if (videos['results'].length > 0) {
     var videoResults = [];
     $.each(videos['results'], function (i) {
-        var video = videos['results'][i];
-        if (video['type'] === 'Trailer') {
-            videoResults.push(video);
-        }
+      var video = videos['results'][i];
+      if (video['type'] === 'Trailer') {
+        videoResults.push(video);
+      }
     });
     if (videoResults.length === 0) {
-        $.each(videos['results'], function (i) {
-            var video = videos['results'][i];
-            if (video['type'] === 'Teaser') {
-                videoResults.push(video);
-            }
-        });
+      $.each(videos['results'], function (i) {
+        var video = videos['results'][i];
+        if (video['type'] === 'Teaser') {
+          videoResults.push(video);
+        }
+      });
+    }
+    if (videoResults.length === 0) {
+      videoResults = videos['results'];
     }
     if (videoResults.length > 0) {
-        var key = videoResults[0]['key'];
-        trailer.attr('src', 'https://www.youtube.com/embed/' + key);
+      var key = videoResults[0]['key'];
+      trailer.attr('src', 'https://www.youtube.com/embed/' + key);
     } else {
-        trailer.attr('src', '');
+      trailer.attr('src', '');
     }
+  } else {
+    trailerBox.addClass('none-display')
+  }
 }
 
 function decorateStarWars() {

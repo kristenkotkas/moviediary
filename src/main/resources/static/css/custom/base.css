@@ -242,6 +242,10 @@ body {
     color: #e57373;
 }
 
+.none-display {
+    display: none;
+}
+
 .content-key {
     font-weight: bold;
 }
