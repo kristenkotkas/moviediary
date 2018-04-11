@@ -303,7 +303,7 @@ function addHistory(data, lang) {
         if (data[i]['Image'] != "") {
             posterPath = 'https://image.tmdb.org/t/p/w342' + data[i]['Image'];
         } else {
-            posterPath = '/static/img/nanPosterBig.jpg'
+            posterPath = '/static/img/nanPosterBig.jpg';
         }
         //console.log(data[i]);
         $("#table").append(

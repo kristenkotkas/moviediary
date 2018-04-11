@@ -81,7 +81,7 @@ eventbus.onopen = function () {
                             if (movie['poster_path'] !== null) {
                                 posterPath = 'https://image.tmdb.org/t/p/w300' + movie['poster_path'];
                             } else {
-                                posterPath = '/static/img/nanPosterBig.jpg'
+                                posterPath = '/static/img/nanPosterBig.jpg';
                             }
 
                             var arrayOfNodes = $.parseHTML(
