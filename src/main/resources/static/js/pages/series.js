@@ -646,7 +646,7 @@ function getBackdropPath(backdropPath) {
     if (backdropPath === null) {
         return "";
     } else {
-        return 'https://image.tmdb.org/t/p/w1920' + backdropPath;
+        return 'https://image.tmdb.org/t/p/original' + backdropPath;
     }
 }
 

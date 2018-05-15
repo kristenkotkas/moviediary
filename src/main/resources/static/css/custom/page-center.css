@@ -11,3 +11,13 @@ body {
     display: table-cell;
     vertical-align: middle;
 }
+
+header{
+    position: absolute;
+    left: 2em;
+    top: 2em;
+}
+
+.index-logo-top {
+    width: 70%;
+}

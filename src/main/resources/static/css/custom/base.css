@@ -21,9 +21,55 @@ body {
 /*.btn:hover {
     cursor:url(http://puu.sh/vU9WA/71571866ef.gif), auto;
 }*/
+.index-description-container {
+    margin-right: 5em;
+    margin-top: 0.7em;
+}
+
+@media only screen and (max-width: 1090px) {
+    .index-description-container {
+        margin-right: auto;
+    }
+}
+
+@media only screen and (max-width: 1020px) {
+    .index-description-container {
+        display: none;
+    }
+}
+
+.desc-line {
+    margin-top: 0.75em;
+}
+
+.lang-buttons {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.login-btn {
+    border-radius: 2em;
+    padding: 0 0 0 1.25em !important;
+}
+
+.index-logo {
+    width: 70%;
+    margin-left: 15%;
+}
+
+.display-msg {
+    padding: 0.15em;
+    border-radius: 1em;
+    font-weight: bold;
+}
+
 .trailer-container {
     width: 100%;
     height: 56.25%;
+}
+
+.index-head {
+    background: white;
 }
 
 .list-group {
@@ -529,11 +575,13 @@ span.badge.new:after {
 }
 
 .cast-left-margin {
-    padding-left: 15px; !important;
+    padding-left: 15px;
+!important;
 }
 
 .modal-footer-info {
-    vertical-align: middle; !important;
+    vertical-align: middle;
+!important;
 }
 
 @media only screen and (min-width: 1071px) {
