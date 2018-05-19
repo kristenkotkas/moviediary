@@ -1,83 +1,19 @@
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath group: 'com.esyfur', name: 'gradle-config-plugin', version: '0.4.+'
-  }
-}
-
 plugins {
   id 'application'
+  id 'java'
+  id 'idea'
   id "com.github.johnrengelman.shadow" version "1.2.4"
   id 'org.hidetake.ssh' version '2.9.0'
-  id 'io.franzbecker.gradle-lombok' version '1.10' apply false
+  id 'io.franzbecker.gradle-lombok' version '1.10'
 }
 
-apply plugin: 'config'
-
-allprojects {
-  apply plugin: 'java'
-  apply plugin: 'idea'
-  apply plugin: 'io.franzbecker.gradle-lombok'
-  group 'eu.kyngas.movies'
-  targetCompatibility = cfg.ver.java
-  sourceCompatibility = cfg.ver.java
-  repositories {
-    mavenCentral()
-    jcenter()
-  }
-  dependencies {
-    compileOnly group: 'io.vertx', name: 'vertx-codegen', version: "${cfg.ver.vertx}"
-  }
-  sourceSets {
-    main {
-      java {
-        srcDirs += 'src/main/gen'
-      }
-    }
-  }
-  idea {
-    module {
-      generatedSourceDirs += file('src/main/gen')
-      outputDir = file("${projectDir}/build/classes/main")
-      testOutputDir = file("${projectDir}/build/classes/test")
-    }
-  }
-  task apiGen(type: JavaCompile) {
-    source = sourceSets.main.java
-    classpath = configurations.compile + configurations.compileOnly
-    destinationDir = project.file('src/main/gen')
-    options.compilerArgs = [
-        '-proc:only',
-        '-processor',
-        'io.vertx.codegen.CodeGenProcessor',
-        "-Acodegen.output=${project.projectDir}/src/main/gen",
-        '-Acodegen.generators=RxJava,service_proxies,sockjs_service_proxies'
-    ]
-  }
-  compileJava {
-    options.encoding = 'UTF-8'
-    dependsOn apiGen
-    //todo dependsOn webpack compilation (npm run prod)
-  }
-  task apiClean(type: Delete) {
-    //noinspection GroovyAssignabilityCheck
-    delete 'src/main/gen'
-  }
-  clean.dependsOn apiClean
+repositories {
+  mavenCentral()
+  jcenter()
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '4.2.1'
-  //noinspection UnnecessaryQualifiedReference
-  distributionType = Wrapper.DistributionType.ALL
-}
-
-
-
-
-//v1 build.gradle
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
 
 dependencies {
   compile files('/libs/templ-handlebars.jar')
@@ -154,4 +90,10 @@ task deployPythonResources() {
         }
         println ':deploy:Python resources uploaded'
     }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '4.7'
+  //noinspection UnnecessaryQualifiedReference
+  distributionType = Wrapper.DistributionType.BIN
 }

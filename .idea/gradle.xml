@@ -10,16 +10,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/backend/auth" />
-            <option value="$PROJECT_DIR$/backend/database" />
-            <option value="$PROJECT_DIR$/backend/server" />
-            <option value="$PROJECT_DIR$/frontend/gateway" />
-            <option value="$PROJECT_DIR$/frontend/native" />
-            <option value="$PROJECT_DIR$/frontend/ui" />
-            <option value="$PROJECT_DIR$/launcher" />
-            <option value="$PROJECT_DIR$/shared/backend" />
-            <option value="$PROJECT_DIR$/shared/common" />
-            <option value="$PROJECT_DIR$/shared/frontend" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
