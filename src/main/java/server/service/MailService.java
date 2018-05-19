@@ -12,8 +12,8 @@ public interface MailService {
     String EMAIL = "email";
     String UNIQUE = "unique";
 
-    static MailService create(Vertx vertx, DatabaseService database) {
-        return new MailServiceImpl(vertx, database);
+    static MailService create(Vertx vertx, DatabaseService database, JsonObject config) {
+        return new MailServiceImpl(vertx, database, config.getJsonObject("mail", new JsonObject()));
     }
 
     Future<JsonObject> sendVerificationEmail(RoutingContext ctx, String userEmail);

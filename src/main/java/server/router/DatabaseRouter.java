@@ -6,6 +6,7 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import java.util.function.BiFunction;
 import server.entity.JsonObj;
 import server.entity.User;
 import server.security.SecurityConfig;
@@ -13,24 +14,22 @@ import server.service.DatabaseService;
 import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
 import server.service.MailService;
-
-import java.util.function.BiFunction;
-
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 import static server.entity.Status.redirect;
 import static server.entity.Status.serviceUnavailable;
-import static server.router.MailRouter.userVerified;
 import static server.router.UiRouter.UI_FORM_REGISTER;
 import static server.router.UiRouter.UI_LOGIN;
-import static server.security.FormClient.*;
+import static server.security.FormClient.FORM_FIRSTNAME;
+import static server.security.FormClient.FORM_LASTNAME;
+import static server.security.FormClient.FORM_PASSWORD;
+import static server.security.FormClient.FORM_USERNAME;
 import static server.security.SecurityConfig.CSRF_TOKEN;
 import static server.service.DatabaseService.createDataMap;
 import static server.service.DatabaseService.getRows;
 import static server.util.CommonUtils.*;
 import static server.util.HandlerUtils.jsonResponse;
 import static server.util.HandlerUtils.resultHandler;
-import static server.util.NetworkUtils.isServer;
 import static server.util.StringUtils.*;
 
 /**
@@ -274,12 +273,12 @@ public class DatabaseRouter extends EventBusRoutable {
                     .put(Column.SALT, salt)
                     .build());
             Future<JsonObject> f2 = database.insert(Table.SETTINGS, mapBuilder(createDataMap(username))
-                    .put(Column.VERIFIED, isServer(config) ? "0" : "1")
-                    .build());
-            CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> check(isServer(config), () -> {
+                .put(Column.VERIFIED, "0")
+                .build());
+            CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> {
                 mail.sendVerificationEmail(ctx, username);
                 redirect(ctx, verifyEmail());
-            }, () -> redirect(ctx, userVerified()))));
+            }));
         }, () -> redirect(ctx, userExists()))));
     }
 

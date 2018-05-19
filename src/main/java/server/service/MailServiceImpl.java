@@ -5,6 +5,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
+import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.mail.MailClient;
@@ -25,14 +26,20 @@ import static server.util.StringUtils.genString;
  */
 public class MailServiceImpl implements MailService {
     private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
-    private static final String FROM = "moviediary@kyngas.eu";
+    private static final String FROM = "moviediary@moviediary.eu";
 
     private final DatabaseService database;
     private final MailClient client;
 
-    protected MailServiceImpl(Vertx vertx, DatabaseService database) {
+    protected MailServiceImpl(Vertx vertx, DatabaseService database, JsonObject config) {
         this.database = database;
-        this.client = MailClient.createNonShared(vertx, new MailConfig().setTrustAll(true));
+        this.client = MailClient.createShared(vertx, new MailConfig()
+            .setHostname(config.getString("host"))
+            .setPort(config.getInteger("port"))
+            .setStarttls(StartTLSOptions.REQUIRED)
+            .setUsername(config.getString("username"))
+            .setPassword(config.getString("password"))
+            .setTrustAll(true));
     }
 
     /**
