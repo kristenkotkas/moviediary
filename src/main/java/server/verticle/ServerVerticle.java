@@ -5,6 +5,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.ext.web.Router;
 import java.util.Arrays;
+import server.database.DatabaseManager;
 import server.router.AuthRouter;
 import server.router.BankLinkRouter;
 import server.router.DatabaseRouter;
@@ -41,6 +42,7 @@ public class ServerVerticle extends AbstractVerticle {
   private MailService mail;
   private RecommendService recommend;
   private SecurityConfig securityConfig;
+  private DatabaseManager databaseManager;
 
   /**
    * Creates service for interacting with database.
@@ -62,6 +64,7 @@ public class ServerVerticle extends AbstractVerticle {
   @Override
   public void start(Future<Void> future) throws Exception {
     Router router = Router.router(vertx);
+    databaseManager = new DatabaseManager(config()).start();
     database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
     tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
     omdb = createIfMissing(omdb, () -> OmdbService.create(vertx, config(), database));
@@ -95,5 +98,8 @@ public class ServerVerticle extends AbstractVerticle {
   @Override
   public void stop() throws Exception {
     closeEventbus();
+    if (databaseManager != null) {
+      databaseManager.stop();
+    }
   }
 }

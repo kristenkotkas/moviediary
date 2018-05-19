@@ -3,9 +3,9 @@ package server.router;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.ext.web.handler.sockjs.BridgeEventType;
+import io.vertx.ext.bridge.BridgeEventType;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
-import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.core.eventbus.Message;
@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.auth.Pac4jUser;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
-import static io.vertx.ext.web.handler.sockjs.BridgeEventType.RECEIVE;
 import static java.lang.String.valueOf;
 import static server.util.CommonUtils.check;
 import static server.util.CommonUtils.ifPresent;
@@ -76,7 +75,7 @@ public abstract class EventBusRoutable implements Routable {
                 CURRENT_USERS.compute(profile.getEmail(), (s, i) -> i == null ? 1 : i + 1);
                 vertx.eventBus().publish("messenger_current_users", CURRENT_USERS.keySet().size());
             }
-            ifTrue(event.getRawMessage() != null && event.type() != RECEIVE, () ->
+            ifTrue(event.getRawMessage() != null && event.type() != BridgeEventType.RECEIVE, () ->
                     ifPresent(((Pac4jUser) event.socket().webUser().getDelegate())
                             .pac4jUserProfiles().values().stream()
                             .findAny()

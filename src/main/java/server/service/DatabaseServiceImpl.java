@@ -7,19 +7,22 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
-
 import java.util.List;
 import java.util.Map;
-
 import static io.vertx.rxjava.core.Future.failedFuture;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
-import static server.service.DatabaseService.Column.*;
+import static server.service.DatabaseService.Column.USERNAME;
+import static server.service.DatabaseService.Column.getSortedColumns;
+import static server.service.DatabaseService.Column.getSortedValues;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
 import static server.service.DatabaseService.createDataMap;
 import static server.util.CommonUtils.*;
-import static server.util.StringUtils.*;
+import static server.util.StringUtils.formToDBDate;
+import static server.util.StringUtils.genString;
+import static server.util.StringUtils.hash;
+import static server.util.StringUtils.movieDateToDBDate;
 
 /**
  * Database service implementation.
@@ -208,9 +211,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private JDBCClient client;
 
     protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
-        if (config.containsKey("mysql")) {
-            this.client = JDBCClient.createShared(vertx, config.getJsonObject("mysql"));
-        }
+        this.client = JDBCClient.createShared(vertx, config.getJsonObject("database"));
     }
 
     private Future<JsonObject> query(String sql, JsonArray params) {

@@ -16,5 +16,17 @@
         <property name="yearIsDateType" value="false" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="MovieDiary v2 local tcp" uuid="0ab7abf4-3f83-41db-affd-ca4835ae84df">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:tcp://localhost:9092/./MovieDiary</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="MovieDiary v2 local file" uuid="8c8b7516-b386-4ff3-a64a-b525e61007ab">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:file:$PROJECT_DIR$/MovieDiary</jdbc-url>
+    </data-source>
   </component>
 </project>
