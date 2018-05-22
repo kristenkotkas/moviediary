@@ -94,17 +94,15 @@ function getWasCinema(wasCinema) {
 }
 
 function getShortDayOfWeek(lang, dayIndex) {
-    var weekdays = [
+    return [
+        lang['STATISTICS_SUN'],
         lang['STATISTICS_MON'],
         lang['STATISTICS_TUE'],
         lang['STATISTICS_WED'],
         lang['STATISTICS_THU'],
         lang['STATISTICS_FRI'],
-        lang['STATISTICS_SAT'],
-        lang['STATISTICS_SUN']
-    ];
-
-    return weekdays[dayIndex];
+        lang['STATISTICS_SAT']
+    ][dayIndex];
 }
 
 function getSingPlur(singularString, pluralString, count) {
@@ -117,7 +115,7 @@ function getSingPlur(singularString, pluralString, count) {
 
 function fillTotalStat(lang) {
     eventbus.send('database_get_home_statistics', {}, function (error, reply) {
-        var data = reply['body']['rows'][0];
+        var data = reply['body'];
         totalViews.append(data['total_views'] + ' ' + getSingPlur(lang['HISTORY_VIEW'], lang['HISTORY_VIEWS'], data['total_views']));
         totalRuntime.append(minutesToString(data['total_runtime'], lang));
         averageRuntime.append(minutesToString(data['total_runtime'] / data['total_views'], lang));
@@ -131,7 +129,7 @@ function fillTotalStat(lang) {
 function fillWishlist(lang) {
     eventbus.send("database_get_last_lists_home", {}, function (error, reply) {
         wishlist.empty();
-        var data = reply['body']['rows'];
+        var data = reply['body'];
         if (data.length > 0) {
             $.each(data, function (i) {
                 var movie = data[i];
@@ -160,7 +158,7 @@ function fillWishlist(lang) {
 
 function fillTodayInHistory(lang) {
     eventbus.send('database_get_today_in_history', {}, function (error, reply) {
-        var data = reply.body['rows'];
+        var data = reply.body;
         todayHistoryTable.empty();
         if (data.length > 0) {
             $.each(data, function (i) {

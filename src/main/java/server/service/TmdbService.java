@@ -25,5 +25,5 @@ public interface TmdbService extends CachingService<JsonObject> {
 
     Future<JsonObject> getTvSeason(String param);
 
-    Future<JsonObject> insertSeasonViews(String username, String jsonParam);
+    Future<Boolean> insertSeasonViews(String username, String jsonParam);
 }

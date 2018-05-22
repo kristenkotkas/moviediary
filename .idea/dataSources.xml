@@ -21,6 +21,9 @@
       <synchronize>true</synchronize>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
       <jdbc-url>jdbc:h2:tcp://localhost:9092/./MovieDiary</jdbc-url>
+      <explain-plan-config>
+        <provider>com.intellij.database.plan.mysql.MysqlExplainPlanProvider</provider>
+      </explain-plan-config>
     </data-source>
     <data-source source="LOCAL" name="MovieDiary v2 local file" uuid="8c8b7516-b386-4ff3-a64a-b525e61007ab">
       <driver-ref>h2.unified</driver-ref>

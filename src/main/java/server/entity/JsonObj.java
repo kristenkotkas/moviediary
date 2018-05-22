@@ -1,8 +1,10 @@
 package server.entity;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Base64;
@@ -10,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 /**
@@ -20,6 +21,11 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
  * @author <a href="https://bitbucket.org/kristjanhk/">Kristjan Hendrik Küngas</a>
  */
 public class JsonObj extends JsonObject {
+
+    static {
+        Json.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Json.mapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE);
+    }
 
     public JsonObj(String json) {
         super(json);

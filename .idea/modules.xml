@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/auth/backend_auth.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/database/backend_database.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" filepath="$PROJECT_DIR$/.idea/modules/backend/server/backend_server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/gateway/frontend_gateway.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/native/frontend_native.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend/ui/frontend_ui.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/launcher.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/moviediary.iml" filepath="$PROJECT_DIR$/.idea/modules/moviediary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/backend/shared_backend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/common/shared_common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/frontend/shared_frontend.iml" />
     </modules>
   </component>
 </project>

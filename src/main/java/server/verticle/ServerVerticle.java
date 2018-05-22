@@ -65,7 +65,7 @@ public class ServerVerticle extends AbstractVerticle {
   public void start(Future<Void> future) throws Exception {
     Router router = Router.router(vertx);
     databaseManager = new DatabaseManager(config()).start();
-    database = createIfMissing(database, () -> DatabaseService.create(vertx, config()));
+    database = createIfMissing(database, () -> DatabaseService.create(vertx, config(), databaseManager.getJooqConfiguration()));
     tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
     omdb = createIfMissing(omdb, () -> OmdbService.create(vertx, config(), database));
     bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
@@ -77,7 +77,7 @@ public class ServerVerticle extends AbstractVerticle {
         new TmdbRouter(vertx, tmdb),
         new OmdbRouter(vertx, omdb),
         new BankLinkRouter(vertx, bankLink),
-        new DatabaseRouter(vertx, config(), securityConfig, database, mail),
+        new DatabaseRouter(vertx, securityConfig, database, mail),
         new MailRouter(vertx, mail),
         new RecommendRouter(recommend),
         new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));

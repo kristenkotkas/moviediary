@@ -1,5 +1,10 @@
 package server.service;
 
+import eu.moviediary.database.tables.pojos.Listentries;
+import eu.moviediary.database.tables.pojos.Movies;
+import eu.moviediary.database.tables.pojos.Series;
+import eu.moviediary.database.tables.pojos.Seriesinfo;
+import eu.moviediary.database.tables.records.SeriesRecord;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
@@ -9,16 +14,34 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import org.jooq.Configuration;
+import org.jooq.DatePart;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
+import server.database.CommonDao;
+import static eu.moviediary.database.tables.Listentries.LISTENTRIES;
+import static eu.moviediary.database.tables.Listsinfo.LISTSINFO;
+import static eu.moviediary.database.tables.Movies.MOVIES;
+import static eu.moviediary.database.tables.Series.SERIES;
+import static eu.moviediary.database.tables.Seriesinfo.SERIESINFO;
+import static eu.moviediary.database.tables.Userseriesinfo.USERSERIESINFO;
+import static eu.moviediary.database.tables.Views.VIEWS;
 import static io.vertx.rxjava.core.Future.failedFuture;
 import static io.vertx.rxjava.core.Future.future;
 import static java.lang.System.currentTimeMillis;
+import static org.jooq.impl.DSL.*;
 import static server.service.DatabaseService.Column.USERNAME;
 import static server.service.DatabaseService.Column.getSortedColumns;
 import static server.service.DatabaseService.Column.getSortedValues;
 import static server.service.DatabaseService.SQLCommand.INSERT;
 import static server.service.DatabaseService.SQLCommand.UPDATE;
 import static server.service.DatabaseService.createDataMap;
-import static server.util.CommonUtils.*;
+import static server.util.CommonUtils.contains;
+import static server.util.CommonUtils.ifPresent;
+import static server.util.CommonUtils.ifTrue;
+import static server.util.CommonUtils.nonNull;
 import static server.util.StringUtils.formToDBDate;
 import static server.util.StringUtils.genString;
 import static server.util.StringUtils.hash;
@@ -27,28 +50,22 @@ import static server.util.StringUtils.movieDateToDBDate;
 /**
  * Database service implementation.
  */
-public class DatabaseServiceImpl implements DatabaseService {
-    private static final String SQL_INSERT_EPISODE =
-            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES (?, ?, ?, ?, ?)";
+public class DatabaseServiceImpl extends CommonDao implements DatabaseService {
     private static final String SQL_GET_YEARS_DIST =
-            "SELECT Year, COUNT(*) AS 'Count' FROM Views " +
+            "SELECT Year, COUNT(1) AS Count FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
     private static final String SQL_GET_WEEKDAYS_DIST =
-            "SELECT ((DAYOFWEEK(Start) + 5) % 7) AS Day, COUNT(*) AS 'Count' " +
+            "SELECT ((DAY_OF_WEEK(Start) + 5) % 7) AS Day, COUNT(1) AS Count " +
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
     private static final String SQL_GET_TIME_DIST =
-            "SELECT HOUR(Start) AS Hour, COUNT(*) AS Count FROM Views " +
+            "SELECT HOUR(Start) AS Hour, COUNT(1) AS Count FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
     private static final String SQL_GET_MONTH_YEAR_DIST =
-            "SELECT MONTH(Start) AS Month, YEAR(Start) AS Year, COUNT(MONTHNAME(Start)) AS Count " +
+            "SELECT MONTH(Start) AS Month, YEAR(Start) AS Year, COUNT(1) AS Count " +
                     "FROM Views " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ? ";
-    private static final String SQL_GET_ALL_TIME_META =
-            "SELECT DATE(Min(Start)) AS Start, COUNT(*) AS Count, " +
-                    "SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
-                    "WHERE Username = ?";
     private static final String SQL_INSERT_USER =
             "INSERT INTO Users (Username, Firstname, Lastname, Password, Salt) VALUES (?, ?, ?, ?, ?)";
     private static final String SQL_QUERY_USERS = "SELECT * FROM Users " +
@@ -66,21 +83,16 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
     private static final String SQL_GET_TOP_MOVIES_STAT =
-            "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
+            "SELECT MovieId, Title, COUNT(1) AS Count, Image FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
-    private static final String SQL_INSERT_MOVIE =
-            "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
-    private static final String SQL_INSERT_SERIES =
-            "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
-    private static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
     private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Id, Start, WasCinema FROM Views" +
                     " WHERE Username = ? AND MovieId = ?" +
                     " ORDER BY Start DESC";
     private static final String SQL_QUERY_VIEWS_META =
-            "SELECT Count(*) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime " +
+            "SELECT Count(1) AS Count, SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime " +
                     "FROM Views " +
                     "JOIN Movies ON Views.MovieId = Movies.Id " +
                     "WHERE Username = ? AND Start >= ? AND Start <= ?";
@@ -98,49 +110,23 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "GROUP BY Series.SeriesId, Active " +
                     "ORDER BY Title;";
     private static final String SQL_GET_LAST_VIEWS =
-            "SELECT Title, Start, MovieId, WEEKDAY(Start) AS 'week_day', WasCinema FROM Views " +
+            "SELECT Title, Start, MovieId, (DAY_OF_WEEK(Start) - 1) AS week_day, WasCinema FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "ORDER BY Start DESC LIMIT 5";
     private static final String SQL_GET_TOP_MOVIES =
-            "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
+            "SELECT MovieId, Title, COUNT(1) AS Count, Image FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
                     "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
-    private static final String SQL_GET_TOTAL_MOVIE_COUNT =
-            "SELECT COUNT(*) AS 'total_movies', SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
-                    "WHERE Username = ?";
-    private static final String SQL_GET_TOTAL_CINEMA_COUNT =
-            "SELECT COUNT(*) AS 'total_cinema' FROM Views " +
-                    "WHERE Username = ? AND WasCinema = 1";
-    private static final String SQL_GET_NEW_MOVIE_COUNT =
-            "SELECT COUNT(WasFirst) AS 'new_movies' FROM Views " +
-                    "WHERE Username = ? " +
-                    "AND WasFirst = 1";
-    private static final String SQL_GET_TOTAL_RUNTIME =
-            "SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
-                    "WHERE Username = ?";
-    private static final String SQL_GET_TOTAL_DISTINCT_MOVIES =
-            "SELECT COUNT(DISTINCT MovieId) AS 'unique_movies' FROM Views " +
-                    "WHERE Username = ?";
-    private static final String SQL_INSERT_SEASON =
-            "INSERT IGNORE INTO Series (Username, SeriesId, EpisodeId, SeasonId, Time) VALUES";
     private static final String SQL_REMOVE_SEASON =
             "DELETE FROM Series WHERE Username = ? AND SeasonId = ?;";
     private static final String SQL_INSERT_NEW_LIST =
             "INSERT INTO ListsInfo (Username, ListName, TimeCreated) VALUES (?, ?, ?);";
     private static final String SQL_GET_LISTS =
             "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
-    private static final String SQL_GET_LISTS_SIZE =
-            "SELECT ListsInfo.Id as id, IFNULL((SELECT COUNT(ListId) FROM ListEntries " +
-                    "WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id GROUP BY ListId), 0) AS count, " +
-                    "IFNULL((SELECT SUM(MovieId IN (SELECT DISTINCT MovieId FROM Views WHERE Username = ?)) AS seen  " +
-                    "FROM ListEntries WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id " +
-                    "GROUP BY ListId), 0) AS seen FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
-    private static final String SQL_INSERT_INTO_LIST =
-            "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
     private static final String SQL_REMOVE_FROM_LIST =
-            "DELETE FROM ListEntries WHERE Username = ? AND ListId = ? && MovieId = ?;";
+            "DELETE FROM ListEntries WHERE Username = ? AND ListId = ? AND MovieId = ?;";
     private static final String SQL_GET_IN_LISTS =
             "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
@@ -158,59 +144,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             "UPDATE ListsInfo SET ListName = ? WHERE Username = ? AND Id = ?;";
     private static final String SQL_DELETE_LIST =
             "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
-    private static final String SQL_GET_LIST_SEEN_MOVIES =
-            "SELECT DISTINCT Views.MovieId FROM ListEntries " +
-                    "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
-                    "WHERE Views.Username = ? AND " +
-                    "ListEntries.Username = ? AND " +
-                    "ListId = ?;";
-    private static final String SQL_GET_LIST_NAME =
-            "SELECT ListName FROM ListsInfo WHERE Username = ? AND Id = ?;";
-    private static final String SQL_GET_LAST_LISTS_HOME =
-            "SELECT ListId, ListName, MovieId, Title, Year FROM ListEntries " +
-                    "JOIN Movies ON Movies.Id = ListEntries.MovieId " +
-                    "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
-                    "WHERE ListEntries.Username = ? AND ACTIVE " +
-                    "ORDER BY Time DESC LIMIT 5";
-    private static final String SQL_GET_DELETED_LISTS =
-            "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated ASC;";
-    private static final String SQL_RESTORE_DELETED_LIST =
-            "UPDATE ListsInfo SET Active = 1 WHERE Username = ? AND Id = ?;";
-    private static final String SQL_INSERT_USER_SERIES_INFO =
-            "INSERT IGNORE INTO UserSeriesInfo (Username, SeriesId) VALUES (?, ?);";
-    private static final String SQL_SET_SERIES_INACTIVE =
-            "UPDATE UserSeriesInfo SET Active = 0 WHERE Username = ? AND SeriesId = ?;";
-    private static final String SQL_GET_INACTIVE_SERIES =
-            "SELECT Title, Image, Series.SeriesId, COUNT(Series.SeriesId) AS Count, Active FROM Series " +
-                    "JOIN SeriesInfo ON Series.SeriesId = SeriesInfo.Id " +
-                    "JOIN UserSeriesInfo ON Series.SeriesId = UserSeriesInfo.SeriesId " +
-                    "WHERE Series.Username = ? AND UserSeriesInfo.Username = ? AND NOT Active " +
-                    "GROUP BY Series.SeriesId, Active " +
-                    "ORDER BY Title;";
-    private static final String SQL_SET_SERIES_ACTIVE =
-            "UPDATE UserSeriesInfo SET Active = 1 WHERE Username = ? AND SeriesId = ?;";
-    private static final String SQL_GET_TODAY_IN_HISTORY =
-            "SELECT MovieId, Title, Year(Start) AS Year, WasCinema FROM Views " +
-                    "JOIN Movies ON Movies.Id = Views.MovieId " +
-                    "WHERE Username = ? AND " +
-                    "DAYOFMONTH(Start) = DAYOFMONTH(DATE(NOW())) AND " +
-                    "MONTH(Start) = MONTH(DATE(NOW())) ORDER BY YEAR DESC;";
-    private static final String SQL_GET_HOME_STATISTICS =
-            "SELECT " +
-                    "(SELECT COUNT(*) FROM Views WHERE Username = ?) " +
-                    "AS 'total_views', " +
-                    "(SELECT COUNT(WasFirst) FROM Views WHERE Username = ? AND WasFirst = 1) " +
-                    "AS 'first_view', " +
-                    "(SELECT COUNT(DISTINCT MovieId) FROM Views WHERE Username = ?) " +
-                    "AS 'unique_movies', " +
-                    "(SELECT COUNT(*) FROM Views WHERE Username = ? AND WasCinema = 1) " +
-                    "AS 'total_cinema', " +
-                    "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
-                    "AS 'total_runtime';";
 
     private JDBCClient client;
 
-    protected DatabaseServiceImpl(Vertx vertx, JsonObject config) {
+    protected DatabaseServiceImpl(Vertx vertx, JsonObject config, Configuration jooqConfig) {
+        super(vertx.getDelegate(), jooqConfig);
         this.client = JDBCClient.createShared(vertx, config.getJsonObject("database"));
     }
 
@@ -267,31 +205,27 @@ public class DatabaseServiceImpl implements DatabaseService {
      * Inserts a movie to movies table.
      */
     @Override
-    public Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath) {
-        return updateOrInsert(SQL_INSERT_MOVIE, new JsonArray()
-                .add(id)
-                .add(movieTitle)
-                .add(year)
-                .add(posterPath));
+    public Future<Boolean> insertMovie(int id, String movieTitle, int year, String posterPath) {
+      return asyncInsertIgnore(MOVIES, new Movies()
+          .setId(id)
+          .setTitle(movieTitle)
+          .setYear((short) year)
+          .setImage(posterPath));
     }
 
     @Override
-    public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
-        return updateOrInsert(SQL_INSERT_SERIES, new JsonArray()
-                .add(id)
-                .add(seriesTitle)
-                .add(posterPath));
+    public Future<Boolean> insertSeries(int id, String seriesTitle, String posterPath) {
+      return asyncInsertIgnore(SERIESINFO, new Seriesinfo()
+          .setId(id)
+          .setTitle(seriesTitle)
+          .setImage(posterPath));
     }
 
     @Override
-    public Future<JsonObject> insertEpisodeView(String username, String jsonParam) {
-        JsonObject json = new JsonObject(jsonParam);
-        return updateOrInsert(SQL_INSERT_EPISODE, new JsonArray()
-                .add(username)
-                .add(json.getInteger("seriesId"))
-                .add(json.getInteger("episodeId"))
-                .add(json.getString("seasonId"))
-                .add(currentTimeMillis()));
+    public Future<Boolean> insertEpisodeView(String username, String jsonParam) {
+        return asyncInsertIgnore(SERIES, new JsonObject(jsonParam)
+            .mapTo(Series.class)
+            .setTime(currentTimeMillis()));
     }
 
     @Override
@@ -457,11 +391,18 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getAllTimeMeta(String username, String jsonParam) {
+      return asyncJson(dsl -> {
+        SelectConditionStep<Record> where = dsl
+            .select(date(min(VIEWS.START)).as("Start"))
+            .select(count().as("Count"))
+            .select(sum(timestampDiff(DatePart.MINUTE, VIEWS.START, VIEWS.END)).as("Runtime"))
+            .from(VIEWS)
+            .where(VIEWS.USERNAME.eq(username));
         JsonObject json = new JsonObject(jsonParam);
-        StringBuilder sb = new StringBuilder(SQL_GET_ALL_TIME_META);
-        ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
-        ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
-        return query(sb.toString(), new JsonArray().add(username));
+        ifTrue(json.getBoolean("is-first", false), () -> where.and(VIEWS.WASFIRST.eq((byte) 1)));
+        ifTrue(json.getBoolean("is-cinema", false), () -> where.and(VIEWS.WASCINEMA.eq((byte) 1)));
+        return where.fetchOneMap();
+      });
     }
 
     @Override
@@ -508,50 +449,30 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_GET_TOP_MOVIES, new JsonArray().add(username));
     }
 
-    @Override
-    public Future<JsonObject> getTotalMovieCount(String username) {
-        return query(SQL_GET_TOTAL_MOVIE_COUNT, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> getNewMovieCount(String username) {
-        return query(SQL_GET_NEW_MOVIE_COUNT, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> getTotalRuntime(String username) {
-        return query(SQL_GET_TOTAL_RUNTIME, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> getTotalDistinctMoviesCount(String username) {
-        return query(SQL_GET_TOTAL_DISTINCT_MOVIES, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> getTotalCinemaCount(String username) {
-        return query(SQL_GET_TOTAL_CINEMA_COUNT, new JsonArray().add(username));
-    }
-
-    @Override
-    public Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId) { // TODO: 18/05/2017 test
-        StringBuilder query = new StringBuilder(SQL_INSERT_SEASON);
-        JsonArray episodes = seasonData.getJsonArray("episodes");
-        JsonArray values = new JsonArray();
-        ifFalse(episodes.isEmpty(), () -> {
-            episodes.stream()
-                    .map(obj -> (JsonObject) obj)
-                    .peek(json -> query.append(" (?, ?, ?, ?, ?),"))
-                    .forEach(json -> values
-                            .add(username)
-                            .add(seriesId)
-                            .add(json.getInteger("id"))
-                            .add(seasonData.getString("_id"))
-                            .add(currentTimeMillis()));
-            query.deleteCharAt(query.length() - 1);
-        });
-        return updateOrInsert(query.toString(), values);
-    }
+    // TODO: 22/05/2018 test
+  @Override
+  public Future<Boolean> insertSeasonViews(String username, JsonObject seasonData, String seriesId) {
+    JsonArray episodes = seasonData.getJsonArray("episodes");
+    return episodes.isEmpty()
+        ? Future.succeededFuture(false)
+        : async(dsl -> {
+      Stream<SeriesRecord> seriesRecords = episodes.stream()
+          .map(obj -> (JsonObject) obj)
+          .map(json -> new Series()
+              .setUsername(username)
+              .setSeriesid(Integer.parseInt(seriesId))
+              .setEpisodeid(json.getInteger("id"))
+              .setSeasonid(seasonData.getString("_id"))
+              .setTime(currentTimeMillis()))
+          .map(series -> dsl.newRecord(SERIES, series));
+      return dsl.loadInto(SERIES)
+          .onDuplicateKeyIgnore()
+          .loadRecords(seriesRecords)
+          .fields(SERIES.USERNAME, SERIES.SERIESID, SERIES.EPISODEID, SERIES.SEASONID, SERIES.TIME)
+          .execute()
+          .stored() > 0;
+    });
+  }
 
     @Override
     public Future<JsonObject> insertList(String username, String listName) {
@@ -574,16 +495,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getDeletedLists(String username) {
-        return query(SQL_GET_DELETED_LISTS, new JsonArray().add(username));
+      String sql = "SELECT Id " +
+          "               ,ListName " +
+          "               ,TimeCreated " +
+          "           FROM ListsInfo " +
+          "          WHERE Username = ? " +
+          "            AND Active = 0 " +
+          "          ORDER BY TimeCreated ASC;";
+        return query(sql, new JsonArray().add(username));
     }
 
     @Override
-    public Future<JsonObject> insertIntoList(String username, String jsonParam) {
-        return updateOrInsert(SQL_INSERT_INTO_LIST, new JsonArray()
-                .add(username)
-                .add(new JsonObject(jsonParam).getString("listId"))
-                .add(new JsonObject(jsonParam).getString("movieId"))
-                .add(currentTimeMillis()));
+    public Future<Boolean> insertIntoList(String username, String jsonParam) {
+      return asyncInsertIgnore(LISTENTRIES, new JsonObject(jsonParam)
+          .mapTo(Listentries.class)
+          .setUsername(username)
+          .setTime(currentTimeMillis()));
     }
 
     @Override
@@ -628,94 +555,121 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getListSeenMovies(String username, String listId) {
-        return query(SQL_GET_LIST_SEEN_MOVIES, new JsonArray()
-                .add(username)
-                .add(username)
-                .add(listId));
+    public Future<String> getListName(String username, String listId) {
+      return async(dsl -> dsl
+          .select(LISTSINFO.LISTNAME)
+          .from(LISTSINFO)
+          .where(LISTSINFO.USERNAME.eq(username))
+          .and(LISTSINFO.ID.eq(Integer.parseInt(listId)))
+          .fetchOne()
+          .value1());
     }
 
     @Override
-    public Future<JsonObject> getListName(String username, String listId) {
-        return query(SQL_GET_LIST_NAME, new JsonArray()
-                .add(username)
-                .add(listId));
+    public Future<JsonArray> getLastListsHome(String username) {
+      return asyncArray(dsl -> dsl
+          .select(LISTENTRIES.LISTID, LISTSINFO.LISTNAME, MOVIES.ID, MOVIES.TITLE, MOVIES.YEAR)
+          .from(LISTENTRIES)
+          .join(MOVIES).on(MOVIES.ID.eq(LISTENTRIES.MOVIEID))
+          .join(LISTSINFO).on(LISTSINFO.ID.eq(LISTENTRIES.LISTID))
+          .where(LISTENTRIES.USERNAME.eq(username))
+          .and(LISTSINFO.ACTIVE.isTrue())
+          .orderBy(LISTENTRIES.TIME.desc())
+          .limit(5)
+          .fetchMaps());
     }
 
     @Override
-    public Future<JsonObject> getLastListsHome(String username) {
-        return query(SQL_GET_LAST_LISTS_HOME, new JsonArray()
-                .add(username));
+    public Future<Boolean> restoreDeletedList(String username, String listId) {
+      return async(dsl -> dsl
+          .update(LISTSINFO)
+          .set(LISTSINFO.ACTIVE, (byte) 1)
+          .where(LISTSINFO.USERNAME.eq(username))
+          .and(LISTSINFO.ID.eq(Integer.parseInt(listId)))
+          .execute() > 0);
+    }
+
+  @Override
+  public Future<JsonObject> getListsSize(String username) {
+    String sql = "SELECT li.Id AS id " +
+        "      ,COALESCE(COUNT(le.ListId), 0) AS count " +
+        "      ,COALESCE((SELECT SUM(le2.MovieId IN (SELECT DISTINCT v.MovieId " +
+        "                                                FROM Views v " +
+        "                                               WHERE v.Username = li.Username)) " +
+        "                   FROM ListEntries le2 " +
+        "                  WHERE le2.Username = li.Username " +
+        "                    AND le2.ListId = li.Id " +
+        "                  GROUP BY le2.ListId), 0) AS seen " +
+        "  FROM ListsInfo li " +
+        "  LEFT JOIN ListEntries le ON le.ListId = li.Id " +
+        " WHERE li.Username = ? " +
+        "   AND li.Active = 1 " +
+        " GROUP BY li.Id " +
+        " ORDER BY li.TimeCreated ASC;";
+    return query(sql, new JsonArray().add(username));
+  }
+
+    @Override
+    public Future<Boolean> insertUserSeriesInfo(String username, String seriesId) {
+        return async(dsl -> dsl()
+                .insertInto(USERSERIESINFO)
+                .columns(USERSERIESINFO.USERNAME, USERSERIESINFO.SERIESID)
+                .values(username, Integer.parseInt(seriesId))
+                .onDuplicateKeyIgnore()
+                .execute() > 0);
     }
 
     @Override
-    public Future<JsonObject> restoreDeletedList(String username, String listId) {
-        return updateOrInsert(SQL_RESTORE_DELETED_LIST, new JsonArray()
-                .add(username)
-                .add(listId));
+    public Future<Boolean> toggleSeriesState(String username, String seriesId, boolean active) {
+      return async(dsl -> dsl
+          .update(USERSERIESINFO)
+          .set(USERSERIESINFO.ACTIVE, active ? 1 : 0)
+          .where(USERSERIESINFO.USERNAME.eq(username))
+          .and(USERSERIESINFO.SERIESID.eq(Integer.parseInt(seriesId)))
+          .execute() > 0);
     }
 
     @Override
-    public Future<JsonObject> getListsSize(String username) {
-        return query(SQL_GET_LISTS_SIZE, new JsonArray()
-                .add(username)
-                .add(username)
-                .add(username)
-                .add(username));
+    public Future<JsonArray> getInactiveSeries(String username) {
+      return asyncArray(dsl -> dsl
+          .select(SERIESINFO.TITLE)
+          .select(SERIESINFO.IMAGE)
+          .select(SERIES.SERIESID)
+          .select(count(SERIES.SERIESID).as("Count"))
+          .select(USERSERIESINFO.ACTIVE)
+          .from(SERIES)
+          .join(SERIESINFO).on(SERIES.SERIESID.eq(SERIESINFO.ID))
+          .join(USERSERIESINFO).on(SERIES.SERIESID.eq(USERSERIESINFO.SERIESID))
+          .where(SERIES.USERNAME.eq(username))
+          .and(USERSERIESINFO.ACTIVE.isFalse())
+          .groupBy(SERIES.SERIESID, USERSERIESINFO.ACTIVE)
+          .orderBy(SERIESINFO.TITLE)
+          .fetchMaps());
     }
 
-    @Override
-    public Future<JsonObject> insertUserSeriesInfo(String username, String seriesId) {
-        return updateOrInsert(SQL_INSERT_USER_SERIES_INFO, new JsonArray()
-                .add(username)
-                .add(seriesId));
-    }
+  @Override
+  public Future<JsonArray> getTodayInHistory(String username) {
+    return asyncArray(dsl -> dsl
+        .select(VIEWS.MOVIEID, MOVIES.TITLE, DSL.year(VIEWS.START).as("Year"), VIEWS.WASCINEMA)
+        .from(VIEWS)
+        .join(MOVIES).on(MOVIES.ID.eq(VIEWS.MOVIEID))
+        .where(VIEWS.USERNAME.eq(username))
+        .and(dayOfMonth(VIEWS.START).eq(dayOfMonth(DSL.currentTimestamp())))
+        .and(DSL.month(VIEWS.START).eq(DSL.month(DSL.currentDate())))
+        .orderBy(MOVIES.YEAR.desc())
+        .fetchMaps());
+  }
 
-    @Override
-    public Future<JsonObject> changeSeriesToInactive(String username, String seriesId) {
-        return updateOrInsert(SQL_SET_SERIES_INACTIVE, new JsonArray()
-                .add(username)
-                .add(seriesId));
-    }
-
-    @Override
-    public Future<JsonObject> getInactiveSeries(String username) {
-        return query(SQL_GET_INACTIVE_SERIES, new JsonArray()
-                .add(username)
-                .add(username));
-    }
-
-    @Override
-    public Future<JsonObject> changeSeriesToActive(String username, String seriesId) {
-        return updateOrInsert(SQL_SET_SERIES_ACTIVE, new JsonArray()
-                .add(username)
-                .add(seriesId));
-    }
-
-    @Override
-    public Future<JsonObject> getTodayInHistory(String username) {
-        return query(SQL_GET_TODAY_IN_HISTORY, new JsonArray()
-                .add(username));
-    }
-
-    /**
-     * Gets users count in database.
-     */
-    @Override
-    public Future<JsonObject> getUsersCount() {
-        return future(fut -> query(SQL_USERS_COUNT, null).rxSetHandler()
-                .map(DatabaseService::getRows)
-                .map(array -> array.getJsonObject(0))
-                .subscribe(fut::complete, fut::fail));
-    }
-
-    @Override
-    public Future<JsonObject> getHomeStatistics(String username) {
-        return query(SQL_GET_HOME_STATISTICS, new JsonArray()
-                .add(username)
-                .add(username)
-                .add(username)
-                .add(username)
-                .add(username));
-    }
+  @Override
+  public Future<JsonObject> getHomeStatistics(String username) {
+    return asyncJson(dsl -> dsl
+        .select(count().as("total_views"))
+        .select(sum(when(VIEWS.WASFIRST.isTrue(), 1)).cast(Integer.class).as("first_view"))
+        .select(countDistinct(VIEWS.MOVIEID).as("unique_movies"))
+        .select(sum(when(VIEWS.WASCINEMA.isTrue(), 1)).cast(Integer.class).as("total_cinema"))
+        .select(sum(timestampDiff(DatePart.MINUTE, VIEWS.START, VIEWS.END)).cast(Integer.class).as("total_runtime"))
+        .from(VIEWS)
+        .where(VIEWS.USERNAME.eq(username))
+        .fetchOneMap());
+  }
 }

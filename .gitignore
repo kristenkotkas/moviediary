@@ -20,3 +20,5 @@ gradlew.bat
 /launcher/src/main/resources/local.json
 /src/main/resources/templates/recommender.hbs
 /src/main/resources/server.json
+/MovieDiary.mv.db
+/MovieDiary.trace.db

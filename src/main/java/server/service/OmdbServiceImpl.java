@@ -7,8 +7,8 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
+import lombok.extern.slf4j.Slf4j;
 import server.entity.Retryable;
-
 import static io.vertx.rxjava.ext.web.codec.BodyCodec.jsonObject;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static server.entity.Status.OK;
@@ -18,6 +18,7 @@ import static server.util.CommonUtils.check;
 /**
  * The Open Movie Database service implementation.
  */
+@Slf4j
 public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements OmdbService {
     private static final String APIKEY = "omdb_key";
     private static final int HTTPS = 443;
@@ -53,7 +54,6 @@ public class OmdbServiceImpl extends CachingServiceImpl<JsonObject> implements O
                 .timeout(5000L)
                 .as(jsonObject())
                 .send((AsyncResult<HttpResponse<JsonObject>> ar) -> {
-                    System.out.println("STATUSCODE ------------ " + ar.cause());
                     check(ar.succeeded(),
                             () -> check(ar.result().statusCode() == OK,
                                     () -> future.complete(cache.set(ar.result().body())),

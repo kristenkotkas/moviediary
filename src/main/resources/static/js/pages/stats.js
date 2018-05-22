@@ -334,15 +334,13 @@ var openCollapsible = function () {
 };
 
 var fillDropDown = function (lang) {
-    eventbus.send("database_get_all_time_meta",
-        {
+    eventbus.send("database_get_all_time_meta", {
             'is-first': $("#seenFirst-stat").is(':checked'),
             'is-cinema': $("#wasCinema-stat").is(':checked')
-        }
-        , function (error, reply) {
-            var data = reply.body['rows'];
-            var start = new Date(data[0]['Start']).getFullYear();
-            if (data[0]['Start'] != null) {
+        }, function (error, reply) {
+            var data = reply.body;
+            var start = new Date(data['Start']).getFullYear();
+            if (data['Start'] != null) {
                 makeDropList(start, lang, 'stat', startDateField, endDateField);
             }
         });
@@ -365,17 +363,16 @@ var makeHistory = function (eventbus, lang, start, end, monthInd) {
 };
 
 var makeAllTime = function (eventbus, lang) {
-    eventbus.send("database_get_all_time_meta",
-        {
+    eventbus.send("database_get_all_time_meta", {
             'is-first': $("#seenFirst-stat").is(':checked'),
             'is-cinema': $("#wasCinema-stat").is(':checked')
         }, function (error, reply) {
-            var data = reply.body['rows'];
+            var data = reply.body;
             var start;
-            if (data[0]['Start'] === null) {
+            if (data['Start'] === null) {
                 start = new Date();
             } else {
-                start = new Date(data[0]['Start']);
+                start = new Date(data['Start']);
             }
             var now = new Date();
             monthIndex = -1 * ((now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));

@@ -147,7 +147,7 @@ function openList(listId) {
       fillMovies(listData, listData[0]['ListName'], listId);
     } else {
       eventbus.send('database_get_list_name', listId.toString(), function (error, reply) {
-        fillMovies(listData, reply.body['rows'][0]['ListName'], listId);
+        fillMovies(listData, reply.body, listId);
       });
     }
     replaceUrlParameter("id", listId);

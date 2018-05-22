@@ -119,7 +119,7 @@ task wrapper(type: Wrapper) {
 sourceSets {
   main {
     java {
-      srcDirs += 'main/gen'
+      srcDirs += 'src/main/gen'
     }
   }
 }
@@ -130,8 +130,8 @@ jooq {
       driver = 'org.h2.Driver'
       url = 'jdbc:h2:file:./MovieDiary'
       user = 'sa'
-      password = 'sa'
-      schema = 'MovieDiary'
+      password = ''
+      schema = 'PUBLIC'
     }
     generator {
       name = 'io.github.jklingsporn.vertx.jooq.generate.VertxGenerator'
@@ -142,7 +142,7 @@ jooq {
         name = 'org.jooq.util.h2.H2Database'
         includes = '.*'
         excludes = 'schema_version|flyway_schema_history|.*_A'
-        inputSchema = 'MovieDiary'
+        inputSchema = 'PUBLIC'
         includeTables = true
         includeRoutines = true
         includePackages = false
@@ -159,7 +159,7 @@ jooq {
       }
       target {
         packageName = 'eu.moviediary.database'
-        directory = 'main/gen'
+        directory = 'src/main/gen'
       }
     }
   }

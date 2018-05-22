@@ -140,15 +140,18 @@ public abstract class EventBusRoutable implements Routable {
         return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
                 check(ar.succeeded(),
                         () -> msg.reply(compiler.apply(msg.headers().get("user"), ar.result())),
-                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
+                        () -> msg.fail(500, "Failure: " + ar.cause().getMessage())));
     }
 
-    protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor) {
-        return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body())).setHandler(ar ->
-                check(ar.succeeded(),
-                        () -> msg.reply(ar.result()),
-                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
-    }
+  protected <T> Handler<Message<T>> reply(BiFunction<String, String, Future<T>> processor) {
+    return msg -> processor.apply(msg.headers().get("user"), valueOf(msg.body()))
+                           .setHandler(ar -> check(ar.succeeded(),
+                                                   () -> msg.reply(ar.result()),
+                                                   () -> {
+                             LOG.error("Eventbus passed error", ar.cause());
+                             msg.fail(500, "Failure: " + ar.cause().getMessage());
+                           }));
+  }
 
     /**
      * Reply to message.
@@ -160,7 +163,7 @@ public abstract class EventBusRoutable implements Routable {
         return msg -> processor.apply(valueOf(msg.body())).setHandler(ar ->
                 check(ar.succeeded(),
                         () -> msg.reply(ar.result()),
-                        () -> msg.reply("Failure: " + ar.cause().getMessage())));
+                        () -> msg.fail(500, "Failure: " + ar.cause().getMessage())));
     }
 
     protected <T> Handler<Message<T>> log() {

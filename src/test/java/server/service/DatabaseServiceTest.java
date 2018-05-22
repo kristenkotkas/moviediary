@@ -8,16 +8,18 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
-import org.junit.*;
+import java.util.Map;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import rx.Observable;
 import server.util.CommonUtils;
 import server.util.LocalDatabase;
 import server.verticle.ServerVerticle;
-
-import java.util.Map;
-
 import static io.vertx.rxjava.core.RxHelper.deployVerticle;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
@@ -88,15 +90,6 @@ public class DatabaseServiceTest {
                 .value();
         assertThat(users.size(), is(2));
         isCorrectUser(users.getJsonObject(0));
-    }
-
-    @Test
-    public void testGetUsersCount(TestContext ctx) throws Exception {
-        Long count = database.getUsersCount().rxSetHandler()
-                .doOnError(ctx::fail)
-                .toBlocking().value()
-                .getLong("Count");
-        assertThat(count, is(2L));
     }
 
     private void isCorrectUser(JsonObject user) {
@@ -305,39 +298,6 @@ public class DatabaseServiceTest {
         JsonObject view = getSingleItem(ctx, database.getMovieViews("unittest@kyngas.eu", "49051"));
         assertThat(view.getString("Start"), is("2017-04-23T14:58:00Z"));
         assertThat(view.getInteger("WasCinema"), is(0));
-    }
-
-    @Test
-    public void testGetTotalDistinctMoviesCount(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
-        JsonObject count = getSingleItem(ctx, database.getTotalDistinctMoviesCount("unittest@kyngas.eu"));
-        assertThat(count.getInteger("unique_movies"), is(2));
-    }
-
-    @Test
-    public void testGetTotalRuntime(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
-        JsonObject runtime = getSingleItem(ctx, database.getTotalRuntime("unittest@kyngas.eu"));
-        assertThat(runtime.getInteger("Runtime"), is(212));
-    }
-
-    @Test
-    public void testGetNewMovieCount(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
-        JsonObject newMovieCount = getSingleItem(ctx, database.getNewMovieCount("unittest@kyngas.eu"));
-        assertThat(newMovieCount.getInteger("new_movies"), is(1));
-    }
-
-    @Test
-    public void testGetTotalMovieCount(TestContext ctx) throws Exception {
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_HOBBIT, null);
-        localDatabase.updateOrInsertBlocking(SQL_INSERT_VIEW_GHOST, null);
-        JsonObject totalMovieCount = getSingleItem(ctx, database.getTotalMovieCount("unittest@kyngas.eu"));
-        assertThat(totalMovieCount.getInteger("total_movies"), is(2));
-        assertThat(totalMovieCount.getInteger("Runtime"), is(212));
     }
 
     @Test

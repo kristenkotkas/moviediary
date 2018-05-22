@@ -4,12 +4,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
-import server.util.CommonUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-
+import org.jooq.Configuration;
+import server.util.CommonUtils;
 import static java.util.stream.Collectors.toList;
 import static server.service.DatabaseService.Column.USERNAME;
 
@@ -24,8 +23,8 @@ public interface DatabaseService {
                 .build();
     }
 
-    static DatabaseService create(Vertx vertx, JsonObject config) {
-        return new DatabaseServiceImpl(vertx, config);
+    static DatabaseService create(Vertx vertx, JsonObject config, Configuration jooqConfig) {
+        return new DatabaseServiceImpl(vertx, config, jooqConfig);
     }
 
     /**
@@ -75,7 +74,7 @@ public interface DatabaseService {
 
     Future<JsonObject> insertUser(String username, String password, String firstname, String lastname);
 
-    Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath);
+    Future<Boolean> insertMovie(int id, String movieTitle, int year, String posterPath);
 
     Future<JsonObject> insertView(String user, String jsonParam);
 
@@ -93,8 +92,6 @@ public interface DatabaseService {
 
     Future<JsonObject> getMovieViews(String username, String movieId);
 
-    Future<JsonObject> getUsersCount();
-
     Future<JsonObject> getYearsDistribution(String username, String jsonParam);
 
     Future<JsonObject> getWeekdaysDistribution(String username, String jsonParam);
@@ -109,11 +106,11 @@ public interface DatabaseService {
 
     Future<JsonObject> removeEpisode(String username, String episodeId);
 
-    Future<JsonObject> insertEpisodeView(String username, String data);
+    Future<Boolean> insertEpisodeView(String username, String data);
 
     Future<JsonObject> getSeenEpisodes(String username, int seriesId);
 
-    Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath);
+    Future<Boolean> insertSeries(int id, String seriesTitle, String posterPath);
 
     Future<JsonObject> getWatchingSeries(String username);
 
@@ -121,21 +118,11 @@ public interface DatabaseService {
 
     Future<JsonObject> getTopMoviesHome(String username);
 
-    Future<JsonObject> getTotalMovieCount(String username);
-
-    Future<JsonObject> getNewMovieCount(String username);
-
-    Future<JsonObject> getTotalRuntime(String username);
-
-    Future<JsonObject> getTotalDistinctMoviesCount(String username);
-
-    Future<JsonObject> getTotalCinemaCount(String username);
-
     Future<JsonObject> getTopMoviesStat(String username, String jsonParam);
 
     Future<JsonObject> getMonthYearDistribution(String username, String jsonParam);
 
-    Future<JsonObject> insertSeasonViews(String username, JsonObject seasonData, String seriesId);
+    Future<Boolean> insertSeasonViews(String username, JsonObject seasonData, String seriesId);
 
     Future<JsonObject> removeSeasonViews(String username, String seasonId);
 
@@ -143,7 +130,7 @@ public interface DatabaseService {
 
     Future<JsonObject> getLists(String username);
 
-    Future<JsonObject> insertIntoList(String username, String jsonParam);
+    Future<Boolean> insertIntoList(String username, String jsonParam);
 
     Future<JsonObject> removeFromList(String username, String jsonParam);
 
@@ -155,27 +142,23 @@ public interface DatabaseService {
 
     Future<JsonObject> deleteList(String username, String listId);
 
-    Future<JsonObject> getListSeenMovies(String username, String listId);
+    Future<String> getListName(String username, String listId);
 
-    Future<JsonObject> getListName(String username, String listId);
-
-    Future<JsonObject> getLastListsHome(String username);
+    Future<JsonArray> getLastListsHome(String username);
 
     Future<JsonObject> getDeletedLists(String username);
 
-    Future<JsonObject> restoreDeletedList(String username, String listId);
+    Future<Boolean> restoreDeletedList(String username, String listId);
 
     Future<JsonObject> getListsSize(String username);
 
-    Future<JsonObject> insertUserSeriesInfo(String username, String seriesId);
+    Future<Boolean> insertUserSeriesInfo(String username, String seriesId);
 
-    Future<JsonObject> changeSeriesToInactive(String username, String seriesId);
+    Future<Boolean> toggleSeriesState(String username, String seriesId, boolean active);
 
-    Future<JsonObject> getInactiveSeries(String username);
+    Future<JsonArray> getInactiveSeries(String username);
 
-    Future<JsonObject> changeSeriesToActive(String username, String seriesId);
-
-    Future<JsonObject> getTodayInHistory(String username);
+    Future<JsonArray> getTodayInHistory(String username);
 
     Future<JsonObject> getHomeStatistics(String username);
 

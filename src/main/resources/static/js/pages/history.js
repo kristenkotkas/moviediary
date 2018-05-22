@@ -132,16 +132,14 @@ var openCollapsible = function () {
 };
 
 var fillDropDown = function (lang) {
-    eventbus.send("database_get_all_time_meta",
-        {
+    eventbus.send("database_get_all_time_meta", {
             'is-first': $("#seenFirst").is(':checked'),
             'is-cinema': $("#wasCinema").is(':checked')
-        }
-        , function (error, reply) {
-            var data = reply.body['rows'];
+        }, function (error, reply) {
+            var data = reply.body;
             console.log(data);
-            var start = new Date(data[0]['Start']).getFullYear();
-            if (data[0]['Start'] != null) {
+            var start = new Date(data['Start']).getFullYear();
+            if (data['Start'] != null) {
                 makeDropList(start, lang, 'history', startDateField, endDateField);
             }
         });
@@ -162,18 +160,16 @@ var makeHistory = function (eventbus, lang, start, end) {
 };
 
 var makeAllTime = function (eventbus, lang) {
-    eventbus.send("database_get_all_time_meta",
-        {
+    eventbus.send("database_get_all_time_meta", {
             'is-first': $("#seenFirst").is(':checked'),
             'is-cinema': $("#wasCinema").is(':checked')
-        }
-        , function (error, reply) {
-            var data = reply.body['rows'];
+        }, function (error, reply) {
+            var data = reply.body;
             //console.log(data);
             //console.log(new Date(data[0]['Start']));
-            startDateField.pickadate('picker').set('select', new Date(data[0]['Start']));
+            startDateField.pickadate('picker').set('select', new Date(data['Start']));
             endDateField.pickadate('picker').set('select', new Date());
-            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data[0]['Count']);
+            searchHistory(eventbus, lang, startDateField.val(), endDateField.val(), data['Count']);
         });
 };
 

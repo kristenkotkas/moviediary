@@ -403,7 +403,7 @@ function removeStarWars() {
 function getOmdb(imdbId, lang) {
     eventbus.send("api_get_awards", imdbId, function (error, reply) {
         console.log('OMDB', reply);
-        if (reply.body != 'Failure: Too many failures.') {
+        if (error === null || error.message !== 'Failure: Too many failures.') {
             if (reply.body['Response'] !== 'False') {
                 parseAwards(reply.body['Awards']);
                 $("#awards").empty().append(
@@ -804,15 +804,14 @@ function listAddOnClick(movieId, listId) {
 }
 
 function insertIntoList(movieId, listId) {
-    eventbus.send('database_insert_into_lists',
-        {
-            'listId': listId.toString(),
-            'movieId': movieId.toString()
-        }, function (error, reply) {
-            if (reply['body']['updated'] != null) {
-                decorateInList(listId);
-            }
-        });
+    eventbus.send('database_insert_into_lists', {
+        'listid': listId.toString(),
+        'movieid': movieId.toString()
+    }, function (error, reply) {
+        if (reply['body'] != null) {
+            decorateInList(listId);
+        }
+    });
 }
 
 function removeFromList(movieId, listId) {
