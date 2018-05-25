@@ -40,6 +40,25 @@ var lang;
 var trailer = $('#movie-trailer');
 var trailerBox = $('#trailer-box');
 var modalFooter = $('#add-watch-modal-ft-info');
+var startDate = $("#watchStartDay");
+var startTime = $("#watchStartTime");
+var startNow = $("#watchStartNow");
+var startCalculate = $("#watchStartCalculate");
+
+var endDate = $("#watchEndDay");
+var endTime = $("#watchEndTime");
+var endNow = $("#watchEndNow");
+var endCalculate = $("#watchEndCalculate");
+
+var seenFirst = $("#watchSeenFirst");
+var wasCinema = $("#watchWasCinema");
+
+var addToWatchBtn = $("#add-watch");
+var addButton = $('#add-btn');
+var addCancel = $('#add-cancel');
+var addViewOpen = $('#add-view-open');
+var blackScreen = $('#black-screen');
+
 eventbus.onopen = function () {
 
     eventbus.send("translations", getCookie("lang"), function (error, reply) {
@@ -197,8 +216,6 @@ var searchMovie = function (eventbus, movieId, lang) {
         var seenFirst = $("#watchSeenFirst");
         var wasCinema = $("#watchWasCinema");
 
-        var commentFiled = $("#watchComment");
-
         var addToWatchBtn = $("#add-watch");
         var addButton = $('#add-btn');
 
@@ -219,7 +236,6 @@ var searchMovie = function (eventbus, movieId, lang) {
             endTime.val('');
             seenFirst.prop('checked', false);
             wasCinema.prop('checked', false);
-            commentFiled.val('');
         });
 
         var data = reply.body;
@@ -235,7 +251,7 @@ var searchMovie = function (eventbus, movieId, lang) {
         }
 
         addButton.click(function () {
-            if (startDate.val() != '' &&  endDate.val() != '' && startTime.val() != '' && endTime.val() != '' && commentFiled.val().length <= 500) {
+            if (startDate.val() != '' &&  endDate.val() != '' && startTime.val() != '' && endTime.val() != '') {
                 var start = startDate.val() + ' ' + startTime.val();
                 var end = endDate.val() + ' ' + endTime.val();
                 eventbus.send("database_insert_view", {
@@ -244,19 +260,35 @@ var searchMovie = function (eventbus, movieId, lang) {
                     'end': end,
                     'wasFirst': seenFirst.is(':checked'),
                     'wasCinema': wasCinema.is(':checked'),
-                    'comment': commentFiled.val()
+                    'comment': ''
                 }, function (error, reply) {
                     if (reply['body']['updated'] != null) {
                         Materialize.toast(data['original_title'] + ' added to views.', 2500);
                         console.log(reply);
                         $('#modal1').modal('close');
                         getMovieViews(eventbus, movieId, lang);
+                        clearViewingAdding();
                     } else {
                         Materialize.toast('Adding failed', 2500);
                     }
                 });
             }
         });
+
+      addCancel.click(function () {
+        clearViewingAdding();
+      });
+      var isClose = true;
+      addViewOpen.click(function () {
+        if (isClose) {
+          isClose = false;
+          console.log('OPEN');
+        } else if (!isClose) {
+          console.log('CLOSE');
+          isClose = true;
+        }
+        switchOverlay(isClose);
+      });
 
         endCalculate.click(function () {
             endCalcPress(endDate, endTime, startDate, startTime, data['runtime']);
@@ -344,6 +376,23 @@ var searchMovie = function (eventbus, movieId, lang) {
         trailerBox.removeClass('scale-out').addClass('scale-in');
     });
 };
+
+function switchOverlay(isClosed) {
+  if (isClosed) {
+    blackScreen.css('visibility', 'hidden').css('opacity', '1');
+  } else if (!isClosed) {
+    blackScreen.css('visibility', 'visible').css('opacity', '0.7');
+  }
+}
+
+function clearViewingAdding() {
+  startDate.val('');
+  startTime.val('');
+  endDate.val('');
+  endTime.val('');
+  seenFirst.prop('checked', false);
+  wasCinema.prop('checked', false);
+}
 
 function getRandomBackdrop(backdrops) {
     var i = 0;
@@ -481,10 +530,10 @@ function fillCrew(crewJson, lang) {
                 composer.push(crewM);
                 break;
             case 'Screenplay':
-            case 'Writer':
                 screenW.push(crewM);
                 break;
             case 'Novel':
+            case 'Writer':
                 novelW.push(crewM);
                 break;
             case 'Producer':
