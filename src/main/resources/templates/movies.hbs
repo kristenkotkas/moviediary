@@ -179,22 +179,24 @@
                     </div>
                     <!-- Add view -->
                     <div class="card col s12 m12 l12 z-depth-0 opacity-object add-view-card" >
-                        <ul class="collapsible z-depth-0" data-collapsible="accordion" id="add-view-open">
+                        <ul class="collapsible z-depth-0" data-collapsible="accordion" id="add-view-coll">
                             <li>
-                                <div class="collapsible-header">
+                                <div class="collapsible-header" id="add-view-open">
                                     <h5 class="plot-title">{{i18n "MOVIES_ADD_TO_WATCH" locale=lang}}</h5>
                                 </div>
                                 <div class="collapsible-body collapsible-body-viewing white">
                                     <!-- Start -->
                                     <div class="row">
-                                        <h6 class="grey-text">{{i18n "START_OF_VIEWING" locale=lang}}</h6>
-                                        <div class="input-field">
-                                            <input id="watchStartDay" type="text" class="datepicker">
-                                            <label for="watchStartDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
-                                        </div>
-                                        <div class="input-field">
-                                            <label for="watchStartTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
-                                            <input id="watchStartTime" type="text" class="timepicker">
+                                        <div class="start-side-title">Start</div>
+                                        <div class="add-view-date-time">
+                                            <div class="input-field">
+                                                <input id="watchStartDay" type="text" class="datepicker">
+                                                <label for="watchStartDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
+                                            </div>
+                                            <div class="input-field">
+                                                <label for="watchStartTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
+                                                <input id="watchStartTime" type="text" class="timepicker">
+                                            </div>
                                         </div>
                                         <div class="input-field">
                                             <button id="watchStartNow" type="submit"
@@ -210,15 +212,17 @@
                                         </div>
                                     </div>
                                     <!-- End -->
-                                    <h6 class="grey-text">{{i18n "END_OF_VIEWING" locale=lang}}</h6>
                                     <div class="row">
-                                        <div class="input-field">
-                                            <input id="watchEndDay" type="text" class="datepicker">
-                                            <label for="watchEndDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
-                                        </div>
-                                        <div class="input-field">
-                                            <label for="watchEndTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
-                                            <input id="watchEndTime" type="text" class="timepicker">
+                                        <div class="start-side-title">End</div>
+                                        <div class="add-view-date-time">
+                                            <div class="input-field">
+                                                <input id="watchEndDay" type="text" class="datepicker">
+                                                <label for="watchEndDay">{{i18n "HISTORY_DATE" locale=lang}}</label>
+                                            </div>
+                                            <div class="input-field">
+                                                <label for="watchEndTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
+                                                <input id="watchEndTime" type="text" class="timepicker">
+                                            </div>
                                         </div>
                                         <div class="input-field">
                                             <button id="watchEndNow" type="submit"

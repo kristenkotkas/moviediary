@@ -231,7 +231,7 @@ body {
 }
 
 .collapsible-body-viewing {
-    padding: 0 2em;
+    padding: 0 1em;
 }
 
 .collapsible-body-tv {
@@ -255,11 +255,30 @@ body {
     height: 100%;
     left: 0;
     top: 0;
-    background: rgba(51,51,51);
+    background: black;
     z-index: 10;
-    visibility: hidden;
-    opacity: 1;
-    transition: visibility 0s, opacity 0.2s;
+    opacity: 0;
+    transition: visibility .3s, opacity .3s;
+}
+
+.add-view-date-time{
+    margin-left: 4em;
+}
+
+.start-side-title {
+    transform: rotate(-90deg);
+    position: relative;
+    left: -2.2em;
+    display: inline-block;
+    bottom: -3.6em;
+    font-weight: bold;
+    background: #60b7f9;
+    color: white;
+    width: 6em;
+    text-align: center;
+    border-radius: 0.1em;
+    font-size: 1.7em;
+    opacity: 0.9;
 }
 
 .home-content-card {
