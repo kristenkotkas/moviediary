@@ -8,6 +8,12 @@
     "password": "",
     "max_pool_size": 30
   },
+  "mail": {
+    "host": "",
+    "port": -1,
+    "username": "",
+    "password": ""
+  },
   "oauth": {
     "localCallback": "http://localhost:8081/callback",
     "callback": "https://moviediary.eu/callback",

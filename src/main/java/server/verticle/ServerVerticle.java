@@ -66,7 +66,7 @@ public class ServerVerticle extends AbstractVerticle {
     tmdb = createIfMissing(tmdb, () -> TmdbService.create(vertx, config(), database));
     omdb = createIfMissing(omdb, () -> OmdbService.create(vertx, config(), database));
     bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
-    mail = createIfMissing(mail, () -> MailService.create(vertx, database));
+    mail = createIfMissing(mail, () -> MailService.create(vertx, database, config()));
     recommend = createIfMissing(recommend, () -> RecommendService.create(vertx));
     securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(vertx, config(), database));
     Arrays.asList(

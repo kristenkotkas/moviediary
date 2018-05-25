@@ -1,4 +1,0 @@
-dependencies {
-  compile project(':shared/backend')
-  compile project(':backend/database')
-}
