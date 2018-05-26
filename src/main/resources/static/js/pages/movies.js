@@ -72,6 +72,10 @@ eventbus.onopen = function () {
         $("#search-button").click();
       }
     });
+    // is mobile?
+    if ($( window ).width() <= 600) {
+      $('.tooltipped').tooltip('remove');
+    }
 
     $("#search-button").click(function () {
       $('#add-btn').off('click').off('keyup');
