@@ -422,14 +422,16 @@ span.badge.new:after {
 }
 
 .github-logo {
-    position: absolute;
-    margin-left: 0.75em;
-    margin-top: 0.15em;
     height: 1em;
 }
 
 .github-logo:hover {
     opacity: 0.8;
+}
+
+.github-logo-cont {
+    margin-left: 0.75em;
+    margin-top: 0.15em;
 }
 
 .search-object-text {
