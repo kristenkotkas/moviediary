@@ -84,6 +84,7 @@ eventbus.onopen = function () {
       $('#plot').removeClass('scale-in').addClass('scale-out');
       $('#add-watch').removeClass('scale-in').addClass('scale-out');
       $('#crew-box').removeClass('scale-in').addClass('scale-out');
+      $('#add-view-card').removeClass('scale-in').addClass('scale-out');
       trailerBox.removeClass('scale-in').removeClass('none-display').addClass('scale-out');
       showEndTime.removeClass('scale-in').addClass('scale-out');
       $('.collapsible').collapsible('close', 0);
@@ -151,7 +152,7 @@ eventbus.onopen = function () {
     });
   });
   addViewColl.collapsible({
-    accordion: false, // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+    accordion: false,
     onOpen: function (el) {
       openAddViewCallback();
     }, // Callback for Collapsible open
@@ -296,7 +297,7 @@ var searchMovie = function (eventbus, movieId, lang) {
             clearViewingAdding();
             setTimeout(function () {
               closeAddView();
-            }, 400);
+            }, 200);
           } else {
             Materialize.toast('Adding failed', 2500);
           }
@@ -383,6 +384,7 @@ var searchMovie = function (eventbus, movieId, lang) {
     $('#plot').removeClass('scale-out').addClass('scale-in');
     $('#add-wishlist').removeClass('scale-out').addClass('scale-in').off('click').off('keyup');
     $('#crew-box').removeClass('scale-out').addClass('scale-in');
+    $('#add-view-card').removeClass('scale-out').addClass('scale-in');
     openShowEndtime(data['runtime']);
     getLists(movieId, lang);
 

@@ -178,10 +178,10 @@
                         </div>
                     </div>
                     <!-- Add view -->
-                    <div class="card col s12 m12 l12 z-depth-0 opacity-object add-view-card" >
+                    <div class="card col s12 m12 l12 z-depth-0 scale-transition scale-out opacity-object add-view-card" id="add-view-card" >
                         <ul class="collapsible z-depth-0" data-collapsible="accordion" id="add-view-coll">
                             <li>
-                                <div class="collapsible-header" id="add-view-open">
+                                <div class="collapsible-header hover" id="add-view-open">
                                     <h5 class="plot-title">{{i18n "MOVIES_ADD_TO_WATCH" locale=lang}}</h5>
                                 </div>
                                 <div class="collapsible-body collapsible-body-viewing white">
@@ -197,18 +197,18 @@
                                                 <label for="watchStartTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
                                                 <input id="watchStartTime" type="text" class="timepicker">
                                             </div>
-                                        </div>
-                                        <div class="input-field">
-                                            <button id="watchStartNow" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0">
-                                                {{i18n "MOVIES_NOW" locale=lang}}
-                                            </button>
-                                            <button id="watchStartCalculate" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0 tooltipped"
-                                                    data-position="right"
-                                                    data-tooltip="{{i18n "CALCULATE_START_TOOLTIP" locale=lang}}">
-                                                {{i18n "MOVIES_CALCULATE" locale=lang}}
-                                            </button>
+                                            <div class="input-field">
+                                                <button id="watchStartNow" type="submit"
+                                                        class="btn calc-now-btns left-calc-now-btns waves-effect waves-light z-depth-0 blue">
+                                                    {{i18n "MOVIES_NOW" locale=lang}}
+                                                </button>
+                                                <button id="watchStartCalculate" type="submit"
+                                                        class="btn calc-now-btns right-calc-now-btns waves-effect waves-light z-depth-0 tooltipped blue"
+                                                        data-position="bottom"
+                                                        data-tooltip="{{i18n "CALCULATE_START_TOOLTIP" locale=lang}}">
+                                                    {{i18n "MOVIES_CALCULATE" locale=lang}}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- End -->
@@ -223,18 +223,18 @@
                                                 <label for="watchEndTime">{{i18n "HISTORY_TIME" locale=lang}}</label>
                                                 <input id="watchEndTime" type="text" class="timepicker">
                                             </div>
-                                        </div>
-                                        <div class="input-field">
-                                            <button id="watchEndNow" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0">
-                                                {{i18n "MOVIES_NOW" locale=lang}}
-                                            </button>
-                                            <button id="watchEndCalculate" type="submit"
-                                                    class="btn waves-effect waves-light z-depth-0 tooltipped"
-                                                    data-position="right"
-                                                    data-tooltip="{{i18n "CALCULATE_END_TOOLTIP" locale=lang}}">
-                                                {{i18n "MOVIES_CALCULATE" locale=lang}}
-                                            </button>
+                                            <div class="input-field">
+                                                <button id="watchEndNow" type="submit"
+                                                        class="btn calc-now-btns left-calc-now-btns waves-effect waves-light z-depth-0 blue">
+                                                    {{i18n "MOVIES_NOW" locale=lang}}
+                                                </button>
+                                                <button id="watchEndCalculate" type="submit"
+                                                        class="btn calc-now-btns right-calc-now-btns waves-effect waves-light z-depth-0 tooltipped blue"
+                                                        data-position="bottom"
+                                                        data-tooltip="{{i18n "CALCULATE_END_TOOLTIP" locale=lang}}">
+                                                    {{i18n "MOVIES_CALCULATE" locale=lang}}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -257,7 +257,7 @@
                                         <br>
                                     </div>
                                     <div class="row">
-                                        <a class="waves-effect waves-green btn z-depth-0 blue" id="add-btn">
+                                        <a class="waves-effect waves-green btn z-depth-0 green" id="add-btn">
                                             {{i18n "MOVIES_ADD" locale=lang}}
                                         </a>
                                         <a class="waves-effect waves-green btn z-depth-0 red" id="add-cancel">
