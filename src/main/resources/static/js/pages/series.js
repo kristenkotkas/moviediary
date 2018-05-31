@@ -98,7 +98,7 @@ function getSeriesSearch(lang) {
             //console.log(searchedTvSeries);
             searchResultContainer.append(
                 $.parseHTML(
-                    '<div class="col s12 m12 l4">' +
+                    '<div class="col s12 m12 l6 xl4">' +
                         '<div class="card horizontal z-depth-0 search-object-series" id="' + resultCardId + '">' +
                             '<div class="card-image">' +
                                 '<img src="' + getPosterPath(searchedTvSeries['poster_path']) + '" class="series-poster" ' +
