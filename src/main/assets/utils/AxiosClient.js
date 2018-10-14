@@ -23,9 +23,9 @@ export function post(url, data) {
 }
 
 export function getMoviePredictions(movieId) {
-    return get("/public/api/v1/recommend/" + movieId)
+    return get("/public/api/v1/recommend/" + movieId);
 }
 
 export function getGenrePredictions(movieDescription) {
-    return post("/public/api/v1/genres", JSON.stringify({description: movieDescription}))
+    return post("/public/api/v1/genres", JSON.stringify({description: movieDescription}));
 }
