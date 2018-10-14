@@ -179,6 +179,8 @@ public interface DatabaseService {
 
     Future<JsonObject> getHomeStatistics(String username);
 
+    Future<JsonObject> getOscarAwards(String movieId);
+
     /**
      * Creates a SQL command string from given Table and list of Columns.
      * Does not set values.

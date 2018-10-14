@@ -83,6 +83,7 @@ public class DatabaseRouter extends EventBusRoutable {
     private static final String CHANGE_SERIES_ACTIVE = "database_change_series_active";
     private static final String GET_TODAY_IN_HISTORY = "database_get_today_in_history";
     private static final String GET_HOME_STATISTICS = "database_get_home_statistics";
+    private static final String GET_OSCAR_AWARDS = "database_get_oscar_awards";
 
     private final JsonObject config;
     private final SecurityConfig securityConfig;
@@ -141,6 +142,7 @@ public class DatabaseRouter extends EventBusRoutable {
         listen(CHANGE_SERIES_ACTIVE, reply(database::changeSeriesToActive));
         listen(GET_TODAY_IN_HISTORY, reply((user, param) -> database.getTodayInHistory(user)));
         listen(GET_HOME_STATISTICS, reply((user, param) -> database.getHomeStatistics(user)));
+        listen(GET_OSCAR_AWARDS, reply((user, param) -> database.getOscarAwards(param)));
     }
 
     @Override

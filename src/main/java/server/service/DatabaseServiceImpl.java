@@ -204,6 +204,13 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "AS 'total_cinema', " +
                     "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
                     "AS 'total_runtime';";
+    private static final String SQL_GET_OSCAR_AWARDS = "" +
+            "SELECT cate.Name " +
+            "FROM Awards awar " +
+            "       JOIN Category cate ON cate.Id = awar.CategoryId " +
+            "WHERE awar.MovieId = ?" +
+            "  AND awar.Status = 'W' " +
+            "ORDER BY cate.Id asc;";
 
     private JDBCClient client;
 
@@ -716,5 +723,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(username)
                 .add(username)
                 .add(username));
+    }
+
+    @Override
+    public Future<JsonObject> getOscarAwards(String movieId) {
+        return query(SQL_GET_OSCAR_AWARDS, new JsonArray()
+                .add(movieId));
     }
 }

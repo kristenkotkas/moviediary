@@ -459,6 +459,11 @@ span.badge.new:after {
     margin-right: 0.5em;
 }
 
+.oscar-statue:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
 .oscar-container {
     padding-bottom: 0;
 }

@@ -362,7 +362,7 @@ var searchMovie = function (eventbus, movieId, lang) {
       backgroundPath = 'https://image.tmdb.org/t/p/original' + getRandomBackdrop(data['images']['backdrops']);
     }
 
-    getOmdb(data['imdb_id'], lang);
+    getOmdb(data['imdb_id'], lang, movieId);
     fillTmdbCredits(data['credits'], lang);
     getMovieViews(eventbus, movieId, lang);
 
@@ -466,12 +466,12 @@ function removeStarWars() {
   $("#add-watch").removeClass('star-wars-add-wishlist').addClass('add-wishlist');
 }
 
-function getOmdb(imdbId, lang) {
+function getOmdb(imdbId, lang, movieId) {
   eventbus.send("api_get_awards", imdbId, function (error, reply) {
     console.log('OMDB', reply);
     if (reply.body != 'Failure: Too many failures.') {
       if (reply.body['Response'] !== 'False') {
-        parseAwards(reply.body['Awards']);
+        parseAwards(reply.body['Awards'], movieId);
         $("#awards").empty().append(
           '<a class="home-link grey-text cursor" href="' + getIMDbAwardsURL(imdbId) + '" target="_blank">' +
           reply.body['Awards'].replace('.', '.<br>') + '</a>'
@@ -612,21 +612,24 @@ function getGoogleQueryURL(query) {
   return googleURL.substring(0, googleURL.length - 1);
 }
 
-function parseAwards(awardString) {
+function parseAwards(awardString, movieId) {
   if (awardString !== 'N/A') {
     var splited = awardString.split(' ');
     if (splited[0] === 'Won' && (splited[2] === 'Oscars.' || splited[2] === 'Oscar.')) {
-      fillOscars(splited[1]);
+      fillOscars(splited[1], movieId);
     }
   }
 }
 
-function fillOscars(oscarCount) {
-  console.log('WON ' + oscarCount + ' Oscars');
+function fillOscars(oscarCount, movieId) {
+
   oscarContainer.empty();
   for (var i = 0; i < oscarCount; i++) {
-    oscarContainer.append('<img class="oscar-statue" src="/static/img/oscar.svg" alt="Oscar statue">');
+    oscarContainer.append('<img class="oscar-statue tooltipped" data-position="bottom" src="/static/img/oscar.svg" ' +
+        'alt="Oscar statue" data-delay="50" id="'+ movieId + "-oscar-" + i +'">');
   }
+
+  getOscarAwards(movieId);
 
 }
 
@@ -673,6 +676,22 @@ var getMovieViews = function (eventbus, movieId, lang) {
     }
   });
 };
+
+function getOscarAwards(movieId) {
+  eventbus.send("database_get_oscar_awards", movieId, function (error, reply) {
+    var result = reply['body']['rows'];
+
+    if (result.length > 0) {
+      for (var i = 0; i < result.length; i++) {
+        $(document.getElementById(movieId + '-oscar-' + i)).attr('data-tooltip', result[i]['Name']);
+      }
+
+      $(document).ready(function(){
+        $('.tooltipped').tooltip({delay: 50});
+      });
+    }
+  });
+}
 
 function removeView(movieId, viewId, lang, date) {
   console.log('viewId', viewId);
