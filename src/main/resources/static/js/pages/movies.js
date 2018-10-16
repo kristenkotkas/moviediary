@@ -683,14 +683,27 @@ function getOscarAwards(movieId) {
 
     if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
-        $(document.getElementById(movieId + '-oscar-' + i)).attr('data-tooltip', result[i]['Name']);
+        $(document.getElementById(movieId + '-oscar-' + i)).attr('data-tooltip', getTooltipMessage(result[i]['Name']));
       }
 
-      $(document).ready(function(){
-        $('.tooltipped').tooltip({delay: 50});
+      $('.oscar-statue').tooltip({ //tooltips initialization
+        delay: 150,
+        position: 'top',
+        html: true
       });
     }
   });
+}
+
+function getTooltipMessage(awardTitle) {
+  return '<div class="award-title">' +
+      '<img src="/static/img/award_leaf_left.svg" class="award-col">' +
+      '<span class="award-col">' +
+      '<h5>Best</h5>' +
+      '<h4>' + awardTitle.substring(5) + '</h4>' +
+      '</span>' +
+      '<img src="/static/img/award_leaf_right.svg" class="award-col">' +
+      '</div>';
 }
 
 function removeView(movieId, viewId, lang, date) {
