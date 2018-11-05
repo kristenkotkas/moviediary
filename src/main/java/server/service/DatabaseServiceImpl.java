@@ -103,7 +103,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "SELECT MovieId, Title, COUNT(*) AS Count, Image FROM Views " +
                     "JOIN Movies ON Movies.Id = Views.MovieId " +
                     "WHERE Username = ? " +
-                    "GROUP BY MovieId ORDER BY Count DESC LIMIT 5";
+                    "GROUP BY MovieId ORDER BY Count DESC, AVG(Start) DESC LIMIT 5";
     private static final String SQL_GET_TOTAL_MOVIE_COUNT =
             "SELECT COUNT(*) AS 'total_movies', SUM(TIMESTAMPDIFF(MINUTE, Start, End)) AS Runtime FROM Views " +
                     "WHERE Username = ?";
