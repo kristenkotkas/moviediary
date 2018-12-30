@@ -4,6 +4,8 @@ plugins {
   id 'idea'
   id "com.github.johnrengelman.shadow" version "2.0.4"
   id 'org.hidetake.ssh' version '2.9.0'
+
+  //id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
 repositories {
@@ -15,7 +17,7 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 dependencies {
-  compile files('/libs/templ-handlebars.jar')
+  compile files('libs/templ-handlebars.jar')
   compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
   compile group: 'com.github.jknack', name: 'handlebars', version: '4.0.6'
   compile group: 'io.vertx', name: 'vertx-core', version: '3.4.2'
@@ -31,7 +33,7 @@ dependencies {
   compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.8.8'
   compile 'org.codehaus.woodstox:woodstox-core-asl:4.4.1'
 
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 
   testCompile group: 'junit', name: 'junit', version: '4.12'
   testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.4.2'
@@ -39,6 +41,12 @@ dependencies {
   testCompile group: 'ch.vorburger.mariaDB4j', name: 'mariaDB4j', version: '2.2.3'
   testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.4.0'
   testCompile group: 'xml-apis', name: 'xml-apis', version: '1.4.01'
+
+  //Java EE modules for java 9+
+  compile 'javax.xml.bind:jaxb-api:2.2.11'
+  compile 'com.sun.xml.bind:jaxb-core:2.2.11'
+  compile 'com.sun.xml.bind:jaxb-impl:2.2.11'
+  compile 'javax.activation:activation:1.1.1'
 }
 
 configurations.all {

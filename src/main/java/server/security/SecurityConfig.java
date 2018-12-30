@@ -7,7 +7,6 @@ import io.vertx.rxjava.ext.web.sstore.SessionStore;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.oauth.client.FacebookClient;
-import org.pac4j.oauth.client.Google2Client;
 import org.pac4j.vertx.auth.Pac4jAuthProvider;
 import org.pac4j.vertx.context.session.VertxSessionStore;
 import server.service.DatabaseService;
@@ -85,11 +84,7 @@ public class SecurityConfig {
             fb.setScope("email");
             return fb;
         }),
-        GOOGLE("google", Google2Client.class, (key, secret) -> {
-            Google2Client g2c = new Google2Client(key, secret);
-            g2c.setScope(Google2Client.Google2Scope.EMAIL);
-            return g2c;
-        }),
+        GOOGLE("google", Google2Client.class, Google2Client::new),
         IDCARD("idcard", IdCardClient.class, (key, secret) -> new IdCardClient());
 
         private static final String OAUTH = "oauth";
