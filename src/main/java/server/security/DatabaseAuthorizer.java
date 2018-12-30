@@ -8,7 +8,6 @@ import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.oauth.profile.facebook.FacebookProfile;
-import org.pac4j.oauth.profile.google2.Google2Profile;
 import server.entity.TriFunction;
 import server.service.DatabaseService;
 
@@ -45,7 +44,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
      * Checks whether Pac4j user profile is authorized.
      */
     @Override
-    protected boolean isProfileAuthorized(WebContext context, CommonProfile profile) throws HttpAction {
+    protected boolean isProfileAuthorized(WebContext context, CommonProfile profile) {
         return profile != null && ProfileAuthorizer.isAuthorized(database, profile,
                 getRows(database.getAllUsers().rxSetHandler().toBlocking().value()));
     }
@@ -69,7 +68,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
      */
     public enum ProfileAuthorizer {
         FACEBOOK(FacebookProfile.class, oAuth2Authorization()),
-        GOOGLE(Google2Profile.class, oAuth2Authorization()),
+        GOOGLE(GoogleProfile.class, oAuth2Authorization()),
         IDCARD(IdCardProfile.class, (IdCardProfile p, Stream<JsonObject> stream, DatabaseService database) -> stream
                 .anyMatch(json -> p.getSerial().equals(json.getString(USERNAME.getName()))) ||
                 database.insertUser(p.getSerial(), genString(), p.getFirstName(), p.getFamilyName())
