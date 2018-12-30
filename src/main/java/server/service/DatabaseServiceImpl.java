@@ -239,7 +239,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> insertUser(String username, String password, String firstname, String lastname) {
-        if (!nonNull(username, password, firstname, lastname) || contains("", username, firstname, lastname)) {
+        if (!nonNull(username, password) || contains("", username)) {
             return failedFuture("Email, firstname and lastname must exist!");
         }
         return future(fut -> ifPresent(genString(), salt -> updateOrInsert(SQL_INSERT_USER, new JsonArray()

@@ -5,36 +5,20 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.StaticHandler;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 import org.pac4j.core.profile.CommonProfile;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
-import server.template.ui.BaseTemplate;
-import server.template.ui.DescToGenreTemplate;
-import server.template.ui.DiscoverTemplate;
-import server.template.ui.DonateFailureTemplate;
-import server.template.ui.DonateSuccessTemplate;
-import server.template.ui.ErrorTemplate;
-import server.template.ui.FormLoginTemplate;
-import server.template.ui.FormRegisterTemplate;
-import server.template.ui.HistoryTemplate;
-import server.template.ui.HomeTemplate;
-import server.template.ui.IdCardLoginTemplate;
-import server.template.ui.ListsTemplate;
-import server.template.ui.LoginTemplate;
-import server.template.ui.MoviesTemplate;
-import server.template.ui.RecommenderTemplate;
-import server.template.ui.SeriesTemplate;
-import server.template.ui.StatisticsTemplate;
+import server.template.ui.*;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
 import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
-import static server.entity.Language.ENGLISH;
-import static server.entity.Language.LANGUAGE;
-import static server.entity.Language.getString;
+import static server.entity.Language.*;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
@@ -42,16 +26,9 @@ import static server.router.DatabaseRouter.DISPLAY_MESSAGE;
 import static server.security.DatabaseAuthorizer.UNAUTHORIZED;
 import static server.security.DatabaseAuthorizer.URL;
 import static server.security.RedirectClient.REDIRECT_URL;
-import static server.security.SecurityConfig.AuthClient.FACEBOOK;
-import static server.security.SecurityConfig.AuthClient.FORM;
-import static server.security.SecurityConfig.AuthClient.GOOGLE;
-import static server.security.SecurityConfig.AuthClient.IDCARD;
-import static server.security.SecurityConfig.CLIENT_CERTIFICATE;
-import static server.security.SecurityConfig.CLIENT_VERIFIED_STATE;
-import static server.security.SecurityConfig.CSRF_TOKEN;
-import static server.util.CommonUtils.check;
-import static server.util.CommonUtils.getProfile;
-import static server.util.CommonUtils.ifPresent;
+import static server.security.SecurityConfig.AuthClient.*;
+import static server.security.SecurityConfig.*;
+import static server.util.CommonUtils.*;
 import static server.util.FileUtils.isRunningFromJar;
 import static server.util.HandlerUtils.endHandler;
 import static server.util.StringUtils.RANDOM;
@@ -305,8 +282,15 @@ public class UiRouter extends EventBusRoutable {
     base.setListsPage(UI_LISTS);
     CommonProfile profile = getProfile(ctx, securityConfig);
     if (profile != null) {
-      base.setUserName(profile.getFirstName() + " " + profile.getFamilyName());
-      base.setUserFirstName(profile.getFirstName());
+      StringBuilder sb = new StringBuilder();
+      if (profile.getFirstName() != null) {
+        base.setUserFirstName(profile.getFirstName());
+        sb.append(profile.getFirstName());
+      }
+      if (profile.getFamilyName() != null) {
+        sb.append(" ").append(profile.getFamilyName());
+      }
+      base.setUserName(sb.toString());
     }
     return base;
   }
