@@ -2,10 +2,12 @@ package server.router;
 
 import eu.kyngas.template.engine.HandlebarsTemplateEngine;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.ext.web.Cookie;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.StaticHandler;
 import org.pac4j.core.profile.CommonProfile;
+import server.entity.Language;
 import server.security.FormClient;
 import server.security.IdCardClient;
 import server.security.SecurityConfig;
@@ -18,7 +20,8 @@ import java.util.UUID;
 import static io.vertx.rxjava.ext.web.Cookie.cookie;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.pac4j.core.util.CommonHelper.addParameter;
-import static server.entity.Language.*;
+import static server.entity.Language.LANGUAGE;
+import static server.entity.Language.getString;
 import static server.entity.Status.redirect;
 import static server.router.AuthRouter.AUTH_LOGOUT;
 import static server.router.DatabaseRouter.API_USERS_FORM_INSERT;
@@ -167,10 +170,11 @@ public class UiRouter extends EventBusRoutable {
   private void handleLogin(RoutingContext ctx) {
     LoginTemplate template = getSafe(ctx, TEMPL_LOGIN, LoginTemplate.class);
     String lang = ctx.request().getParam(LANGUAGE);
+    String validatedLang = Language.validate(lang);
     if (lang != null) {
       ctx.removeCookie(LANGUAGE);
-      ctx.addCookie(cookie(LANGUAGE, lang).setMaxAge(DAYS.toSeconds(30)));
-      template.setLang(lang);
+      ctx.addCookie(cookie(LANGUAGE, validatedLang).setMaxAge(DAYS.toSeconds(30)));
+      template.setLang(validatedLang);
     }
     String key = ctx.request().getParam(DISPLAY_MESSAGE);
     engine.render(template.setDisplayMessage(getString(key, ctx))
@@ -269,8 +273,8 @@ public class UiRouter extends EventBusRoutable {
    */
   private <S extends BaseTemplate> S getSafe(RoutingContext ctx, String fileName, Class<S> type) {
     S base = engine.getSafeTemplate(ctx.getDelegate(), fileName, type);
-    base.setLang(ctx.getCookie(LANGUAGE) != null ? ctx.getCookie(LANGUAGE).getValue() :
-        ENGLISH.getLocale().getLanguage());
+    Cookie languageCookie = ctx.getCookie(LANGUAGE);
+    base.setLang(Language.validate(languageCookie != null ? languageCookie.getValue() : null));
     base.setLogoutUrl(addParameter(AUTH_LOGOUT, URL, UI_LOGIN));
     base.setLoginPage(UI_LOGIN);
     base.setHomePage(UI_HOME);
