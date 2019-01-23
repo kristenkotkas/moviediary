@@ -51,7 +51,7 @@ public enum Language {
     }
 
     public static String validate(String lang) {
-        return getLanguageOrDefault(lang).toString();
+        return getLanguageOrDefault(lang).getLocale().getLanguage();
     }
 
     private static Language getLanguageOrDefault(String lang) {
