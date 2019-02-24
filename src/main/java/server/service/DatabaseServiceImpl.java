@@ -205,12 +205,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
                     "AS 'total_runtime';";
     private static final String SQL_GET_OSCAR_AWARDS = "" +
-            "SELECT cate.Name " +
+            "SELECT cate.Name, awar.Status " +
             "FROM Awards awar " +
             "       JOIN Category cate ON cate.Id = awar.CategoryId " +
             "WHERE awar.MovieId = ?" +
-            "  AND awar.Status = 'W' " +
-            "ORDER BY cate.Id asc;";
+            "ORDER BY awar.Status asc, cate.Id asc;";
 
     private JDBCClient client;
 
