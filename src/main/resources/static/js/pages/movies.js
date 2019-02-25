@@ -99,7 +99,6 @@ eventbus.onopen = function () {
       setTimeout(function () {
         eventbus.send("api_get_search", $("#search").val(), function (error, reply) {
           var data = reply.body['results'];
-          console.log(data);
           if (data.length > 0) {
             $.each(data, function (i) {
               var movie = data[i];
@@ -167,12 +166,10 @@ eventbus.onopen = function () {
 };
 
 function openAddViewCallback() {
-  console.log("OPEN");
   blackScreen.css('opacity', '0.8').css('visibility', 'visible');
 }
 
 function closeAddViewCallback() {
-  console.log("CLOSE");
   blackScreen.css('opacity', '0').css('visibility', 'hidden');
 }
 
@@ -227,9 +224,7 @@ function startLoadingCrew() {
 }
 
 var searchMovie = function (eventbus, movieId, lang) {
-  //console.log("LANG: " + JSON.stringify(lang));
   $('#add-btn').off('click').off('keyup');
-  console.log(movieId);
   eventbus.send("api_get_movie", movieId.toString(), function (error, reply) {
     clearInterval(interval);
     startAwardLoading();
@@ -259,7 +254,6 @@ var searchMovie = function (eventbus, movieId, lang) {
     });
 
     addToWatchBtn.click(function () {
-      console.log('click');
       modal.modal('open');
       startDate.val('');
       startTime.val('');
@@ -295,7 +289,6 @@ var searchMovie = function (eventbus, movieId, lang) {
         }, function (error, reply) {
           if (reply['body']['updated'] != null) {
             Materialize.toast(data['original_title'] + ' added to views.', 2500);
-            console.log(reply);
             $('#modal1').modal('close');
             getMovieViews(eventbus, movieId, lang);
             clearViewingAdding();
@@ -337,7 +330,6 @@ var searchMovie = function (eventbus, movieId, lang) {
     }
 
     document.title = 'Movie Diary | ' + data.title;
-    console.log(data);
 
     $("#search-result").empty().hide();
     $('#movie-views-table').empty();
@@ -468,7 +460,6 @@ function removeStarWars() {
 
 function getOmdb(imdbId, lang, movieId) {
   eventbus.send("api_get_awards", imdbId, function (error, reply) {
-    console.log('OMDB', reply);
     if (reply.body != 'Failure: Too many failures.') {
       if (reply.body['Response'] !== 'False') {
         parseAwards(reply.body['Awards'], movieId);
@@ -613,6 +604,7 @@ function getGoogleQueryURL(query) {
 }
 
 function parseAwards(awardString, movieId) {
+  oscarContainer.empty();
   eventbus.send("database_get_oscar_awards", movieId.toString(), function (error, reply) {
     if (reply['body']['rows'].length > 0) {
       fillOscarsFromDB(reply['body']['rows'], movieId);
@@ -628,7 +620,6 @@ function parseAwards(awardString, movieId) {
 }
 
 function fillOscarsFromOmdb(count, movieId) {
-  oscarContainer.empty();
   for (var i = 0; i < count; i++) {
     oscarContainer.append('<img class="oscar-statue tooltipped" data-position="bottom" src="/static/img/oscar.svg" ' +
         'alt="Oscar statue" data-delay="50" id="' + movieId + "-oscar-" + i + '">');
@@ -636,7 +627,6 @@ function fillOscarsFromOmdb(count, movieId) {
 }
 
 function fillOscarsFromDB(oscars, movieId) {
-  oscarContainer.empty();
   for (var i = 0; i < oscars.length; i++) {
     if (oscars[i]['Status'] === 'N') {
       oscarContainer.append('<img class="oscar-statue tooltipped" data-position="bottom" src="/static/img/oscar_nom.svg" ' +
@@ -652,7 +642,6 @@ function fillOscarsFromDB(oscars, movieId) {
 var getMovieViews = function (eventbus, movieId, lang) {
   eventbus.send("database_get_movie_history", movieId.toString(), function (error, reply) {
     var data = reply.body['rows'];
-    console.log(data);
     if (data.length > 0) {
       if (data.length > 1) {
         $('#seen-header').empty().append(lang['MOVIES_JS_SEEN_THIS'] + ' ' + data.length + lang['MOVIES_JS_SEEN_TIMES']);
@@ -719,7 +708,6 @@ function getTooltipMessage(awardTitle) {
 }
 
 function removeView(movieId, viewId, lang, date) {
-  console.log('viewId', viewId);
   eventbus.send("database_remove_view", viewId, function (error, reply) {
     if (reply['body']['updated'] != null) {
       getMovieViews(eventbus, movieId, lang);
@@ -801,7 +789,6 @@ function getNormalDate(date, lang) {
 }
 
 var nullCheck = function (data, lang) {
-  console.log(data);
   if (data === 0 || data == null) {
     return lang['MOVIES_JS_UNKNOWN'];
   } else return data;
@@ -829,7 +816,6 @@ var getStringFormArray = function (jsonArray, lang) {
   if (jsonArray === lang['MOVIES_JS_UNKNOWN']) {
     return lang['MOVIES_JS_UNKNOWN'];
   } else {
-    //console.log(jsonArray);
     if (jsonArray.length === 0) {
       return lang['MOVIES_JS_UNKNOWN'];
     }

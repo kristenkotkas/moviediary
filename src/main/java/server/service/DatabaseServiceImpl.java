@@ -209,7 +209,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "FROM Awards awar " +
             "       JOIN Category cate ON cate.Id = awar.CategoryId " +
             "WHERE awar.MovieId = ?" +
-            "ORDER BY awar.Status asc, cate.Id asc;";
+            "ORDER BY cate.Id asc;";
 
     private JDBCClient client;
 
