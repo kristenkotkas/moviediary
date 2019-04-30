@@ -7,13 +7,17 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import server.entity.JsonObj;
+import server.entity.Privilege;
+import server.entity.Status;
 import server.entity.User;
 import server.security.SecurityConfig;
 import server.service.DatabaseService;
 import server.service.DatabaseService.Column;
 import server.service.DatabaseService.Table;
 import server.service.MailService;
+
 import java.util.function.BiFunction;
+
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 import static server.entity.Status.redirect;
@@ -38,6 +42,7 @@ public class DatabaseRouter extends EventBusRoutable {
 
     private static final String API_USER_INFO = "/private/api/v1/user/info";
     private static final String API_USERS_COUNT = "/private/api/v1/user/count";
+    private static final String API_NEW_USERS_COUNT = "/private/api/v1/user/new_count";
     public static final String API_HISTORY = "/private/api/v1/history";
 
     private static final String GET_HISTORY = "database_get_history";
@@ -151,6 +156,7 @@ public class DatabaseRouter extends EventBusRoutable {
         router.get(API_USERS_COUNT).handler(this::handleUsersCount);
         router.post(API_USERS_FORM_INSERT).handler(this::handleUsersFormInsert);
         router.get(API_HISTORY).handler(this::handleGetHistory);
+        router.get(API_NEW_USERS_COUNT).handler(this::handleNewUsersCount);
     }
 
     private void handleGetHistory(RoutingContext ctx) { // TODO: 07/05/2017 test
@@ -233,9 +239,28 @@ public class DatabaseRouter extends EventBusRoutable {
      * Returns current users count in database as String response.
      */
     private void handleUsersCount(RoutingContext ctx) {
-        database.getUsersCount().rxSetHandler()
-                .doOnError(ctx::fail)
-                .subscribe(count -> ctx.response().end(count.encodePrettily()));
+        handlePrivilegeProtectedResource(ctx, Privilege.ADMIN, database.getUsersCount());
+    }
+
+
+    /**
+     * Returns new registers count aggregated by registration date.
+     */
+    private void handleNewUsersCount(RoutingContext ctx) {
+        handlePrivilegeProtectedResource(ctx, Privilege.ADMIN, database.getNewUsersCount());
+    }
+
+    private void handlePrivilegeProtectedResource(RoutingContext ctx, Privilege privilege,
+                                                  Future<JsonObject> jsonObject) {
+        database.isPrivilegeGranted(getUsername(ctx, securityConfig), privilege)
+                .setHandler(resultHandler(ctx, result -> check(result,
+                        () -> jsonObject.rxSetHandler()
+                                .doOnError(ctx::fail)
+                                .subscribe(res -> ctx.response().end(res.encodePrettily())),
+                        () -> ctx.response()
+                                .setStatusCode(Status.FORBIDDEN)
+                                .end(Status.FORBIDDEN + ": Forbidden\nCause: Not enough privileges"))
+                ));
     }
 
     /**
@@ -272,8 +297,8 @@ public class DatabaseRouter extends EventBusRoutable {
                     .put(Column.SALT, salt)
                     .build());
             Future<JsonObject> f2 = database.insert(Table.SETTINGS, mapBuilder(createDataMap(username))
-                .put(Column.VERIFIED, "0")
-                .build());
+                    .put(Column.VERIFIED, "0")
+                    .build());
             CompositeFuture.all(f1, f2).setHandler(resultHandler(ctx, ar -> {
                 mail.sendVerificationEmail(ctx, username);
                 redirect(ctx, verifyEmail());

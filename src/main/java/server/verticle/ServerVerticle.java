@@ -4,29 +4,16 @@ import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.ext.web.Router;
-import java.util.Arrays;
-import server.router.AuthRouter;
-import server.router.BankLinkRouter;
-import server.router.DatabaseRouter;
-import server.router.MailRouter;
-import server.router.OmdbRouter;
-import server.router.RecommendRouter;
-import server.router.TmdbRouter;
-import server.router.UiRouter;
+import server.router.*;
 import server.security.SecurityConfig;
-import server.service.BankLinkService;
-import server.service.DatabaseService;
-import server.service.MailService;
-import server.service.OmdbService;
-import server.service.RecommendService;
-import server.service.TmdbService;
+import server.service.*;
+
+import java.util.Arrays;
+
 import static server.router.EventBusRoutable.closeEventbus;
 import static server.router.EventBusRoutable.startEventbus;
 import static server.util.CommonUtils.createIfMissing;
-import static server.util.NetworkUtils.DEFAULT_HOST;
-import static server.util.NetworkUtils.DEFAULT_PORT;
-import static server.util.NetworkUtils.HTTP_HOST;
-import static server.util.NetworkUtils.HTTP_PORT;
+import static server.util.NetworkUtils.*;
 
 /**
  * Main server logic.

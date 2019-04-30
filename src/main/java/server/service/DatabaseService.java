@@ -4,6 +4,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
+import server.entity.Event;
+import server.entity.Privilege;
 import server.util.CommonUtils;
 
 import java.util.List;
@@ -180,6 +182,12 @@ public interface DatabaseService {
     Future<JsonObject> getHomeStatistics(String username);
 
     Future<JsonObject> getOscarAwards(String movieId);
+
+    Future<JsonObject> insertEvent(String username, Event event);
+
+    Future<JsonObject> getNewUsersCount();
+
+    Future<Boolean> isPrivilegeGranted(String username, Privilege privilege);
 
     /**
      * Creates a SQL command string from given Table and list of Columns.

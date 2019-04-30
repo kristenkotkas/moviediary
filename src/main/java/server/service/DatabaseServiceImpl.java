@@ -7,6 +7,8 @@ import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
+import server.entity.Event;
+import server.entity.Privilege;
 
 import java.util.List;
 import java.util.Map;
@@ -210,6 +212,18 @@ public class DatabaseServiceImpl implements DatabaseService {
             "       JOIN Category cate ON cate.Id = awar.CategoryId " +
             "WHERE awar.MovieId = ?" +
             "ORDER BY cate.Id asc;";
+    private static final String SQL_INSERT_EVENT = "INSERT INTO Event (Username, Event) VALUE (?, ?);";
+    private static final String SQL_GET_NEW_USERS_COUNT = "" +
+            "SELECT DATE(users.AddedTime) AS Date, count(*) AS Count " +
+            "FROM Users users " +
+            "WHERE users.AddedTime IS NOT NULL " +
+            "GROUP BY date " +
+            "ORDER BY date DESC;";
+    private static final String SQL_IS_PRIVILEGE_GRANTED = "" +
+            "SELECT EXISTS(SELECT * " +
+            "FROM Privilege " +
+            "WHERE Username = ? " +
+            "AND Privilege = ?) as PrivilegeExists;";
 
     private JDBCClient client;
 
@@ -279,6 +293,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(year)
                 .add(posterPath));
     }
+
 
     @Override
     public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
@@ -351,6 +366,7 @@ public class DatabaseServiceImpl implements DatabaseService {
      */
     @Override
     public Future<JsonObject> getUser(String username) {
+
         return query(SQL_QUERY_USER, new JsonArray().add(username));
     }
 
@@ -728,5 +744,27 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Future<JsonObject> getOscarAwards(String movieId) {
         return query(SQL_GET_OSCAR_AWARDS, new JsonArray()
                 .add(movieId));
+    }
+
+    @Override
+    public Future<JsonObject> insertEvent(String username, Event event) {
+        return updateOrInsert(SQL_INSERT_EVENT, new JsonArray()
+                .add(username)
+                .add(event));
+    }
+
+    @Override
+    public Future<JsonObject> getNewUsersCount() {
+        return future(fut -> query(SQL_GET_NEW_USERS_COUNT, null).rxSetHandler()
+                .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
+                .subscribe(fut::complete, fut::fail));
+    }
+
+    @Override
+    public Future<Boolean> isPrivilegeGranted(String username, Privilege privilege) {
+        return query(SQL_IS_PRIVILEGE_GRANTED, new JsonArray()
+                .add(username)
+                .add(privilege))
+                .map(res -> res.getJsonArray("rows").getJsonObject(0).getLong("PrivilegeExists").equals(1L));
     }
 }
