@@ -213,6 +213,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "WHERE awar.MovieId = ?" +
             "ORDER BY cate.Id asc;";
     private static final String SQL_INSERT_EVENT = "INSERT INTO Event (Username, Event) VALUE (?, ?);";
+    private static final String SQL_INSERT_API_KEY_EVENT = "CALL insert_api_key_event(?, ?, ?);";
     private static final String SQL_GET_NEW_USERS_COUNT = "" +
             "SELECT DATE(users.AddedTime) AS Date, count(*) AS Count " +
             "FROM Users users " +
@@ -221,8 +222,8 @@ public class DatabaseServiceImpl implements DatabaseService {
             "ORDER BY date DESC;";
     private static final String SQL_IS_PRIVILEGE_GRANTED = "" +
             "SELECT EXISTS(SELECT * " +
-            "FROM Privilege " +
-            "WHERE Username = ? " +
+            "FROM ApiKey " +
+            "WHERE ApiKey = ? " +
             "AND Privilege = ?) as PrivilegeExists;";
 
     private JDBCClient client;
@@ -754,6 +755,14 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
+    public Future<JsonObject> insertApiKeyEvent(String apiKey, Event event, String data) {
+        return updateOrInsert(SQL_INSERT_API_KEY_EVENT, new JsonArray()
+                .add(apiKey)
+                .add(event)
+                .add(data));
+    }
+
+    @Override
     public Future<JsonObject> getNewUsersCount() {
         return future(fut -> query(SQL_GET_NEW_USERS_COUNT, null).rxSetHandler()
                 .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
@@ -761,9 +770,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<Boolean> isPrivilegeGranted(String username, Privilege privilege) {
+    public Future<Boolean> isPrivilegeGranted(String apiKey, Privilege privilege) {
         return query(SQL_IS_PRIVILEGE_GRANTED, new JsonArray()
-                .add(username)
+                .add(apiKey)
                 .add(privilege))
                 .map(res -> res.getJsonArray("rows").getJsonObject(0).getLong("PrivilegeExists").equals(1L));
     }

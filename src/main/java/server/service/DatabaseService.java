@@ -185,9 +185,11 @@ public interface DatabaseService {
 
     Future<JsonObject> insertEvent(String username, Event event);
 
+    Future<JsonObject> insertApiKeyEvent(String apiKey, Event event, String data);
+
     Future<JsonObject> getNewUsersCount();
 
-    Future<Boolean> isPrivilegeGranted(String username, Privilege privilege);
+    Future<Boolean> isPrivilegeGranted(String apiKey, Privilege privilege);
 
     /**
      * Creates a SQL command string from given Table and list of Columns.

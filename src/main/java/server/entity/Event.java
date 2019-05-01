@@ -1,5 +1,5 @@
 package server.entity;
 
 public enum Event {
-    SIGN_IN
+    SIGN_IN, API_REQUEST
 }
