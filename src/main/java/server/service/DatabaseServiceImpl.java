@@ -131,45 +131,45 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_GET_LISTS =
             "SELECT Id, ListName FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
     private static final String SQL_GET_LISTS_SIZE =
-            "SELECT ListsInfo.Id as id, IFNULL((SELECT COUNT(ListId) FROM ListEntries " +
-                    "WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id GROUP BY ListId), 0) AS count, " +
+            "SELECT ListsInfo.Id as id, IFNULL((SELECT COUNT(ListId) FROM ListEntry " +
+                    "WHERE Username = ? AND ListEntry.ListId = ListsInfo.Id GROUP BY ListId), 0) AS count, " +
                     "IFNULL((SELECT SUM(MovieId IN (SELECT DISTINCT MovieId FROM Views WHERE Username = ?)) AS seen  " +
-                    "FROM ListEntries WHERE Username = ? AND ListEntries.ListId = ListsInfo.Id " +
+                    "FROM ListEntry WHERE Username = ? AND ListEntry.ListId = ListsInfo.Id " +
                     "GROUP BY ListId), 0) AS seen FROM ListsInfo WHERE Username = ? AND Active ORDER BY TimeCreated ASC;";
     private static final String SQL_INSERT_INTO_LIST =
-            "INSERT IGNORE INTO ListEntries VALUES (?, ?, ?, ?);";
+            "INSERT IGNORE INTO ListEntry VALUES (?, ?, ?, ?);";
     private static final String SQL_REMOVE_FROM_LIST =
-            "DELETE FROM ListEntries WHERE Username = ? AND ListId = ? && MovieId = ?;";
+            "DELETE FROM ListEntry WHERE Username = ? AND ListId = ? && MovieId = ?;";
     private static final String SQL_GET_IN_LISTS =
-            "SELECT ListId FROM ListEntries WHERE Username = ? AND MovieId = ?;";
+            "SELECT ListId FROM ListEntry WHERE Username = ? AND MovieId = ?;";
     private static final String SQL_GET_LIST_ENTRIES =
             "SELECT MovieId, Title, ListName, Year, Image, Time, ListId, " +
                     "MovieId IN (SELECT DISTINCT Views.MovieId " +
-                    "FROM ListEntries " +
-                    "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
-                    "WHERE Views.Username = ? AND ListEntries.Username = ? AND " +
-                    "ListId = ?) AS Seen FROM ListEntries " +
-                    "JOIN Movies ON ListEntries.MovieId = Movies.Id " +
-                    "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
-                    "WHERE ListEntries.Username = ? AND ListId = ? " +
+                    "FROM ListEntry " +
+                    "JOIN Views ON ListEntry.MovieId = Views.MovieId " +
+                    "WHERE Views.Username = ? AND ListEntry.Username = ? AND " +
+                    "ListId = ?) AS Seen FROM ListEntry " +
+                    "JOIN Movies ON ListEntry.MovieId = Movies.Id " +
+                    "JOIN ListsInfo ON ListsInfo.Id = ListEntry.ListId " +
+                    "WHERE ListEntry.Username = ? AND ListId = ? " +
                     "ORDER BY Time DESC;";
     private static final String SQL_CHANGE_LIST_NAME =
             "UPDATE ListsInfo SET ListName = ? WHERE Username = ? AND Id = ?;";
     private static final String SQL_DELETE_LIST =
             "UPDATE ListsInfo SET Active = 0 WHERE Username = ? AND Id = ?;";
     private static final String SQL_GET_LIST_SEEN_MOVIES =
-            "SELECT DISTINCT Views.MovieId FROM ListEntries " +
-                    "JOIN Views ON ListEntries.MovieId = Views.MovieId " +
+            "SELECT DISTINCT Views.MovieId FROM ListEntry " +
+                    "JOIN Views ON ListEntry.MovieId = Views.MovieId " +
                     "WHERE Views.Username = ? AND " +
-                    "ListEntries.Username = ? AND " +
+                    "ListEntry.Username = ? AND " +
                     "ListId = ?;";
     private static final String SQL_GET_LIST_NAME =
             "SELECT ListName FROM ListsInfo WHERE Username = ? AND Id = ?;";
     private static final String SQL_GET_LAST_LISTS_HOME =
-            "SELECT ListId, ListName, MovieId, Title, Year FROM ListEntries " +
-                    "JOIN Movies ON Movies.Id = ListEntries.MovieId " +
-                    "JOIN ListsInfo ON ListsInfo.Id = ListEntries.ListId " +
-                    "WHERE ListEntries.Username = ? AND ACTIVE " +
+            "SELECT ListId, ListName, MovieId, Title, Year FROM ListEntry " +
+                    "JOIN Movies ON Movies.Id = ListEntry.MovieId " +
+                    "JOIN ListsInfo ON ListsInfo.Id = ListEntry.ListId " +
+                    "WHERE ListEntry.Username = ? AND ACTIVE " +
                     "ORDER BY Time DESC LIMIT 5";
     private static final String SQL_GET_DELETED_LISTS =
             "SELECT Id, ListName, TimeCreated FROM ListsInfo WHERE Username = ? AND NOT Active ORDER BY TimeCreated ASC;";
