@@ -22,7 +22,14 @@ $(document).ready(function () {
   $(document).ready(function () {
     $('.materialboxed').materialbox();
   });
-
+  // to prevent autoclose
+  // https://stackoverflow.com/questions/55200244/materialize-date-picker-automatically-hide-after-opening-problem-on-chrome
+  $('.datepicker').on('mousedown',function(event){
+    event.preventDefault();
+  });
+  $('.timepicker').on('mousedown',function(event){
+    event.preventDefault();
+  });
 });
 
 var eventbus = new EventBus("/eventbus");
