@@ -27,6 +27,7 @@ public class ServerVerticle extends AbstractVerticle {
   private BankLinkService bankLink;
   private MailService mail;
   private RecommendService recommend;
+  private AdminService admin;
   private SecurityConfig securityConfig;
 
   /**
@@ -55,6 +56,7 @@ public class ServerVerticle extends AbstractVerticle {
     bankLink = createIfMissing(bankLink, () -> BankLinkService.create(vertx, config()));
     mail = createIfMissing(mail, () -> MailService.create(vertx, database, config()));
     recommend = createIfMissing(recommend, () -> RecommendService.create(vertx));
+    admin = createIfMissing(admin, () -> AdminService.create(vertx));
     securityConfig = createIfMissing(securityConfig, () -> new SecurityConfig(vertx, config(), database));
     Arrays.asList(
         new AuthRouter(vertx, config(), securityConfig),
@@ -64,6 +66,7 @@ public class ServerVerticle extends AbstractVerticle {
         new DatabaseRouter(vertx, config(), securityConfig, database, mail),
         new MailRouter(vertx, mail),
         new RecommendRouter(recommend),
+        new AdminRouter(admin, database),
         new UiRouter(vertx, securityConfig)).forEach(routable -> routable.route(router));
     startEventbus(router, vertx);
     vertx.createHttpServer(new HttpServerOptions()

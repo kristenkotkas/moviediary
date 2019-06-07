@@ -9,6 +9,7 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import server.entity.Event;
 import server.entity.Privilege;
+import server.entity.admin.AdminCountParams;
 
 import java.util.List;
 import java.util.Map;
@@ -214,12 +215,6 @@ public class DatabaseServiceImpl implements DatabaseService {
             "ORDER BY cate.Id asc;";
     private static final String SQL_INSERT_EVENT = "INSERT INTO Event (Username, Event) VALUE (?, ?);";
     private static final String SQL_INSERT_API_KEY_EVENT = "CALL insert_api_key_event(?, ?, ?);";
-    private static final String SQL_GET_NEW_USERS_COUNT = "" +
-            "SELECT DATE(users.AddedTime) AS Date, count(*) AS Count " +
-            "FROM Users users " +
-            "WHERE users.AddedTime IS NOT NULL " +
-            "GROUP BY date " +
-            "ORDER BY date DESC;";
     private static final String SQL_IS_PRIVILEGE_GRANTED = "" +
             "SELECT EXISTS(SELECT * " +
             "FROM ApiKey " +
@@ -763,10 +758,40 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<JsonObject> getNewUsersCount() {
-        return future(fut -> query(SQL_GET_NEW_USERS_COUNT, null).rxSetHandler()
+    public Future<JsonObject> getNewUsersCount(AdminCountParams params) {
+        StringBuilder sql = new StringBuilder();
+        JsonArray sqlParams = new JsonArray();
+
+        if (params.isSum()) {
+            sql.append("SELECT MIN(result.Date) as StartDate, MAX(result.Date) as EndDate, SUM(result.Count) as Count FROM ( ");
+        }
+
+        sql.append("SELECT DATE(users.AddedTime) AS Date, count(*) AS Count FROM Users users ");
+        sql.append("WHERE users.AddedTime IS NOT NULL ");
+
+        appendSql(params.getYear(), sql, "AND YEAR(users.AddedTime) = ?", sqlParams);
+        appendSql(params.getMonth(), sql, "AND MONTH(users.AddedTime) = ?", sqlParams);
+        appendSql(params.getDay(), sql, "AND DAY(users.AddedTime) = ?", sqlParams);
+        appendSql(params.getStartDate(), sql, "AND DATE(users.AddedTime) >= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
+        appendSql(params.getEndDate(), sql, "AND DATE(users.AddedTime) <= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
+        sql.append("GROUP BY date ORDER BY date DESC");
+
+        if (params.isSum()) {
+            sql.append(") result");
+        }
+
+        sql.append(";");
+
+        return future(fut -> query(sql.toString(), sqlParams).rxSetHandler()
                 .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
                 .subscribe(fut::complete, fut::fail));
+    }
+
+    private void appendSql(Object param, StringBuilder builder, String sql, JsonArray sqlParams) {
+        if (param != null) {
+            builder.append(sql).append(" ");
+            sqlParams.add(param);
+        }
     }
 
     @Override
@@ -774,6 +799,9 @@ public class DatabaseServiceImpl implements DatabaseService {
         return query(SQL_IS_PRIVILEGE_GRANTED, new JsonArray()
                 .add(apiKey)
                 .add(privilege))
-                .map(res -> res.getJsonArray("rows").getJsonObject(0).getLong("PrivilegeExists").equals(1L));
+                .map(res -> res.getJsonArray("rows")
+                        .getJsonObject(0)
+                        .getLong("PrivilegeExists")
+                        .equals(1L));
     }
 }
