@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.SplittableRandom;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -152,6 +153,12 @@ public class StringUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static <E extends Enum<E>> String getRegexForEnum(Class<E> enumClass) {
+        return Arrays.stream(enumClass.getEnumConstants())
+                .map(value -> value.toString().toLowerCase())
+                .collect(Collectors.joining("|"));
     }
 
 

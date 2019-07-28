@@ -762,11 +762,15 @@ public class DatabaseServiceImpl implements DatabaseService {
         StringBuilder sql = new StringBuilder();
         JsonArray sqlParams = new JsonArray();
 
+        final String VALUE_LABEL = getValueLabel(params);
+
         if (params.isSum()) {
-            sql.append("SELECT MIN(result.Date) as StartDate, MAX(result.Date) as EndDate, SUM(result.Count) as Count FROM ( ");
+            sql.append(String.format("SELECT MIN(result.%s) as Start%s, MAX(result.%s) as End%s, " +
+                    "SUM(result.Count) as Count FROM ( ", VALUE_LABEL, VALUE_LABEL, VALUE_LABEL, VALUE_LABEL));
         }
 
-        sql.append("SELECT DATE(users.AddedTime) AS Date, count(*) AS Count FROM Users users ");
+        sql.append(String.format("SELECT %S (users.AddedTime) AS %s, count(*) AS Count FROM Users users ",
+                VALUE_LABEL, VALUE_LABEL));
         sql.append("WHERE users.AddedTime IS NOT NULL ");
 
         appendSql(params.getYear(), sql, "AND YEAR(users.AddedTime) = ?", sqlParams);
@@ -774,7 +778,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         appendSql(params.getDay(), sql, "AND DAY(users.AddedTime) = ?", sqlParams);
         appendSql(params.getStartDate(), sql, "AND DATE(users.AddedTime) >= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
         appendSql(params.getEndDate(), sql, "AND DATE(users.AddedTime) <= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
-        sql.append("GROUP BY date ORDER BY date DESC");
+        sql.append(String.format("GROUP BY %s ORDER BY %s %S", VALUE_LABEL, VALUE_LABEL, getOrderValue(params)));
 
         if (params.isSum()) {
             sql.append(") result");
@@ -785,6 +789,14 @@ public class DatabaseServiceImpl implements DatabaseService {
         return future(fut -> query(sql.toString(), sqlParams).rxSetHandler()
                 .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
                 .subscribe(fut::complete, fut::fail));
+    }
+
+    private static String getValueLabel(AdminCountParams params) {
+        return params.getAggregation() == null ? "Date" : params.getAggregation().getValue();
+    }
+
+    private static String getOrderValue(AdminCountParams params) {
+        return params.getAggregation() == null ? "DESC" : "ASC";
     }
 
     private void appendSql(Object param, StringBuilder builder, String sql, JsonArray sqlParams) {

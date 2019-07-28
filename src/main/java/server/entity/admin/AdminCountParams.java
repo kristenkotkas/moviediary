@@ -22,7 +22,8 @@ public class AdminCountParams {
     private final String REGEX_MONTH = "(0[1-9]|1[012])";
     private final String REGEX_DAY = "([012][1-9]|[123]0|31)";
     private final String REGEX_DATE = REGEX_YEAR + "-" + REGEX_MONTH + "-" + REGEX_DAY;
-    private final String REGEX_SUM = "true|false";
+    private final String REGEX_BOOLEAN = "true|false";
+    private final String REGEX_AGR = Aggregation.getValidationRegex();
 
     private Long year;
     private Long month;
@@ -30,6 +31,7 @@ public class AdminCountParams {
     private String startDate;
     private String endDate;
     private boolean sum;
+    private Aggregation aggregation;
 
     private List<String> invalidParameters = new ArrayList<>();
 
@@ -40,7 +42,8 @@ public class AdminCountParams {
         setValue(this::setDay, Long::parseLong, "day", REGEX_DAY);
         setValue(this::setStartDate, Function.identity(), "start_date", REGEX_DATE);
         setValue(this::setEndDate, Function.identity(), "end_date", REGEX_DATE);
-        setValue(this::setSum, Boolean::valueOf, "sum", REGEX_SUM);
+        setValue(this::setSum, Boolean::valueOf, "sum", REGEX_BOOLEAN);
+        setValue(this::setAggregation, value -> Aggregation.valueOf(value.toUpperCase()), "agr", REGEX_AGR);
     }
 
     public void checkParameters() throws BadRequestException {
