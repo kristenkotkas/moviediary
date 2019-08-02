@@ -208,11 +208,11 @@ public class DatabaseServiceImpl implements DatabaseService {
                     "(SELECT SUM(TIMESTAMPDIFF(MINUTE, Start, End)) FROM Views WHERE Username = ?) " +
                     "AS 'total_runtime';";
     private static final String SQL_GET_OSCAR_AWARDS = "" +
-            "SELECT cate.Name, awar.Status " +
+            "SELECT cate.Name, awar.Status, cate.DisplayValue " +
             "FROM Awards awar " +
             "       JOIN Category cate ON cate.Id = awar.CategoryId " +
             "WHERE awar.MovieId = ?" +
-            "ORDER BY cate.Id asc;";
+            "ORDER BY cate.Order, cate.Id asc;";
     private static final String SQL_INSERT_EVENT = "INSERT INTO Event (Username, Event) VALUE (?, ?);";
     private static final String SQL_INSERT_API_KEY_EVENT = "CALL insert_api_key_event(?, ?, ?);";
     private static final String SQL_IS_PRIVILEGE_GRANTED = "" +

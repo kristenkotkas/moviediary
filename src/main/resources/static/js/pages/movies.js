@@ -692,7 +692,7 @@ var getMovieViews = function (eventbus, movieId, lang) {
 function addOscarTooltips(result, movieId) {
     if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
-        $(document.getElementById(movieId + '-oscar-' + i)).attr('data-tooltip', getTooltipMessage(result[i]['Name']));
+        $(document.getElementById(movieId + '-oscar-' + i)).attr('data-tooltip', getTooltipMessage(result[i]['DisplayValue']));
       }
 
       $('.oscar-statue').tooltip({ //tooltips initialization
