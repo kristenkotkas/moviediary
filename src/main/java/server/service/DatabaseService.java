@@ -188,6 +188,8 @@ public interface DatabaseService {
 
     Future<JsonObject> insertApiKeyEvent(String apiKey, Event event, String data);
 
+    Future<JsonObject> insertLoginEvent(String username, String client, String server);
+
     Future<JsonObject> getNewUsersCount(AdminCountParams params);
 
     Future<Boolean> isPrivilegeGranted(String apiKey, Privilege privilege);

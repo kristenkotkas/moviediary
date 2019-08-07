@@ -9,7 +9,7 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %highlight(%-1level) \(%file:%line\):%M -> %msg %n</pattern>
         </encoder>
     </appender>
-    <root level="ALL">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

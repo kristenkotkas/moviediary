@@ -215,6 +215,8 @@ public class DatabaseServiceImpl implements DatabaseService {
             "ORDER BY cate.Order, cate.Id asc;";
     private static final String SQL_INSERT_EVENT = "INSERT INTO Event (Username, Event) VALUE (?, ?);";
     private static final String SQL_INSERT_API_KEY_EVENT = "CALL insert_api_key_event(?, ?, ?);";
+    private static final String SQL_INSERT_LOGIN_EVENT =
+            "INSERT INTO LoginEvent (Username, Client, Server) VALUES (?, ?, ?);";
     private static final String SQL_IS_PRIVILEGE_GRANTED = "" +
             "SELECT EXISTS(SELECT * " +
             "FROM ApiKey " +
@@ -755,6 +757,14 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(apiKey)
                 .add(event)
                 .add(data));
+    }
+
+    @Override
+    public Future<JsonObject> insertLoginEvent(String username, String client, String server) {
+        return updateOrInsert(SQL_INSERT_LOGIN_EVENT, new JsonArray()
+                .add(username)
+                .add(client)
+                .add(server));
     }
 
     @Override

@@ -48,7 +48,7 @@ public class SecurityConfig {
      */
     public SecurityConfig(Vertx vertx, JsonObject config, DatabaseService database) {
         this.sessionStore = LocalSessionStore.create(vertx);
-        this.vertxSessionStore = new VertxSessionStore(sessionStore.getDelegate());
+        this.vertxSessionStore = new VertxSessionStoreImpl(sessionStore.getDelegate(), database);
         this.pac4jConfig = new Config(getCallback(config), Arrays.stream(values())
                 .map(client -> client.create(config))
                 .collect(toList()));
