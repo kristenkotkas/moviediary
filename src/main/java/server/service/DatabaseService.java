@@ -7,6 +7,7 @@ import io.vertx.rxjava.core.Vertx;
 import server.entity.Event;
 import server.entity.Privilege;
 import server.entity.admin.AdminCountParams;
+import server.entity.admin.AdminSessionsParams;
 import server.util.CommonUtils;
 
 import java.util.List;
@@ -191,6 +192,8 @@ public interface DatabaseService {
     Future<JsonObject> insertLoginEvent(String username, String client, String server);
 
     Future<JsonObject> getNewUsersCount(AdminCountParams params);
+
+    Future<JsonObject> getUsersSessions(AdminSessionsParams params);
 
     Future<Boolean> isPrivilegeGranted(String apiKey, Privilege privilege);
 

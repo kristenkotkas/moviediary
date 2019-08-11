@@ -10,6 +10,7 @@ import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import server.entity.Event;
 import server.entity.Privilege;
 import server.entity.admin.AdminCountParams;
+import server.entity.admin.AdminSessionsParams;
 
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             "FROM ApiKey " +
             "WHERE ApiKey = ? " +
             "AND Privilege = ?) as PrivilegeExists;";
+    private static final String SQL_GET_USER_SESSION = "SELECT user, count, login FROM v_user_session;";
 
     private JDBCClient client;
 
@@ -797,6 +799,13 @@ public class DatabaseServiceImpl implements DatabaseService {
         sql.append(";");
 
         return future(fut -> query(sql.toString(), sqlParams).rxSetHandler()
+                .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
+                .subscribe(fut::complete, fut::fail));
+    }
+
+    @Override
+    public Future<JsonObject> getUsersSessions(AdminSessionsParams params) {
+        return future(fut -> query(SQL_GET_USER_SESSION, null).rxSetHandler()
                 .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
                 .subscribe(fut::complete, fut::fail));
     }
