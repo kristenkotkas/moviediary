@@ -9,6 +9,9 @@ import java.util.function.Function;
 
 public abstract class SearchParams {
 
+    protected final String REGEX_BOOLEAN = "true|false";
+    protected final String REGEX_NUMBER = "[0-9]+";
+
     protected final MultiMap params;
     protected List<String> invalidParameters = new ArrayList<>();
 

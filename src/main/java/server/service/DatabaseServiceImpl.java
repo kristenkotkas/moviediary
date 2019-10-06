@@ -223,7 +223,6 @@ public class DatabaseServiceImpl implements DatabaseService {
             "FROM ApiKey " +
             "WHERE ApiKey = ? " +
             "AND Privilege = ?) as PrivilegeExists;";
-    private static final String SQL_GET_USER_SESSION = "SELECT user, count, login FROM v_user_session;";
 
     private JDBCClient client;
 
@@ -805,9 +804,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> getUsersSessions(AdminSessionsParams params) {
-        return future(fut -> query(SQL_GET_USER_SESSION, null).rxSetHandler()
-                .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
-                .subscribe(fut::complete, fut::fail));
+        StringBuilder sql = new StringBuilder("SELECT user, client, timestamp FROM v_user_session ");
+        JsonArray sqlParams = new JsonArray();
+
+        sql.append("WHERE 1 = 1 ");
+
+        appendSql(params.getYear(), sql, "AND YEAR(timestamp) = ?", sqlParams);
+        appendSql(params.getMonth(), sql, "AND MONTH(timestamp) = ?", sqlParams);
+        appendSql(params.getDay(), sql, "AND DAY(timestamp) = ?", sqlParams);
+        appendSql(params.getStartDate(), sql, "AND DATE(timestamp) >= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
+        appendSql(params.getEndDate(), sql, "AND DATE(timestamp) <= STR_TO_DATE(?, '%Y-%m-%d')", sqlParams);
+
+        sql.append(";");
+
+        return future(fut -> query(sql.toString(), sqlParams).rxSetHandler()
+            .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
+            .subscribe(fut::complete, fut::fail));
     }
 
     private static String getValueLabel(AdminCountParams params) {

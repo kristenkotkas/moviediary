@@ -11,7 +11,6 @@ import lombok.ToString;
 @Setter(AccessLevel.PRIVATE)
 public class AdminCountParams extends TimelineParams {
 
-    private final String REGEX_BOOLEAN = "true|false";
     private final String REGEX_AGR = Aggregation.getValidationRegex();
 
     private boolean sum;
