@@ -46,7 +46,7 @@ public class DatabaseAuthorizer extends ProfileAuthorizer<CommonProfile> {
     @Override
     protected boolean isProfileAuthorized(WebContext context, CommonProfile profile) {
         return profile != null && ProfileAuthorizer.isAuthorized(database, profile,
-                getRows(database.getAllUsers().rxSetHandler().toBlocking().value()));
+                getRows(database.getUser(profile.getEmail()).rxSetHandler().toBlocking().value()));
     }
 
     @Override
