@@ -37,10 +37,10 @@ export default class DraggablePoster extends React.Component {
   }
 
   handleStop(draggableEventHandler) {
-    console.log(
+    /*console.log(
         draggableEventHandler.clientX,
         draggableEventHandler.clientY
-    );
+    );*/
     this.setState({
       imageXPosition: draggableEventHandler.clientX,
       posterStyle: {...this.state.posterStyle, zIndex: this.props.depth}

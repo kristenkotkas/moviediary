@@ -133,7 +133,7 @@ function getYear(year) {
 function searchYear(year, lang, startDateField, endDateField) {
     var dates = getYear(year);
     var monthIndex = -1 * ((new Date().getFullYear() - year) * 12 + (new Date().getMonth()));
-    console.log(dates);
+    //console.log(dates);
     startDateField.pickadate('picker').set('select', dates['start']);
     endDateField.pickadate('picker').set('select', dates['end']);
     makeHistory(eventbus, lang, startDateField.val(), endDateField.val(), monthIndex);

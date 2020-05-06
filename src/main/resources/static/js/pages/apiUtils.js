@@ -24,7 +24,7 @@ function getMovieSearch(movieName) {
             return data;
         },
         error: function (e) {
-            console.log(e.message());
+            //console.log(e.message());
         }
     });
 }

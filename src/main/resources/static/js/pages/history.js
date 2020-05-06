@@ -131,7 +131,7 @@ var openCollapsible = function () {
     collFilters.collapsible({
         accordion: false,
         onOpen: function (el) {
-            console.log('filter open');
+            //console.log('filter open');
         }
     });*/
 };
@@ -144,7 +144,7 @@ var fillDropDown = function (lang) {
         }
         , function (error, reply) {
             var data = reply.body['rows'];
-            console.log(data);
+            //console.log(data);
             var start = new Date(data[0]['Start']).getFullYear();
             if (data[0]['Start'] != null) {
                 makeDropList(start, lang, 'history', startDateField, endDateField);
@@ -233,7 +233,7 @@ var searchHistory = function (eventbus, lang, start, end, count) {
                             'page': ++i
                         }, function (error, reply) {
                             var addData = reply.body['rows'];
-                            console.log(addData.length);
+                            //console.log(addData.length);
                             if (addData.length < 10) {
                                 $("#load-more-holder").hide();
                             }
@@ -284,9 +284,9 @@ function addNotFound(lang) {
 }
 
 function removeView(viewId, lang) {
-    console.log(viewId);
+    //console.log(viewId);
     eventbus.send("database_remove_view", viewId, function (error, reply) {
-        console.log(viewId + ' removed');
+        //console.log(viewId + ' removed');
         document.getElementById('history-' + viewId).remove();
         eventbus.send("database_get_history_meta",
             {

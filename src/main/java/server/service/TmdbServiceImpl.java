@@ -74,6 +74,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                             0,
                             json.getString("poster_path") == null ? "" : json.getString("poster_path"));
                 }
+                database.updateMoviePoster(json.getInteger("id"),
+                        json.getString("poster_path") == null ? "" : json.getString("poster_path"));
             } else {
                 LOG.error("TMDB getMovieByID failed, could not add movie to DB: " + ar.cause());
             }
@@ -104,6 +106,8 @@ public class TmdbServiceImpl extends CachingServiceImpl<JsonObject> implements T
                 //System.out.println(json.encodePrettily());
                 fut.complete(json);
                 database.insertSeries(json.getInteger("id"), json.getString("name"),
+                        json.getString("poster_path") == null ? "" : json.getString("poster_path"));
+                database.updateSeriesPoster(json.getInteger("id"),
                         json.getString("poster_path") == null ? "" : json.getString("poster_path"));
             }
         }));

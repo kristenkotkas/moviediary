@@ -67,7 +67,7 @@ function fillSorterJSONs(lang) {
 }
 
 function modalClose() {
-  console.log('modal closed');
+  //console.log('modal closed');
   inputNewListName.val('');
   unboundOnClick();
 }
@@ -76,7 +76,7 @@ function createNewList() {
   if (inputNewListName.val().length > 0 && inputNewListName.val().length <= 50) {
     eventbus.send('database_insert_new_list', inputNewListName.val(), function (error, reply) {
       if (reply['body']['updated'] != null) {
-        console.log('new list created');
+        //console.log('new list created');
         newListModal.modal('close');
         getLists();
       } else {
@@ -120,7 +120,7 @@ function getListsSize() {
 }
 
 function fillListsSize(rows) {
-  console.log(rows);
+  //console.log(rows);
   $.each(rows, function (i) {
     var percent = Math.round(rows[i]['seen'] / rows[i]['count'] * 100);
     $(document.getElementById('list-size-' + rows[i]['id'])).empty().append(
@@ -137,7 +137,7 @@ function fillListsSize(rows) {
 
 function openList(listId) {
   eventbus.send('database_get_list_entries', listId.toString(), function (error, reply) {
-    console.log(reply);
+    //console.log(reply);
     unboundOnClick();
     if (isMobile) {
       closeCollabsible();
@@ -305,7 +305,7 @@ function changeListName(title, listId) {
 }
 
 function openDeleteModal(listId) {
-  console.log('delete list modal open');
+  //console.log('delete list modal open');
   modalDeleteList.modal('open');
   btnDeleteList.click(function () {
     deleteList(listId);
@@ -315,7 +315,7 @@ function openDeleteModal(listId) {
 function deleteList(listId) {
   eventbus.send('database_delete_list', listId.toString(), function (error, reply) {
     if (reply['body']['updated'] != null) {
-      console.log('deleted list', listId);
+      //console.log('deleted list', listId);
       modalDeleteList.modal('close');
       listTitleHolder.empty();
       listContainer.empty();
@@ -431,7 +431,7 @@ function removeFromList(movieId, listId) {
       }, function (error, reply) {
         if (reply['body']['updated'] != null) {
           var id = 'card_' + movieId;
-          console.log('REMOVED', id);
+          //console.log('REMOVED', id);
           $(document.getElementById(id)).remove();
           getLists();
         }

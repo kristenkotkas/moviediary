@@ -708,7 +708,7 @@
             value = value + this.amOrPm;
             if ( this.amOrPm == 'PM' ) {
                 submit = ((this.hours > 12) ? (this.hours + 12) : '00') + ':' + leadingZero(this.minutes) + ':00';
-                console.log(this.hours, this.minutes, this.amOrPm);
+                //console.log(this.hours, this.minutes, this.amOrPm);
             }
         }
         /*!

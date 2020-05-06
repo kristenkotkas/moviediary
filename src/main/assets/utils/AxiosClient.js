@@ -6,19 +6,19 @@ export const getApiUrl = () => {
     return url.indexOf('localhost') !== -1 ? localUrl : url;
 };
 
-console.log('API', getApiUrl());
+//console.log('API', getApiUrl());
 export const client = axios.create({
     baseURL: getApiUrl(),
     responseType: 'json'
 });
 
 export function get(url) {
-    console.log('AXIOS GET', url);
+    //console.log('AXIOS GET', url);
     return client.get(url, {});
 }
 
 export function post(url, data) {
-    console.log('AXIOS POST', url, data);
+    //console.log('AXIOS POST', url, data);
     return client.post(url, data, {});
 }
 

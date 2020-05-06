@@ -17,7 +17,7 @@ export default class App extends React.Component {
       moviesData: moviesData.slice(0, 100),
       similarityArray: []
     };
-    console.log('Total movies count', moviesData);
+    //console.log('Total movies count', moviesData);
   }
 
   componentWillMount() {
@@ -39,12 +39,12 @@ export default class App extends React.Component {
   stopHandler(movieData) {
     if (movieData.state.imageXPosition / this.state.screenWidth <= 0.1) {
       if (this.state.dislikedMovies.length < 8) {
-        console.log('You don\'t like ' + movieData.data.movieTitle + '.');
+        //console.log('You don\'t like ' + movieData.data.movieTitle + '.');
         this.addToDislikes(movieData.data);
       }
     } else if (movieData.state.imageXPosition / this.state.screenWidth >= 0.9) {
       if (this.state.likedMovies.length < 8) {
-        console.log('You like ' + movieData.data.movieTitle + '.');
+        //console.log('You like ' + movieData.data.movieTitle + '.');
         this.addToLikes(movieData.data);
       }
     }
@@ -56,7 +56,7 @@ export default class App extends React.Component {
     }, this.removeFromMovies(movieData));
 
     getMoviePredictions(movieData.movieId).then(res => {
-      console.log("Liked movie response: ", res.data.result);
+      //console.log("Liked movie response: ", res.data.result);
       this.updatePosterPositions(res.data.result, 1);
     });
   }
@@ -67,7 +67,7 @@ export default class App extends React.Component {
     }, this.removeFromMovies(movieData));
 
     getMoviePredictions(movieData.movieId).then(res => {
-      console.log("Not liked movie response: ", res.data.result);
+      //console.log("Not liked movie response: ", res.data.result);
       this.updatePosterPositions(res.data.result, -1);
     });
   }
@@ -92,13 +92,13 @@ export default class App extends React.Component {
 
   updatePosterPositions(similarityArray, type) {
     if (this.state.similarityArray.length > 0) {
-      console.log(95);
+      //console.log(95);
       const newSimilarityArray = similarityArray.map(similarity => {
         let similar = this.state.similarityArray.filter(arrayMovie => arrayMovie['tmdb_id'] === similarity['tmdb_id']);
-        /*console.log(similar[0]['similarity']);
-        console.log(similarity['similarity']);
-        console.log("-----");*/
-        console.log("simData", similar[0]['similarity'], type, similarity['similarity']);
+        /*//console.log(similar[0]['similarity']);
+        //console.log(similarity['similarity']);
+        //console.log("-----");*/
+        //console.log("simData", similar[0]['similarity'], type, similarity['similarity']);
         return Object.assign({}, similarity, {
           similarity: similar[0]['similarity'] + (type * similarity['similarity'])
         });
@@ -115,16 +115,16 @@ export default class App extends React.Component {
 
   getNewMovieData() {
     const count = this.state.likedMovies.length + this.state.dislikedMovies.length;
-    console.log("count", count);
+    //console.log("count", count);
     const similarityArray = this.state.similarityArray;
-    console.log("similarityArray", similarityArray);
+    //console.log("similarityArray", similarityArray);
     const similarities = similarityArray.map(elem => elem['similarity'] / count).sort(function (a, b) {
       return a - b
     });
-    console.log("similarities", similarities);
+    //console.log("similarities", similarities);
     const min = similarities[0];
     const max = similarities[similarities.length - 1];
-    console.log("initial range", min, max);
+    //console.log("initial range", min, max);
 
     const data = this.state.moviesData.map(movieData => {
       let similar = similarityArray.filter(simMovie => simMovie['tmdb_id'] === movieData.movieId)[0];
@@ -136,7 +136,7 @@ export default class App extends React.Component {
       moviesData: data
     });
 
-    console.log("new movieData", this.state.moviesData);
+    //console.log("new movieData", this.state.moviesData);
   }
 
   reset() {

@@ -400,7 +400,7 @@ function getData(eventbus, lang, start, end) {
             'end': end
         }
         , function (error, reply) {
-            //console.log(reply);
+            ////console.log(reply);
             var data = reply.body['rows'];
             if (data.length > 0) {
                 makeYearsChart(data);

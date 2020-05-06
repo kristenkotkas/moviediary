@@ -1,4 +1,4 @@
-console.log("hello");
+////console.log("hello");
 
 const getApiUrl = function () {
   const url = window.location.origin + '/';
@@ -6,7 +6,7 @@ const getApiUrl = function () {
   return url.indexOf('localhost') !== -1 ? localUrl : url;
 };
 //https://moviediary.eu/'
-console.log('API', getApiUrl());
+//console.log('API', getApiUrl());
 
 const suitableGenres = $("#suitable-genres");
 const getGenres = $("#get-genres");
@@ -17,8 +17,8 @@ getGenres.click(function () {
 });
 
 function loadGenres(plot) {
-  console.log("get genres pressed");
-  console.log("PLOT", plot);
+  //console.log("get genres pressed");
+  //console.log("PLOT", plot);
 
   $.ajax({
     type: "POST",
@@ -31,7 +31,7 @@ function loadGenres(plot) {
 }
 
 function fillGenres(result) {
-  console.log("RESULT", result);
+  //console.log("RESULT", result);
   result = $.parseJSON(result);
   suitableGenres.empty().append(
       $.parseHTML(

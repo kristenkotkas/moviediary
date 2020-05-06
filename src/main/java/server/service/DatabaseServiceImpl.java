@@ -73,8 +73,12 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static final String SQL_QUERY_SETTINGS = "SELECT * FROM Settings WHERE Username = ?";
     private static final String SQL_INSERT_MOVIE =
             "INSERT IGNORE INTO Movies VALUES (?, ?, ?, ?)";
+    private static final String SQL_UPDATE_MOVIE_POSTER =
+            "UPDATE Movies SET Image = ? WHERE Movies.Id = ?";
     private static final String SQL_INSERT_SERIES =
             "INSERT IGNORE INTO SeriesInfo VALUES (?, ?, ?)";
+    private static final String SQL_UPDATE_SERIES_POSTER =
+            "UPDATE SeriesInfo SET Image = ? WHERE SeriesInfo.Id = ?";
     private static final String SQL_USERS_COUNT = "SELECT COUNT(*) AS Count FROM Users";
     private static final String SQL_GET_MOVIE_VIEWS =
             "SELECT Id, Start, WasCinema FROM Views" +
@@ -293,6 +297,13 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(posterPath));
     }
 
+    @Override
+    public Future<JsonObject> updateMoviePoster(int id, String posterPath) {
+        return updateOrInsert(SQL_UPDATE_MOVIE_POSTER, new JsonArray()
+                .add(posterPath)
+                .add(id));
+    }
+
 
     @Override
     public Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath) {
@@ -300,6 +311,13 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .add(id)
                 .add(seriesTitle)
                 .add(posterPath));
+    }
+
+    @Override
+    public Future<JsonObject> updateSeriesPoster(int id, String posterPath) {
+        return updateOrInsert(SQL_UPDATE_SERIES_POSTER, new JsonArray()
+                .add(posterPath)
+                .add(id));
     }
 
     @Override
@@ -818,8 +836,8 @@ public class DatabaseServiceImpl implements DatabaseService {
         sql.append(";");
 
         return future(fut -> query(sql.toString(), sqlParams).rxSetHandler()
-            .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
-            .subscribe(fut::complete, fut::fail));
+                .map(obj -> new JsonObject().put("rows", obj.getJsonArray("rows")))
+                .subscribe(fut::complete, fut::fail));
     }
 
     private static String getValueLabel(AdminCountParams params) {

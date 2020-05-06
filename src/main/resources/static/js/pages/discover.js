@@ -30,7 +30,7 @@ eventbus.onopen = function () {
 function getMovies() {
     eventbus.send("api_get_search", addInput.val(), function (error, reply) {
         var search = reply.body['results'];
-        console.log(search);
+        //console.log(search);
         searchResult.empty();
         $.each(search, function (i) {
             var movie = search[i];
@@ -51,7 +51,7 @@ function getMovies() {
 
 function getDiscover(movieId) {
     eventbus.send("api_get_recommendations", movieId, function (error, reply) {
-        console.log(reply.body);
+        //console.log(reply.body);
         var data = reply.body['results'];
         $.each(data, function (i) {
             var movie = data[i];

@@ -120,7 +120,7 @@ function getSeriesSearch(lang) {
             var resultCard = $(document.getElementById(resultCardId));
 
             resultCard.click(function () {
-                console.log(resultCardId + ' clicked');
+                //console.log(resultCardId + ' clicked');
                 openSeries(searchedTvSeries['id'], 1);
                 startLoading();
             })
@@ -359,8 +359,8 @@ function changeToInActive(card, element, data) {
 function addEpisodeToView(episodeData, seriesData, seasonData, card, element, lang) {
     var episodeId = episodeData['id'];
     var seriesId = seriesData['id'];
-    console.log('seriesId', seriesId);
-    console.log('episodeId', episodeId);
+    //console.log('seriesId', seriesId);
+    //console.log('episodeId', episodeId);
     eventbus.send("database_insert_episode",
         {
             'seriesId': seriesId,
@@ -370,7 +370,7 @@ function addEpisodeToView(episodeData, seriesData, seasonData, card, element, la
         , function (error, reply) {
             //console.log('reply', reply);
             if (reply['body']['updated'] != null) {
-                console.log('episode added');
+                //console.log('episode added');
                 changeToActive(card, element, episodeData);
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
                     fillSeenSeries(reply.body['rows'], lang);
@@ -387,7 +387,7 @@ function removeEpisode(card, element, episodeData, lang) {
         , function (error, reply) {
             //console.log('reply', reply);
             if (reply['body']['updated'] != null) {
-                console.log('episode removed');
+                //console.log('episode removed');
                 changeToInActive(card, element, episodeData);
                 eventbus.send("database_get_watching_series", {},  function (error, reply) {
                     fillSeenSeries(reply.body['rows'], lang);
@@ -417,9 +417,9 @@ function addSeasonToWatch(event) {
                             var card = episodesContainer[0]['childNodes'][i]['childNodes'];
                             var episodeData = data['episodes'][i];
                             var element = $(card).find('span.badge');
-                            /*console.log(card);
-                             console.log(episodeData);
-                             console.log('elemenr', element);*/
+                            /*//console.log(card);
+                             //console.log(episodeData);
+                             //console.log('elemenr', element);*/
                             changeToActive($(card), element, episodeData);
                         }, timeout += 25);
                     })
@@ -431,9 +431,9 @@ function addSeasonToWatch(event) {
 function removeSeasonFromWatch(event) {
     var data = event.data.seasonData;
     var seasonId = data['_id'];
-    console.log(seasonId);
+    //console.log(seasonId);
     eventbus.send("database_remove_season_views", seasonId, function (error, reply) {
-        console.log(reply.body);
+        //console.log(reply.body);
         if (reply['body']['updated'] != null) {
             eventbus.send("database_get_watching_series", {},  function (error, reply) {
                 fillSeenSeries(reply.body['rows'], event.data.lang);
@@ -444,9 +444,9 @@ function removeSeasonFromWatch(event) {
                     setTimeout(function () {
                         var card = episodesContainer[0]['childNodes'][i]['childNodes'];
                         var element = $(card).find('span.badge');
-                        /*console.log(card);
-                         console.log(episodeData);
-                         console.log('elemenr', element);*/
+                        /*//console.log(card);
+                         //console.log(episodeData);
+                         //console.log('elemenr', element);*/
                         changeToInActive($(card), element);
                     }, timeout += 25);
                 })
@@ -457,7 +457,7 @@ function removeSeasonFromWatch(event) {
 
 function getInactiveSeries() {
     eventbus.send('database_get_inactive_series', {}, function (inactiveError, inactiveReply) {
-        console.log(inactiveReply.body['rows']);
+        //console.log(inactiveReply.body['rows']);
         fillInactiveSeries(inactiveReply.body['rows']);
     });
 }
@@ -483,7 +483,7 @@ function changeDesign(seriesData) {
 }
 
 function fillSeenSeries(seriesData, lang) {
-    console.log(seriesData);
+    //console.log(seriesData);
     seenSeriesContainer.empty();
     fillActiveSeriesTitle(seriesData.length);
     if (seriesData.length > 0) {
@@ -600,7 +600,7 @@ function fillInactiveSeries(rows) {
 }
 
 function changeSeriesToInactive(seriesId) {
-    console.log(seriesId);
+    //console.log(seriesId);
     eventbus.send('database_change_series_inactive', seriesId.toString(), function (error, reply) {
         if (reply['body']['updated'] != null) {
             getWatchingSeries();
@@ -609,7 +609,7 @@ function changeSeriesToInactive(seriesId) {
 }
 
 function changeSeriesToActive(seriesId) {
-    console.log(seriesId);
+    //console.log(seriesId);
     eventbus.send('database_change_series_active', seriesId.toString(), function (error, reply) {
         if (reply['body']['updated'] != null) {
             getWatchingSeries();

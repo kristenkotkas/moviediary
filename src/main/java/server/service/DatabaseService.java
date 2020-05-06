@@ -81,6 +81,8 @@ public interface DatabaseService {
 
     Future<JsonObject> insertMovie(int id, String movieTitle, int year, String posterPath);
 
+    Future<JsonObject> updateMoviePoster(int id, String posterPath);
+
     Future<JsonObject> insertView(String user, String jsonParam);
 
     Future<JsonObject> getSettings(String username);
@@ -118,6 +120,8 @@ public interface DatabaseService {
     Future<JsonObject> getSeenEpisodes(String username, int seriesId);
 
     Future<JsonObject> insertSeries(int id, String seriesTitle, String posterPath);
+
+    Future<JsonObject> updateSeriesPoster(int id, String posterPath);
 
     Future<JsonObject> getWatchingSeries(String username);
 
