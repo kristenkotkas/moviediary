@@ -505,14 +505,11 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> getViewsMeta(String username, String jsonParam) {
         JsonObject json = new JsonObject(jsonParam);
-        System.out.println(json.encodePrettily());
         json.put("start", formToDBDate(json.getString("start"), false));
         json.put("end", formToDBDate(json.getString("end"), true));
         StringBuilder sb = new StringBuilder(SQL_QUERY_VIEWS_META);
         ifTrue(json.getBoolean("is-first"), () -> sb.append(" AND WasFirst"));
         ifTrue(json.getBoolean("is-cinema"), () -> sb.append(" AND WasCinema"));
-        System.out.println("QUERY");
-        System.out.println(sb.toString());
         return query(sb.toString(), new JsonArray()
                 .add(username)
                 .add(json.getString("start"))

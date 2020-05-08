@@ -13,6 +13,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.SplittableRandom;
 import java.util.stream.Collectors;
@@ -40,6 +43,8 @@ public class StringUtils {
             .put("November,", "11")
             .put("December,", "12").build();
 
+    private static ZoneId EUROPE_TALLINN = ZoneId.of("Europe/Tallinn");
+
     /**
      * Returns String representing given LocalDateTime.
      *
@@ -54,17 +59,22 @@ public class StringUtils {
                 " " + date.getYear();
     }
 
+    /**
+     * Returns String representing the time of given ZonedDateTime string in Europe/Tallinn zone
+     * 2017-02-21T12:46:11Z -> 15:46
+     * @param dateTime to format
+     * @return time as string
+     */
     public static String toNormalTime(String dateTime) {
-        //15:23 <- 2017-02-21T15:46:11Z
-        LocalDateTime time = LocalDateTime.parse(dateTime.substring(0, dateTime.length() - 1));
-        String hour = Integer.toString(time.getHour());
-        String min = Integer.toString(time.getMinute());
-        return (hour.length() == 1 ? "0" + hour : hour) + ":" +
-                (min.length() == 1 ? "0" + min : min);
+        return ZonedDateTime
+                .parse(dateTime)
+                .withZoneSameInstant(EUROPE_TALLINN)
+                .toLocalDateTime()
+                .format(DateTimeFormatter.ofPattern("k:m"));
     }
 
     public static String getNormalDTFromDB(String date, int type) {
-        return getNormalDate(LocalDateTime.parse(date.substring(0, date.length() - 1)), type);
+        return getNormalDate(ZonedDateTime.parse(date).withZoneSameInstant(EUROPE_TALLINN).toLocalDateTime(), type);
     }
 
     public static String getWeekdayFromDB(String date) {
