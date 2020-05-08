@@ -70,7 +70,7 @@ public class StringUtils {
                 .parse(dateTime)
                 .withZoneSameInstant(EUROPE_TALLINN)
                 .toLocalDateTime()
-                .format(DateTimeFormatter.ofPattern("k:m"));
+                .format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public static String getNormalDTFromDB(String date, int type) {
