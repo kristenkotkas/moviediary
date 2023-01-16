@@ -16,7 +16,7 @@
     "react-dom": "16.2.0",
     "react-draggable": "^3.0.4",
     "react-fontawesome": "^1.6.1",
-    "axios": "^0.16.2"
+    "axios": "^0.19.2"
   },
   "devDependencies": {
     "babel-core": "^6.18.2",
